@@ -1,2 +1,6 @@
-# ai-cbt-analyzer-production
-I want a cbt test based analysis quick and mistake pdf download format and bookmark wrong question on weak topic 
+# AI CBT Analyzer
+
+AI-powered CBT platform for educational test creation, examination,
+scoring, analytics, mistake analysis, and AI-assisted retesting.
+
+Project: ai-cbt-analyzer-production
