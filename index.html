@@ -4,32 +4,88 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AI CBT Analyzer</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f6fb;color:#172033}
-header{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;padding:22px 16px}
-header h1{margin:0;font-size:25px}
-header p{margin:6px 0 0;opacity:.9}
-main{max-width:1000px;margin:auto;padding:16px}
-.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:16px}
-.tabs button{border:0;padding:11px 14px;border-radius:10px;background:white;font-weight:bold;white-space:nowrap}
-.tabs button.active{background:#5b5bd6;color:white}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.card{background:white;border-radius:16px;padding:17px;margin-bottom:16px;box-shadow:0 5px 20px #0000000d}
-.stat b{display:block;font-size:28px;margin-top:7px}
-.muted{color:#667085;font-size:13px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.bar{height:10px;background:#e9ecf2;border-radius:20px;overflow:hidden;margin-top:8px}
-.fill{height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6)}
-.question{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin:10px 0}
-.bad{color:#b42318;background:#fff1f2}
-.good{color:#047857;background:#ecfdf5}
-.pill{display:inline-block;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:bold}
-button{cursor:pointer}
-.primary{background:#5b5bd6;color:white;border:0;border-radius:9px;padding:10px 14px;font-weight:bold}
-.secondary{background:#eef2ff;color:#4338ca;border:0;border-radius:9px;padding:10px 14px;font-weight:bold}
-textarea{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:10px;font-family:monospace}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:25px 16px;text-align:center}
+header h1{margin:0;font-size:28px}
+header p{margin:7px 0 0}
+.container{max-width:1000px;margin:auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 5px 20px #0001}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{text-align:center;background:#eef2ff;padding:16px;border-radius:12px}
+.stat b{display:block;font-size:28px;margin-top:5px}
+button{border:0;border-radius:9px;padding:11px 16px;margin:4px;font-weight:bold;cursor:pointer}
+.primary{background:#2563eb;color:#fff}
+.success{background:#16a34a;color:#fff}
+.warning{background:#f59e0b;color:#fff}
+.danger{background:#dc2626;color:#fff}
+.dark{background:#172033;color:#fff}
+input,textarea{width:100%;padding:11px;margin:6px 0;border:1px solid #ccd3df;border-radius:9px}
+.option{display:block;background:#f1f5f9;padding:13px;margin:8px 0;border-radius:9px}
+.option:hover{background:#e0e7ff}
+.question{border-left:5px solid #2563eb;padding:14px;margin:10px 0;background:#f8fafc;border-radius:8px}
+.wrong{border-left-color:#dc2626}
+.good{border-left-color:#16a34a}
+.topic{display:inline-block;background:#ede9fe;color:#6d28d9;padding:5px 9px;border-radius:20px;margin:3px}
 .hidden{display:none}
-.empty{text-align:center;color:#667085;padding:30px}
-@media(max-width:700px){.grid{grid-template-columns:
+.muted{color:#64748b;font-size:13px}
+@media(max-width:600px){header h1{font-size:23px}}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🧠 AI CBT Analyzer</h1>
+<p>CBT Test • Score • Mistakes • Bookmarks • Weak Topics</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>Start CBT Test</h2>
+<input id="student" placeholder="Student name">
+<input id="testName" value="CBT Practice Test">
+<button class="primary" onclick="startTest()">Start Test</button>
+<button class="dark" onclick="loadDemo()">Load Demo Test</button>
+</div>
+
+<div id="test" class="card hidden">
+<button class="warning" onclick="bookmark()">🔖 Bookmark</button>
+<h3 id="number"></h3>
+<h2 id="question"></h2>
+<div id="options"></div>
+
+<button class="dark" onclick="previous()">← Previous</button>
+<button class="primary" onclick="next()">Next →</button>
+<button class="success" onclick="submitTest()">Submit Test</button>
+</div>
+
+<div id="result" class="hidden">
+
+<div class="card">
+<h2>📊 Test Result</h2>
+<div class="grid">
+<div class="stat">Score<b id="score">0</b></div>
+<div class="stat">Correct<b id="correct">0</b></div>
+<div class="stat">Wrong<b id="wrong">0</b></div>
+<div class="stat">Accuracy<b id="accuracy">0%</b></div>
+<div class="stat">Attempted<b id="attempted">0</b></div>
+</div>
+</div>
+
+<div class="card">
+<h2>🎯 Weak Topics</h2>
+<div id="topics"></div>
+</div>
+
+<div class="card">
+<h2>❌ Mistake Analysis</h2>
+<div id="mistakes"></div>
+</div>
+
+<div class="card">
+<h2>🔖 Bookmarked Questions</h2>
+<div id="saved
