@@ -88,4 +88,249 @@ input,textarea{width:100%;padding:11px;margin:6px 0;border:1px solid #ccd3df;bor
 
 <div class="card">
 <h2>🔖 Bookmarked Questions</h2>
-<div id="saved
+<div id="saved"></div>
+</div>
+
+<div class="card">
+<h2>📥 Reports</h2>
+<button class="danger" onclick="window.print()">🖨 Print / Save PDF</button>
+<button class="primary" onclick="download()">⬇ Download JSON</button>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let questions=[];
+let current=0;
+let answers=[];
+let marks=[];
+
+const demo=[
+{
+q:"The SI unit of force is:",
+o:["Joule","Newton","Watt","Pascal"],
+a:1,
+t:"Physics - Units"
+},
+{
+q:"The powerhouse of the cell is:",
+o:["Nucleus","Ribosome","Mitochondria","Golgi body"],
+a:2,
+t:"Biology - Cell"
+},
+{
+q:"Oxidation state of oxygen in H₂O is:",
+o:["+2","-2","0","+1"],
+a:1,
+t:"Chemistry - Redox"
+},
+{
+q:"Boyle's law relates:",
+o:["Pressure and volume","Mass and energy","Current and voltage","Force and distance"],
+a:0,
+t:"Physics - Gas Laws"
+},
+{
+q:"DNA replication is:",
+o:["Conservative","Semi-conservative","Random","Dispersive only"],
+a:1,
+t:"Biology - Genetics"
+}
+];
+
+function startTest(){
+if(!questions.length)questions=demo;
+answers=new Array(questions.length).fill(null);
+marks=[];
+current=0;
+document.getElementById("test").classList.remove("hidden");
+document.getElementById("result").classList.add("hidden");
+show();
+}
+
+function show(){
+
+let q=questions[current];
+
+document.getElementById("number").innerText=
+"Question "+(current+1)+" of "+questions.length;
+
+document.getElementById("question").innerText=q.q;
+
+let box=document.getElementById("options");
+box.innerHTML="";
+
+q.o.forEach((x,i)=>{
+box.innerHTML+=`
+<label class="option">
+<input type="radio" name="answer" value="${i}"
+${answers[current]===i?"checked":""}>
+${String.fromCharCode(65+i)}. ${x}
+</label>`;
+});
+
+}
+
+function saveAnswer(){
+let x=document.querySelector('input[name="answer"]:checked');
+if(x)answers[current]=Number(x.value);
+}
+
+function next(){
+saveAnswer();
+if(current<questions.length-1){
+current++;
+show();
+}
+}
+
+function previous(){
+saveAnswer();
+if(current>0){
+current--;
+show();
+}
+}
+
+function bookmark(){
+if(marks.includes(current))
+marks=marks.filter(x=>x!==current);
+else marks.push(current);
+}
+
+function submitTest(){
+
+saveAnswer();
+
+if(!confirm("Submit test?"))return;
+
+let correct=0;
+let wrong=0;
+let attempted=0;
+let topic={};
+let mistakeHTML="";
+let savedHTML="";
+
+questions.forEach((q,i)=>{
+
+if(!topic[q.t])topic[q.t]={c:0,w:0};
+
+if(answers[i]!==null){
+attempted++;
+
+if(answers[i]===q.a){
+correct++;
+topic[q.t].c++;
+}else{
+wrong++;
+topic[q.t].w++;
+
+mistakeHTML+=`
+<div class="card question wrong">
+<h3>Question ${i+1}</h3>
+<p><b>${q.q}</b></p>
+<p>Your answer: <b>${q.o[answers[i]]}</b></p>
+<p>Correct answer: <b>${q.o[q.a]}</b></p>
+<span class="topic">${q.t}</span>
+<p><b>Mistake reason:</b> Incorrect answer. Review this concept and practise similar questions.</p>
+</div>`;
+}
+
+}else{
+wrong++;
+topic[q.t].w++;
+}
+
+});
+
+marks.forEach(i=>{
+let q=questions[i];
+savedHTML+=`
+<div class="card question">
+<h3>Question ${i+1}</h3>
+<p>${q.q}</p>
+<span class="topic">${q.t}</span>
+</div>`;
+});
+
+let accuracy=attempted?
+Math.round(correct/attempted*100):0;
+
+document.getElementById("score").innerText=correct*4-wrong;
+document.getElementById("correct").innerText=correct;
+document.getElementById("wrong").innerText=wrong;
+document.getElementById("accuracy").innerText=accuracy+"%";
+document.getElementById("attempted").innerText=attempted;
+
+let topicsHTML="";
+
+Object.keys(topic).forEach(t=>{
+let x=topic[t];
+let total=x.c+x.w;
+let acc=Math.round(x.c/total*100);
+
+if(x.w>0){
+topicsHTML+=`
+<div class="card">
+<h3>${t}</h3>
+<p>Correct: ${x.c} | Wrong: ${x.w}</p>
+<p>Accuracy: <b>${acc}%</b></p>
+<p>${acc<60?"🔴 High priority revision":
+acc<80?"🟠 Medium priority practice":
+"🟢 Maintain with revision"}</p>
+</div>`;
+}
+});
+
+document.getElementById("topics").innerHTML=
+topicsHTML||"<p>🎉 No weak topics detected.</p>";
+
+document.getElementById("mistakes").innerHTML=
+mistakeHTML||"<p>🎉 Excellent! No mistakes.</p>";
+
+document.getElementById("saved").innerHTML=
+savedHTML||"<p>No bookmarked questions.</p>";
+
+document.getElementById("test").classList.add("hidden");
+document.getElementById("result").classList.remove("hidden");
+
+localStorage.setItem("cbtResult",JSON.stringify({
+student:document.getElementById("student").value,
+test:document.getElementById("testName").value,
+questions,answers,marks
+}));
+
+}
+
+function loadDemo(){
+questions=demo;
+alert("Demo test loaded. Tap Start Test.");
+}
+
+function download(){
+
+let data=localStorage.getItem("cbtResult");
+
+if(!data){
+alert("Submit a test first.");
+return;
+}
+
+let blob=new Blob([data],{type:"application/json"});
+let url=URL.createObjectURL(blob);
+let a=document.createElement("a");
+
+a.href=url;
+a.download="CBT-Analysis.json";
+a.click();
+
+URL.revokeObjectURL(url);
+}
+
+</script>
+
+</body>
+</html>
