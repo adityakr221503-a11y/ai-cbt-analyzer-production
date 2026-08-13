@@ -51,3 +51,16 @@ export {
   getMistakesByStatus,
   getActiveMistakes,
 } from "./mistakes/mistakeBook.js";
+export {
+  getMistakeForPractice,
+  recordPractice,
+  getPracticeProgress,
+} from "./practice/practiceEngine.js";
+
+export {
+  getMistakeBook,
+  getMistake,
+  getMistakesByReason,
+  getMistakesByStatus,
+  getActiveMistakes,
+} from "./mistake/mistakeBook.js";
