@@ -220,6 +220,12 @@ ${testData}`;
       }
     }
   </script>
+<script type="module">
+  import * as CBTCore from "./src/core/index.js";
 
+  window.CBTCore = CBTCore;
+
+  console.log("CBT Production Core loaded:", CBTCore);
+</script>
 </body>
 </html>
