@@ -38,3 +38,16 @@ export {
   calculateMistakeAnalytics,
   calculateImprovement,
 } from "./analytics/analytics.js";
+export {
+  getMistakeForPractice,
+  recordPractice,
+  getPracticeProgress,
+} from "./practice/practiceEngine.js";
+
+export {
+  getMistakeBook,
+  getMistake,
+  getMistakesByReason,
+  getMistakesByStatus,
+  getActiveMistakes,
+} from "./mistakes/mistakeBook.js";
