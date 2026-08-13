@@ -14,7 +14,7 @@
     p { margin: 0; color: #64748b; font-size: 14px; }
     .card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; }
     label { display: block; font-weight: 600; margin: 12px 0 4px 0; font-size: 14px; }
-    input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; background: white; }
     button { width: 100%; margin-top: 12px; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; }
     .btn-secondary { background: #0284c7; }
     .btn-success { background: #10b981; }
@@ -29,7 +29,7 @@
     /* Clean PDF / Print Styles */
     @media print {
       body { background: white; color: black; padding: 0; }
-      .no-print, button, input, textarea, label[for="apiKey"], label[for="testData"] { display: none !important; }
+      .no-print, button, input, textarea, select, label[for="apiKey"], label[for="testData"], label[for="examPreset"] { display: none !important; }
       .card { box-shadow: none; border: none; padding: 0; margin-bottom: 16px; }
       #analysisOutput { background: #ffffff; border: 1px solid #cbd5e1; padding: 12px; }
       header p { display: none; }
@@ -49,8 +49,18 @@
     <label for="apiKey">Gemini API Key</label>
     <input type="password" id="apiKey" placeholder="Paste your API key here...">
 
+    <label for="examPreset">Target Exam Preset</label>
+    <select id="examPreset">
+      <option value="General CBT">General CBT Test</option>
+      <option value="JEE (Main & Advanced)">JEE (Main & Advanced)</option>
+      <option value="NEET UG">NEET UG</option>
+      <option value="UPSC Civil Services">UPSC / Civil Services</option>
+      <option value="SSC / Banking">SSC / Banking / Railways</option>
+      <option value="Custom Competitive Exam">Other Competitive Exam</option>
+    </select>
+
     <label for="testData">CBT Test Results / Log</label>
-    <textarea id="testData" rows="5" placeholder="Paste score summary or incorrect questions here..."></textarea>
+    <textarea id="testData" rows="5" placeholder="Paste score summary, topic scores, or incorrect questions..."></textarea>
 
     <button onclick="handleAnalyze()">Analyze Test</button>
   </div>
@@ -96,6 +106,7 @@
 
     async function handleAnalyze() {
       const apiKey = document.getElementById('apiKey').value.trim();
+      const examPreset = document.getElementById('examPreset').value;
       const testData = document.getElementById('testData').value.trim();
       const output = document.getElementById('analysisOutput');
 
@@ -105,15 +116,15 @@
       }
 
       localStorage.setItem('gemini_api_key', apiKey);
-      output.innerText = 'Analyzing with AI... Please wait.';
+      output.innerText = `Analyzing for ${examPreset}... Please wait.`;
       document.getElementById('actionButtons').style.display = 'none';
 
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        const prompt = `You are an expert CBT test analyzer. Analyze the following test log:
-1. Overall Performance Summary
-2. Key Weak Topics & Error Patterns
-3. 3-Step Actionable Revision Strategy
+        const prompt = `You are an expert test analyst specializing in ${examPreset}. Analyze the following test log:
+1. Overall Performance Summary (Tailored for ${examPreset} standards and marking dynamics)
+2. Key Weak Topics & High-Yield Mistake Patterns
+3. 3-Step Actionable Revision Strategy (Prioritizing high-weightage areas for ${examPreset})
 
 Test Log:
 ${testData}`;
@@ -126,7 +137,7 @@ ${testData}`;
 
         const data = await response.json();
         if (data.candidates && data.candidates[0].content.parts[0].text) {
-          currentAnalysisText = data.candidates[0].content.parts[0].text;
+          currentAnalysisText = `[Exam Target: ${examPreset}]\n\n` + data.candidates[0].content.parts[0].text;
           output.innerText = currentAnalysisText;
           document.getElementById('actionButtons').style.display = 'flex';
 
