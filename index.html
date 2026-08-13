@@ -1,343 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> <!-- Mobile & PWA Setup -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4f46e5">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3407/3407024.png">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI CBT Analyzer</title>
-
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
-header{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:25px 16px;text-align:center}
-header h1{margin:0;font-size:28px}
-header p{margin:7px 0 0}
-.container{max-width:1000px;margin:auto;padding:16px}
-.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 5px 20px #0001}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.stat{text-align:center;background:#eef2ff;padding:16px;border-radius:12px}
-.stat b{display:block;font-size:28px;margin-top:5px}
-button{border:0;border-radius:9px;padding:11px 16px;margin:4px;font-weight:bold;cursor:pointer}
-.primary{background:#2563eb;color:#fff}
-.success{background:#16a34a;color:#fff}
-.warning{background:#f59e0b;color:#fff}
-.danger{background:#dc2626;color:#fff}
-.dark{background:#172033;color:#fff}
-input,textarea{width:100%;padding:11px;margin:6px 0;border:1px solid #ccd3df;border-radius:9px}
-.option{display:block;background:#f1f5f9;padding:13px;margin:8px 0;border-radius:9px}
-.option:hover{background:#e0e7ff}
-.question{border-left:5px solid #2563eb;padding:14px;margin:10px 0;background:#f8fafc;border-radius:8px}
-.wrong{border-left-color:#dc2626}
-.good{border-left-color:#16a34a}
-.topic{display:inline-block;background:#ede9fe;color:#6d28d9;padding:5px 9px;border-radius:20px;margin:3px}
-.hidden{display:none}
-.muted{color:#64748b;font-size:13px}
-@media(max-width:600px){header h1{font-size:23px}}
-</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI CBT Analyzer</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4f46e5">
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { margin: 0; padding: 16px; background: #f8fafc; color: #1e293b; }
+    header { text-align: center; margin-bottom: 20px; }
+    h1 { color: #4f46e5; margin: 0 0 6px 0; font-size: 24px; }
+    p { margin: 0; color: #64748b; font-size: 14px; }
+    .card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; }
+    label { display: block; font-weight: 600; margin: 12px 0 4px 0; font-size: 14px; }
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+    button { width: 100%; margin-top: 16px; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+    #analysisOutput { margin-top: 12px; white-space: pre-wrap; background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.5; min-height: 80px; }
+  </style>
 </head>
-
 <body>
 
-<header>
-<h1>🧠 AI CBT Analyzer</h1>
-<p>CBT Test • Score • Mistakes • Bookmarks • Weak Topics</p>
-</header>
+  <header>
+    <h1>AI CBT Analyzer</h1>
+    <p>AI-powered platform for educational test analysis</p>
+  </header>
 
-<div class="container">
+  <div class="card">
+    <label for="apiKey">Gemini API Key</label>
+    <input type="password" id="apiKey" placeholder="Paste your API key here...">
 
-<div class="card">
-<h2>Start CBT Test</h2>
-<input id="student" placeholder="Student name">
-<input id="testName" value="CBT Practice Test">
-<button class="primary" onclick="startTest()">Start Test</button>
-<button class="dark" onclick="loadDemo()">Load Demo Test</button>
-</div>
+    <label for="testData">CBT Test Results / Log</label>
+    <textarea id="testData" rows="6" placeholder="Paste score summary or incorrect questions here..."></textarea>
 
-<div id="test" class="card hidden">
-<button class="warning" onclick="bookmark()">🔖 Bookmark</button>
-<h3 id="number"></h3>
-<h2 id="question"></h2>
-<div id="options"></div>
+    <button onclick="handleAnalyze()">Analyze Test</button>
 
-<button class="dark" onclick="previous()">← Previous</button>
-<button class="primary" onclick="next()">Next →</button>
-<button class="success" onclick="submitTest()">Submit Test</button>
-</div>
+    <label>AI Performance Analysis</label>
+    <div id="analysisOutput">Report will appear here...</div>
+  </div>
 
-<div id="result" class="hidden">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
+    }
 
-<div class="card">
-<h2>📊 Test Result</h2>
-<div class="grid">
-<div class="stat">Score<b id="score">0</b></div>
-<div class="stat">Correct<b id="correct">0</b></div>
-<div class="stat">Wrong<b id="wrong">0</b></div>
-<div class="stat">Accuracy<b id="accuracy">0%</b></div>
-<div class="stat">Attempted<b id="attempted">0</b></div>
-</div>
-</div>
+    // Auto-load saved API Key from storage
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedKey = localStorage.getItem('gemini_api_key');
+      if (savedKey) document.getElementById('apiKey').value = savedKey;
+    });
 
-<div class="card">
-<h2>🎯 Weak Topics</h2>
-<div id="topics"></div>
-</div>
+    async function handleAnalyze() {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const testData = document.getElementById('testData').value.trim();
+      const output = document.getElementById('analysisOutput');
 
-<div class="card">
-<h2>❌ Mistake Analysis</h2>
-<div id="mistakes"></div>
-</div>
+      if (!apiKey || !testData) {
+        alert('Please enter both your API key and test results.');
+        return;
+      }
 
-<div class="card">
-<h2>🔖 Bookmarked Questions</h2>
-<div id="saved"></div>
-</div>
+      localStorage.setItem('gemini_api_key', apiKey);
+      output.innerText = 'Analyzing with AI... Please wait.';
 
-<div class="card">
-<h2>📥 Reports</h2>
-<button class="danger" onclick="window.print()">🖨 Print / Save PDF</button>
-<button class="primary" onclick="download()">⬇ Download JSON</button>
-</div>
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const prompt = `You are an expert CBT test analyzer. Analyze the following test log:
+1. Overall Performance Summary
+2. Key Weak Topics & Error Patterns
+3. 3-Step Actionable Revision Strategy
 
-</div>
+Test Log:
+${testData}`;
 
-</div>
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
 
-<script>
-
-let questions=[];
-let current=0;
-let answers=[];
-let marks=[];
-
-const demo=[
-{
-q:"The SI unit of force is:",
-o:["Joule","Newton","Watt","Pascal"],
-a:1,
-t:"Physics - Units"
-},
-{
-q:"The powerhouse of the cell is:",
-o:["Nucleus","Ribosome","Mitochondria","Golgi body"],
-a:2,
-t:"Biology - Cell"
-},
-{
-q:"Oxidation state of oxygen in H₂O is:",
-o:["+2","-2","0","+1"],
-a:1,
-t:"Chemistry - Redox"
-},
-{
-q:"Boyle's law relates:",
-o:["Pressure and volume","Mass and energy","Current and voltage","Force and distance"],
-a:0,
-t:"Physics - Gas Laws"
-},
-{
-q:"DNA replication is:",
-o:["Conservative","Semi-conservative","Random","Dispersive only"],
-a:1,
-t:"Biology - Genetics"
-}
-];
-
-function startTest(){
-if(!questions.length)questions=demo;
-answers=new Array(questions.length).fill(null);
-marks=[];
-current=0;
-document.getElementById("test").classList.remove("hidden");
-document.getElementById("result").classList.add("hidden");
-show();
-}
-
-function show(){
-
-let q=questions[current];
-
-document.getElementById("number").innerText=
-"Question "+(current+1)+" of "+questions.length;
-
-document.getElementById("question").innerText=q.q;
-
-let box=document.getElementById("options");
-box.innerHTML="";
-
-q.o.forEach((x,i)=>{
-box.innerHTML+=`
-<label class="option">
-<input type="radio" name="answer" value="${i}"
-${answers[current]===i?"checked":""}>
-${String.fromCharCode(65+i)}. ${x}
-</label>`;
-});
-
-}
-
-function saveAnswer(){
-let x=document.querySelector('input[name="answer"]:checked');
-if(x)answers[current]=Number(x.value);
-}
-
-function next(){
-saveAnswer();
-if(current<questions.length-1){
-current++;
-show();
-}
-}
-
-function previous(){
-saveAnswer();
-if(current>0){
-current--;
-show();
-}
-}
-
-function bookmark(){
-if(marks.includes(current))
-marks=marks.filter(x=>x!==current);
-else marks.push(current);
-}
-
-function submitTest(){
-
-saveAnswer();
-
-if(!confirm("Submit test?"))return;
-
-let correct=0;
-let wrong=0;
-let attempted=0;
-let topic={};
-let mistakeHTML="";
-let savedHTML="";
-
-questions.forEach((q,i)=>{
-
-if(!topic[q.t])topic[q.t]={c:0,w:0};
-
-if(answers[i]!==null){
-attempted++;
-
-if(answers[i]===q.a){
-correct++;
-topic[q.t].c++;
-}else{
-wrong++;
-topic[q.t].w++;
-
-mistakeHTML+=`
-<div class="card question wrong">
-<h3>Question ${i+1}</h3>
-<p><b>${q.q}</b></p>
-<p>Your answer: <b>${q.o[answers[i]]}</b></p>
-<p>Correct answer: <b>${q.o[q.a]}</b></p>
-<span class="topic">${q.t}</span>
-<p><b>Mistake reason:</b> Incorrect answer. Review this concept and practise similar questions.</p>
-</div>`;
-}
-
-}else{
-wrong++;
-topic[q.t].w++;
-}
-
-});
-
-marks.forEach(i=>{
-let q=questions[i];
-savedHTML+=`
-<div class="card question">
-<h3>Question ${i+1}</h3>
-<p>${q.q}</p>
-<span class="topic">${q.t}</span>
-</div>`;
-});
-
-let accuracy=attempted?
-Math.round(correct/attempted*100):0;
-
-document.getElementById("score").innerText=correct*4-wrong;
-document.getElementById("correct").innerText=correct;
-document.getElementById("wrong").innerText=wrong;
-document.getElementById("accuracy").innerText=accuracy+"%";
-document.getElementById("attempted").innerText=attempted;
-
-let topicsHTML="";
-
-Object.keys(topic).forEach(t=>{
-let x=topic[t];
-let total=x.c+x.w;
-let acc=Math.round(x.c/total*100);
-
-if(x.w>0){
-topicsHTML+=`
-<div class="card">
-<h3>${t}</h3>
-<p>Correct: ${x.c} | Wrong: ${x.w}</p>
-<p>Accuracy: <b>${acc}%</b></p>
-<p>${acc<60?"🔴 High priority revision":
-acc<80?"🟠 Medium priority practice":
-"🟢 Maintain with revision"}</p>
-</div>`;
-}
-});
-
-document.getElementById("topics").innerHTML=
-topicsHTML||"<p>🎉 No weak topics detected.</p>";
-
-document.getElementById("mistakes").innerHTML=
-mistakeHTML||"<p>🎉 Excellent! No mistakes.</p>";
-
-document.getElementById("saved").innerHTML=
-savedHTML||"<p>No bookmarked questions.</p>";
-
-document.getElementById("test").classList.add("hidden");
-document.getElementById("result").classList.remove("hidden");
-
-localStorage.setItem("cbtResult",JSON.stringify({
-student:document.getElementById("student").value,
-test:document.getElementById("testName").value,
-questions,answers,marks
-}));
-
-}
-
-function loadDemo(){
-questions=demo;
-alert("Demo test loaded. Tap Start Test.");
-}
-
-function download(){
-
-let data=localStorage.getItem("cbtResult");
-
-if(!data){
-alert("Submit a test first.");
-return;
-}
-
-let blob=new Blob([data],{type:"application/json"});
-let url=URL.createObjectURL(blob);
-let a=document.createElement("a");
-
-a.href=url;
-a.download="CBT-Analysis.json";
-a.click();
-
-URL.revokeObjectURL(url);
-}
-
-</script>
+        const data = await response.json();
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+          output.innerText = data.candidates[0].content.parts[0].text;
+        } else {
+          output.innerText = 'Analysis failed. Check your API key or input format.';
+        }
+      } catch (err) {
+        output.innerText = 'Error connecting to AI service. Ensure you are online and using a valid key.';
+      }
+    }
+  </script>
 
 </body>
 </html>
