@@ -64,3 +64,8 @@ export {
   getMistakesByStatus,
   getActiveMistakes,
 } from "./mistake/mistakeBook.js";
+export {
+  startAttempt,
+  saveAnswer,
+  submitAttempt,
+} from "./cbt/engine.js";
