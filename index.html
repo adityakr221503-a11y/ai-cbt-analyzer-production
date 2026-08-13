@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+       <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -15,8 +15,13 @@
     .card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; }
     label { display: block; font-weight: 600; margin: 12px 0 4px 0; font-size: 14px; }
     input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
-    button { width: 100%; margin-top: 16px; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+    button { width: 100%; margin-top: 12px; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; }
+    .btn-secondary { background: #0284c7; }
+    .btn-danger { background: #ef4444; }
     #analysisOutput { margin-top: 12px; white-space: pre-wrap; background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.5; min-height: 80px; }
+    .history-item { border-bottom: 1px solid #e2e8f0; padding: 10px 0; }
+    .history-item:last-child { border-bottom: none; }
+    .history-date { font-size: 12px; color: #64748b; margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -26,17 +31,36 @@
     <p>AI-powered platform for educational test analysis</p>
   </header>
 
+  <!-- Input Form Card -->
   <div class="card">
     <label for="apiKey">Gemini API Key</label>
     <input type="password" id="apiKey" placeholder="Paste your API key here...">
 
     <label for="testData">CBT Test Results / Log</label>
-    <textarea id="testData" rows="6" placeholder="Paste score summary or incorrect questions here..."></textarea>
+    <textarea id="testData" rows="5" placeholder="Paste score summary or incorrect questions here..."></textarea>
 
     <button onclick="handleAnalyze()">Analyze Test</button>
+  </div>
 
+  <!-- Output Card -->
+  <div class="card">
     <label>AI Performance Analysis</label>
     <div id="analysisOutput">Report will appear here...</div>
+    <button id="bookmarkBtn" class="btn-secondary" style="display:none;" onclick="bookmarkCurrentReport()">⭐ Bookmark Weak Topics</button>
+  </div>
+
+  <!-- Bookmarks & History Card -->
+  <div class="card">
+    <label>📌 Bookmarked Weak Topics</label>
+    <div id="bookmarksList" style="font-size: 14px; color: #475569; margin-top: 8px;">No bookmarks saved yet.</div>
+  </div>
+
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <label style="margin:0;">📜 Saved Test History</label>
+      <button class="btn-danger" style="width: auto; padding: 6px 12px; font-size: 12px; margin:0;" onclick="clearHistory()">Clear All</button>
+    </div>
+    <div id="historyList" style="margin-top: 10px;">No previous history.</div>
   </div>
 
   <script>
@@ -44,10 +68,13 @@
       navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
     }
 
-    // Auto-load saved API Key from storage
+    let currentAnalysisText = '';
+
     document.addEventListener('DOMContentLoaded', () => {
       const savedKey = localStorage.getItem('gemini_api_key');
       if (savedKey) document.getElementById('apiKey').value = savedKey;
+      renderHistory();
+      renderBookmarks();
     });
 
     async function handleAnalyze() {
@@ -62,6 +89,7 @@
 
       localStorage.setItem('gemini_api_key', apiKey);
       output.innerText = 'Analyzing with AI... Please wait.';
+      document.getElementById('bookmarkBtn').style.display = 'none';
 
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -81,12 +109,77 @@ ${testData}`;
 
         const data = await response.json();
         if (data.candidates && data.candidates[0].content.parts[0].text) {
-          output.innerText = data.candidates[0].content.parts[0].text;
+          currentAnalysisText = data.candidates[0].content.parts[0].text;
+          output.innerText = currentAnalysisText;
+          document.getElementById('bookmarkBtn').style.display = 'block';
+
+          saveToHistory(currentAnalysisText);
         } else {
           output.innerText = 'Analysis failed. Check your API key or input format.';
         }
       } catch (err) {
         output.innerText = 'Error connecting to AI service. Ensure you are online and using a valid key.';
+      }
+    }
+
+    function saveToHistory(reportText) {
+      const history = JSON.parse(localStorage.getItem('cbt_history') || '[]');
+      history.unshift({
+        date: new Date().toLocaleString(),
+        report: reportText
+      });
+      localStorage.setItem('cbt_history', JSON.stringify(history.slice(0, 10))); // keep last 10
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem('cbt_history') || '[]');
+      const container = document.getElementById('historyList');
+      if (history.length === 0) {
+        container.innerHTML = '<div style="font-size:13px; color:#94a3b8;">No previous history.</div>';
+        return;
+      }
+      container.innerHTML = history.map((item, index) => `
+        <div class="history-item">
+          <div class="history-date">📅 ${item.date}</div>
+          <div style="font-size: 13px; color: #334155; white-space: pre-wrap; max-height: 80px; overflow: hidden;">${item.report.substring(0, 150)}...</div>
+        </div>
+      `).join('');
+    }
+
+    function bookmarkCurrentReport() {
+      if (!currentAnalysisText) return;
+      const bookmarks = JSON.parse(localStorage.getItem('cbt_bookmarks') || '[]');
+      bookmarks.unshift({
+        date: new Date().toLocaleDateString(),
+        snippet: currentAnalysisText
+      });
+      localStorage.setItem('cbt_bookmarks', JSON.stringify(bookmarks));
+      renderBookmarks();
+      alert('Topics bookmarked successfully!');
+    }
+
+    function renderBookmarks() {
+      const bookmarks = JSON.parse(localStorage.getItem('cbt_bookmarks') || '[]');
+      const container = document.getElementById('bookmarksList');
+      if (bookmarks.length === 0) {
+        container.innerText = 'No bookmarks saved yet.';
+        return;
+      }
+      container.innerHTML = bookmarks.map(b => `
+        <div style="background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:6px; border: 1px solid #e2e8f0;">
+          <div style="font-size:11px; color:#64748b;">${b.date}</div>
+          <div style="white-space:pre-wrap;">${b.snippet.substring(0, 120)}...</div>
+        </div>
+      `).join('');
+    }
+
+    function clearHistory() {
+      if (confirm('Clear all history and bookmarks?')) {
+        localStorage.removeItem('cbt_history');
+        localStorage.removeItem('cbt_bookmarks');
+        renderHistory();
+        renderBookmarks();
       }
     }
   </script>
