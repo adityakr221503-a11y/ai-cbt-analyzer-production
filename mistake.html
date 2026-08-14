@@ -274,7 +274,9 @@ CBT Analyzer <span>Pro</span>
 class="dashboard"
 id="dashboardBtn"
 type="button">
+
 Dashboard
+
 </button>
 
 </div>
@@ -307,7 +309,8 @@ and review everything you have already mastered.
 <button
 type="button"
 class="stat"
-id="activeBtn">
+id="activeBtn"
+onclick="showActive()">
 
 <div class="icon">❌</div>
 
@@ -328,10 +331,13 @@ Tap to View →
 </button>
 
 
+<!-- FIXED MASTERED BUTTON -->
+
 <button
 type="button"
 class="stat"
-id="masteredBtn">
+id="masteredBtn"
+onclick="showMastered()">
 
 <div class="icon">🏆</div>
 
@@ -363,7 +369,8 @@ View Mastered →
 <button
 class="action primary"
 id="retryBtn"
-type="button">
+type="button"
+onclick="openRetry()">
 
 🔄 Retry Active Mistakes
 
@@ -372,7 +379,8 @@ type="button">
 <button
 class="action secondary"
 id="cbtBtn"
-type="button">
+type="button"
+onclick="location.href='cbt.html'">
 
 📝 Start CBT
 
@@ -401,10 +409,11 @@ type="button">
 <script>
 
 /* =====================================================
-EXACT STORAGE USED BY retry.html
+STORAGE
 ===================================================== */
 
 const HISTORY_KEY = "cbtHistory";
+
 const MASTERY_KEY = "cbtMasteryV2";
 
 const RETRY_QUEUE_KEY =
@@ -416,7 +425,6 @@ const RETRY_QUESTION_KEY =
 
 /* =====================================================
 NORMALIZE
-EXACT SAME AS retry.html
 ===================================================== */
 
 function normalize(value){
@@ -431,7 +439,6 @@ return String(value || "")
 
 /* =====================================================
 READ HISTORY
-EXACT SAME AS retry.html
 ===================================================== */
 
 function getHistory(){
@@ -461,28 +468,43 @@ return [];
 
 
 /* =====================================================
-READ MASTERY
-EXACT SAME AS retry.html
+READ EXACT MASTERY STORAGE
 ===================================================== */
 
 function getMasteryData(){
 
 try{
 
-const data =
-JSON.parse(
+const raw =
 localStorage.getItem(
 MASTERY_KEY
-) || "[]"
 );
 
-return Array.isArray(data)
-? data
-: [];
+if(!raw){
+
+return [];
+
+}
+
+const data =
+JSON.parse(raw);
+
+if(
+Array.isArray(data)
+){
+
+return data;
+
+}
+
+return [];
 
 }catch(error){
 
-console.error(error);
+console.error(
+"Mastery read error:",
+error
+);
 
 return [];
 
@@ -492,8 +514,7 @@ return [];
 
 
 /* =====================================================
-GET MASTERED SET
-EXACT SAME LOGIC AS retry.html
+MASTERED SET
 ===================================================== */
 
 function getMastered(){
@@ -527,8 +548,7 @@ return mastered;
 
 
 /* =====================================================
-GET ACTIVE MISTAKES
-EXACT SAME LOGIC AS retry.html
+ACTIVE MISTAKES
 ===================================================== */
 
 function getActiveMistakes(){
@@ -607,7 +627,7 @@ map.values()
 
 
 /* =====================================================
-ESCAPE
+ESCAPE HTML
 ===================================================== */
 
 function escapeHTML(value){
@@ -636,7 +656,7 @@ function updateCounts(){
 const active =
 getActiveMistakes();
 
-const mastery =
+const mastered =
 getMasteryData();
 
 
@@ -649,7 +669,7 @@ active.length;
 document.getElementById(
 "masteredCount"
 ).textContent =
-mastery.length;
+mastered.length;
 
 }
 
@@ -679,17 +699,21 @@ return;
 
 localStorage.setItem(
 RETRY_QUEUE_KEY,
-JSON.stringify(mistakes)
+JSON.stringify(
+mistakes
+)
 );
 
 
 localStorage.setItem(
 RETRY_QUESTION_KEY,
-JSON.stringify(mistakes[0])
+JSON.stringify(
+mistakes[0]
+)
 );
 
 
-window.location.href =
+location.href =
 "retry.html";
 
 }
@@ -716,7 +740,9 @@ return;
 
 localStorage.setItem(
 RETRY_QUEUE_KEY,
-JSON.stringify(mistakes)
+JSON.stringify(
+mistakes
+)
 );
 
 
@@ -728,7 +754,7 @@ mistakes[index]
 );
 
 
-window.location.href =
+location.href =
 "retry.html";
 
 }
@@ -748,7 +774,8 @@ document.getElementById(
 
 document.getElementById(
 "controls"
-).innerHTML = "";
+).innerHTML =
+"";
 
 
 const list =
@@ -756,7 +783,8 @@ document.getElementById(
 "list"
 );
 
-list.innerHTML = "";
+list.innerHTML =
+"";
 
 
 const mistakes =
@@ -796,7 +824,9 @@ mistakes.forEach(
 function(q,index){
 
 const div =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 div.className =
 "item";
@@ -837,7 +867,6 @@ q.topic || "Unknown"
 
 </div>
 
-
 <div class="question">
 
 ${escapeHTML(
@@ -845,7 +874,6 @@ q.question
 )}
 
 </div>
-
 
 <div class="info">
 
@@ -878,10 +906,10 @@ answer
 
 </div>
 
-
 <button
 class="retry"
-type="button">
+type="button"
+onclick="retryOne(${index})">
 
 🔄 Retry This Question
 
@@ -890,19 +918,9 @@ type="button">
 `;
 
 
-div.querySelector(
-".retry"
-).addEventListener(
-"click",
-function(){
-
-retryOne(index);
-
-}
+list.appendChild(
+div
 );
-
-
-list.appendChild(div);
 
 });
 
@@ -911,7 +929,6 @@ list.appendChild(div);
 
 /* =====================================================
 SHOW MASTERED
-DIRECTLY FROM cbtMasteryV2
 ===================================================== */
 
 function showMastered(){
@@ -928,8 +945,8 @@ document.getElementById(
 
 <button
 class="back"
-id="backActive"
-type="button">
+type="button"
+onclick="showActive()">
 
 ← Active Mistakes
 
@@ -938,32 +955,23 @@ type="button">
 `;
 
 
-document.getElementById(
-"backActive"
-).onclick =
-showActive;
-
-
 const list =
 document.getElementById(
 "list"
 );
 
-list.innerHTML = "";
+list.innerHTML =
+"";
 
 
 /*
-READ AGAIN FROM THE EXACT
-SAME KEY USED BY retry.html
+READ DIRECTLY FROM:
+cbtMasteryV2
 */
 
 const mastered =
 getMasteryData();
 
-
-/*
-UPDATE COUNT
-*/
 
 document.getElementById(
 "masteredCount"
@@ -1002,14 +1010,16 @@ return;
 
 
 /*
-DISPLAY ALL MASTERED QUESTIONS
+DISPLAY MASTERED QUESTIONS
 */
 
 mastered.forEach(
 function(q,index){
 
 const div =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 div.className =
 "item mastered-item";
@@ -1024,6 +1034,7 @@ q.options[
 Number(q.correctIndex)
 ]
 :
+q.selectedAnswer ||
 ""
 );
 
@@ -1050,7 +1061,6 @@ q.topic || "Unknown"
 
 </div>
 
-
 <div class="question">
 
 ${escapeHTML(
@@ -1059,13 +1069,14 @@ q.question
 
 </div>
 
-
 <div class="info">
 
 <strong>
+
 <span class="correct">
 ✅ Correct Answer
 </span>
+
 </strong>
 
 <br><br>
@@ -1073,7 +1084,6 @@ q.question
 ${escapeHTML(
 answer
 )}
-
 
 ${
 q.solution
@@ -1101,8 +1111,9 @@ q.solution
 
 `;
 
-
-list.appendChild(div);
+list.appendChild(
+div
+);
 
 });
 
@@ -1110,57 +1121,18 @@ list.appendChild(div);
 
 
 /* =====================================================
-BUTTONS
+DASHBOARD
 ===================================================== */
 
 document.getElementById(
-"activeBtn"
-).addEventListener(
-"click",
-showActive
-);
-
-
-document.getElementById(
-"masteredBtn"
-).addEventListener(
-"click",
-showMastered
-);
-
-
-document.getElementById(
-"retryBtn"
-).addEventListener(
-"click",
-openRetry
-);
-
-
-document.getElementById(
 "dashboardBtn"
-).addEventListener(
-"click",
+).onclick =
 function(){
 
-window.location.href =
+location.href =
 "index.html";
 
-}
-);
-
-
-document.getElementById(
-"cbtBtn"
-).addEventListener(
-"click",
-function(){
-
-window.location.href =
-"cbt.html";
-
-}
-);
+};
 
 
 /* =====================================================
@@ -1173,7 +1145,7 @@ showActive();
 
 
 /* =====================================================
-REFRESH WHEN RETURNING TO PAGE
+REFRESH COUNTS WHEN PAGE RETURNS
 ===================================================== */
 
 document.addEventListener(
