@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CBT Analyzer Pro - Mistake Bank</title>
+<title>CBT Analyzer Pro — Mistake Bank</title>
 
 <style>
 *{box-sizing:border-box}
@@ -16,17 +16,17 @@ color:#0f172a;
 }
 
 header{
-background:white;
-padding:16px;
+background:#fff;
 border-bottom:1px solid #e2e8f0;
+padding:16px 20px;
 }
 
 .header{
 max-width:1000px;
 margin:auto;
 display:flex;
-justify-content:space-between;
 align-items:center;
+justify-content:space-between;
 }
 
 .logo{
@@ -39,43 +39,50 @@ color:#4f46e5;
 }
 
 button{
-border:0;
+font-family:Arial,sans-serif;
 cursor:pointer;
-font-family:inherit;
+touch-action:manipulation;
 }
 
 .dashboard{
+border:0;
 background:#4f46e5;
-color:white;
-padding:12px 17px;
+color:#fff;
+padding:12px 18px;
 border-radius:10px;
 font-weight:800;
 }
 
 .container{
 max-width:1000px;
-margin:20px auto;
+margin:25px auto;
 padding:0 15px;
 }
 
 .hero{
 background:#4f46e5;
-color:white;
-padding:25px;
-border-radius:18px;
-margin-bottom:18px;
+color:#fff;
+padding:27px;
+border-radius:20px;
+margin-bottom:20px;
 }
 
 .hero h1{
 margin:0 0 8px;
+font-size:30px;
+}
+
+.hero p{
+margin:0;
+line-height:1.5;
 }
 
 .card{
-background:white;
+background:#fff;
+border-radius:17px;
 padding:20px;
-border-radius:16px;
-margin-bottom:18px;
-box-shadow:0 3px 12px rgba(0,0,0,.07);
+margin-bottom:20px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .stats{
@@ -85,28 +92,32 @@ gap:12px;
 }
 
 .stat{
+border:0;
 background:#f8fafc;
+border-radius:15px;
 padding:20px;
-border-radius:14px;
 text-align:left;
+color:#0f172a;
+width:100%;
 }
 
 .number{
-font-size:35px;
+font-size:36px;
 font-weight:800;
 margin:5px 0;
 }
 
 .label{
+font-size:16px;
 color:#64748b;
 font-weight:700;
 }
 
 .hint{
-color:#4f46e5;
 font-size:13px;
 font-weight:800;
-margin-top:8px;
+color:#4f46e5;
+margin-top:7px;
 }
 
 .actions{
@@ -116,6 +127,7 @@ gap:10px;
 }
 
 .action{
+border:0;
 padding:14px;
 border-radius:10px;
 font-size:15px;
@@ -124,14 +136,16 @@ font-weight:800;
 
 .primary{
 background:#4f46e5;
-color:white;
+color:#fff;
 }
 
 .secondary{
 background:#e2e8f0;
+color:#0f172a;
 }
 
 .back{
+border:0;
 background:#e2e8f0;
 padding:11px 15px;
 border-radius:10px;
@@ -140,25 +154,25 @@ font-weight:800;
 
 .item{
 border:1px solid #e2e8f0;
-padding:16px;
-border-radius:13px;
-margin-top:12px;
+border-radius:14px;
+padding:17px;
+margin-top:13px;
 }
 
-.mastered{
+.mastered-item{
 background:#f0fdf4;
 border-color:#bbf7d0;
 }
 
 .badge{
 display:inline-block;
-padding:6px 8px;
 background:#eef2ff;
 color:#3730a3;
-border-radius:7px;
+padding:6px 9px;
+border-radius:8px;
 font-size:12px;
 font-weight:800;
-margin:2px;
+margin:2px 4px 2px 0;
 }
 
 .question{
@@ -170,7 +184,7 @@ margin-top:12px;
 
 .info{
 background:#f8fafc;
-padding:13px;
+padding:14px;
 border-radius:10px;
 margin-top:12px;
 line-height:1.6;
@@ -183,18 +197,19 @@ font-weight:800;
 
 .retry{
 width:100%;
+border:0;
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:13px;
 border-radius:10px;
-font-weight:800;
 font-size:15px;
-margin-top:12px;
+font-weight:800;
+margin-top:13px;
 }
 
 .empty{
 text-align:center;
-padding:35px 10px;
+padding:35px 15px;
 color:#64748b;
 }
 
@@ -204,7 +219,11 @@ grid-template-columns:1fr;
 }
 
 .card{
-padding:16px;
+padding:17px;
+}
+
+.number{
+font-size:31px;
 }
 }
 </style>
@@ -221,6 +240,7 @@ CBT Analyzer <span>Pro</span>
 
 <button
 class="dashboard"
+type="button"
 onclick="goDashboard()">
 Dashboard
 </button>
@@ -234,7 +254,7 @@ Dashboard
 <h1>🧠 Mistake Bank</h1>
 <p>
 Turn mistakes into mastery. Retry difficult questions
-and review mastered questions.
+and review everything you have already mastered.
 </p>
 </div>
 
@@ -246,6 +266,7 @@ and review mastered questions.
 
 <button
 class="stat"
+type="button"
 onclick="showActive()">
 
 <div>❌</div>
@@ -266,8 +287,10 @@ Tap to View →
 
 </button>
 
+
 <button
 class="stat"
+type="button"
 onclick="showMastered()">
 
 <div>🏆</div>
@@ -291,13 +314,15 @@ Tap to View →
 </div>
 </div>
 
+
 <div class="card">
 
 <div class="actions">
 
 <button
 class="action primary"
-onclick="retryAll()">
+type="button"
+onclick="openRetry()">
 
 🔄 Retry Active Mistakes
 
@@ -305,6 +330,7 @@ onclick="retryAll()">
 
 <button
 class="action secondary"
+type="button"
 onclick="goCBT()">
 
 📝 Start CBT
@@ -315,11 +341,12 @@ onclick="goCBT()">
 
 </div>
 
+
 <div class="card">
 
 <div id="controls"></div>
 
-<h2 id="title">
+<h2 id="sectionTitle">
 ❌ Active Mistakes
 </h2>
 
@@ -329,30 +356,43 @@ onclick="goCBT()">
 
 </div>
 
+
 <script>
 
 var HISTORY_KEY="cbtHistory";
 var MASTERY_KEY="cbtMasteryV2";
-var RETRY_QUEUE="cbtAnalyzer.retryQueue";
-var RETRY_QUESTION="cbtRetryQuestion";
+var RETRY_QUEUE_KEY="cbtAnalyzer.retryQueue";
+var RETRY_QUESTION_KEY="cbtRetryQuestion";
 
 
-function read(key){
+function readJSON(key){
 
 try{
-return JSON.parse(
-localStorage.getItem(key)||"[]"
-);
-}catch(e){
+
+var value=
+localStorage.getItem(key);
+
+if(!value){
 return [];
 }
 
+var data=
+JSON.parse(value);
+
+return data;
+
+}catch(e){
+
+return [];
+
+}
+
 }
 
 
-function norm(x){
+function normalize(value){
 
-return String(x||"")
+return String(value||"")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -360,9 +400,16 @@ return String(x||"")
 }
 
 
-function esc(x){
+function escapeHTML(value){
 
-return String(x==null?"":x)
+return String(
+value===undefined ||
+value===null
+?
+""
+:
+value
+)
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -372,70 +419,90 @@ return String(x==null?"":x)
 }
 
 
-/* MASTERED */
+/* =========================
+MASTERED
+========================= */
 
-function mastered(){
+function getMastered(){
 
-var data=read(MASTERY_KEY);
+var data=
+readJSON(MASTERY_KEY);
 
-if(!Array.isArray(data))
+if(!Array.isArray(data)){
 return [];
+}
 
 var map={};
 
 data.forEach(function(q){
 
-if(q && q.question){
+if(!q || !q.question){
+return;
+}
 
-map[norm(q.question)]=q;
+var key=
+normalize(q.question);
 
+if(key){
+map[key]=q;
 }
 
 });
 
-return Object.keys(map).map(function(k){
-return map[k];
+return Object.keys(map).map(function(key){
+return map[key];
 });
 
 }
 
 
-/* ACTIVE */
+/* =========================
+ACTIVE
+========================= */
 
-function active(){
+function getActive(){
 
-var history=read(HISTORY_KEY);
+var history=
+readJSON(HISTORY_KEY);
 
-if(!Array.isArray(history))
+if(!Array.isArray(history)){
 return [];
+}
 
-var masteredMap={};
-
-mastered().forEach(function(q){
-
-masteredMap[norm(q.question)]=true;
-
-});
+var masteredSet=
+new Set(
+getMastered().map(function(q){
+return normalize(q.question);
+})
+);
 
 var map={};
 
 history.forEach(function(test){
 
-if(!test ||
-!Array.isArray(test.questions))
+if(
+!test ||
+!Array.isArray(test.questions)
+){
 return;
+}
 
 test.questions.forEach(function(q){
 
-if(!q ||
+if(
+!q ||
 !q.question ||
-q.status!=="wrong")
+q.status!=="wrong"
+){
 return;
+}
 
-var key=norm(q.question);
+var key=
+normalize(q.question);
 
-if(masteredMap[key])
+if(masteredSet.has(key)){
 return;
+}
 
 map[key]=q;
 
@@ -443,93 +510,154 @@ map[key]=q;
 
 });
 
-return Object.keys(map).map(function(k){
-return map[k];
+return Object.keys(map).map(function(key){
+return map[key];
 });
 
 }
 
 
-/* COUNTS */
+/* =========================
+COUNTS
+========================= */
 
-function counts(){
+function updateCounts(){
 
 document.getElementById("activeCount")
-.textContent=active().length;
+.textContent=
+getActive().length;
 
 document.getElementById("masteredCount")
-.textContent=mastered().length;
+.textContent=
+getMastered().length;
 
 }
 
 
-/* ACTIVE VIEW */
+/* =========================
+ACTIVE VIEW
+========================= */
 
 function showActive(){
 
-document.getElementById("title")
-.textContent="❌ Active Mistakes";
+document.getElementById("sectionTitle")
+.textContent=
+"❌ Active Mistakes";
 
 document.getElementById("controls")
 .innerHTML="";
 
-var list=document.getElementById("list");
+var list=
+document.getElementById("list");
 
 list.innerHTML="";
 
-var data=active();
+var data=
+getActive();
 
 if(data.length===0){
 
-list.innerHTML=
-'<div class="empty">'+
-'<div style="font-size:50px">🎉</div>'+
-'<h2>No Active Mistakes</h2>'+
-'<p>You have no unresolved mistakes.</p>'+
-'</div>';
+list.innerHTML=`
+
+<div class="empty">
+
+<div style="font-size:55px">
+🎉
+</div>
+
+<h2>
+No Active Mistakes
+</h2>
+
+<p>
+You have no unresolved mistakes.
+</p>
+
+</div>
+
+`;
 
 return;
 
 }
 
-data.forEach(function(q,i){
 
-var answer=q.correctAnswer||"";
+data.forEach(function(q,index){
 
-if(!answer &&
-Array.isArray(q.options)){
+var answer=
+q.correctAnswer||"";
+
+if(
+!answer &&
+Array.isArray(q.options)
+){
 
 answer=
-q.options[Number(q.correctIndex)]||"";
+q.options[
+Number(q.correctIndex)
+]||"";
 
 }
 
-var div=document.createElement("div");
+var div=
+document.createElement("div");
 
 div.className="item";
 
-div.innerHTML=
-'<span class="badge">❌ Mistake '+(i+1)+'</span>'+
-'<span class="badge">'+esc(q.subject||"Unknown")+'</span>'+
-'<span class="badge">'+esc(q.topic||"Unknown")+'</span>'+
+div.innerHTML=`
 
-'<div class="question">'+
-esc(q.question)+
-'</div>'+
+<span class="badge">
+❌ Mistake ${index+1}
+</span>
 
-'<div class="info">'+
-'<b>Your answer:</b><br>'+
-esc(q.selectedAnswer||"Not answered")+
-'<br><br>'+
-'<b>Correct answer:</b><br>'+
-'<span class="correct">'+
-esc(answer)+
-'</span>'+
-'</div>'+
+<span class="badge">
+${escapeHTML(q.subject||"Unknown")}
+</span>
 
-'<button class="retry" onclick="retryOne('+i+')">'+
-'🔄 Retry This Question'+
-'</button>';
+<span class="badge">
+${escapeHTML(q.topic||"Unknown")}
+</span>
+
+<div class="question">
+${escapeHTML(q.question)}
+</div>
+
+<div class="info">
+
+<strong>
+Your answer:
+</strong>
+
+<br>
+
+${escapeHTML(
+q.selectedAnswer||"Not answered"
+)}
+
+<br><br>
+
+<strong>
+Correct answer:
+</strong>
+
+<br>
+
+<span class="correct">
+${escapeHTML(answer)}
+</span>
+
+</div>
+
+<button
+class="retry"
+type="button"
+onclick="retryOne(${index})">
+
+🔄 Retry This Question
+
+</button>
+
+`;
 
 list.appendChild(div);
 
@@ -538,48 +666,85 @@ list.appendChild(div);
 }
 
 
-/* MASTERED VIEW */
+/* =========================
+MASTERED VIEW
+========================= */
 
 function showMastered(){
 
-document.getElementById("title")
-.textContent="🏆 Mastered Questions";
+document.getElementById("sectionTitle")
+.textContent=
+"🏆 Mastered Questions";
 
 document.getElementById("controls")
-.innerHTML=
-'<button class="back" onclick="showActive()">← Active Mistakes</button>';
+.innerHTML=`
 
-var list=document.getElementById("list");
+<button
+class="back"
+type="button"
+onclick="showActive()">
+
+← Active Mistakes
+
+</button>
+
+`;
+
+var list=
+document.getElementById("list");
 
 list.innerHTML="";
 
-var data=mastered();
+var data=
+getMastered();
 
 document.getElementById("masteredCount")
-.textContent=data.length;
+.textContent=
+data.length;
+
 
 if(data.length===0){
 
-list.innerHTML=
-'<div class="empty">'+
-'<div style="font-size:50px">🔎</div>'+
-'<h2>No Mastered Questions</h2>'+
-'<p>No questions are stored in cbtMasteryV2.</p>'+
-'</div>';
+list.innerHTML=`
+
+<div class="empty">
+
+<div style="font-size:55px">
+🔎
+</div>
+
+<h2>
+No Mastered Questions Found
+</h2>
+
+<p>
+No questions are currently stored
+in cbtMasteryV2.
+</p>
+
+</div>
+
+`;
 
 return;
 
 }
 
-data.forEach(function(q,i){
 
-var answer=q.correctAnswer||"";
+data.forEach(function(q,index){
 
-if(!answer &&
-Array.isArray(q.options)){
+var answer=
+q.correctAnswer||"";
+
+if(
+!answer &&
+Array.isArray(q.options)
+){
 
 answer=
-q.options[Number(q.correctIndex)]||"";
+q.options[
+Number(q.correctIndex)
+]||"";
 
 }
 
@@ -587,31 +752,61 @@ var solution="";
 
 if(q.solution){
 
-solution=
-'<br><br><b>💡 Solution</b><br><br>'+
-esc(q.solution);
+solution=`
+
+<br><br>
+
+<strong>
+💡 Solution
+</strong>
+
+<br><br>
+
+${escapeHTML(q.solution)}
+
+`;
 
 }
 
-var div=document.createElement("div");
+var div=
+document.createElement("div");
 
-div.className="item mastered";
+div.className=
+"item mastered-item";
 
-div.innerHTML=
-'<span class="badge">🏆 Mastered '+(i+1)+'</span>'+
-'<span class="badge">'+esc(q.subject||"Unknown")+'</span>'+
-'<span class="badge">'+esc(q.topic||"Unknown")+'</span>'+
+div.innerHTML=`
 
-'<div class="question">'+
-esc(q.question)+
-'</div>'+
+<span class="badge">
+🏆 Mastered ${index+1}
+</span>
 
-'<div class="info">'+
-'<span class="correct">✅ Correct Answer</span>'+
-'<br><br>'+
-esc(answer)+
-solution+
-'</div>';
+<span class="badge">
+${escapeHTML(q.subject||"Unknown")}
+</span>
+
+<span class="badge">
+${escapeHTML(q.topic||"Unknown")}
+</span>
+
+<div class="question">
+${escapeHTML(q.question)}
+</div>
+
+<div class="info">
+
+<span class="correct">
+✅ Correct Answer
+</span>
+
+<br><br>
+
+${escapeHTML(answer)}
+
+${solution}
+
+</div>
+
+`;
 
 list.appendChild(div);
 
@@ -620,78 +815,91 @@ list.appendChild(div);
 }
 
 
-/* RETRY ALL */
+/* =========================
+RETRY
+========================= */
 
-function retryAll(){
+function openRetry(){
 
-var data=active();
+var data=
+getActive();
 
-if(!data.length){
+if(data.length===0){
 
-alert("No active mistakes available.");
+alert(
+"No active mistakes available."
+);
 
 return;
 
 }
 
 localStorage.setItem(
-RETRY_QUEUE,
+RETRY_QUEUE_KEY,
 JSON.stringify(data)
 );
 
 localStorage.setItem(
-RETRY_QUESTION,
+RETRY_QUESTION_KEY,
 JSON.stringify(data[0])
 );
 
-location.href="retry.html";
+location.href=
+"retry.html";
 
 }
 
 
-/* RETRY ONE */
+function retryOne(index){
 
-function retryOne(i){
+var data=
+getActive();
 
-var data=active();
-
-if(!data[i])
+if(!data[index]){
 return;
+}
 
 localStorage.setItem(
-RETRY_QUEUE,
+RETRY_QUEUE_KEY,
 JSON.stringify(data)
 );
 
 localStorage.setItem(
-RETRY_QUESTION,
-JSON.stringify(data[i])
+RETRY_QUESTION_KEY,
+JSON.stringify(data[index])
 );
 
-location.href="retry.html";
+location.href=
+"retry.html";
 
 }
 
 
-/* NAVIGATION */
+/* =========================
+NAVIGATION
+========================= */
 
 function goDashboard(){
 
-location.href="index.html";
+location.href=
+"index.html";
 
 }
 
 
 function goCBT(){
 
-location.href="cbt.html";
+location.href=
+"cbt.html";
 
 }
 
 
-/* START */
+/* =========================
+START
+========================= */
 
-counts();
+updateCounts();
 
 if(
 location.hash.toLowerCase()==="#mastered"
@@ -704,6 +912,23 @@ showMastered();
 showActive();
 
 }
+
+
+/* =========================
+REFRESH
+========================= */
+
+document.addEventListener(
+"visibilitychange",
+function(){
+
+if(!document.hidden){
+
+updateCounts();
+
+}
+
+});
 
 </script>
 
