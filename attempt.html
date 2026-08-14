@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>CBT Analyzer Pro — Mistake to Mastery</title>
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>CBT Analyzer Pro — Performance Dashboard</title>
 
 <style>
 
@@ -24,10 +28,13 @@ header{
 background:#fff;
 border-bottom:1px solid #e2e8f0;
 padding:16px 20px;
+position:sticky;
+top:0;
+z-index:10;
 }
 
 .header{
-max-width:1100px;
+max-width:1150px;
 margin:auto;
 display:flex;
 align-items:center;
@@ -45,9 +52,31 @@ color:#4f46e5;
 }
 
 .container{
-max-width:1100px;
+max-width:1150px;
 margin:25px auto;
 padding:0 15px;
+}
+
+.hero{
+background:linear-gradient(
+135deg,
+#4f46e5,
+#6366f1
+);
+color:#fff;
+border-radius:18px;
+padding:25px;
+margin-bottom:20px;
+}
+
+.hero h1{
+margin:0 0 8px;
+font-size:28px;
+}
+
+.hero p{
+margin:0;
+opacity:.9;
 }
 
 .card{
@@ -58,42 +87,27 @@ margin-bottom:20px;
 box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
-.hero{
-background:linear-gradient(
-135deg,
-#4f46e5,
-#6366f1
-);
-color:white;
+.card h2{
+margin-top:0;
 }
 
-.hero h1{
-margin:0 0 8px;
-}
-
-.hero p{
-margin:0;
-opacity:.9;
-}
-
-.summary{
+.stats{
 display:grid;
 grid-template-columns:
-repeat(5,1fr);
+repeat(4,1fr);
 gap:12px;
-margin-top:20px;
 }
 
 .stat{
 background:#f8fafc;
 padding:18px;
-border-radius:12px;
+border-radius:13px;
 text-align:center;
 }
 
 .stat strong{
 display:block;
-font-size:25px;
+font-size:27px;
 margin-bottom:5px;
 }
 
@@ -107,139 +121,77 @@ grid-template-columns:1fr 1fr;
 gap:20px;
 }
 
-.metric{
-margin:15px 0;
+.chart{
+display:flex;
+align-items:flex-end;
+gap:10px;
+height:220px;
+padding:20px 5px 5px;
+border-bottom:1px solid #e2e8f0;
+overflow-x:auto;
 }
 
-.metric-top{
+.bar-column{
+min-width:45px;
+height:100%;
 display:flex;
-justify-content:space-between;
-font-weight:700;
-margin-bottom:7px;
+flex-direction:column;
+justify-content:flex-end;
+align-items:center;
+gap:5px;
 }
 
 .bar{
-height:10px;
-background:#e2e8f0;
-border-radius:20px;
-overflow:hidden;
+width:30px;
+min-height:3px;
+background:#4f46e5;
+border-radius:7px 7px 0 0;
 }
 
-.fill{
-height:100%;
-background:#4f46e5;
-border-radius:20px;
+.bar-label{
+font-size:11px;
+color:#64748b;
+}
+
+.bar-value{
+font-size:11px;
+font-weight:700;
 }
 
 .subject{
 border:1px solid #e2e8f0;
 border-radius:12px;
-padding:14px;
+padding:15px;
 margin-top:12px;
 }
 
-.subject-name{
+.subject-header{
+display:flex;
+justify-content:space-between;
 font-weight:800;
 margin-bottom:8px;
 }
 
-.question{
-border:1px solid #e2e8f0;
-border-radius:14px;
-padding:20px;
-margin-top:15px;
+.progress{
+height:9px;
+background:#e2e8f0;
+border-radius:20px;
+overflow:hidden;
 }
 
-.question.wrong{
-border-left:5px solid #dc2626;
+.progress-fill{
+height:100%;
+background:#4f46e5;
+border-radius:20px;
 }
 
-.question.correct{
-border-left:5px solid #16a34a;
-}
-
-.question.skipped{
-border-left:5px solid #f59e0b;
-}
-
-.badge{
-display:inline-block;
-padding:6px 9px;
-border-radius:7px;
-font-size:12px;
-font-weight:700;
-margin-bottom:12px;
-}
-
-.badge.wrong{
-background:#fee2e2;
-color:#991b1b;
-}
-
-.badge.correct{
-background:#dcfce7;
-color:#166534;
-}
-
-.badge.skipped{
-background:#fef3c7;
-color:#92400e;
-}
-
-.badge.bookmark{
-background:#fef3c7;
-color:#92400e;
-}
-
-.question-text{
-font-size:17px;
-font-weight:700;
-line-height:1.6;
-margin-bottom:15px;
-}
-
-.answer{
-padding:12px;
-border-radius:9px;
-margin-top:8px;
-}
-
-.your{
-background:#fff7ed;
-}
-
-.correct-answer{
-background:#ecfdf5;
-}
-
-.reason{
-background:#eef2ff;
-padding:14px;
-border-radius:10px;
-margin-top:12px;
-line-height:1.6;
-}
-
-.solution{
-background:#f8fafc;
-padding:14px;
-border-radius:10px;
-margin-top:12px;
-line-height:1.6;
-}
-
-.recommendation{
-padding:15px;
+.insight{
+padding:16px;
 border-radius:10px;
 background:#eef2ff;
 border-left:4px solid #4f46e5;
-margin-top:12px;
 line-height:1.6;
-}
-
-.weak{
-background:#fff7ed;
-border-left-color:#f97316;
+margin-top:12px;
 }
 
 .good{
@@ -247,10 +199,47 @@ background:#ecfdf5;
 border-left-color:#16a34a;
 }
 
-.empty{
-text-align:center;
-padding:40px;
+.warning{
+background:#fff7ed;
+border-left-color:#f97316;
+}
+
+.test{
+border:1px solid #e2e8f0;
+border-radius:14px;
+padding:18px;
+margin-top:14px;
+}
+
+.test-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.test-title{
+font-size:18px;
+font-weight:800;
+}
+
+.score{
+font-size:21px;
+font-weight:800;
+color:#4f46e5;
+}
+
+.details{
 color:#64748b;
+margin-top:7px;
+line-height:1.5;
+}
+
+.actions{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:13px;
 }
 
 button{
@@ -263,7 +252,7 @@ cursor:pointer;
 
 .primary{
 background:#4f46e5;
-color:white;
+color:#fff;
 }
 
 .secondary{
@@ -271,21 +260,30 @@ background:#e2e8f0;
 color:#0f172a;
 }
 
-.actions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
+.danger{
+background:#dc2626;
+color:#fff;
+}
+
+.empty{
+text-align:center;
+padding:45px 15px;
+color:#64748b;
 }
 
 @media(max-width:800px){
 
-.summary{
+.stats{
 grid-template-columns:
 1fr 1fr;
 }
 
 .grid{
 grid-template-columns:1fr;
+}
+
+.hero h1{
+font-size:23px;
 }
 
 }
@@ -306,16 +304,6 @@ grid-template-columns:1fr;
 CBT Analyzer <span>Pro</span>
 </div>
 
-<div class="actions">
-
-<button
-class="secondary"
-onclick="location.href='history.html'">
-
-← History
-
-</button>
-
 <button
 class="primary"
 onclick="location.href='cbt.html'">
@@ -326,44 +314,71 @@ onclick="location.href='cbt.html'">
 
 </div>
 
-</div>
-
 </header>
 
 
 <div class="container">
 
 
-<div
-class="card hero">
+<div class="hero">
 
 <h1>
-🧠 Mistake-to-Mastery Analysis
+📊 Performance Intelligence
 </h1>
 
-<p id="date">
-Analyzing your CBT performance...
+<p>
+Track your progress and identify what to master next.
 </p>
 
 </div>
 
 
+<!-- OVERALL -->
+
 <div class="card">
 
 <h2>
-📊 Attempt Overview
+🏆 Overall Performance
 </h2>
 
-<div class="summary">
+<div class="stats">
 
 
 <div class="stat">
 
-<strong id="score">
+<strong id="tests">
 0
 </strong>
 
-<small>Score</small>
+<small>
+Total Tests
+</small>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="best">
+0
+</strong>
+
+<small>
+Best Score
+</small>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="average">
+0
+</strong>
+
+<small>
+Average Score
+</small>
 
 </div>
 
@@ -374,40 +389,9 @@ Analyzing your CBT performance...
 0%
 </strong>
 
-<small>Accuracy</small>
-
-</div>
-
-
-<div class="stat">
-
-<strong id="correct">
-0
-</strong>
-
-<small>Correct</small>
-
-</div>
-
-
-<div class="stat">
-
-<strong id="incorrect">
-0
-</strong>
-
-<small>Incorrect</small>
-
-</div>
-
-
-<div class="stat">
-
-<strong id="bookmarked">
-0
-</strong>
-
-<small>Bookmarked</small>
+<small>
+Overall Accuracy
+</small>
 
 </div>
 
@@ -416,6 +400,8 @@ Analyzing your CBT performance...
 
 </div>
 
+
+<!-- TRENDS -->
 
 <div class="grid">
 
@@ -423,7 +409,40 @@ Analyzing your CBT performance...
 <div class="card">
 
 <h2>
-📚 Subject Performance
+📈 Score Trend
+</h2>
+
+<div
+class="chart"
+id="scoreChart">
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+🎯 Accuracy Trend
+</h2>
+
+<div
+class="chart"
+id="accuracyChart">
+</div>
+
+</div>
+
+
+</div>
+
+
+<!-- SUBJECTS -->
+
+<div class="card">
+
+<h2>
+📚 Subject Intelligence
 </h2>
 
 <div id="subjects"></div>
@@ -431,38 +450,53 @@ Analyzing your CBT performance...
 </div>
 
 
-<div class="card">
-
-<h2>
-🧠 Mistake Analysis
-</h2>
-
-<div id="mistakes"></div>
-
-</div>
-
-
-</div>
-
+<!-- AI INSIGHT -->
 
 <div class="card">
 
 <h2>
-🎯 Mastery Recommendation
+🧠 Performance Intelligence
 </h2>
 
-<div id="recommendation"></div>
+<div id="insights"></div>
 
 </div>
 
 
+<!-- HISTORY -->
+
 <div class="card">
 
 <h2>
-❌ Question-by-Question Analysis
+📋 Test History
 </h2>
 
-<div id="questions"></div>
+<div id="history"></div>
+
+</div>
+
+
+<!-- DATA -->
+
+<div class="card">
+
+<h2>
+⚙️ Data Management
+</h2>
+
+<p class="details">
+
+Your CBT history is stored locally on this device.
+
+</p>
+
+<button
+class="danger"
+onclick="clearHistory()">
+
+🗑️ Clear All History
+
+</button>
 
 </div>
 
@@ -474,102 +508,110 @@ Analyzing your CBT performance...
 
 
 /* =========================
-LOAD ATTEMPT
+GET HISTORY
 ========================= */
 
 
-const test =
-JSON.parse(
+function getHistory(){
+
+return JSON.parse(
 localStorage.getItem(
-"selectedCBTAttempt"
-) || "null"
+"cbtHistory"
+) || "[]"
 );
-
-
-if(!test){
-
-document.getElementById(
-"questions"
-).innerHTML=
-
-`
-<div class="empty">
-
-<h3>
-No attempt selected
-</h3>
-
-<p>
-Return to Test History and select
-an attempt.
-</p>
-
-</div>
-`;
-
-}
-else{
-
-loadAnalysis();
 
 }
 
 
 /* =========================
-MAIN ANALYSIS
+LOAD DASHBOARD
 ========================= */
 
 
-function loadAnalysis(){
+function loadDashboard(){
+
+const history =
+getHistory();
 
 
-const questions =
-test.questions || [];
+if(history.length===0){
+
+showEmpty();
+
+return;
+
+}
 
 
-const correct =
-Number(test.correct) || 0;
+let best=0;
+
+let totalScore=0;
+
+let correct=0;
+
+let incorrect=0;
+
+let skipped=0;
 
 
-const incorrect =
-Number(test.incorrect) || 0;
+history.forEach(test=>{
+
+const score=
+Number(test.score)||0;
+
+best=
+Math.max(best,score);
+
+totalScore+=score;
+
+correct+=
+Number(test.correct)||0;
+
+incorrect+=
+Number(test.incorrect)||0;
+
+skipped+=
+Number(test.skipped)||0;
+
+});
 
 
-const skipped =
-Number(test.skipped) || 0;
+const average=
+Math.round(
+totalScore/history.length
+);
 
 
-const attempted =
-correct + incorrect;
+const attempted=
+correct+incorrect;
 
 
-const accuracy =
-attempted > 0
+const accuracy=
+attempted>0
 ?
 Math.round(
-(correct / attempted)*100
+correct/attempted*100
 )
 :
 0;
 
 
-const bookmarked =
-questions.filter(
-q => q.bookmarked
-).length;
+document.getElementById(
+"tests"
+).textContent=
+history.length;
 
 
 document.getElementById(
-"date"
+"best"
 ).textContent=
-
-(test.date || "Unknown date");
+best;
 
 
 document.getElementById(
-"score"
+"average"
 ).textContent=
-test.score ?? 0;
+average;
 
 
 document.getElementById(
@@ -578,60 +620,239 @@ document.getElementById(
 accuracy+"%";
 
 
-document.getElementById(
-"correct"
-).textContent=
-correct;
+renderScoreChart(history);
 
+renderAccuracyChart(history);
 
-document.getElementById(
-"incorrect"
-).textContent=
-incorrect;
+renderSubjects(history);
 
-
-document.getElementById(
-"bookmarked"
-).textContent=
-bookmarked;
-
-
-analyzeSubjects(questions);
-
-analyzeMistakes(
-questions,
-incorrect
-);
-
-generateRecommendation(
+renderInsights(
+history,
 accuracy,
+correct,
 incorrect,
-skipped,
-questions
+skipped
 );
 
-renderQuestions(questions);
+renderHistory(history);
 
 }
 
 
 /* =========================
-SUBJECT ANALYSIS
+EMPTY
 ========================= */
 
 
-function analyzeSubjects(questions){
+function showEmpty(){
 
+document.getElementById(
+"history"
+).innerHTML=
+
+`
+<div class="empty">
+
+<h3>
+No tests completed yet
+</h3>
+
+<p>
+Complete your first CBT to start building
+your performance intelligence.
+</p>
+
+<button
+class="primary"
+onclick="location.href='cbt.html'">
+
+Start CBT
+
+</button>
+
+</div>
+`;
+
+}
+
+
+/* =========================
+SCORE CHART
+========================= */
+
+
+function renderScoreChart(history){
+
+const chart=
+document.getElementById(
+"scoreChart"
+);
+
+chart.innerHTML="";
+
+
+const recent=
+history.slice(-10);
+
+
+recent.forEach(
+(test,index)=>{
+
+
+const score=
+Number(test.score)||0;
+
+
+const maxScore=
+Math.max(
+40,
+Number(test.totalQuestions||10)*4
+);
+
+
+const height=
+Math.max(
+3,
+(score/maxScore)*170
+);
+
+
+const column=
+document.createElement(
+"div"
+);
+
+column.className=
+"bar-column";
+
+
+column.innerHTML=
+
+`
+<div class="bar-value">
+${score}
+</div>
+
+<div
+class="bar"
+style="height:${height}px">
+</div>
+
+<div class="bar-label">
+#${history.length-recent.length+index+1}
+</div>
+`;
+
+
+chart.appendChild(column);
+
+});
+
+}
+
+
+/* =========================
+ACCURACY CHART
+========================= */
+
+
+function renderAccuracyChart(history){
+
+const chart=
+document.getElementById(
+"accuracyChart"
+);
+
+chart.innerHTML="";
+
+
+const recent=
+history.slice(-10);
+
+
+recent.forEach(
+(test,index)=>{
+
+
+const correct=
+Number(test.correct)||0;
+
+const incorrect=
+Number(test.incorrect)||0;
+
+const attempted=
+correct+incorrect;
+
+
+const accuracy=
+attempted>0
+?
+Math.round(
+correct/attempted*100
+)
+:
+0;
+
+
+const height=
+Math.max(
+3,
+accuracy*1.7
+);
+
+
+const column=
+document.createElement(
+"div"
+);
+
+column.className=
+"bar-column";
+
+
+column.innerHTML=
+
+`
+<div class="bar-value">
+${accuracy}%
+</div>
+
+<div
+class="bar"
+style="height:${height}px">
+</div>
+
+<div class="bar-label">
+#${history.length-recent.length+index+1}
+</div>
+`;
+
+
+chart.appendChild(column);
+
+});
+
+}
+
+
+/* =========================
+SUBJECT INTELLIGENCE
+========================= */
+
+
+function renderSubjects(history){
 
 const subjects={};
 
 
-questions.forEach(q=>{
+history.forEach(test=>{
+
+(test.questions||[])
+.forEach(q=>{
 
 
-const subject =
-q.subject ||
-"General";
+const subject=
+q.subject||"General";
 
 
 if(!subjects[subject]){
@@ -639,14 +860,10 @@ if(!subjects[subject]){
 subjects[subject]={
 correct:0,
 wrong:0,
-skipped:0,
-total:0
+skipped:0
 };
 
 }
-
-
-subjects[subject].total++;
 
 
 if(q.status==="correct"){
@@ -667,8 +884,10 @@ subjects[subject].skipped++;
 
 });
 
+});
 
-const box =
+
+const box=
 document.getElementById(
 "subjects"
 );
@@ -677,51 +896,65 @@ document.getElementById(
 box.innerHTML="";
 
 
-Object.keys(subjects)
-.forEach(subject=>{
+const names=
+Object.keys(subjects);
 
 
-const data =
+if(names.length===0){
+
+box.innerHTML=
+`
+<div class="empty">
+
+Subject data will appear after
+completed tests with question analysis.
+
+</div>
+`;
+
+return;
+
+}
+
+
+names.forEach(subject=>{
+
+
+const data=
 subjects[subject];
 
 
-const attempted =
+const attempted=
 data.correct+
 data.wrong;
 
 
-const accuracy =
+const accuracy=
 attempted>0
 ?
 Math.round(
-data.correct/
-attempted*
-100
+data.correct/attempted*100
 )
 :
 0;
 
 
-const item =
+const item=
 document.createElement(
 "div"
 );
 
-
-item.className="subject";
+item.className=
+"subject";
 
 
 item.innerHTML=
 
 `
-<div class="subject-name">
-${subject}
-</div>
-
-<div class="metric-top">
+<div class="subject-header">
 
 <span>
-Accuracy
+${subject}
 </span>
 
 <span>
@@ -730,22 +963,24 @@ ${accuracy}%
 
 </div>
 
-<div class="bar">
+<div class="progress">
 
 <div
-class="fill"
+class="progress-fill"
 style="width:${accuracy}%">
 </div>
 
 </div>
 
 <div
-style="margin-top:8px;color:#64748b">
+class="details">
 
 ✅ ${data.correct}
-&nbsp;&nbsp;
+&nbsp; | &nbsp;
+
 ❌ ${data.wrong}
-&nbsp;&nbsp;
+&nbsp; | &nbsp;
+
 ⏭️ ${data.skipped}
 
 </div>
@@ -760,480 +995,465 @@ box.appendChild(item);
 
 
 /* =========================
-MISTAKE ANALYSIS
+INSIGHTS
 ========================= */
 
 
-function analyzeMistakes(
-questions,
-incorrect
+function renderInsights(
+history,
+accuracy,
+correct,
+incorrect,
+skipped
 ){
 
-
-let conceptual=0;
-
-let careless=0;
-
-let skipped=0;
-
-
-questions.forEach(q=>{
-
-
-if(q.status==="skipped"){
-
-skipped++;
-
-}
-
-
-if(q.status==="wrong"){
-
-const reason =
-(q.mistakeReason || "")
-.toLowerCase();
-
-
-if(
-reason.includes("careless") ||
-reason.includes("silly")
-){
-
-careless++;
-
-}
-else{
-
-conceptual++;
-
-}
-
-}
-
-});
-
-
-const box =
+const box=
 document.getElementById(
-"mistakes"
+"insights"
 );
 
 
-box.innerHTML=
+let html="";
+
+
+if(history.length>=2){
+
+const previous=
+history[history.length-2];
+
+const latest=
+history[history.length-1];
+
+
+const previousScore=
+Number(previous.score)||0;
+
+const latestScore=
+Number(latest.score)||0;
+
+
+if(latestScore>previousScore){
+
+html+=
 
 `
-<div class="metric">
-
-<div class="metric-top">
-
-<span>
-Conceptual
-</span>
+<div class="insight good">
 
 <strong>
-${conceptual}
-</strong>
-
-</div>
-
-</div>
-
-
-<div class="metric">
-
-<div class="metric-top">
-
-<span>
-Careless
-</span>
-
-<strong>
-${careless}
-</strong>
-
-</div>
-
-</div>
-
-
-<div class="metric">
-
-<div class="metric-top">
-
-<span>
-Skipped
-</span>
-
-<strong>
-${skipped}
-</strong>
-
-</div>
-
-</div>
-
-
-<div class="recommendation">
-
-<strong>
-💡 Key Insight
+📈 You're improving
 </strong>
 
 <br><br>
 
-${
-conceptual > careless
-?
-"Your main improvement area is conceptual understanding. Focus on learning the underlying concept before doing more questions."
-:
-"Your performance suggests that reducing careless mistakes and improving question-reading discipline may give you the fastest improvement."
+Your latest score is
+${latestScore}, compared with
+${previousScore} on your previous test.
+
+Keep analyzing mistakes instead of
+only increasing the number of tests.
+
+</div>
+`;
+
 }
+else if(latestScore<previousScore){
+
+html+=
+
+`
+<div class="insight warning">
+
+<strong>
+⚠️ Recent performance dropped
+</strong>
+
+<br><br>
+
+Your latest score was
+${latestScore}, compared with
+${previousScore} previously.
+
+Review your incorrect and skipped
+questions before taking another full test.
+
+</div>
+`;
+
+}
+else{
+
+html+=
+
+`
+<div class="insight">
+
+<strong>
+📊 Performance is stable
+</strong>
+
+<br><br>
+
+Your latest score is similar to your
+previous test. Focus on converting
+repeated mistakes into mastered concepts.
 
 </div>
 `;
 
 }
 
-
-/* =========================
-RECOMMENDATION
-========================= */
-
-
-function generateRecommendation(
-accuracy,
-incorrect,
-skipped,
-questions
-){
-
-
-const box =
-document.getElementById(
-"recommendation"
-);
-
-
-let weakSubjects={};
-
-
-questions.forEach(q=>{
-
-
-if(q.status==="wrong"){
-
-const subject =
-q.subject ||
-"General";
-
-
-weakSubjects[subject]=
-(weakSubjects[subject]||0)+1;
-
 }
-
-});
-
-
-let weakest =
-null;
-
-let maxWrong=0;
-
-
-Object.keys(weakSubjects)
-.forEach(subject=>{
-
-if(
-weakSubjects[subject]>maxWrong
-){
-
-maxWrong=
-weakSubjects[subject];
-
-weakest=
-subject;
-
-}
-
-});
 
 
 if(accuracy>=85){
 
-box.className=
-"recommendation good";
-
-box.innerHTML=
+html+=
 
 `
+<div class="insight good">
+
 <strong>
-🔥 Strong Performance
+🔥 Strong accuracy
 </strong>
 
 <br><br>
 
-Your accuracy is ${accuracy}%.
-Your next goal should be maintaining accuracy
-while improving speed and handling difficult questions.
+Your overall accuracy is
+${accuracy}%.
 
-<br><br>
+Your next focus should be difficult
+questions, speed and consistency.
 
-<strong>Next Action:</strong>
-
-Take a higher-difficulty CBT and focus on
-questions that require multi-step reasoning.
+</div>
 `;
 
 }
-else if(weakest){
+else if(accuracy<65){
 
-box.className=
-"recommendation weak";
-
-box.innerHTML=
+html+=
 
 `
+<div class="insight warning">
+
 <strong>
-🎯 Priority Area: ${weakest}
+🎯 Revision required
 </strong>
 
 <br><br>
 
-You made the largest number of mistakes in
-${weakest}.
+Your overall accuracy is
+${accuracy}%.
 
-<br><br>
+Prioritize concept revision and
+question-level mistake analysis.
 
-<strong>Recommended cycle:</strong>
-
-Concept Revision → Easy Questions →
-Moderate Questions → Re-test → Analyze Mistakes
-
-<br><br>
-
-Do not simply repeat the same test.
-Master the underlying concept first.
+</div>
 `;
 
 }
-else{
 
-box.innerHTML=
+
+html+=
 
 `
+<div class="insight">
+
 <strong>
-📈 Keep Building
+🧠 Mistake-to-Mastery Rule
 </strong>
 
 <br><br>
 
-Review every incorrect and skipped question
-before starting another full test.
+Every incorrect question should become
+a learning opportunity:
+
+<strong>
+Understand → Record mistake → Revise →
+Retry → Master
+</strong>
+
+</div>
 `;
 
-}
+
+box.innerHTML=
+html;
 
 }
 
 
 /* =========================
-QUESTION ANALYSIS
+HISTORY LIST
 ========================= */
 
 
-function renderQuestions(
-questions
-){
+function renderHistory(history){
 
-
-const container =
+const box=
 document.getElementById(
-"questions"
+"history"
 );
 
 
-container.innerHTML="";
+box.innerHTML="";
 
 
-if(questions.length===0){
+history
+.slice()
+.reverse()
+.forEach(
+function(test,index){
 
-container.innerHTML=
+
+const originalIndex=
+history.length-1-index;
+
+
+const score=
+Number(test.score)||0;
+
+
+const correct=
+Number(test.correct)||0;
+
+
+const incorrect=
+Number(test.incorrect)||0;
+
+
+const skipped=
+Number(test.skipped)||0;
+
+
+const attempted=
+correct+incorrect;
+
+
+const accuracy=
+attempted>0
+?
+Math.round(
+correct/attempted*100
+)
+:
+0;
+
+
+const item=
+document.createElement(
+"div"
+);
+
+item.className=
+"test";
+
+
+item.innerHTML=
 
 `
-<div class="empty">
+<div class="test-header">
 
-Question-level data is not available.
+<div class="test-title">
+
+CBT Attempt #${originalIndex+1}
+
+</div>
+
+<div class="score">
+
+${score}
+
+</div>
+
+</div>
+
+
+<div class="details">
+
+📅 ${test.date||"Unknown date"}
+
+</div>
+
+
+<div class="details">
+
+🎯 Accuracy:
+${accuracy}%
+
+&nbsp; | &nbsp;
+
+✅ Correct:
+${correct}
+
+&nbsp; | &nbsp;
+
+❌ Incorrect:
+${incorrect}
+
+&nbsp; | &nbsp;
+
+⏭️ Skipped:
+${skipped}
+
+</div>
+
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="viewAttempt(${originalIndex})">
+
+🧠 View Analysis
+
+</button>
+
+<button
+class="secondary"
+onclick="deleteAttempt(${originalIndex})">
+
+Delete
+
+</button>
 
 </div>
 `;
+
+
+box.appendChild(item);
+
+});
+
+}
+
+
+/* =========================
+VIEW ATTEMPT
+========================= */
+
+
+function viewAttempt(index){
+
+const history=
+getHistory();
+
+
+if(!history[index]){
 
 return;
 
 }
 
 
-questions.forEach(
-function(q,index){
-
-
-const card =
-document.createElement(
-"div"
+localStorage.setItem(
+"selectedCBTAttempt",
+JSON.stringify(
+history[index]
+)
 );
 
 
-const status =
-q.status ||
-"skipped";
-
-
-card.className=
-"question "+status;
-
-
-let html="";
-
-
-html+=
-
-`
-<div class="badge ${status}">
-${status.toUpperCase()}
-</div>
-`;
-
-
-if(q.bookmarked){
-
-html+=
-
-`
-<span class="badge bookmark">
-🔖 BOOKMARKED
-</span>
-`;
+location.href=
+"attempt.html";
 
 }
 
 
-html+=
-
-`
-<div class="question-text">
-
-Q${q.questionNumber || index+1}.
-
-${q.question || "Question unavailable"}
-
-</div>
-`;
+/* =========================
+DELETE
+========================= */
 
 
-html+=
+function deleteAttempt(index){
 
-`
-<div class="answer your">
-
-<strong>
-Your Answer:
-</strong>
-
-<br>
-
-${q.selectedAnswer || "Not Attempted"}
-
-</div>
-`;
+const history=
+getHistory();
 
 
-html+=
+if(!history[index]){
 
-`
-<div class="answer correct-answer">
-
-<strong>
-Correct Answer:
-</strong>
-
-<br>
-
-${q.correctAnswer || "Not Available"}
-
-</div>
-`;
-
-
-if(status==="wrong"){
-
-html+=
-
-`
-<div class="reason">
-
-<strong>
-🧠 Mistake Reason
-</strong>
-
-<br><br>
-
-${q.mistakeReason ||
-"Review the concept and determine why the incorrect option was selected."}
-
-</div>
-`;
+return;
 
 }
 
 
-html+=
+if(
+!confirm(
+"Delete this CBT attempt?"
+)
+){
 
-`
-<div class="solution">
-
-<strong>
-💡 Solution
-</strong>
-
-<br><br>
-
-${q.solution ||
-"Solution not available."}
-
-</div>
-`;
-
-
-if(q.subject){
-
-html+=
-
-`
-<div
-style="margin-top:12px;color:#64748b">
-
-📚 Subject:
-<strong>
-${q.subject}
-</strong>
-
-</div>
-`;
+return;
 
 }
 
 
-card.innerHTML=
-html;
+history.splice(index,1);
 
 
-container.appendChild(card);
+localStorage.setItem(
+"cbtHistory",
+JSON.stringify(history)
+);
 
-});
+
+loadDashboard();
 
 }
+
+
+/* =========================
+CLEAR ALL
+========================= */
+
+
+function clearHistory(){
+
+const history=
+getHistory();
+
+
+if(history.length===0){
+
+alert(
+"No test history available."
+);
+
+return;
+
+}
+
+
+if(
+!confirm(
+"Delete ALL CBT history?"
+)
+){
+
+return;
+
+}
+
+
+localStorage.removeItem(
+"cbtHistory"
+);
+
+
+loadDashboard();
+
+}
+
+
+/* =========================
+START
+========================= */
+
+
+loadDashboard();
 
 </script>
 
 </body>
+
 </html>
