@@ -7,7 +7,9 @@
 <title>CBT Analyzer Pro — Mistake Bank</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
@@ -55,6 +57,11 @@ margin-bottom:20px;
 
 .hero h1{
 margin:0 0 8px;
+}
+
+.hero p{
+margin:0;
+opacity:.9;
 }
 
 .card{
@@ -109,9 +116,10 @@ line-height:1.5;
 
 .answer{
 margin-top:10px;
-padding:10px;
+padding:11px;
 border-radius:8px;
 background:#f8fafc;
+line-height:1.5;
 }
 
 .correct{
@@ -122,36 +130,36 @@ border-left:4px solid #16a34a;
 border-left:4px solid #dc2626;
 }
 
-.empty{
-text-align:center;
-padding:40px 15px;
-color:#64748b;
-}
-
-button{
-border:0;
-border-radius:10px;
-padding:12px 16px;
-font-weight:700;
-cursor:pointer;
-}
-
-.primary{
-background:#4f46e5;
-color:#fff;
-}
-
 .retry{
+width:100%;
 background:#16a34a;
 color:#fff;
 font-size:16px;
-padding:14px 20px;
-width:100%;
+padding:15px;
+border:0;
+border-radius:10px;
+font-weight:800;
+cursor:pointer;
+}
+
+.retry:hover{
+opacity:.9;
 }
 
 .secondary{
 background:#e2e8f0;
 color:#0f172a;
+border:0;
+border-radius:10px;
+padding:11px 15px;
+font-weight:700;
+cursor:pointer;
+}
+
+.empty{
+text-align:center;
+padding:40px 15px;
+color:#64748b;
 }
 
 .actions{
@@ -173,6 +181,7 @@ grid-template-columns:1fr;
 
 <body>
 
+
 <header>
 
 <div class="header">
@@ -182,10 +191,10 @@ CBT Analyzer <span>Pro</span>
 </div>
 
 <button
-class="primary"
+class="secondary"
 onclick="location.href='analysis.html'">
 
-Dashboard
+📊 Dashboard
 
 </button>
 
@@ -196,6 +205,8 @@ Dashboard
 
 <div class="container">
 
+
+<!-- HERO -->
 
 <div class="hero">
 
@@ -212,9 +223,10 @@ Review your incorrect questions and turn mistakes into mastery.
 
 <div class="card">
 
-<h2>Mistake Summary</h2>
+<h2>📊 Mistake Summary</h2>
 
 <div class="stats">
+
 
 <div class="stat">
 
@@ -222,7 +234,9 @@ Review your incorrect questions and turn mistakes into mastery.
 0
 </strong>
 
-<small>Total Mistakes</small>
+<small>
+Total Mistakes
+</small>
 
 </div>
 
@@ -233,7 +247,9 @@ Review your incorrect questions and turn mistakes into mastery.
 0
 </strong>
 
-<small>Retry Questions</small>
+<small>
+Retry Questions
+</small>
 
 </div>
 
@@ -244,14 +260,18 @@ Review your incorrect questions and turn mistakes into mastery.
 0
 </strong>
 
-<small>Mastered</small>
+<small>
+Mastered
+</small>
 
 </div>
 
+
 </div>
 
 
-<div class="actions">
+<br>
+
 
 <button
 class="retry"
@@ -261,7 +281,6 @@ onclick="startRetry()">
 
 </button>
 
-</div>
 
 </div>
 
@@ -289,11 +308,12 @@ Loading mistakes...
 <script>
 
 
-/* =========================
-LOAD DATA
-========================= */
+/* =====================================
+LOAD HISTORY
+===================================== */
 
 let history=[];
+
 
 try{
 
@@ -302,36 +322,45 @@ JSON.parse(
 localStorage.getItem("cbtHistory") || "[]"
 );
 
+
 if(!Array.isArray(history)){
-history=[];
-}
-
-}catch(e){
 
 history=[];
 
 }
 
+}catch(error){
 
-/* =========================
-COLLECT MISTAKES
-========================= */
+history=[];
+
+}
+
+
+/* =====================================
+COLLECT WRONG QUESTIONS
+===================================== */
 
 function getMistakes(){
 
 const mistakes=[];
 
 
-history.forEach(function(test,testIndex){
+history.forEach(
+function(test,testIndex){
 
 if(!Array.isArray(test.questions)){
+
 return;
+
 }
 
 
-test.questions.forEach(function(q,questionIndex){
+test.questions.forEach(
+function(q,questionIndex){
 
-if(q.status==="wrong"){
+if(
+q.status==="wrong"
+){
 
 mistakes.push({
 
@@ -357,9 +386,9 @@ return mistakes;
 }
 
 
-/* =========================
+/* =====================================
 RENDER
-========================= */
+===================================== */
 
 function render(){
 
@@ -379,14 +408,54 @@ document.getElementById(
 mistakes.length;
 
 
+/*
+Mastered questions are tracked
+from retryHistory.
+*/
+
+let mastered=0;
+
+
+try{
+
+const retryHistory=
+JSON.parse(
+localStorage.getItem(
+"retryHistory"
+) || "[]"
+);
+
+
+if(Array.isArray(retryHistory)){
+
+retryHistory.forEach(
+function(result){
+
+mastered +=
+Number(result.correct) || 0;
+
+});
+
+}
+
+}catch(e){
+
+mastered=0;
+
+}
+
+
 document.getElementById(
 "mastered"
 ).textContent=
-"0";
+mastered;
 
 
 const box=
-document.getElementById("mistakes");
+document.getElementById(
+"mistakes"
+);
+
 
 box.innerHTML="";
 
@@ -411,29 +480,35 @@ return;
 }
 
 
-mistakes.forEach(function(q,index){
+mistakes.forEach(
+function(q,index){
 
 const div=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
-div.className="question";
+div.className=
+"question";
 
 
 const questionText=
 q.question ||
 q.text ||
+q.questionText ||
 "Question text unavailable";
 
 
 const yourAnswer=
 q.selectedAnswer ??
 q.userAnswer ??
-q.answer ??
+q.userAnswerText ??
 "Not recorded";
 
 
 const correctAnswer=
 q.correctAnswer ??
+q.correctOption ??
 q.correct ??
 "Not recorded";
 
@@ -441,23 +516,24 @@ q.correct ??
 const reason=
 q.mistakeReason ||
 q.reason ||
-"Review the concept and solution carefully.";
+"Review this question carefully and identify why the answer was incorrect.";
 
 
 const solution=
 q.solution ||
 q.explanation ||
-"No solution recorded.";
+"No solution recorded for this question.";
 
 
 div.innerHTML=
-
 `
+
 <div class="question-number">
 
 Mistake #${index+1}
 
 </div>
+
 
 <div class="question-text">
 
@@ -465,33 +541,53 @@ ${escapeHTML(questionText)}
 
 </div>
 
+
 <div class="answer wrong">
 
-<strong>Your Answer:</strong><br>
+<strong>
+❌ Your Answer
+</strong>
+
+<br>
 
 ${escapeHTML(yourAnswer)}
 
 </div>
 
+
 <div class="answer correct">
 
-<strong>Correct Answer:</strong><br>
+<strong>
+✅ Correct Answer
+</strong>
+
+<br>
 
 ${escapeHTML(correctAnswer)}
 
 </div>
 
+
 <div class="answer">
 
-<strong>🧠 Mistake Reason:</strong><br>
+<strong>
+🧠 Mistake Reason
+</strong>
+
+<br>
 
 ${escapeHTML(reason)}
 
 </div>
 
+
 <div class="answer">
 
-<strong>💡 Solution:</strong><br>
+<strong>
+💡 Solution
+</strong>
+
+<br>
 
 ${escapeHTML(solution)}
 
@@ -507,9 +603,9 @@ box.appendChild(div);
 }
 
 
-/* =========================
-RETRY
-========================= */
+/* =====================================
+START RETRY
+===================================== */
 
 function startRetry(){
 
@@ -529,21 +625,25 @@ return;
 
 
 /*
-Create a dedicated retry set.
-
-The existing CBT can read this
-when retry mode is implemented.
+Create retry question set.
 */
 
 const retryQuestions=
-mistakes.map(function(q,index){
+mistakes.map(
+function(q,index){
 
 return {
 
 ...q,
 
 retryQuestionId:
-"retry_"+Date.now()+"_"+index
+"retry_"
++
+Date.now()
++
+"_"
++
+index
 
 };
 
@@ -552,7 +652,9 @@ retryQuestionId:
 
 localStorage.setItem(
 "cbtRetryQuestions",
-JSON.stringify(retryQuestions)
+JSON.stringify(
+retryQuestions
+)
 );
 
 
@@ -563,39 +665,55 @@ localStorage.setItem(
 
 
 /*
-Open CBT.
+Open retry.html,
+NOT the normal 36-question CBT.
 */
 
 window.location.href=
-"cbt.html?mode=retry";
+"retry.html";
 
 }
 
 
-/* =========================
+/* =====================================
 ESCAPE HTML
-========================= */
+===================================== */
 
 function escapeHTML(value){
 
 return String(value)
 
-.replace(/&/g,"&amp;")
+.replace(
+/&/g,
+"&amp;"
+)
 
-.replace(/</g,"&lt;")
+.replace(
+/</g,
+"&lt;"
+)
 
-.replace(/>/g,"&gt;")
+.replace(
+/>/g,
+"&gt;"
+)
 
-.replace(/"/g,"&quot;")
+.replace(
+/"/g,
+"&quot;"
+)
 
-.replace(/'/g,"&#039;");
+.replace(
+/'/g,
+"&#039;"
+);
 
 }
 
 
-/* =========================
+/* =====================================
 START
-========================= */
+===================================== */
 
 render();
 
