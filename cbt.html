@@ -187,17 +187,11 @@ border-radius:8px;
 font-weight:700
 }
 
-.reason-title{
-font-weight:800;
-margin-top:15px;
-margin-bottom:8px
-}
-
 .reason-options{
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:8px;
-margin-top:8px
+margin-top:10px
 }
 
 .reason-button{
@@ -221,6 +215,13 @@ font-weight:800
 font-size:13px;
 color:#64748b;
 margin-top:8px
+}
+
+.saved-message{
+margin-top:8px;
+color:#15803d;
+font-weight:700;
+font-size:13px
 }
 
 @media(max-width:800px){
@@ -503,6 +504,8 @@ new Array(questions.length).fill(null);
 
 let submitted=false;
 
+let savedHistoryIndex=-1;
+
 let timeLeft=1800;
 
 
@@ -512,9 +515,9 @@ TIMER
 
 function updateTimer(){
 
-let m=Math.floor(timeLeft/60);
+const m=Math.floor(timeLeft/60);
 
-let s=timeLeft%60;
+const s=timeLeft%60;
 
 document.getElementById("timer").textContent=
 String(m).padStart(2,"0")+
@@ -707,52 +710,119 @@ renderPalette();
 
 
 /* =========================
-DEFAULT MISTAKE REASON
+SAVE REASON TO HISTORY
 ========================= */
 
-function getMistakeReason(q,selected){
+function saveReasonToHistory(index,reason){
 
-if(selected===null){
+if(savedHistoryIndex<0){
 
-return "Question was skipped. Review the concept before attempting it again.";
+return;
 
 }
 
-return q.mistakeReason ||
-"Review the concept and analyze why the selected option was incorrect.";
+try{
+
+const history=
+JSON.parse(
+localStorage.getItem("cbtHistory") || "[]"
+);
+
+if(
+!Array.isArray(history) ||
+!history[savedHistoryIndex] ||
+!Array.isArray(
+history[savedHistoryIndex].questions
+)
+){
+
+return;
+
+}
+
+
+const questionRecord=
+history[savedHistoryIndex].questions[index];
+
+if(!questionRecord){
+
+return;
+
+}
+
+
+questionRecord.mistakeType=reason;
+
+questionRecord.mistakeReason=
+getReasonExplanation(reason);
+
+
+history[savedHistoryIndex].questions[index]=
+questionRecord;
+
+
+localStorage.setItem(
+"cbtHistory",
+JSON.stringify(history)
+);
+
+}catch(error){
+
+console.error(
+"Could not save mistake reason:",
+error
+);
+
+}
 
 }
 
 
 /* =========================
-SELECT MISTAKE REASON
+REASON EXPLANATION
+========================= */
+
+function getReasonExplanation(reason){
+
+const explanations={
+
+"Concept Gap":
+"Student identified a gap in understanding the underlying concept.",
+
+"Calculation Error":
+"Student identified an error in calculation, arithmetic or numerical processing.",
+
+"Misread Question":
+"Student identified that the question or options were misunderstood or read incorrectly.",
+
+"Guessing":
+"Student identified that the answer was selected without sufficient confidence or reasoning.",
+
+"Time Pressure":
+"Student identified that time pressure affected the answer."
+
+};
+
+return explanations[reason] ||
+"Student-selected mistake reason.";
+
+}
+
+
+/* =========================
+SELECT REASON
 ========================= */
 
 function selectMistakeReason(index,reason){
 
 mistakeReasons[index]=reason;
 
-saveSelectedReasons();
-
-generateReview();
-
-}
-
-
-/* =========================
-SAVE SELECTED REASONS
-========================= */
-
-function saveSelectedReasons(){
-
-try{
-
-localStorage.setItem(
-"cbtCurrentMistakeReasons",
-JSON.stringify(mistakeReasons)
+saveReasonToHistory(
+index,
+reason
 );
 
-}catch(e){}
+generateReview();
 
 }
 
@@ -761,7 +831,12 @@ JSON.stringify(mistakeReasons)
 SAVE TEST
 ========================= */
 
-function saveTest(correct,incorrect,skipped,score){
+function saveTest(
+correct,
+incorrect,
+skipped,
+score
+){
 
 let history=[];
 
@@ -813,12 +888,6 @@ null
 q.options[answers[index]];
 
 
-const chosenReason=
-mistakeReasons[index] ||
-q.mistakeType ||
-"Not Classified";
-
-
 return {
 
 question:q.question,
@@ -844,14 +913,16 @@ bookmarked:marked[index],
 mistakeType:
 status==="wrong"
 ?
-chosenReason
+(mistakeReasons[index] ||
+"Not Classified")
 :
 null,
 
 mistakeReason:
 status==="wrong"
 ?
-getMistakeReason(q,answers[index])
+(mistakeReasons[index] ||
+"Student has not selected a mistake reason yet.")
 :
 "Correct answer.",
 
@@ -884,6 +955,10 @@ questions:questionData
 
 
 history.push(testRecord);
+
+savedHistoryIndex=
+history.length-1;
+
 
 localStorage.setItem(
 "cbtHistory",
@@ -930,7 +1005,8 @@ incorrect++;
 });
 
 
-const score=(correct*4)-incorrect;
+const score=
+(correct*4)-incorrect;
 
 
 saveTest(
@@ -946,20 +1022,32 @@ submitted=true;
 clearInterval(timerInterval);
 
 
-document.getElementById("testScreen").style.display="none";
-
-document.querySelector("aside").style.display="none";
-
-document.getElementById("result").style.display="block";
+document.getElementById(
+"testScreen"
+).style.display="none";
 
 
-document.getElementById("score").textContent=
+document.querySelector(
+"aside"
+).style.display="none";
+
+
+document.getElementById(
+"result"
+).style.display="block";
+
+
+document.getElementById(
+"score"
+).textContent=
 score+
 " / "+
 (questions.length*4);
 
 
-document.getElementById("summary").textContent=
+document.getElementById(
+"summary"
+).textContent=
 "Correct: "+
 correct+
 " | Incorrect: "+
@@ -974,10 +1062,14 @@ generateReview();
 
 
 /* =========================
-REASON BUTTONS
+REASON BUTTON
 ========================= */
 
-function reasonButton(index,reason,icon){
+function reasonButton(
+index,
+reason,
+icon
+){
 
 const selected=
 mistakeReasons[index]===reason
@@ -986,7 +1078,9 @@ mistakeReasons[index]===reason
 :
 "";
 
+
 return `
+
 <button
 type="button"
 class="reason-button${selected}"
@@ -995,6 +1089,7 @@ onclick="selectMistakeReason(${index},'${reason}')">
 ${icon} ${reason}
 
 </button>
+
 `;
 
 }
@@ -1008,7 +1103,8 @@ function generateReview(){
 
 const box=document.getElementById("review");
 
-box.innerHTML="<h3>Question Analysis</h3>";
+box.innerHTML=
+"<h3>Question Analysis</h3>";
 
 
 questions.forEach(function(q,index){
@@ -1016,6 +1112,7 @@ questions.forEach(function(q,index){
 const item=document.createElement("div");
 
 let status;
+
 
 if(answers[index]===null){
 
@@ -1079,15 +1176,16 @@ item.innerHTML+=
 if(status==="incorrect"){
 
 const selectedReason=
-mistakeReasons[index] ||
-"";
+mistakeReasons[index];
 
 
 item.innerHTML+=`
 
 <div class="analysis">
 
-<strong>❌ Why did you get this wrong?</strong>
+<strong>
+❌ Why did you get this wrong?
+</strong>
 
 <div class="reason-options">
 
@@ -1115,13 +1213,26 @@ selectedReason
 
 </div>
 
+${
+selectedReason
+?
+'<div class="saved-message">✓ Saved to your performance history</div>'
+:
+''
+}
+
 <br>
 
-<strong>💡 Solution:</strong><br>
+<strong>
+💡 Solution:
+</strong>
+
+<br>
 
 ${q.solution}
 
 </div>
+
 `;
 
 }
@@ -1133,11 +1244,17 @@ item.innerHTML+=`
 
 <div class="analysis">
 
-<strong>⏭️ Skipped Question</strong>
+<strong>
+⏭️ Skipped Question
+</strong>
 
 <br><br>
 
-<strong>💡 Solution:</strong><br>
+<strong>
+💡 Solution:
+</strong>
+
+<br>
 
 ${q.solution}
 
