@@ -187,6 +187,17 @@ border-radius:8px;
 font-weight:700
 }
 
+.reason-badge{
+display:inline-block;
+margin-top:8px;
+padding:6px 10px;
+border-radius:8px;
+background:#ede9fe;
+color:#4c1d95;
+font-weight:700;
+font-size:13px
+}
+
 @media(max-width:800px){
 .container{
 grid-template-columns:1fr
@@ -329,7 +340,6 @@ Submit Test
 
 <script>
 
-
 /* =========================
 QUESTIONS
 ========================= */
@@ -351,11 +361,13 @@ options:[
 
 answer:1,
 
+mistakeType:"Concept Gap",
+
 solution:
 "Mars appears reddish because iron minerals in its surface have oxidized.",
 
 mistakeReason:
-"Review the basic identification and characteristics of planets."
+"Concept Gap — Review the basic identification and characteristics of planets."
 },
 
 
@@ -374,11 +386,13 @@ options:[
 
 answer:1,
 
+mistakeType:"Calculation Error",
+
 solution:
 "Adding 2 and 2 gives 4.",
 
 mistakeReason:
-"Recheck the basic arithmetic operation."
+"Calculation Error — Recheck the basic arithmetic operation."
 },
 
 
@@ -397,11 +411,13 @@ options:[
 
 answer:2,
 
+mistakeType:"Concept Gap",
+
 solution:
 "Nitrogen makes up approximately 78% of Earth's atmosphere.",
 
 mistakeReason:
-"Revise the approximate composition of Earth's atmosphere."
+"Concept Gap — Revise the approximate composition of Earth's atmosphere."
 },
 
 
@@ -420,11 +436,13 @@ options:[
 
 answer:1,
 
+mistakeType:"Misread Question",
+
 solution:
 "The SI unit of force is the newton (N).",
 
 mistakeReason:
-"Revise SI units of common physical quantities."
+"Misread Question — Carefully distinguish force from energy, power and pressure units."
 },
 
 
@@ -443,11 +461,13 @@ options:[
 
 answer:2,
 
+mistakeType:"Concept Gap",
+
 solution:
-"Mitochondria are the major sites of aerobic cellular respiration and ATP production.",
+"Mitochondria are major sites of aerobic cellular respiration and ATP production.",
 
 mistakeReason:
-"Revise the functions of major cell organelles."
+"Concept Gap — Revise the functions of major cell organelles."
 },
 
 
@@ -466,11 +486,13 @@ options:[
 
 answer:1,
 
+mistakeType:"Concept Gap",
+
 solution:
 "The chemical symbol of sodium is Na, derived from its Latin name natrium.",
 
 mistakeReason:
-"Revise symbols of common elements."
+"Concept Gap — Revise symbols of common elements."
 },
 
 
@@ -489,11 +511,13 @@ options:[
 
 answer:1,
 
+mistakeType:"Misread Question",
+
 solution:
 "Cellular respiration in mitochondria generates ATP through oxidative phosphorylation and related processes.",
 
 mistakeReason:
-"Differentiate cellular respiration from other cellular processes."
+"Misread Question — Differentiate cellular respiration from other cellular processes."
 },
 
 
@@ -512,11 +536,13 @@ options:[
 
 answer:1,
 
+mistakeType:"Calculation Error",
+
 solution:
 "The standard approximate value of gravitational acceleration near Earth's surface is 9.8 m/s².",
 
 mistakeReason:
-"Revise standard physical constants and their units."
+"Calculation Error — Revise standard physical constants and check numerical values carefully."
 },
 
 
@@ -535,11 +561,13 @@ options:[
 
 answer:2,
 
+mistakeType:"Concept Gap",
+
 solution:
 "DNA stores and transmits hereditary genetic information in most organisms.",
 
 mistakeReason:
-"Revise the roles of DNA, RNA, proteins and other biomolecules."
+"Concept Gap — Revise the roles of DNA, RNA, proteins and other biomolecules."
 },
 
 
@@ -558,11 +586,13 @@ options:[
 
 answer:2,
 
+mistakeType:"Concept Gap",
+
 solution:
 "An electron carries one unit of negative elementary charge.",
 
 mistakeReason:
-"Revise the basic properties of subatomic particles."
+"Concept Gap — Revise the basic properties of subatomic particles."
 }
 
 ];
@@ -895,12 +925,12 @@ selected
 
 if(selected===null){
 
-return "Question was skipped. Review the concept before attempting it again.";
+return "Not Classified — Question was skipped. Review the concept before attempting it again.";
 
 }
 
 return q.mistakeReason ||
-"Review the concept and analyze why the selected option was incorrect.";
+"Not Classified — Review the concept and analyze why the selected option was incorrect.";
 
 }
 
@@ -916,12 +946,26 @@ skipped,
 score
 ){
 
-const history=
+let history=[];
+
+try{
+
+history=
 JSON.parse(
 localStorage.getItem(
 "cbtHistory"
 ) || "[]"
 );
+
+if(!Array.isArray(history)){
+history=[];
+}
+
+}catch(e){
+
+history=[];
+
+}
 
 
 const questionData=
@@ -988,15 +1032,22 @@ q.options[q.answer],
 bookmarked:
 marked[index],
 
-mistakeReason:
-status==="correct"
+mistakeType:
+status==="wrong"
 ?
-"Correct answer."
+q.mistakeType
 :
+null,
+
+mistakeReason:
+status==="wrong"
+?
 getMistakeReason(
 q,
 answers[index]
-),
+)
+:
+"Correct answer.",
 
 solution:
 q.solution,
@@ -1019,6 +1070,8 @@ score:score,
 correct:correct,
 
 incorrect:incorrect,
+
+wrong:incorrect,
 
 skipped:skipped,
 
@@ -1261,16 +1314,28 @@ item.innerHTML+=
 
 if(status!=="correct"){
 
+const reason=
+getMistakeReason(
+q,
+answers[index]
+);
+
 item.innerHTML+=
 
 '<div class="analysis">' +
 
 "<strong>🧠 Mistake Reason:</strong><br>" +
 
-getMistakeReason(
-q,
-answers[index]
-) +
+reason +
+
+'<br><br>' +
+
+'<span class="reason-badge">' +
+
+(q.mistakeType ||
+"Not Classified") +
+
+'</span>' +
 
 "<br><br>" +
 
