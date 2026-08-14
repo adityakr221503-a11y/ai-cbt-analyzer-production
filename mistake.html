@@ -142,10 +142,6 @@ font-weight:800;
 cursor:pointer;
 }
 
-.retry:hover{
-opacity:.9;
-}
-
 .secondary{
 background:#e2e8f0;
 color:#0f172a;
@@ -162,11 +158,20 @@ padding:40px 15px;
 color:#64748b;
 }
 
-.actions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:15px;
+.mastered-box{
+background:#ecfdf5;
+border-left:5px solid #16a34a;
+padding:15px;
+border-radius:10px;
+margin-top:12px;
+}
+
+.still-box{
+background:#fff7ed;
+border-left:5px solid #f97316;
+padding:15px;
+border-radius:10px;
+margin-top:12px;
 }
 
 @media(max-width:700px){
@@ -180,7 +185,6 @@ grid-template-columns:1fr;
 </head>
 
 <body>
-
 
 <header>
 
@@ -206,14 +210,12 @@ onclick="location.href='analysis.html'">
 <div class="container">
 
 
-<!-- HERO -->
-
 <div class="hero">
 
 <h1>🧠 Mistake Bank</h1>
 
 <p>
-Review your incorrect questions and turn mistakes into mastery.
+Turn every mistake into mastery.
 </p>
 
 </div>
@@ -227,7 +229,6 @@ Review your incorrect questions and turn mistakes into mastery.
 
 <div class="stats">
 
-
 <div class="stat">
 
 <strong id="totalMistakes">
@@ -235,7 +236,7 @@ Review your incorrect questions and turn mistakes into mastery.
 </strong>
 
 <small>
-Total Mistakes
+Active Mistakes
 </small>
 
 </div>
@@ -248,7 +249,7 @@ Total Mistakes
 </strong>
 
 <small>
-Retry Questions
+Ready to Retry
 </small>
 
 </div>
@@ -266,9 +267,7 @@ Mastered
 
 </div>
 
-
 </div>
-
 
 <br>
 
@@ -281,15 +280,25 @@ onclick="startRetry()">
 
 </button>
 
+</div>
+
+
+<!-- STATUS -->
+
+<div class="card">
+
+<h2>🧠 Mastery Status</h2>
+
+<div id="status"></div>
 
 </div>
 
 
-<!-- MISTAKES -->
+<!-- ACTIVE MISTAKES -->
 
 <div class="card">
 
-<h2>❌ Your Mistakes</h2>
+<h2>❌ Active Mistakes</h2>
 
 <div id="mistakes">
 
@@ -314,7 +323,6 @@ LOAD HISTORY
 
 let history=[];
 
-
 try{
 
 history=
@@ -322,14 +330,13 @@ JSON.parse(
 localStorage.getItem("cbtHistory") || "[]"
 );
 
-
 if(!Array.isArray(history)){
 
 history=[];
 
 }
 
-}catch(error){
+}catch(e){
 
 history=[];
 
@@ -337,10 +344,64 @@ history=[];
 
 
 /* =====================================
-COLLECT WRONG QUESTIONS
+LOAD MASTERED
 ===================================== */
 
-function getMistakes(){
+let masteredIds=[];
+
+try{
+
+masteredIds=
+JSON.parse(
+localStorage.getItem(
+"cbtMasteredQuestions"
+) || "[]"
+);
+
+if(!Array.isArray(masteredIds)){
+
+masteredIds=[];
+
+}
+
+}catch(e){
+
+masteredIds=[];
+
+}
+
+
+/* =====================================
+QUESTION ID
+===================================== */
+
+function getQuestionId(q){
+
+if(q.retryQuestionId){
+
+return q.retryQuestionId;
+
+}
+
+return(
+String(
+q.question ||
+q.text ||
+q.questionText ||
+""
+)
+.trim()
+.toLowerCase()
+);
+
+}
+
+
+/* =====================================
+GET ALL WRONG
+===================================== */
+
+function getAllMistakes(){
 
 const mistakes=[];
 
@@ -358,9 +419,7 @@ return;
 test.questions.forEach(
 function(q,questionIndex){
 
-if(
-q.status==="wrong"
-){
+if(q.status==="wrong"){
 
 mistakes.push({
 
@@ -387,69 +446,99 @@ return mistakes;
 
 
 /* =====================================
-RENDER
+GET ACTIVE MISTAKES
 ===================================== */
 
-function render(){
+function getActiveMistakes(){
 
-const mistakes=
-getMistakes();
-
-
-document.getElementById(
-"totalMistakes"
-).textContent=
-mistakes.length;
+const all=
+getAllMistakes();
 
 
-document.getElementById(
-"retryCount"
-).textContent=
-mistakes.length;
+return all.filter(
+function(q){
 
+const id=
+getQuestionId(q);
 
-/*
-Mastered questions are tracked
-from retryHistory.
-*/
-
-let mastered=0;
-
-
-try{
-
-const retryHistory=
-JSON.parse(
-localStorage.getItem(
-"retryHistory"
-) || "[]"
-);
-
-
-if(Array.isArray(retryHistory)){
-
-retryHistory.forEach(
-function(result){
-
-mastered +=
-Number(result.correct) || 0;
+return !masteredIds.includes(id);
 
 });
 
 }
 
-}catch(e){
 
-mastered=0;
+/* =====================================
+RENDER
+===================================== */
 
-}
+function render(){
+
+const all=
+getAllMistakes();
+
+
+const active=
+getActiveMistakes();
+
+
+document.getElementById(
+"totalMistakes"
+).textContent=
+active.length;
+
+
+document.getElementById(
+"retryCount"
+).textContent=
+active.length;
 
 
 document.getElementById(
 "mastered"
 ).textContent=
-mastered;
+masteredIds.length;
 
+
+/* STATUS */
+
+const status=
+document.getElementById(
+"status"
+);
+
+
+status.innerHTML=
+`
+<div class="still-box">
+
+❌ <strong>
+${active.length}
+active mistake(s)
+</strong>
+
+<br>
+
+These questions still need practice.
+
+</div>
+
+<div class="mastered-box">
+
+✅ <strong>
+${masteredIds.length}
+mastered question(s)
+</strong>
+
+<br>
+
+These questions have been answered correctly during retry.
+
+</div>
+`;
+
+
+/* MISTAKES */
 
 const box=
 document.getElementById(
@@ -460,17 +549,21 @@ document.getElementById(
 box.innerHTML="";
 
 
-if(mistakes.length===0){
+if(active.length===0){
 
 box.innerHTML=
 `
 <div class="empty">
 
-🎉 No wrong questions found yet.
+🎉 <strong>Excellent!</strong>
 
 <br><br>
 
-Complete a CBT and your mistakes will appear here.
+You currently have no active mistakes.
+
+<br><br>
+
+Keep practicing to build mastery.
 
 </div>
 `;
@@ -480,7 +573,7 @@ return;
 }
 
 
-mistakes.forEach(
+active.forEach(
 function(q,index){
 
 const div=
@@ -516,13 +609,13 @@ q.correct ??
 const reason=
 q.mistakeReason ||
 q.reason ||
-"Review this question carefully and identify why the answer was incorrect.";
+"Review the concept and identify why the answer was incorrect.";
 
 
 const solution=
 q.solution ||
 q.explanation ||
-"No solution recorded for this question.";
+"No solution recorded.";
 
 
 div.innerHTML=
@@ -609,14 +702,14 @@ START RETRY
 
 function startRetry(){
 
-const mistakes=
-getMistakes();
+const active=
+getActiveMistakes();
 
 
-if(mistakes.length===0){
+if(active.length===0){
 
 alert(
-"No mistakes are available for retry yet."
+"No active mistakes are available for retry."
 );
 
 return;
@@ -624,26 +717,16 @@ return;
 }
 
 
-/*
-Create retry question set.
-*/
-
 const retryQuestions=
-mistakes.map(
+active.map(
 function(q,index){
 
-return {
+return{
 
 ...q,
 
 retryQuestionId:
-"retry_"
-+
-Date.now()
-+
-"_"
-+
-index
+getQuestionId(q)
 
 };
 
@@ -663,11 +746,6 @@ localStorage.setItem(
 "true"
 );
 
-
-/*
-Open retry.html,
-NOT the normal 36-question CBT.
-*/
 
 window.location.href=
 "retry.html";
