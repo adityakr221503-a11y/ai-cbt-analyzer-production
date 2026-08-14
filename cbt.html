@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>CBT Analyzer Pro</title>
+<title>CBT Analyzer Pro — CBT Test</title>
 
 <style>
-
-*{
-box-sizing:border-box
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
@@ -190,28 +185,22 @@ border-left:5px solid #dc2626
 border-left:5px solid #f59e0b
 }
 
-.result-buttons{
+.result-actions{
 display:flex;
 gap:10px;
-margin-top:20px;
-flex-wrap:wrap
+flex-wrap:wrap;
+margin-top:20px
 }
 
 @media(max-width:800px){
-
 .container{
 grid-template-columns:1fr
 }
-
 }
-
 </style>
-
 </head>
 
-
 <body>
-
 
 <header>
 
@@ -235,159 +224,116 @@ CBT Analyzer Pro
 
 <main class="card">
 
-
 <section id="testScreen">
-
 
 <div
 class="question-number"
 id="questionNumber">
-
 Loading...
-
 </div>
-
 
 <div
 class="question"
 id="question">
 </div>
 
-
 <div id="options"></div>
 
-
 <div class="buttons">
-
 
 <button
 class="secondary"
 onclick="previousQuestion()">
-
 Previous
-
 </button>
-
 
 <button
 class="warning"
 onclick="markReview()">
-
 Mark for Review
-
 </button>
-
 
 <button
 class="secondary"
 onclick="clearAnswer()">
-
 Clear Answer
-
 </button>
-
 
 <button
 class="primary"
 id="nextButton"
 onclick="nextQuestion()">
-
 Next
-
 </button>
 
-
 </div>
-
 
 </section>
 
 
 <section id="result">
 
-
 <h2>
 Test Completed
 </h2>
-
 
 <div
 class="score"
 id="score">
 </div>
 
-
 <p id="summary"></p>
 
+<div
+id="review">
+</div>
 
-<div id="review"></div>
-
-
-<div class="result-buttons">
-
+<div class="result-actions">
 
 <button
 class="primary"
 onclick="location.href='history.html'">
-
-📊 View History
-
+📊 Test History
 </button>
-
 
 <button
 class="secondary"
-onclick="location.href='attempt.html'">
-
-🧠 View Analysis
-
+onclick="location.href='mistake.html'">
+🧠 Mistake Bank
 </button>
-
 
 <button
 class="secondary"
 onclick="location.reload()">
-
 🔄 Restart Test
-
 </button>
-
 
 </div>
 
-
 </section>
-
 
 </main>
 
 
 <aside class="card">
 
-
 <h3>
 Question Palette
 </h3>
-
 
 <div
 class="palette"
 id="palette">
 </div>
 
-
 <div class="legend">
 
 🟩 Answered<br>
-
 🟨 Marked for review<br>
-
 ⬜ Not answered<br>
-
 🟦 Current question
 
 </div>
-
 
 <button
 class="danger"
@@ -398,7 +344,6 @@ Submit Test
 
 </button>
 
-
 </aside>
 
 
@@ -407,230 +352,160 @@ Submit Test
 
 <script>
 
-
 /* =========================
-   QUESTION BANK
+QUESTION BANK
 ========================= */
-
 
 const questions=[
 
-
 {
-question:
-"Which planet is known as the Red Planet?",
-
-options:[
-"Earth",
-"Mars",
-"Jupiter",
-"Venus"
-],
-
-answer:1,
-
-subject:"General Science",
-
-solution:
-"Mars is called the Red Planet because iron minerals in its surface have oxidized, giving it a reddish appearance."
-
-},
-
-
-{
-question:
-"What is 2 + 2?",
-
-options:[
-"3",
-"4",
-"5",
-"6"
-],
-
-answer:1,
-
-subject:"Mathematics",
-
-solution:
-"Adding 2 and 2 gives 4."
-},
-
-
-{
-question:
-"Which gas is most abundant in Earth's atmosphere?",
-
-options:[
-"Oxygen",
-"Carbon dioxide",
-"Nitrogen",
-"Hydrogen"
-],
-
-answer:2,
-
 subject:"Biology",
-
-solution:
-"Nitrogen makes up about 78% of Earth's atmosphere, making it the most abundant atmospheric gas."
-},
-
-
-{
-question:
-"What is the SI unit of force?",
-
-options:[
-"Joule",
-"Newton",
-"Watt",
-"Pascal"
-],
-
-answer:1,
-
-subject:"Physics",
-
-solution:
-"The SI unit of force is the newton (N). One newton is the force required to give a 1 kg mass an acceleration of 1 m/s²."
-},
-
-
-{
-question:
-"Which organelle is known as the powerhouse of the cell?",
-
+question:"Which organelle is known as the powerhouse of the cell?",
 options:[
 "Nucleus",
 "Ribosome",
 "Mitochondria",
 "Golgi apparatus"
 ],
-
 answer:2,
-
-subject:"Biology",
-
-solution:
-"Mitochondria generate most of the ATP used by the cell through cellular respiration."
+solution:"Mitochondria are the major sites of aerobic cellular respiration and ATP production."
 },
 
-
 {
-question:
-"What is the chemical symbol for sodium?",
-
-options:[
-"So",
-"Na",
-"S",
-"Sd"
-],
-
-answer:1,
-
-subject:"Chemistry",
-
-solution:
-"The chemical symbol for sodium is Na, derived from its Latin name natrium."
-},
-
-
-{
-question:
-"Which process produces ATP in mitochondria?",
-
-options:[
-"Photosynthesis",
-"Cellular respiration",
-"Transcription",
-"Translation"
-],
-
-answer:1,
-
-subject:"Biology",
-
-solution:
-"Cellular respiration in mitochondria generates ATP through pathways including the citric acid cycle and oxidative phosphorylation."
-},
-
-
-{
-question:
-"What is the approximate acceleration due to gravity near Earth's surface?",
-
+subject:"Physics",
+question:"What is the approximate acceleration due to gravity near Earth's surface?",
 options:[
 "4.9 m/s²",
 "9.8 m/s²",
 "19.6 m/s²",
 "98 m/s²"
 ],
-
 answer:1,
-
-subject:"Physics",
-
-solution:
-"The average acceleration due to gravity near Earth's surface is approximately 9.8 m/s²."
+solution:"The standard approximate value of gravitational acceleration near Earth's surface is 9.8 m/s²."
 },
 
+{
+subject:"Chemistry",
+question:"What is the chemical symbol for sodium?",
+options:[
+"So",
+"Na",
+"S",
+"Sd"
+],
+answer:1,
+solution:"The symbol Na comes from the Latin name natrium."
+},
 
 {
-question:
-"Which molecule carries genetic information?",
-
+subject:"Biology",
+question:"Which molecule carries genetic information?",
 options:[
 "Protein",
 "Lipid",
 "DNA",
 "Glucose"
 ],
-
 answer:2,
-
-subject:"Biology",
-
-solution:
-"DNA stores and transmits the genetic information required for the development and functioning of organisms."
+solution:"DNA stores and transmits hereditary genetic information in living organisms."
 },
 
-
 {
-question:
-"Which particle has a negative electric charge?",
-
+subject:"Physics",
+question:"Which particle has a negative electric charge?",
 options:[
 "Proton",
 "Neutron",
 "Electron",
 "Photon"
 ],
-
 answer:2,
+solution:"An electron carries a negative elementary electric charge."
+},
 
+{
+subject:"Chemistry",
+question:"Which gas is most abundant in Earth's atmosphere?",
+options:[
+"Oxygen",
+"Carbon dioxide",
+"Nitrogen",
+"Hydrogen"
+],
+answer:2,
+solution:"Nitrogen makes up approximately 78% of Earth's atmosphere by volume."
+},
+
+{
 subject:"Physics",
+question:"What is the SI unit of force?",
+options:[
+"Joule",
+"Newton",
+"Watt",
+"Pascal"
+],
+answer:1,
+solution:"The SI unit of force is the newton (N)."
+},
 
-solution:
-"An electron carries a negative elementary electric charge."
+{
+subject:"Biology",
+question:"Which process produces ATP in mitochondria?",
+options:[
+"Photosynthesis",
+"Cellular respiration",
+"Transcription",
+"Translation"
+],
+answer:1,
+solution:"Cellular respiration in mitochondria generates ATP through oxidative metabolism."
+},
+
+{
+subject:"Physics",
+question:"Which planet is known as the Red Planet?",
+options:[
+"Earth",
+"Mars",
+"Jupiter",
+"Venus"
+],
+answer:1,
+solution:"Mars appears reddish because of iron oxides present on its surface."
+},
+
+{
+subject:"Chemistry",
+question:"What is 2 + 2?",
+options:[
+"3",
+"4",
+"5",
+"6"
+],
+answer:1,
+solution:"Adding two and two gives four."
 }
 
 ];
 
 
 /* =========================
-   TEST STATE
+STATE
 ========================= */
-
 
 let current=0;
 
 let answers=
-new Array(questions.length).fill(null);
+new Array(
+questions.length
+).fill(null);
 
 let marked=
-new Array(questions.length).fill(false);
+new Array(
+questions.length
+).fill(false);
 
 let submitted=false;
 
@@ -638,23 +513,22 @@ let timeLeft=1800;
 
 
 /* =========================
-   TIMER
+TIMER
 ========================= */
-
 
 function updateTimer(){
 
-let m=
+const m=
 Math.floor(timeLeft/60);
 
-let s=
+const s=
 timeLeft%60;
 
-document.getElementById("timer").textContent=
-
+document.getElementById(
+"timer"
+).textContent=
 String(m).padStart(2,"0")
-+
-":"
++":"
 +
 String(s).padStart(2,"0");
 
@@ -674,7 +548,9 @@ timeLeft=0;
 
 updateTimer();
 
-clearInterval(timerInterval);
+clearInterval(
+timerInterval
+);
 
 submitTest();
 
@@ -688,28 +564,28 @@ updateTimer();
 
 
 /* =========================
-   RENDER QUESTION
+QUESTION
 ========================= */
-
 
 function renderQuestion(){
 
 const q=
 questions[current];
 
-
 document.getElementById(
 "questionNumber"
 ).textContent=
-
 "Question "
 +
 (current+1)
 +
 " of "
 +
-questions.length;
-
+questions.length
++
+" • "
++
+q.subject;
 
 document.getElementById(
 "question"
@@ -722,7 +598,6 @@ document.getElementById(
 "options"
 );
 
-
 box.innerHTML="";
 
 
@@ -730,10 +605,12 @@ q.options.forEach(
 function(option,index){
 
 const button=
-document.createElement("button");
+document.createElement(
+"button"
+);
 
-
-button.className="option";
+button.className=
+"option";
 
 
 if(
@@ -748,7 +625,6 @@ button.classList.add(
 
 
 button.textContent=
-
 String.fromCharCode(
 65+index
 )
@@ -761,14 +637,17 @@ option;
 button.onclick=
 function(){
 
-answers[current]=index;
+answers[current]=
+index;
 
 renderQuestion();
 
 };
 
 
-box.appendChild(button);
+box.appendChild(
+button
+);
 
 });
 
@@ -776,7 +655,6 @@ box.appendChild(button);
 document.getElementById(
 "nextButton"
 ).textContent=
-
 current===
 questions.length-1
 ?
@@ -791,9 +669,8 @@ renderPalette();
 
 
 /* =========================
-   QUESTION PALETTE
+PALETTE
 ========================= */
-
 
 function renderPalette(){
 
@@ -802,7 +679,6 @@ document.getElementById(
 "palette"
 );
 
-
 palette.innerHTML="";
 
 
@@ -810,8 +686,9 @@ questions.forEach(
 function(q,index){
 
 const button=
-document.createElement("button");
-
+document.createElement(
+"button"
+);
 
 button.textContent=
 index+1;
@@ -828,9 +705,7 @@ button.classList.add(
 }
 
 
-if(
-marked[index]
-){
+if(marked[index]){
 
 button.classList.add(
 "review"
@@ -839,9 +714,7 @@ button.classList.add(
 }
 
 
-if(
-index===current
-){
+if(index===current){
 
 button.classList.add(
 "current"
@@ -860,7 +733,9 @@ renderQuestion();
 };
 
 
-palette.appendChild(button);
+palette.appendChild(
+button
+);
 
 });
 
@@ -868,9 +743,8 @@ palette.appendChild(button);
 
 
 /* =========================
-   NAVIGATION
+NAVIGATION
 ========================= */
-
 
 function nextQuestion(){
 
@@ -926,9 +800,116 @@ renderPalette();
 
 
 /* =========================
-   SUBMIT TEST
+MISTAKE REASON
 ========================= */
 
+function getMistakeReason(
+questionIndex
+){
+
+const answer=
+answers[questionIndex];
+
+if(answer===null){
+
+return "Skipped question. Review the concept and attempt it again without looking at the answer.";
+
+}
+
+return "Review the concept, identify why the selected option was chosen, and compare it with the correct reasoning.";
+
+}
+
+
+/* =========================
+CREATE ATTEMPT DATA
+========================= */
+
+function buildAttemptData(){
+
+const detailedQuestions=[];
+
+
+questions.forEach(
+function(q,index){
+
+let status;
+
+if(
+answers[index]===null
+){
+
+status="skipped";
+
+}
+else if(
+answers[index]===q.answer
+){
+
+status="correct";
+
+}
+else{
+
+status="wrong";
+
+}
+
+
+detailedQuestions.push({
+
+questionNumber:index+1,
+
+subject:q.subject,
+
+question:q.question,
+
+options:q.options,
+
+selectedIndex:
+answers[index],
+
+selectedAnswer:
+answers[index]===null
+?
+"Not Attempted"
+:
+q.options[answers[index]],
+
+correctIndex:q.answer,
+
+correctAnswer:
+q.options[q.answer],
+
+status:status,
+
+bookmarked:
+marked[index],
+
+mistakeReason:
+status==="wrong" ||
+status==="skipped"
+?
+getMistakeReason(index)
+:
+"",
+
+solution:
+q.solution
+
+});
+
+});
+
+
+return detailedQuestions;
+
+}
+
+
+/* =========================
+SUBMIT
+========================= */
 
 function submitTest(){
 
@@ -942,23 +923,14 @@ let incorrect=0;
 let skipped=0;
 
 
-const questionData=[];
-
-
 questions.forEach(
 function(q,index){
-
-
-let status="skipped";
-
 
 if(
 answers[index]===null
 ){
 
 skipped++;
-
-status="skipped";
 
 }
 else if(
@@ -967,140 +939,59 @@ answers[index]===q.answer
 
 correct++;
 
-status="correct";
-
 }
 else{
 
 incorrect++;
 
-status="wrong";
-
 }
 
-
-/* QUESTION LEVEL DATA */
-
-
-questionData.push({
-
-question:
-q.question,
-
-options:
-q.options,
-
-selectedAnswer:
-
-answers[index]===null
-?
-null
-:
-q.options[
-answers[index]
-],
-
-correctAnswer:
-q.options[q.answer],
-
-status:
-status,
-
-mistakeReason:
-
-status==="wrong"
-?
-getMistakeReason(q,index)
-:
-"",
-
-solution:
-q.solution ||
-(
-"Correct answer: "
-+
-q.options[q.answer]
-),
-
-subject:
-q.subject ||
-"General",
-
-bookmarked:
-marked[index],
-
-questionNumber:
-index+1
-
 });
-
-});
-
-
-submitted=true;
-
-
-clearInterval(
-timerInterval
-);
-
-
-/* SCORE */
 
 
 const score=
-(correct*4)-incorrect;
+(correct*4)
+-
+incorrect;
 
 
-/* =========================
-   SAVE HISTORY
-========================= */
+const detailedQuestions=
+buildAttemptData();
 
 
-const history=
-
-JSON.parse(
-localStorage.getItem(
-"cbtHistory"
-)
-||"[]"
-);
-
-
-const testRecord={
-
-title:
-"CBT Analyzer Pro Test",
+const attempt={
 
 date:
 new Date().toLocaleString(),
 
-score:
-score,
+score:score,
 
-correct:
-correct,
+correct:correct,
 
-incorrect:
-incorrect,
+incorrect:incorrect,
 
-skipped:
-skipped,
+skipped:skipped,
 
 totalQuestions:
 questions.length,
 
-timeUsed:
-1800-timeLeft,
-
 questions:
-questionData
+detailedQuestions
 
 };
 
 
+const history=
+JSON.parse(
+localStorage.getItem(
+"cbtHistory"
+)
+|| "[]"
+);
+
+
 history.push(
-testRecord
+attempt
 );
 
 
@@ -1110,30 +1001,40 @@ JSON.stringify(history)
 );
 
 
-/* =========================
-   SHOW RESULT
-========================= */
+localStorage.setItem(
+"selectedCBTAttempt",
+JSON.stringify(attempt)
+);
+
+
+submitted=true;
+
+clearInterval(
+timerInterval
+);
 
 
 document.getElementById(
 "testScreen"
-).style.display="none";
+).style.display=
+"none";
 
 
 document.querySelector(
 "aside"
-).style.display="none";
+).style.display=
+"none";
 
 
 document.getElementById(
 "result"
-).style.display="block";
+).style.display=
+"block";
 
 
 document.getElementById(
 "score"
 ).textContent=
-
 score
 +
 " / "
@@ -1144,7 +1045,6 @@ score
 document.getElementById(
 "summary"
 ).textContent=
-
 "Correct: "
 +
 correct
@@ -1164,24 +1064,8 @@ generateReview();
 
 
 /* =========================
-   MISTAKE REASON
+REVIEW
 ========================= */
-
-
-function getMistakeReason(q,index){
-
-return
-"Conceptual or selection mistake. "
-+
-"Review the question carefully, compare your selected answer with the correct concept, and retry a similar question.";
-
-}
-
-
-/* =========================
-   RESULT REVIEW
-========================= */
-
 
 function generateReview(){
 
@@ -1190,7 +1074,6 @@ document.getElementById(
 "review"
 );
 
-
 box.innerHTML=
 "<h3>Question Review</h3>";
 
@@ -1198,51 +1081,45 @@ box.innerHTML=
 questions.forEach(
 function(q,index){
 
-
 const item=
 document.createElement(
 "div"
 );
 
-
-item.className=
-"review-item";
+let status;
 
 
 if(
 answers[index]===null
 ){
 
-item.classList.add(
-"skipped"
-);
+status="skipped";
 
 }
 else if(
 answers[index]===q.answer
 ){
 
-item.classList.add(
-"correct"
-);
+status="correct";
 
 }
 else{
 
-item.classList.add(
-"incorrect"
-);
+status="incorrect";
 
 }
 
 
+item.className=
+"review-item "
++
+status;
+
+
 const selected=
-
 answers[index]===null
-
 ?
 "Not answered"
-
 :
 q.options[
 answers[index]
@@ -1251,11 +1128,13 @@ answers[index]
 
 item.innerHTML=
 
-"<strong>"
-+
-"Question "
+"<strong>Question "
 +
 (index+1)
++
+" • "
++
+q.subject
 +
 "</strong>"
 
@@ -1281,50 +1160,20 @@ selected
 +
 q.options[q.answer]
 +
-"</p>";
+"</p>"
 
-
-if(
-answers[index]!==null
-&&
-answers[index]!==q.answer
-){
-
-item.innerHTML+=
-
-"<p><strong>🧠 Mistake reason:</strong> "
 +
-getMistakeReason(q,index)
+
+"<p><strong>Solution:</strong> "
 +
-"</p>";
-
-}
-
-
-item.innerHTML+=
-
-"<p><strong>💡 Solution:</strong> "
-+
-(
-q.solution ||
-"Solution not available."
-)
+q.solution
 +
 "</p>";
 
 
-if(
-marked[index]
-){
-
-item.innerHTML+=
-
-"<p><strong>🔖 Bookmarked</strong></p>";
-
-}
-
-
-box.appendChild(item);
+box.appendChild(
+item
+);
 
 });
 
@@ -1332,9 +1181,8 @@ box.appendChild(item);
 
 
 /* =========================
-   INITIALIZE
+START
 ========================= */
-
 
 updateTimer();
 
