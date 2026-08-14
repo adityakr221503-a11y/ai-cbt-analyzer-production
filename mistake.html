@@ -7,9 +7,7 @@
 <title>CBT Analyzer Pro — Mistake Bank</title>
 
 <style>
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
@@ -154,32 +152,39 @@ cursor:pointer;
 
 .empty{
 text-align:center;
-padding:40px 15px;
+padding:35px 15px;
 color:#64748b;
 }
 
-.mastered-box{
-background:#ecfdf5;
-border-left:5px solid #16a34a;
-padding:15px;
-border-radius:10px;
-margin-top:12px;
+.mastered-card{
+border:1px solid #bbf7d0;
+background:#f0fdf4;
+border-radius:14px;
+padding:18px;
+margin-top:14px;
 }
 
-.still-box{
-background:#fff7ed;
-border-left:5px solid #f97316;
-padding:15px;
-border-radius:10px;
-margin-top:12px;
+.mastered-title{
+font-weight:800;
+color:#15803d;
+margin-bottom:10px;
+}
+
+.mastered-question{
+font-weight:700;
+line-height:1.5;
+}
+
+.mastered-info{
+margin-top:10px;
+font-size:14px;
+color:#475569;
 }
 
 @media(max-width:700px){
-
 .stats{
 grid-template-columns:1fr;
 }
-
 }
 </style>
 </head>
@@ -187,7 +192,6 @@ grid-template-columns:1fr;
 <body>
 
 <header>
-
 <div class="header">
 
 <div class="logo">
@@ -203,12 +207,10 @@ onclick="location.href='analysis.html'">
 </button>
 
 </div>
-
 </header>
 
 
 <div class="container">
-
 
 <div class="hero">
 
@@ -230,47 +232,23 @@ Turn every mistake into mastery.
 <div class="stats">
 
 <div class="stat">
-
-<strong id="totalMistakes">
-0
-</strong>
-
-<small>
-Active Mistakes
-</small>
-
+<strong id="totalMistakes">0</strong>
+<small>Active Mistakes</small>
 </div>
 
-
 <div class="stat">
-
-<strong id="retryCount">
-0
-</strong>
-
-<small>
-Ready to Retry
-</small>
-
+<strong id="retryCount">0</strong>
+<small>Ready to Retry</small>
 </div>
 
-
 <div class="stat">
-
-<strong id="mastered">
-0
-</strong>
-
-<small>
-Mastered
-</small>
-
+<strong id="mastered">0</strong>
+<small>Mastered</small>
 </div>
 
 </div>
 
 <br>
-
 
 <button
 class="retry"
@@ -283,30 +261,28 @@ onclick="startRetry()">
 </div>
 
 
-<!-- STATUS -->
-
-<div class="card">
-
-<h2>🧠 Mastery Status</h2>
-
-<div id="status"></div>
-
-</div>
-
-
 <!-- ACTIVE MISTAKES -->
 
 <div class="card">
 
 <h2>❌ Active Mistakes</h2>
 
-<div id="mistakes">
-
-<div class="empty">
-Loading mistakes...
-</div>
+<div id="mistakes"></div>
 
 </div>
+
+
+<!-- MASTERED QUESTIONS -->
+
+<div class="card">
+
+<h2>🏆 Mastered Questions</h2>
+
+<p style="color:#64748b;">
+Questions you answered correctly during retry.
+</p>
+
+<div id="masteredQuestions"></div>
 
 </div>
 
@@ -316,12 +292,13 @@ Loading mistakes...
 
 <script>
 
-
-/* =====================================
-LOAD HISTORY
-===================================== */
+/* =================================
+LOAD DATA
+================================= */
 
 let history=[];
+let masteredIds=[];
+
 
 try{
 
@@ -331,9 +308,7 @@ localStorage.getItem("cbtHistory") || "[]"
 );
 
 if(!Array.isArray(history)){
-
 history=[];
-
 }
 
 }catch(e){
@@ -342,12 +317,6 @@ history=[];
 
 }
 
-
-/* =====================================
-LOAD MASTERED
-===================================== */
-
-let masteredIds=[];
 
 try{
 
@@ -359,9 +328,7 @@ localStorage.getItem(
 );
 
 if(!Array.isArray(masteredIds)){
-
 masteredIds=[];
-
 }
 
 }catch(e){
@@ -371,20 +338,13 @@ masteredIds=[];
 }
 
 
-/* =====================================
+/* =================================
 QUESTION ID
-===================================== */
+================================= */
 
 function getQuestionId(q){
 
-if(q.retryQuestionId){
-
-return q.retryQuestionId;
-
-}
-
-return(
-String(
+return String(
 q.question ||
 q.text ||
 q.questionText ||
@@ -392,46 +352,30 @@ q.questionText ||
 )
 .trim()
 .toLowerCase()
-);
+.replace(/\s+/g," ");
 
 }
 
 
-/* =====================================
-GET ALL WRONG
-===================================== */
+/* =================================
+ALL WRONG QUESTIONS
+================================= */
 
 function getAllMistakes(){
 
-const mistakes=[];
+const result=[];
 
-
-history.forEach(
-function(test,testIndex){
+history.forEach(function(test){
 
 if(!Array.isArray(test.questions)){
-
 return;
-
 }
 
-
-test.questions.forEach(
-function(q,questionIndex){
+test.questions.forEach(function(q){
 
 if(q.status==="wrong"){
 
-mistakes.push({
-
-...q,
-
-originalTest:
-testIndex+1,
-
-originalQuestion:
-questionIndex+1
-
-});
+result.push(q);
 
 }
 
@@ -439,23 +383,18 @@ questionIndex+1
 
 });
 
-
-return mistakes;
+return result;
 
 }
 
 
-/* =====================================
-GET ACTIVE MISTAKES
-===================================== */
+/* =================================
+ACTIVE MISTAKES
+================================= */
 
 function getActiveMistakes(){
 
-const all=
-getAllMistakes();
-
-
-return all.filter(
+return getAllMistakes().filter(
 function(q){
 
 const id=
@@ -468,85 +407,77 @@ return !masteredIds.includes(id);
 }
 
 
-/* =====================================
-RENDER
-===================================== */
+/* =================================
+MASTERED QUESTIONS
+================================= */
 
-function render(){
+function getMasteredQuestions(){
 
-const all=
-getAllMistakes();
+const result=[];
+const seen=new Set();
 
+getAllMistakes().forEach(function(q){
+
+const id=
+getQuestionId(q);
+
+if(
+masteredIds.includes(id) &&
+!seen.has(id)
+){
+
+seen.add(id);
+result.push(q);
+
+}
+
+});
+
+return result;
+
+}
+
+
+/* =================================
+ESCAPE
+================================= */
+
+function escapeHTML(value){
+
+return String(value)
+
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =================================
+RENDER ACTIVE
+================================= */
+
+function renderActive(){
 
 const active=
 getActiveMistakes();
 
+const box=
+document.getElementById("mistakes");
+
+box.innerHTML="";
 
 document.getElementById(
 "totalMistakes"
 ).textContent=
 active.length;
 
-
 document.getElementById(
 "retryCount"
 ).textContent=
 active.length;
-
-
-document.getElementById(
-"mastered"
-).textContent=
-masteredIds.length;
-
-
-/* STATUS */
-
-const status=
-document.getElementById(
-"status"
-);
-
-
-status.innerHTML=
-`
-<div class="still-box">
-
-❌ <strong>
-${active.length}
-active mistake(s)
-</strong>
-
-<br>
-
-These questions still need practice.
-
-</div>
-
-<div class="mastered-box">
-
-✅ <strong>
-${masteredIds.length}
-mastered question(s)
-</strong>
-
-<br>
-
-These questions have been answered correctly during retry.
-
-</div>
-`;
-
-
-/* MISTAKES */
-
-const box=
-document.getElementById(
-"mistakes"
-);
-
-
-box.innerHTML="";
 
 
 if(active.length===0){
@@ -555,15 +486,11 @@ box.innerHTML=
 `
 <div class="empty">
 
-🎉 <strong>Excellent!</strong>
+🎉 <strong>No active mistakes!</strong>
 
 <br><br>
 
-You currently have no active mistakes.
-
-<br><br>
-
-Keep practicing to build mastery.
+All currently tracked mistakes have been mastered.
 
 </div>
 `;
@@ -573,31 +500,18 @@ return;
 }
 
 
-active.forEach(
-function(q,index){
+active.forEach(function(q,index){
 
-const div=
-document.createElement(
-"div"
-);
-
-div.className=
-"question";
-
-
-const questionText=
+const question=
 q.question ||
 q.text ||
 q.questionText ||
-"Question text unavailable";
-
+"Question unavailable";
 
 const yourAnswer=
 q.selectedAnswer ??
 q.userAnswer ??
-q.userAnswerText ??
 "Not recorded";
-
 
 const correctAnswer=
 q.correctAnswer ??
@@ -605,89 +519,51 @@ q.correctOption ??
 q.correct ??
 "Not recorded";
 
-
 const reason=
 q.mistakeReason ||
 q.reason ||
-"Review the concept and identify why the answer was incorrect.";
-
+"Review why the original answer was incorrect.";
 
 const solution=
 q.solution ||
 q.explanation ||
 "No solution recorded.";
 
+const div=
+document.createElement("div");
+
+div.className="question";
 
 div.innerHTML=
 `
-
 <div class="question-number">
-
 Mistake #${index+1}
-
 </div>
-
 
 <div class="question-text">
-
-${escapeHTML(questionText)}
-
+${escapeHTML(question)}
 </div>
-
 
 <div class="answer wrong">
-
-<strong>
-❌ Your Answer
-</strong>
-
-<br>
-
+<strong>❌ Your Answer</strong><br>
 ${escapeHTML(yourAnswer)}
-
 </div>
-
 
 <div class="answer correct">
-
-<strong>
-✅ Correct Answer
-</strong>
-
-<br>
-
+<strong>✅ Correct Answer</strong><br>
 ${escapeHTML(correctAnswer)}
-
 </div>
 
-
 <div class="answer">
-
-<strong>
-🧠 Mistake Reason
-</strong>
-
-<br>
-
+<strong>🧠 Mistake Reason</strong><br>
 ${escapeHTML(reason)}
-
 </div>
-
 
 <div class="answer">
-
-<strong>
-💡 Solution
-</strong>
-
-<br>
-
+<strong>💡 Solution</strong><br>
 ${escapeHTML(solution)}
-
 </div>
-
 `;
-
 
 box.appendChild(div);
 
@@ -696,15 +572,110 @@ box.appendChild(div);
 }
 
 
-/* =====================================
+/* =================================
+RENDER MASTERED
+================================= */
+
+function renderMastered(){
+
+const mastered=
+getMasteredQuestions();
+
+const box=
+document.getElementById(
+"masteredQuestions"
+);
+
+box.innerHTML="";
+
+document.getElementById(
+"mastered"
+).textContent=
+mastered.length;
+
+
+if(mastered.length===0){
+
+box.innerHTML=
+`
+<div class="empty">
+
+🏆 No mastered questions yet.
+
+<br><br>
+
+Retry your active mistakes and answer them correctly.
+
+</div>
+`;
+
+return;
+
+}
+
+
+mastered.forEach(function(q,index){
+
+const question=
+q.question ||
+q.text ||
+q.questionText ||
+"Question unavailable";
+
+const correctAnswer=
+q.correctAnswer ??
+q.correctOption ??
+q.correct ??
+"Not recorded";
+
+const div=
+document.createElement("div");
+
+div.className="mastered-card";
+
+div.innerHTML=
+`
+<div class="mastered-title">
+🏆 Mastered Question #${index+1}
+</div>
+
+<div class="mastered-question">
+${escapeHTML(question)}
+</div>
+
+<div class="answer correct">
+
+<strong>✅ Correct Answer</strong><br>
+
+${escapeHTML(correctAnswer)}
+
+</div>
+
+<div class="mastered-info">
+
+🎯 Status: <strong>Mastered</strong><br>
+
+This question was answered correctly during retry
+and has been removed from the active mistake queue.
+
+</div>
+`;
+
+box.appendChild(div);
+
+});
+
+}
+
+
+/* =================================
 START RETRY
-===================================== */
+================================= */
 
 function startRetry(){
 
 const active=
 getActiveMistakes();
-
 
 if(active.length===0){
 
@@ -718,8 +689,7 @@ return;
 
 
 const retryQuestions=
-active.map(
-function(q,index){
+active.map(function(q){
 
 return{
 
@@ -740,12 +710,10 @@ retryQuestions
 )
 );
 
-
 localStorage.setItem(
 "cbtRetryMode",
 "true"
 );
-
 
 window.location.href=
 "retry.html";
@@ -753,47 +721,13 @@ window.location.href=
 }
 
 
-/* =====================================
-ESCAPE HTML
-===================================== */
-
-function escapeHTML(value){
-
-return String(value)
-
-.replace(
-/&/g,
-"&amp;"
-)
-
-.replace(
-/</g,
-"&lt;"
-)
-
-.replace(
-/>/g,
-"&gt;"
-)
-
-.replace(
-/"/g,
-"&quot;"
-)
-
-.replace(
-/'/g,
-"&#039;"
-);
-
-}
-
-
-/* =====================================
+/* =================================
 START
-===================================== */
+================================= */
 
-render();
+renderActive();
+
+renderMastered();
 
 </script>
 
