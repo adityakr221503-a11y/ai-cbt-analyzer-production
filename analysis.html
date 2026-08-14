@@ -7,6 +7,7 @@
 <title>CBT Analyzer Pro — Performance Dashboard</title>
 
 <style>
+
 *{
 box-sizing:border-box;
 }
@@ -70,6 +71,11 @@ margin-bottom:20px;
 
 .hero h1{
 margin:0 0 8px;
+}
+
+.hero p{
+margin:0;
+opacity:.9;
 }
 
 .card{
@@ -169,6 +175,44 @@ font-size:27px;
 margin-bottom:5px;
 }
 
+.reason-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px;
+margin-top:15px;
+}
+
+.reason-card{
+background:#f8fafc;
+border-radius:12px;
+padding:16px;
+}
+
+.reason-card strong{
+display:block;
+font-size:24px;
+margin-bottom:5px;
+}
+
+.reason-bar{
+height:9px;
+background:#e2e8f0;
+border-radius:20px;
+overflow:hidden;
+margin-top:8px;
+}
+
+.reason-bar div{
+height:100%;
+background:#4f46e5;
+}
+
+.reason-total{
+font-size:14px;
+color:#64748b;
+margin-top:8px;
+}
+
 .insight{
 padding:15px;
 border-radius:10px;
@@ -203,7 +247,12 @@ grid-template-columns:1fr 1fr;
 grid-template-columns:1fr;
 }
 
+.reason-grid{
+grid-template-columns:1fr;
 }
+
+}
+
 </style>
 </head>
 
@@ -243,7 +292,9 @@ Track your tests, retries, mistakes and mastery.
 </div>
 
 
-<!-- OVERALL -->
+<!-- ================================
+OVERALL PERFORMANCE
+================================ -->
 
 <div class="card">
 
@@ -252,68 +303,130 @@ Track your tests, retries, mistakes and mastery.
 <div class="stats">
 
 <div class="stat">
-<strong id="tests">0</strong>
-<small>Tests</small>
+
+<strong id="tests">
+0
+</strong>
+
+<small>
+Tests
+</small>
+
 </div>
+
 
 <div class="stat">
-<strong id="accuracy">0%</strong>
-<small>Accuracy</small>
+
+<strong id="accuracy">
+0%
+</strong>
+
+<small>
+Accuracy
+</small>
+
 </div>
+
 
 <div class="stat">
-<strong id="correct">0</strong>
-<small>Correct</small>
+
+<strong id="correct">
+0
+</strong>
+
+<small>
+Correct
+</small>
+
 </div>
+
 
 <div class="stat">
-<strong id="wrong">0</strong>
-<small>Wrong</small>
-</div>
+
+<strong id="wrong">
+0
+</strong>
+
+<small>
+Wrong
+</small>
 
 </div>
 
 </div>
 
+</div>
 
-<!-- MASTERY ANALYTICS -->
+
+<!-- ================================
+MASTERY ANALYTICS
+================================ -->
 
 <div class="card">
 
-<h2>🏆 Mistake Mastery Analytics</h2>
+<h2>
+🏆 Mistake Mastery Analytics
+</h2>
 
 <div id="masteryAnalytics"></div>
 
 </div>
 
 
-<!-- PROGRESS -->
+<!-- ================================
+MISTAKE REASON ANALYTICS
+================================ -->
 
 <div class="card">
 
-<h2>📈 Progress Over Attempts</h2>
+<h2>
+🧠 Mistake Reason Analytics
+</h2>
+
+<div id="mistakeReasonAnalytics"></div>
+
+</div>
+
+
+<!-- ================================
+PROGRESS
+================================ -->
+
+<div class="card">
+
+<h2>
+📈 Progress Over Attempts
+</h2>
 
 <div id="attemptProgress"></div>
 
 </div>
 
 
-<!-- RETRY -->
+<!-- ================================
+RETRY
+================================ -->
 
 <div class="card">
 
-<h2>🔄 Retry Progress</h2>
+<h2>
+🔄 Retry Progress
+</h2>
 
 <div id="retryProgress"></div>
 
 </div>
 
 
-<!-- INSIGHTS -->
+<!-- ================================
+INSIGHTS
+================================ -->
 
 <div class="card">
 
-<h2>🧠 Performance Insights</h2>
+<h2>
+💡 Performance Insights
+</h2>
 
 <div id="insights"></div>
 
@@ -391,7 +504,7 @@ mastered=[];
 
 
 /* =====================================
-NORMALIZE QUESTION
+NORMALIZE
 ===================================== */
 
 function normalize(text){
@@ -405,7 +518,7 @@ return String(text || "")
 
 
 /* =====================================
-MASTERED QUESTION TEXTS
+MASTERED TEXTS
 ===================================== */
 
 function getMasteredTexts(){
@@ -610,6 +723,7 @@ Math.round(
 
 box.innerHTML=
 `
+
 <div class="mastery-box">
 
 <div>
@@ -629,13 +743,16 @@ ${rate}%
 
 <div class="mastery-grid">
 
+
 <div class="mastery-stat">
 
 <strong>
 ${masteredCount}
 </strong>
 
-<span>🏆 Mastered</span>
+<span>
+🏆 Mastered
+</span>
 
 </div>
 
@@ -646,7 +763,9 @@ ${masteredCount}
 ${activeCount}
 </strong>
 
-<span>❌ Active</span>
+<span>
+❌ Active
+</span>
 
 </div>
 
@@ -657,9 +776,12 @@ ${activeCount}
 ${retryHistory.length}
 </strong>
 
-<span>🔄 Retries</span>
+<span>
+🔄 Retries
+</span>
 
 </div>
+
 
 </div>
 
@@ -668,24 +790,352 @@ ${retryHistory.length}
 
 ${
 total===0
+
 ?
+
 "Complete a CBT to start building your mistake mastery data."
+
 :
+
 rate>=80
+
 ?
+
 "🔥 Excellent! Most of your mistakes have been converted into mastered questions."
+
 :
+
 rate>=50
+
 ?
+
 "📈 Good progress! Keep retrying your remaining active mistakes."
+
 :
+
 "🎯 Your biggest opportunity is to retry the active mistakes and convert them into mastery."
+
 }
 
 </div>
 
 </div>
+
 `;
+
+}
+
+
+/* =====================================
+MISTAKE REASON CLASSIFICATION
+===================================== */
+
+function classifyMistake(q){
+
+const raw=
+String(
+q.mistakeReason ||
+q.reason ||
+q.errorType ||
+q.mistakeType ||
+""
+)
+.toLowerCase()
+.trim();
+
+
+if(!raw){
+
+return "Not Classified";
+
+}
+
+
+if(
+raw.includes("concept") ||
+raw.includes("knowledge") ||
+raw.includes("theory")
+){
+
+return "Concept Gap";
+
+}
+
+
+if(
+raw.includes("calculation") ||
+raw.includes("calculat") ||
+raw.includes("arithmetic")
+){
+
+return "Calculation Error";
+
+}
+
+
+if(
+raw.includes("misread") ||
+raw.includes("read question") ||
+raw.includes("interpret")
+){
+
+return "Misread Question";
+
+}
+
+
+if(
+raw.includes("guess") ||
+raw.includes("random")
+){
+
+return "Guessing";
+
+}
+
+
+if(
+raw.includes("time") ||
+raw.includes("hurry") ||
+raw.includes("pressure")
+){
+
+return "Time Pressure";
+
+}
+
+
+return "Not Classified";
+
+}
+
+
+/* =====================================
+MISTAKE REASON ANALYTICS
+===================================== */
+
+function renderMistakeReasonAnalytics(){
+
+const box=
+document.getElementById(
+"mistakeReasonAnalytics"
+);
+
+
+const counts={
+
+"Concept Gap":0,
+
+"Calculation Error":0,
+
+"Misread Question":0,
+
+"Guessing":0,
+
+"Time Pressure":0,
+
+"Not Classified":0
+
+};
+
+
+let total=0;
+
+
+history.forEach(function(test){
+
+if(!Array.isArray(test.questions)){
+return;
+}
+
+
+test.questions.forEach(function(q){
+
+if(q.status==="wrong"){
+
+const reason=
+classifyMistake(q);
+
+counts[reason]++;
+
+total++;
+
+}
+
+});
+
+});
+
+
+if(total===0){
+
+box.innerHTML=
+`
+
+<div class="empty">
+
+🧠 No mistake-reason data yet.
+
+<br><br>
+
+Complete CBT attempts with mistakes to build
+mistake-reason analytics.
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+let highestReason="";
+let highestCount=0;
+
+
+Object.keys(counts).forEach(function(reason){
+
+if(
+counts[reason]>highestCount &&
+reason!=="Not Classified"
+){
+
+highestCount=
+counts[reason];
+
+highestReason=
+reason;
+
+}
+
+});
+
+
+const icons={
+
+"Concept Gap":"🧠",
+
+"Calculation Error":"🧮",
+
+"Misread Question":"👀",
+
+"Guessing":"🎲",
+
+"Time Pressure":"⏱️",
+
+"Not Classified":"❓"
+
+};
+
+
+let html=
+`
+<div class="reason-grid">
+`;
+
+
+Object.keys(counts).forEach(function(reason){
+
+const count=
+counts[reason];
+
+const percentage=
+Math.round(
+(count/total)*100
+);
+
+
+html+=
+`
+
+<div class="reason-card">
+
+<strong>
+
+${icons[reason]} ${count}
+
+</strong>
+
+
+<div>
+${reason}
+</div>
+
+
+<div class="reason-bar">
+
+<div
+style="width:${percentage}%">
+</div>
+
+</div>
+
+
+<div class="reason-total">
+
+${percentage}%
+of recorded mistakes
+
+</div>
+
+</div>
+
+`;
+
+});
+
+
+html+=
+`
+</div>
+`;
+
+
+if(highestReason){
+
+html+=
+`
+
+<div class="insight focus">
+
+🎯 <strong>
+Most common mistake:
+</strong>
+
+${highestReason}
+
+<br><br>
+
+Focus your next revision session on this
+mistake pattern.
+
+</div>
+
+`;
+
+}
+
+
+if(counts["Not Classified"]>0){
+
+html+=
+`
+
+<div class="insight">
+
+ℹ️ ${counts["Not Classified"]}
+mistake(s) do not have a recognized reason yet.
+
+</div>
+
+`;
+
+}
+
+
+box.innerHTML=
+html;
 
 }
 
@@ -703,18 +1153,24 @@ document.getElementById(
 
 box.innerHTML="";
 
+
 if(history.length===0){
 
 box.innerHTML=
 `
+
 <div class="empty">
+
 Complete a CBT to start tracking attempts.
+
 </div>
+
 `;
 
 return;
 
 }
+
 
 history.forEach(function(test,index){
 
@@ -740,18 +1196,28 @@ Math.round(
 (correct/attempted)*100
 );
 
+
 const div=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 div.className="attempt";
 
+
 div.innerHTML=
 `
-<strong>Attempt #${index+1}</strong>
+
+<strong>
+Attempt #${index+1}
+</strong>
+
 
 <div class="row">
 
-<span>Accuracy</span>
+<span>
+Accuracy
+</span>
 
 <strong>
 ${accuracy}%
@@ -759,24 +1225,36 @@ ${accuracy}%
 
 </div>
 
+
 <div class="progress">
 
-<div style="width:${accuracy}%"></div>
+<div
+style="width:${accuracy}%">
+</div>
 
 </div>
+
 
 <div class="row">
 
-<span>✅ ${correct}</span>
+<span>
+✅ ${correct}
+</span>
 
-<span>❌ ${wrong}</span>
+<span>
+❌ ${wrong}
+</span>
 
-<span>📅 ${escapeHTML(
+<span>
+📅 ${escapeHTML(
 test.date||""
-)}</span>
+)}
+</span>
 
 </div>
+
 `;
+
 
 box.appendChild(div);
 
@@ -798,21 +1276,29 @@ document.getElementById(
 
 box.innerHTML="";
 
+
 if(retryHistory.length===0){
 
 box.innerHTML=
 `
+
 <div class="empty">
+
 No retry attempts yet.
+
 <br><br>
+
 Open Mistake Bank and tap
 <strong>🔄 Retry Mistakes</strong>.
+
 </div>
+
 `;
 
 return;
 
 }
+
 
 retryHistory.forEach(function(retry,index){
 
@@ -840,40 +1326,67 @@ Math.round(
 const masteredNow=
 Number(retry.mastered)||0;
 
+
 const div=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 div.className="attempt";
 
+
 div.innerHTML=
 `
-<strong>🔄 Retry #${index+1}</strong>
+
+<strong>
+🔄 Retry #${index+1}
+</strong>
+
 
 <div class="row">
 
-<span>Accuracy</span>
+<span>
+Accuracy
+</span>
 
-<strong>${accuracy}%</strong>
+<strong>
+${accuracy}%
+</strong>
 
 </div>
+
 
 <div class="progress green">
 
-<div style="width:${accuracy}%"></div>
+<div
+style="width:${accuracy}%">
+</div>
 
 </div>
 
+
 <div class="row">
 
-<span>✅ ${correct}</span>
-<span>❌ ${wrong}</span>
-<span>⏭️ ${skipped}</span>
+<span>
+✅ ${correct}
+</span>
+
+<span>
+❌ ${wrong}
+</span>
+
+<span>
+⏭️ ${skipped}
+</span>
 
 </div>
 
+
 <div class="row">
 
-<span>🏆 Mastered</span>
+<span>
+🏆 Mastered
+</span>
 
 <strong>
 ${masteredNow}
@@ -881,14 +1394,19 @@ ${masteredNow}
 
 </div>
 
+
 <div class="row">
 
-<span>📅 ${escapeHTML(
+<span>
+📅 ${escapeHTML(
 retry.date||""
-)}</span>
+)}
+</span>
 
 </div>
+
 `;
+
 
 box.appendChild(div);
 
@@ -920,7 +1438,9 @@ box.innerHTML="";
 if(masteredCount>0){
 
 const a=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 a.className=
 "insight success";
@@ -938,7 +1458,9 @@ box.appendChild(a);
 if(activeCount>0){
 
 const b=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 b.className=
 "insight focus";
@@ -960,9 +1482,13 @@ activeCount===0
 
 box.innerHTML=
 `
+
 <div class="empty">
+
 Complete a CBT to generate mistake analytics.
+
 </div>
+
 `;
 
 }
@@ -971,28 +1497,35 @@ Complete a CBT to generate mistake analytics.
 
 
 /* =====================================
-ESCAPE
+ESCAPE HTML
 ===================================== */
 
 function escapeHTML(value){
 
 return String(value)
+
 .replace(/&/g,"&amp;")
+
 .replace(/</g,"&lt;")
+
 .replace(/>/g,"&gt;")
+
 .replace(/"/g,"&quot;")
+
 .replace(/'/g,"&#039;");
 
 }
 
 
 /* =====================================
-START
+START DASHBOARD
 ===================================== */
 
 renderOverall();
 
 renderMasteryAnalytics();
+
+renderMistakeReasonAnalytics();
 
 renderAttempts();
 
