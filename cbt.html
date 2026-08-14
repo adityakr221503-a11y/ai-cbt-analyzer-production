@@ -83,6 +83,10 @@ font-size:16px;
 cursor:pointer
 }
 
+.option:hover{
+border-color:#818cf8
+}
+
 .option.selected{
 border-color:#4f46e5;
 background:#eef2ff;
@@ -105,10 +109,25 @@ font-weight:700;
 cursor:pointer
 }
 
-.primary{background:#4f46e5;color:white}
-.secondary{background:#e2e8f0;color:#0f172a}
-.warning{background:#f59e0b;color:white}
-.danger{background:#dc2626;color:white}
+.primary{
+background:#4f46e5;
+color:white
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a
+}
+
+.warning{
+background:#f59e0b;
+color:white
+}
+
+.danger{
+background:#dc2626;
+color:white
+}
 
 .palette{
 display:grid;
@@ -224,6 +243,18 @@ font-weight:700;
 font-size:13px
 }
 
+.result-actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:20px
+}
+
+.result-actions button{
+flex:1;
+min-width:150px
+}
+
 @media(max-width:800px){
 
 .container{
@@ -231,6 +262,18 @@ grid-template-columns:1fr
 }
 
 .reason-options{
+grid-template-columns:1fr
+}
+
+}
+
+@media(max-width:500px){
+
+.question{
+font-size:18px
+}
+
+.buttons{
 grid-template-columns:1fr
 }
 
@@ -323,13 +366,27 @@ id="score">
 
 <div id="review"></div>
 
-<br>
+<div class="result-actions">
 
 <button
 class="primary"
 onclick="location.href='mistake.html'">
 Open Mistake Bank
 </button>
+
+<button
+class="primary"
+onclick="location.href='retry.html'">
+Retry Mistakes
+</button>
+
+<button
+class="secondary"
+onclick="location.href='index.html'">
+Dashboard
+</button>
+
+</div>
 
 </section>
 
@@ -368,9 +425,40 @@ Submit Test
 
 <script>
 
-/* =========================
-QUESTIONS
-========================= */
+/* =========================================================
+   CBT ANALYZER PRO
+   SHARED STORAGE SYSTEM
+========================================================= */
+
+const STORAGE = {
+
+history:
+"cbtHistory",
+
+tests:
+"cbtAnalyzer.tests",
+
+mistakes:
+"cbtAnalyzer.mistakes",
+
+bookmarks:
+"cbtAnalyzer.bookmarks",
+
+retryQueue:
+"cbtAnalyzer.retryQueue",
+
+retryHistory:
+"cbtAnalyzer.retryHistory",
+
+mastery:
+"cbtAnalyzer.mastery"
+
+};
+
+
+/* =========================================================
+   QUESTIONS
+========================================================= */
 
 const questions=[
 
@@ -487,9 +575,9 @@ mistakeType:"Concept Gap"
 ];
 
 
-/* =========================
-STATE
-========================= */
+/* =========================================================
+   STATE
+========================================================= */
 
 let current=0;
 
@@ -509,17 +597,75 @@ let savedHistoryIndex=-1;
 let timeLeft=1800;
 
 
-/* =========================
-TIMER
-========================= */
+/* =========================================================
+   STORAGE HELPERS
+========================================================= */
+
+function readStorage(key,fallback){
+
+try{
+
+const value=
+localStorage.getItem(key);
+
+if(!value){
+
+return fallback;
+}
+
+return JSON.parse(value);
+
+}catch(error){
+
+console.error(
+"Storage read error:",
+error
+);
+
+return fallback;
+
+}
+
+}
+
+
+function writeStorage(key,value){
+
+try{
+
+localStorage.setItem(
+key,
+JSON.stringify(value)
+);
+
+}catch(error){
+
+console.error(
+"Storage write error:",
+error
+);
+
+}
+
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
 
 function updateTimer(){
 
-const m=Math.floor(timeLeft/60);
+const m=
+Math.floor(timeLeft/60);
 
-const s=timeLeft%60;
+const s=
+timeLeft%60;
 
-document.getElementById("timer").textContent=
+document.getElementById(
+"timer"
+).textContent=
+
 String(m).padStart(2,"0")+
 ":"+
 String(s).padStart(2,"0");
@@ -527,7 +673,8 @@ String(s).padStart(2,"0");
 }
 
 
-const timerInterval=setInterval(function(){
+const timerInterval=
+setInterval(function(){
 
 if(submitted)return;
 
@@ -552,15 +699,19 @@ updateTimer();
 },1000);
 
 
-/* =========================
-QUESTION
-========================= */
+/* =========================================================
+   RENDER QUESTION
+========================================================= */
 
 function renderQuestion(){
 
-const q=questions[current];
+const q=
+questions[current];
 
-document.getElementById("questionNumber").textContent=
+document.getElementById(
+"questionNumber"
+).textContent=
+
 "Question "+
 (current+1)+
 " of "+
@@ -568,26 +719,54 @@ questions.length+
 " • "+
 q.subject;
 
-document.getElementById("question").textContent=q.question;
 
-const box=document.getElementById("options");
+document.getElementById(
+"question"
+).textContent=
+q.question;
+
+
+const box=
+document.getElementById(
+"options"
+);
 
 box.innerHTML="";
 
-q.options.forEach(function(option,index){
 
-const button=document.createElement("button");
+q.options.forEach(function(
+option,
+index
+){
 
-button.className="option";
+const button=
+document.createElement(
+"button"
+);
 
-if(answers[current]===index){
-button.classList.add("selected");
+button.className=
+"option";
+
+
+if(
+answers[current]===index
+){
+
+button.classList.add(
+"selected"
+);
+
 }
 
+
 button.textContent=
-String.fromCharCode(65+index)+
+
+String.fromCharCode(
+65+index
+)+
 ". "+
 option;
+
 
 button.onclick=function(){
 
@@ -597,49 +776,87 @@ renderQuestion();
 
 };
 
+
 box.appendChild(button);
 
 });
 
-document.getElementById("nextButton").textContent=
-current===questions.length-1
+
+document.getElementById(
+"nextButton"
+).textContent=
+
+current===
+questions.length-1
 ?
 "Finish"
 :
 "Next";
+
 
 renderPalette();
 
 }
 
 
-/* =========================
-PALETTE
-========================= */
+/* =========================================================
+   PALETTE
+========================================================= */
 
 function renderPalette(){
 
-const palette=document.getElementById("palette");
+const palette=
+document.getElementById(
+"palette"
+);
 
 palette.innerHTML="";
 
-questions.forEach(function(q,index){
 
-const button=document.createElement("button");
+questions.forEach(
+function(q,index){
 
-button.textContent=index+1;
+const button=
+document.createElement(
+"button"
+);
 
-if(answers[index]!==null){
-button.classList.add("answered");
+button.textContent=
+index+1;
+
+
+if(
+answers[index]!==null
+){
+
+button.classList.add(
+"answered"
+);
+
 }
 
-if(marked[index]){
-button.classList.add("review");
+
+if(
+marked[index]
+){
+
+button.classList.add(
+"review"
+);
+
 }
 
-if(index===current){
-button.classList.add("current");
+
+if(
+index===current
+){
+
+button.classList.add(
+"current"
+);
+
 }
+
 
 button.onclick=function(){
 
@@ -649,6 +866,7 @@ renderQuestion();
 
 };
 
+
 palette.appendChild(button);
 
 });
@@ -656,20 +874,22 @@ palette.appendChild(button);
 }
 
 
-/* =========================
-NAVIGATION
-========================= */
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 function nextQuestion(){
 
-if(current<questions.length-1){
+if(
+current<
+questions.length-1
+){
 
 current++;
 
 renderQuestion();
 
-}
-else{
+}else{
 
 submitTest();
 
@@ -702,87 +922,21 @@ renderQuestion();
 
 function markReview(){
 
-marked[current]=!marked[current];
+marked[current]=
+!marked[current];
 
 renderPalette();
 
 }
 
 
-/* =========================
-SAVE REASON TO HISTORY
-========================= */
+/* =========================================================
+   MISTAKE REASON
+========================================================= */
 
-function saveReasonToHistory(index,reason){
-
-if(savedHistoryIndex<0){
-
-return;
-
-}
-
-try{
-
-const history=
-JSON.parse(
-localStorage.getItem("cbtHistory") || "[]"
-);
-
-if(
-!Array.isArray(history) ||
-!history[savedHistoryIndex] ||
-!Array.isArray(
-history[savedHistoryIndex].questions
-)
+function getReasonExplanation(
+reason
 ){
-
-return;
-
-}
-
-
-const questionRecord=
-history[savedHistoryIndex].questions[index];
-
-if(!questionRecord){
-
-return;
-
-}
-
-
-questionRecord.mistakeType=reason;
-
-questionRecord.mistakeReason=
-getReasonExplanation(reason);
-
-
-history[savedHistoryIndex].questions[index]=
-questionRecord;
-
-
-localStorage.setItem(
-"cbtHistory",
-JSON.stringify(history)
-);
-
-}catch(error){
-
-console.error(
-"Could not save mistake reason:",
-error
-);
-
-}
-
-}
-
-
-/* =========================
-REASON EXPLANATION
-========================= */
-
-function getReasonExplanation(reason){
 
 const explanations={
 
@@ -803,19 +957,19 @@ const explanations={
 
 };
 
-return explanations[reason] ||
+return explanations[reason]||
 "Student-selected mistake reason.";
 
 }
 
 
-/* =========================
-SELECT REASON
-========================= */
+function selectMistakeReason(
+index,
+reason
+){
 
-function selectMistakeReason(index,reason){
-
-mistakeReasons[index]=reason;
+mistakeReasons[index]=
+reason;
 
 saveReasonToHistory(
 index,
@@ -827,9 +981,177 @@ generateReview();
 }
 
 
-/* =========================
-SAVE TEST
-========================= */
+/* =========================================================
+   SAVE MISTAKE REASON
+========================================================= */
+
+function saveReasonToHistory(
+index,
+reason
+){
+
+const history=
+readStorage(
+STORAGE.history,
+[]
+);
+
+
+if(
+!Array.isArray(history)||
+savedHistoryIndex<0||
+!history[savedHistoryIndex]
+){
+
+return;
+
+}
+
+
+if(
+!Array.isArray(
+history[savedHistoryIndex]
+.questions
+)
+){
+
+return;
+
+}
+
+
+const record=
+history[savedHistoryIndex]
+.questions[index];
+
+
+if(!record)return;
+
+
+record.mistakeType=
+reason;
+
+record.mistakeReason=
+getReasonExplanation(
+reason
+);
+
+
+history[savedHistoryIndex]
+.questions[index]=
+record;
+
+
+writeStorage(
+STORAGE.history,
+history
+);
+
+
+/* Update shared mistake */
+
+updateSharedMistake(
+record
+);
+
+}
+
+
+/* =========================================================
+   UPDATE SHARED MISTAKE
+========================================================= */
+
+function updateSharedMistake(
+record
+){
+
+let mistakes=
+readStorage(
+STORAGE.mistakes,
+[]
+);
+
+
+if(!Array.isArray(mistakes)){
+
+mistakes=[];
+
+}
+
+
+const existing=
+mistakes.findIndex(
+item=>item.id===record.id
+);
+
+
+const mistake={
+
+id:record.id,
+
+question:record.question,
+
+options:record.options,
+
+subject:record.subject,
+
+topic:record.topic,
+
+selectedIndex:
+record.selectedIndex,
+
+selectedAnswer:
+record.selectedAnswer,
+
+correctIndex:
+record.correctIndex,
+
+correctAnswer:
+record.correctAnswer,
+
+mistakeType:
+record.mistakeType,
+
+mistakeReason:
+record.mistakeReason,
+
+solution:
+record.solution,
+
+source:"CBT Test",
+
+date:new Date().toISOString(),
+
+mastered:false
+
+};
+
+
+if(existing>=0){
+
+mistakes[existing]={
+...mistakes[existing],
+...mistake
+};
+
+}else{
+
+mistakes.push(mistake);
+
+}
+
+
+writeStorage(
+STORAGE.mistakes,
+mistakes
+);
+
+}
+
+
+/* =========================================================
+   SAVE TEST
+========================================================= */
 
 function saveTest(
 correct,
@@ -838,37 +1160,41 @@ skipped,
 score
 ){
 
-let history=[];
-
-try{
-
-history=
-JSON.parse(
-localStorage.getItem("cbtHistory") || "[]"
+let history=
+readStorage(
+STORAGE.history,
+[]
 );
 
+
 if(!Array.isArray(history)){
-history=[];
-}
-
-}catch(e){
 
 history=[];
 
 }
+
+
+const testId=
+"test-"+Date.now();
 
 
 const questionData=
-questions.map(function(q,index){
+questions.map(
+function(q,index){
 
 let status;
 
-if(answers[index]===null){
+
+if(
+answers[index]===null
+){
 
 status="skipped";
 
 }
-else if(answers[index]===q.answer){
+else if(
+answers[index]===q.answer
+){
 
 status="correct";
 
@@ -885,50 +1211,75 @@ answers[index]===null
 ?
 null
 :
-q.options[answers[index]];
+q.options[
+answers[index]
+];
 
 
-return {
+return{
 
-question:q.question,
+id:
+testId+
+"-q-"+
+index,
 
-options:q.options,
+question:
+q.question,
 
-subject:q.subject,
+options:
+q.options,
 
-topic:q.topic,
+subject:
+q.subject,
 
-status:status,
+topic:
+q.topic,
 
-selectedIndex:answers[index],
+status:
+status,
 
-selectedAnswer:selectedAnswer,
+selectedIndex:
+answers[index],
 
-correctIndex:q.answer,
+selectedAnswer:
+selectedAnswer,
 
-correctAnswer:q.options[q.answer],
+correctIndex:
+q.answer,
 
-bookmarked:marked[index],
+correctAnswer:
+q.options[q.answer],
+
+bookmarked:
+marked[index],
 
 mistakeType:
 status==="wrong"
 ?
-(mistakeReasons[index] ||
-"Not Classified")
+(
+mistakeReasons[index]||
+"Not Classified"
+)
 :
 null,
 
 mistakeReason:
 status==="wrong"
 ?
-(mistakeReasons[index] ||
-"Student has not selected a mistake reason yet.")
+(
+mistakeReasons[index]||
+"Student has not selected a mistake reason yet."
+)
 :
 "Correct answer.",
 
-solution:q.solution,
+solution:
+q.solution,
 
-markedForReview:marked[index]
+markedForReview:
+marked[index],
+
+mastered:false
 
 };
 
@@ -937,133 +1288,321 @@ markedForReview:marked[index]
 
 const testRecord={
 
-date:new Date().toLocaleString(),
+id:
+testId,
 
-score:score,
+date:
+new Date().toISOString(),
 
-correct:correct,
+displayDate:
+new Date().toLocaleString(),
 
-incorrect:incorrect,
+score:
+score,
 
-wrong:incorrect,
+correct:
+correct,
 
-skipped:skipped,
+incorrect:
+incorrect,
 
-questions:questionData
+wrong:
+incorrect,
+
+skipped:
+skipped,
+
+total:
+questions.length,
+
+accuracy:
+questions.length
+?
+Math.round(
+correct/
+questions.length*
+100
+)
+:
+0,
+
+questions:
+questionData
 
 };
 
 
-history.push(testRecord);
+/* Existing history */
+
+history.push(
+testRecord
+);
 
 savedHistoryIndex=
 history.length-1;
 
+writeStorage(
+STORAGE.history,
+history
+);
 
-localStorage.setItem(
-"cbtHistory",
-JSON.stringify(history)
+
+/* Shared tests */
+
+const tests=
+readStorage(
+STORAGE.tests,
+[]
+);
+
+tests.push(
+testRecord
+);
+
+writeStorage(
+STORAGE.tests,
+tests
+);
+
+
+/* Shared mistakes */
+
+let mistakes=
+readStorage(
+STORAGE.mistakes,
+[]
+);
+
+if(!Array.isArray(mistakes)){
+
+mistakes=[];
+
+}
+
+
+/* Shared bookmarks */
+
+let bookmarks=
+readStorage(
+STORAGE.bookmarks,
+[]
+);
+
+if(!Array.isArray(bookmarks)){
+
+bookmarks=[];
+
+}
+
+
+questionData.forEach(
+function(record){
+
+/* WRONG */
+
+if(
+record.status==="wrong"
+){
+
+const mistake={
+
+id:record.id,
+
+question:record.question,
+
+options:record.options,
+
+subject:record.subject,
+
+topic:record.topic,
+
+selectedIndex:
+record.selectedIndex,
+
+selectedAnswer:
+record.selectedAnswer,
+
+correctIndex:
+record.correctIndex,
+
+correctAnswer:
+record.correctAnswer,
+
+mistakeType:
+record.mistakeType,
+
+mistakeReason:
+record.mistakeReason,
+
+solution:
+record.solution,
+
+source:"CBT Test",
+
+date:
+new Date().toISOString(),
+
+mastered:false
+
+};
+
+
+const exists=
+mistakes.some(
+item=>
+item.id===mistake.id
+);
+
+
+if(!exists){
+
+mistakes.push(
+mistake
 );
 
 }
 
-
-/* =========================
-SUBMIT
-========================= */
-
-function submitTest(){
-
-if(submitted)return;
+}
 
 
-let correct=0;
+/* BOOKMARK */
 
-let incorrect=0;
+if(
+record.bookmarked
+){
 
-let skipped=0;
+const bookmark={
+
+id:record.id,
+
+question:
+record.question,
+
+options:
+record.options,
+
+subject:
+record.subject,
+
+topic:
+record.topic,
+
+correctIndex:
+record.correctIndex,
+
+correctAnswer:
+record.correctAnswer,
+
+solution:
+record.solution,
+
+source:"CBT Test",
+
+date:
+new Date().toISOString()
+
+};
 
 
-questions.forEach(function(q,index){
+const exists=
+bookmarks.some(
+item=>
+item.id===bookmark.id
+);
 
-if(answers[index]===null){
 
-skipped++;
+if(!exists){
+
+bookmarks.push(
+bookmark
+);
 
 }
-else if(answers[index]===q.answer){
-
-correct++;
-
-}
-else{
-
-incorrect++;
 
 }
 
 });
 
 
-const score=
-(correct*4)-incorrect;
+writeStorage(
+STORAGE.mistakes,
+mistakes
+);
 
-
-saveTest(
-correct,
-incorrect,
-skipped,
-score
+writeStorage(
+STORAGE.bookmarks,
+bookmarks
 );
 
 
-submitted=true;
+/* Retry Queue */
 
-clearInterval(timerInterval);
-
-
-document.getElementById(
-"testScreen"
-).style.display="none";
-
-
-document.querySelector(
-"aside"
-).style.display="none";
-
-
-document.getElementById(
-"result"
-).style.display="block";
-
-
-document.getElementById(
-"score"
-).textContent=
-score+
-" / "+
-(questions.length*4);
-
-
-document.getElementById(
-"summary"
-).textContent=
-"Correct: "+
-correct+
-" | Incorrect: "+
-incorrect+
-" | Skipped: "+
-skipped;
-
-
-generateReview();
+createRetryQueue();
 
 }
 
 
-/* =========================
-REASON BUTTON
-========================= */
+/* =========================================================
+   RETRY QUEUE
+========================================================= */
+
+function createRetryQueue(){
+
+const mistakes=
+readStorage(
+STORAGE.mistakes,
+[]
+);
+
+const bookmarks=
+readStorage(
+STORAGE.bookmarks,
+[]
+);
+
+
+const combined=[
+...mistakes,
+...bookmarks
+];
+
+
+const unique=[];
+
+const seen=
+new Set();
+
+
+combined.forEach(
+function(item){
+
+const id=
+item.id||
+item.question;
+
+
+if(!seen.has(id)){
+
+seen.add(id);
+
+unique.push(item);
+
+}
+
+});
+
+
+writeStorage(
+STORAGE.retryQueue,
+unique
+);
+
+}
+
+
+/* =========================================================
+   REASON BUTTON
+========================================================= */
 
 function reasonButton(
 index,
@@ -1072,7 +1611,8 @@ icon
 ){
 
 const selected=
-mistakeReasons[index]===reason
+mistakeReasons[index]===
+reason
 ?
 " selected-reason"
 :
@@ -1095,31 +1635,43 @@ ${icon} ${reason}
 }
 
 
-/* =========================
-REVIEW
-========================= */
+/* =========================================================
+   REVIEW
+========================================================= */
 
 function generateReview(){
 
-const box=document.getElementById("review");
+const box=
+document.getElementById(
+"review"
+);
 
 box.innerHTML=
 "<h3>Question Analysis</h3>";
 
 
-questions.forEach(function(q,index){
+questions.forEach(
+function(q,index){
 
-const item=document.createElement("div");
+const item=
+document.createElement(
+"div"
+);
+
 
 let status;
 
 
-if(answers[index]===null){
+if(
+answers[index]===null
+){
 
 status="skipped";
 
 }
-else if(answers[index]===q.answer){
+else if(
+answers[index]===q.answer
+){
 
 status="correct";
 
@@ -1137,150 +1689,4 @@ status;
 
 
 const selected=
-answers[index]===null
-?
-"Not answered"
-:
-q.options[answers[index]];
-
-
-item.innerHTML=
-
-"<strong>Question "+
-(index+1)+
-" • "+
-q.subject+
-"</strong>"+
-
-"<p>"+
-q.question+
-"</p>"+
-
-"<p><strong>Your answer:</strong> "+
-selected+
-"</p>"+
-
-"<p><strong>Correct answer:</strong> "+
-q.options[q.answer]+
-"</p>";
-
-
-if(marked[index]){
-
-item.innerHTML+=
-'<div class="bookmark">🔖 Bookmarked for review</div>';
-
-}
-
-
-if(status==="incorrect"){
-
-const selectedReason=
-mistakeReasons[index];
-
-
-item.innerHTML+=`
-
-<div class="analysis">
-
-<strong>
-❌ Why did you get this wrong?
-</strong>
-
-<div class="reason-options">
-
-${reasonButton(index,"Concept Gap","🧠")}
-
-${reasonButton(index,"Calculation Error","🧮")}
-
-${reasonButton(index,"Misread Question","👀")}
-
-${reasonButton(index,"Guessing","🎲")}
-
-${reasonButton(index,"Time Pressure","⏱️")}
-
-</div>
-
-<div class="reason-status">
-
-${
-selectedReason
-?
-"Selected: "+selectedReason
-:
-"Select the reason that best describes your mistake."
-}
-
-</div>
-
-${
-selectedReason
-?
-'<div class="saved-message">✓ Saved to your performance history</div>'
-:
-''
-}
-
-<br>
-
-<strong>
-💡 Solution:
-</strong>
-
-<br>
-
-${q.solution}
-
-</div>
-
-`;
-
-}
-
-
-if(status==="skipped"){
-
-item.innerHTML+=`
-
-<div class="analysis">
-
-<strong>
-⏭️ Skipped Question
-</strong>
-
-<br><br>
-
-<strong>
-💡 Solution:
-</strong>
-
-<br>
-
-${q.solution}
-
-</div>
-
-`;
-
-}
-
-
-box.appendChild(item);
-
-});
-
-}
-
-
-/* =========================
-START
-========================= */
-
-updateTimer();
-
-renderQuestion();
-
-</script>
-
-</body>
-</html>
+ans
