@@ -7,7 +7,10 @@
 <title>CBT Analyzer Pro — Mistake Bank</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
@@ -39,15 +42,14 @@ font-weight:800;
 color:#4f46e5;
 }
 
-.back{
+.dashboard{
 border:0;
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:12px 18px;
-border-radius:12px;
-font-size:16px;
-font-weight:700;
-cursor:pointer;
+border-radius:11px;
+font-weight:800;
+font-size:15px;
 }
 
 .container{
@@ -59,33 +61,31 @@ padding:0 15px;
 .hero{
 background:#4f46e5;
 color:white;
-padding:30px;
+padding:28px;
 border-radius:20px;
-margin-bottom:22px;
+margin-bottom:20px;
 }
 
 .hero h1{
-font-size:34px;
 margin:0 0 10px;
+font-size:34px;
 }
 
 .hero p{
+margin:0;
 font-size:17px;
 line-height:1.5;
-margin:0;
 }
 
 .card{
-background:white;
+background:#fff;
 border-radius:18px;
 padding:22px;
 margin-bottom:20px;
 box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
-/* ================= STATS ================= */
-
-.overview-title{
+.title{
 font-size:25px;
 font-weight:800;
 margin-bottom:18px;
@@ -93,53 +93,48 @@ margin-bottom:18px;
 
 .stats{
 display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:16px;
+grid-template-columns:1fr 1fr;
+gap:15px;
 }
 
 .stat{
+display:block;
+width:100%;
+border:0;
 background:#f8fafc;
 border-radius:16px;
 padding:22px;
-min-height:135px;
+text-align:left;
 cursor:pointer;
-user-select:none;
 -webkit-tap-highlight-color:transparent;
-transition:.15s;
 }
 
 .stat:active{
 transform:scale(.98);
 }
 
-.stat:hover{
-box-shadow:0 3px 12px rgba(0,0,0,.08);
+.icon{
+font-size:30px;
 }
 
-.stat-icon{
-font-size:28px;
-}
-
-.stat-number{
+.number{
 font-size:38px;
 font-weight:800;
-margin:4px 0;
+margin:5px 0;
 }
 
-.stat-title{
+.label{
 font-size:17px;
 color:#64748b;
 font-weight:600;
 }
 
-.stat-hint{
-font-size:13px;
+.hint{
+margin-top:7px;
 color:#4f46e5;
+font-size:13px;
 font-weight:800;
-margin-top:8px;
 }
-
-/* ================= BUTTONS ================= */
 
 .actions{
 display:grid;
@@ -147,65 +142,48 @@ grid-template-columns:1fr 1fr;
 gap:10px;
 }
 
-button{
-font-family:Arial,sans-serif;
+.action{
+border:0;
+padding:14px;
+border-radius:11px;
+font-size:16px;
+font-weight:800;
 cursor:pointer;
 }
 
 .primary{
-border:0;
 background:#4f46e5;
 color:white;
-padding:14px;
-border-radius:11px;
-font-size:16px;
-font-weight:800;
 }
 
 .secondary{
-border:0;
 background:#e2e8f0;
 color:#0f172a;
-padding:14px;
-border-radius:11px;
-font-size:16px;
-font-weight:800;
 }
-
-/* ================= MISTAKES ================= */
 
 .mistake{
 border:1px solid #e2e8f0;
-border-radius:15px;
-padding:18px;
-margin-top:15px;
-}
-
-.badges{
-display:flex;
-gap:7px;
-flex-wrap:wrap;
-margin-bottom:12px;
+border-radius:14px;
+padding:17px;
+margin-top:14px;
 }
 
 .badge{
+display:inline-block;
 background:#eef2ff;
 color:#3730a3;
 padding:6px 9px;
 border-radius:8px;
 font-size:12px;
 font-weight:800;
-}
-
-.badge.red{
-background:#fee2e2;
-color:#991b1b;
+margin-right:5px;
 }
 
 .question{
 font-size:18px;
 font-weight:800;
 line-height:1.5;
+margin-top:12px;
 }
 
 .answer{
@@ -227,37 +205,27 @@ font-weight:800;
 }
 
 .retry{
-margin-top:14px;
 width:100%;
+margin-top:13px;
 border:0;
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:13px;
 border-radius:10px;
 font-size:16px;
 font-weight:800;
-}
-
-.solution{
-margin-top:12px;
-padding:13px;
-background:#f0fdf4;
-border:1px solid #bbf7d0;
-border-radius:10px;
-line-height:1.6;
+cursor:pointer;
 }
 
 .empty{
 text-align:center;
-padding:40px 15px;
+padding:35px 15px;
 color:#64748b;
 }
 
 .empty-icon{
 font-size:55px;
 }
-
-/* ================= MOBILE ================= */
 
 @media(max-width:600px){
 
@@ -273,17 +241,19 @@ padding:22px;
 font-size:30px;
 }
 
+.card{
+padding:17px;
+}
+
 .stats{
-grid-template-columns:1fr 1fr;
-gap:12px;
+gap:10px;
 }
 
 .stat{
 padding:16px;
-min-height:125px;
 }
 
-.stat-number{
+.number{
 font-size:32px;
 }
 
@@ -291,15 +261,14 @@ font-size:32px;
 grid-template-columns:1fr;
 }
 
-.card{
-padding:17px;
 }
 
-}
 </style>
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -310,7 +279,7 @@ CBT Analyzer <span>Pro</span>
 </div>
 
 <button
-class="back"
+class="dashboard"
 type="button"
 onclick="location.href='index.html'">
 
@@ -325,7 +294,6 @@ Dashboard
 
 <div class="container">
 
-<!-- HERO -->
 
 <div class="hero">
 
@@ -333,92 +301,90 @@ Dashboard
 
 <p>
 Every wrong CBT answer becomes a learning opportunity.
-Review mistakes, retry them and turn them into mastery.
+Review it, retry it, and convert it into mastery.
 </p>
 
 </div>
 
 
-<!-- OVERVIEW -->
-
 <div class="card">
 
-<div class="overview-title">
+<div class="title">
 📊 Mistake Overview
 </div>
+
 
 <div class="stats">
 
 
 <!-- ACTIVE MISTAKES -->
 
-<div
+<button
+type="button"
 class="stat"
-id="activeMistakeCard"
 onclick="openRetry()">
 
-<div class="stat-icon">
+<div class="icon">
 ❌
 </div>
 
 <div
 id="activeCount"
-class="stat-number">
+class="number">
 0
 </div>
 
-<div class="stat-title">
+<div class="label">
 Active Mistakes
 </div>
 
-<div class="stat-hint">
+<div class="hint">
 Tap to Retry →
 </div>
 
-</div>
+</button>
 
 
 <!-- MASTERED -->
 
-<div
+<button
+type="button"
 class="stat"
 onclick="showMastered()">
 
-<div class="stat-icon">
+<div class="icon">
 🏆
 </div>
 
 <div
 id="masteredCount"
-class="stat-number">
+class="number">
 0
 </div>
 
-<div class="stat-title">
+<div class="label">
 Mastered
 </div>
 
-<div class="stat-hint">
-View Mastery →
+<div class="hint">
+View Mastered →
+</div>
+
+</button>
+
+
 </div>
 
 </div>
 
-
-</div>
-
-</div>
-
-
-<!-- ACTIONS -->
 
 <div class="card">
 
 <div class="actions">
 
 <button
-class="primary"
 type="button"
+class="action primary"
 onclick="openRetry()">
 
 🔄 Retry Active Mistakes
@@ -426,8 +392,8 @@ onclick="openRetry()">
 </button>
 
 <button
-class="secondary"
 type="button"
+class="action secondary"
 onclick="location.href='cbt.html'">
 
 📝 Start CBT
@@ -438,8 +404,6 @@ onclick="location.href='cbt.html'">
 
 </div>
 
-
-<!-- LIST -->
 
 <div class="card">
 
@@ -463,20 +427,13 @@ No Active Mistakes
 </h2>
 
 <p>
-Complete a CBT test and answer a question incorrectly.
+Complete a CBT test and answer at least one question incorrectly.
 </p>
 
-<button
-class="primary"
-onclick="location.href='cbt.html'">
-
-Start CBT
-
-</button>
-
 </div>
 
 </div>
+
 
 </div>
 
@@ -487,23 +444,51 @@ Start CBT
 STORAGE
 ===================================================== */
 
-const MISTAKES_KEY =
+const HISTORY_KEY="cbtHistory";
+
+const MISTAKES_KEY=
 "cbtAnalyzer.mistakes";
 
-const HISTORY_KEY =
-"cbtHistory";
-
-const MASTERY_KEY =
+const MASTERY_KEY=
 "cbtAnalyzer.mastery";
 
-const LEGACY_MASTERY_KEY =
+const LEGACY_MASTERY_KEY=
 "cbtMasteryV2";
 
-const RETRY_QUEUE_KEY =
+const RETRY_QUEUE_KEY=
 "cbtAnalyzer.retryQueue";
 
-const RETRY_QUESTION_KEY =
+const RETRY_QUESTION_KEY=
 "cbtRetryQuestion";
+
+
+/* =====================================================
+READ STORAGE
+===================================================== */
+
+function read(key,fallback){
+
+try{
+
+const raw=
+localStorage.getItem(key);
+
+if(!raw){
+return fallback;
+}
+
+const value=
+JSON.parse(raw);
+
+return value;
+
+}catch(e){
+
+return fallback;
+
+}
+
+}
 
 
 /* =====================================================
@@ -512,7 +497,7 @@ NORMALIZE
 
 function normalize(value){
 
-return String(value || "")
+return String(value||"")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -521,41 +506,10 @@ return String(value || "")
 
 
 /* =====================================================
-READ JSON
+MASTERED
 ===================================================== */
 
-function readJSON(key,fallback){
-
-try{
-
-const value=
-localStorage.getItem(key);
-
-if(!value){
-return fallback;
-}
-
-const parsed=
-JSON.parse(value);
-
-return parsed;
-
-}catch(error){
-
-console.error(error);
-
-return fallback;
-
-}
-
-}
-
-
-/* =====================================================
-MASTERED SET
-===================================================== */
-
-function getMasteredSet(){
+function masteredSet(){
 
 const set=new Set();
 
@@ -565,7 +519,7 @@ LEGACY_MASTERY_KEY
 ].forEach(function(key){
 
 const data=
-readJSON(key,[]);
+read(key,[]);
 
 if(!Array.isArray(data)){
 return;
@@ -594,47 +548,40 @@ return set;
 
 
 /* =====================================================
-BUILD ACTIVE MISTAKES
+GET MISTAKES
 ===================================================== */
 
-function getActiveMistakes(){
+function getMistakes(){
 
 const mastered=
-getMasteredSet();
+masteredSet();
 
 const map=
 new Map();
 
 
-/*
-FIRST:
-Read dedicated Mistake Bank storage.
-*/
+/* Existing mistake storage */
 
-const storedMistakes=
-readJSON(
-MISTAKES_KEY,
-[]
-);
+const mistakes=
+read(MISTAKES_KEY,[]);
 
+if(Array.isArray(mistakes)){
 
-if(Array.isArray(storedMistakes)){
-
-storedMistakes.forEach(function(item){
+mistakes.forEach(function(q){
 
 if(
-!item ||
-!item.question
+!q ||
+!q.question
 ){
 return;
 }
 
 const key=
-normalize(item.question);
+normalize(q.question);
 
 if(!mastered.has(key)){
 
-map.set(key,item);
+map.set(key,q);
 
 }
 
@@ -643,19 +590,10 @@ map.set(key,item);
 }
 
 
-/*
-SECOND:
-Read CBT history.
-This makes the page work even if
-mistake storage wasn't created.
-*/
+/* CBT history */
 
 const history=
-readJSON(
-HISTORY_KEY,
-[]
-);
-
+read(HISTORY_KEY,[]);
 
 if(Array.isArray(history)){
 
@@ -672,12 +610,9 @@ test.questions.forEach(function(q){
 
 if(
 !q ||
-!q.question
+!q.question ||
+q.status!=="wrong"
 ){
-return;
-}
-
-if(q.status!=="wrong"){
 return;
 }
 
@@ -689,11 +624,13 @@ return;
 }
 
 
-const item={
+map.set(
+key,
+{
 
 id:
 q.id ||
-"mistake-"+Date.now()+"-"+Math.random(),
+"mistake-"+Date.now(),
 
 question:
 q.question,
@@ -729,22 +666,13 @@ Array.isArray(q.options)
 :""
 ),
 
-mistakeType:
-q.mistakeType ||
-"Not Classified",
-
-mistakeReason:
-q.mistakeReason ||
-"Review the concept and identify why the answer was incorrect.",
-
 solution:
 q.solution ||
 "Solution not available."
 
-};
+}
 
-
-map.set(key,item);
+);
 
 });
 
@@ -759,17 +687,13 @@ return Array.from(map.values());
 
 
 /* =====================================================
-UPDATE COUNTS
+UPDATE COUNT
 ===================================================== */
 
-function updateCounts(){
+function updateCount(){
 
 const mistakes=
-getActiveMistakes();
-
-const mastered=
-getMasteredSet();
-
+getMistakes();
 
 document.getElementById(
 "activeCount"
@@ -780,30 +704,7 @@ mistakes.length;
 document.getElementById(
 "masteredCount"
 ).textContent=
-mastered.size;
-
-}
-
-
-/* =====================================================
-SAVE RETRY QUEUE
-===================================================== */
-
-function saveRetryData(queue,selected){
-
-localStorage.setItem(
-RETRY_QUEUE_KEY,
-JSON.stringify(queue)
-);
-
-if(selected){
-
-localStorage.setItem(
-RETRY_QUESTION_KEY,
-JSON.stringify(selected)
-);
-
-}
+masteredSet().size;
 
 }
 
@@ -815,13 +716,13 @@ OPEN RETRY
 function openRetry(){
 
 const mistakes=
-getActiveMistakes();
+getMistakes();
 
 
 if(mistakes.length===0){
 
 alert(
-"No active mistakes found.\n\nComplete a CBT test and answer at least one question incorrectly."
+"No active mistakes found. Complete a CBT test and answer at least one question incorrectly."
 );
 
 return;
@@ -830,20 +731,32 @@ return;
 
 
 /*
-Put ALL active mistakes into retry queue.
+Save retry queue.
 */
 
-saveRetryData(
-mistakes,
-mistakes[0]
+localStorage.setItem(
+RETRY_QUEUE_KEY,
+JSON.stringify(mistakes)
 );
 
 
 /*
-Open retry page.
+Select first question.
 */
 
-window.location.href="retry.html";
+localStorage.setItem(
+RETRY_QUESTION_KEY,
+JSON.stringify(mistakes[0])
+);
+
+
+/*
+Direct navigation.
+*/
+
+window.location.assign(
+"retry.html"
+);
 
 }
 
@@ -855,21 +768,28 @@ RETRY ONE
 function retryOne(index){
 
 const mistakes=
-getActiveMistakes();
+getMistakes();
 
-const question=
+const q=
 mistakes[index];
 
-if(!question){
+if(!q){
 return;
 }
 
-saveRetryData(
-mistakes,
-question
+localStorage.setItem(
+RETRY_QUEUE_KEY,
+JSON.stringify(mistakes)
 );
 
-window.location.href="retry.html";
+localStorage.setItem(
+RETRY_QUESTION_KEY,
+JSON.stringify(q)
+);
+
+window.location.assign(
+"retry.html"
+);
 
 }
 
@@ -878,10 +798,10 @@ window.location.href="retry.html";
 RENDER
 ===================================================== */
 
-function renderMistakes(){
+function render(){
 
 const mistakes=
-getActiveMistakes();
+getMistakes();
 
 const list=
 document.getElementById(
@@ -892,7 +812,6 @@ const empty=
 document.getElementById(
 "empty"
 );
-
 
 list.innerHTML="";
 
@@ -911,28 +830,26 @@ empty.style.display="none";
 
 mistakes.forEach(function(q,index){
 
-const item=
+const div=
 document.createElement("div");
 
-item.className="mistake";
+div.className="mistake";
 
 
-const correctAnswer=
+const answer=
 q.correctAnswer ||
 (
 Array.isArray(q.options)
-?
-q.options[q.correctIndex]
-:
-""
+?q.options[q.correctIndex]
+:""
 );
 
 
-item.innerHTML=`
+div.innerHTML=`
 
-<div class="badges">
+<div>
 
-<span class="badge red">
+<span class="badge">
 ❌ Mistake ${index+1}
 </span>
 
@@ -947,9 +864,7 @@ ${escapeHTML(q.topic)}
 </div>
 
 <div class="question">
-
 ${escapeHTML(q.question)}
-
 </div>
 
 <div class="answer">
@@ -965,24 +880,14 @@ ${escapeHTML(q.selectedAnswer)}
 <strong>Correct answer:</strong>
 
 <span class="correct">
-${escapeHTML(correctAnswer)}
+${escapeHTML(answer)}
 </span>
 
 </div>
 
-<div class="solution">
-
-<strong>💡 Solution</strong>
-
-<br><br>
-
-${escapeHTML(q.solution)}
-
-</div>
-
 <button
-class="retry"
 type="button"
+class="retry"
 onclick="retryOne(${index})">
 
 🔄 Retry This Question
@@ -991,7 +896,7 @@ onclick="retryOne(${index})">
 
 `;
 
-list.appendChild(item);
+list.appendChild(div);
 
 });
 
@@ -999,41 +904,30 @@ list.appendChild(item);
 
 
 /* =====================================================
-SHOW MASTERED
+MASTERED
 ===================================================== */
 
 function showMastered(){
 
-const mastery=
-readJSON(
-MASTERY_KEY,
-[]
-);
-
-const legacy=
-readJSON(
-LEGACY_MASTERY_KEY,
-[]
-);
-
-const combined=[
-...(Array.isArray(mastery)?mastery:[]),
-...(Array.isArray(legacy)?legacy:[])
+const data=
+[
+...read(MASTERY_KEY,[]),
+...read(LEGACY_MASTERY_KEY,[])
 ];
 
+const unique=
+new Map();
 
-const unique=new Map();
-
-combined.forEach(function(item){
+data.forEach(function(q){
 
 if(
-item &&
-item.question
+q &&
+q.question
 ){
 
 unique.set(
-normalize(item.question),
-item
+normalize(q.question),
+q
 );
 
 }
@@ -1076,10 +970,6 @@ list.innerHTML=`
 No Mastered Questions Yet
 </h2>
 
-<p>
-Answer a retry question correctly to record mastery.
-</p>
-
 </div>
 
 `;
@@ -1091,49 +981,32 @@ return;
 
 unique.forEach(function(q){
 
-const item=
+const div=
 document.createElement("div");
 
-item.className="mistake";
+div.className="mistake";
 
-item.innerHTML=`
-
-<div class="badges">
+div.innerHTML=`
 
 <span class="badge">
 🏆 Mastered
 </span>
 
 <span class="badge">
-${escapeHTML(q.subject || "Unknown")}
+${escapeHTML(q.subject||"Unknown")}
 </span>
 
 <span class="badge">
-${escapeHTML(q.topic || "Unknown")}
+${escapeHTML(q.topic||"Unknown")}
 </span>
-
-</div>
 
 <div class="question">
 ${escapeHTML(q.question)}
 </div>
 
-<div class="solution">
-
-<strong>💡 Solution</strong>
-
-<br><br>
-
-${escapeHTML(
-q.solution ||
-"Solution not available."
-)}
-
-</div>
-
 `;
 
-list.appendChild(item);
+list.appendChild(div);
 
 });
 
@@ -1146,12 +1019,7 @@ ESCAPE
 
 function escapeHTML(value){
 
-return String(
-value===undefined ||
-value===null
-?""
-:value
-)
+return String(value??"")
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -1165,9 +1033,9 @@ value===null
 START
 ===================================================== */
 
-updateCounts();
+updateCount();
 
-renderMistakes();
+render();
 
 </script>
 
