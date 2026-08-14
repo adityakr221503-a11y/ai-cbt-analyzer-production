@@ -7,10 +7,7 @@
 <title>CBT Analyzer Pro — Retry Mistakes</title>
 
 <style>
-
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
@@ -26,7 +23,7 @@ border-bottom:1px solid #e2e8f0;
 }
 
 .header{
-max-width:1000px;
+max-width:900px;
 margin:auto;
 display:flex;
 justify-content:space-between;
@@ -43,129 +40,129 @@ color:#4f46e5;
 }
 
 .container{
-max-width:1000px;
+max-width:900px;
 margin:25px auto;
 padding:0 15px;
+}
+
+.hero{
+background:#16a34a;
+color:#fff;
+padding:24px;
+border-radius:18px;
+margin-bottom:20px;
+}
+
+.hero h1{
+margin:0 0 8px;
 }
 
 .card{
 background:#fff;
 border-radius:16px;
-padding:22px;
+padding:20px;
 margin-bottom:20px;
 box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
-.question-number{
-color:#64748b;
-font-weight:700;
-margin-bottom:12px;
+.question{
+border:1px solid #e2e8f0;
+border-radius:14px;
+padding:18px;
+margin-bottom:18px;
 }
 
-.question{
-font-size:20px;
+.qno{
+font-weight:800;
+color:#16a34a;
+margin-bottom:10px;
+}
+
+.qtext{
+font-size:17px;
 font-weight:700;
 line-height:1.5;
-margin-bottom:20px;
+margin-bottom:15px;
 }
 
 .option{
 display:block;
 width:100%;
 text-align:left;
-padding:15px;
+background:#f8fafc;
+border:1px solid #cbd5e1;
+padding:13px;
 margin:8px 0;
-border:2px solid #e2e8f0;
-background:#fff;
-border-radius:10px;
-font-size:16px;
+border-radius:9px;
 cursor:pointer;
+font-size:15px;
 }
 
 .option.selected{
-border-color:#4f46e5;
+border:2px solid #4f46e5;
 background:#eef2ff;
-font-weight:700;
 }
 
-.buttons{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:20px;
+.option.correct{
+background:#dcfce7;
+border-color:#16a34a;
 }
 
-button{
+.option.wrong{
+background:#fee2e2;
+border-color:#dc2626;
+}
+
+.submit{
+width:100%;
+background:#4f46e5;
+color:#fff;
 border:0;
 border-radius:10px;
-padding:13px;
+padding:15px;
+font-size:16px;
 font-weight:700;
 cursor:pointer;
 }
 
-.primary{
-background:#4f46e5;
-color:white;
-}
-
-.secondary{
+.back{
 background:#e2e8f0;
 color:#0f172a;
+border:0;
+border-radius:10px;
+padding:12px 16px;
+font-weight:700;
+cursor:pointer;
 }
 
-.success{
-background:#16a34a;
-color:white;
-}
-
-.danger{
-background:#dc2626;
-color:white;
+.result{
+text-align:center;
 }
 
 .score{
 font-size:40px;
 font-weight:800;
-text-align:center;
-margin:20px;
-}
-
-.review{
-padding:15px;
-background:#f8fafc;
-border-radius:10px;
-margin-top:12px;
-}
-
-.correct{
-border-left:5px solid #16a34a;
-}
-
-.incorrect{
-border-left:5px solid #dc2626;
+color:#4f46e5;
 }
 
 .empty{
 text-align:center;
-padding:50px 15px;
+padding:40px 15px;
 color:#64748b;
 }
 
-.actions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:20px;
+.info{
+background:#eef2ff;
+padding:14px;
+border-radius:10px;
+margin-bottom:18px;
 }
 
-@media(max-width:700px){
-
-.buttons{
-grid-template-columns:1fr;
+@media(max-width:600px){
+.container{
+padding:0 10px;
 }
-
 }
-
 </style>
 </head>
 
@@ -180,10 +177,10 @@ CBT Analyzer <span>Pro</span>
 </div>
 
 <button
-class="primary"
+class="back"
 onclick="location.href='mistake.html'">
 
-🧠 Mistake Bank
+Mistake Bank
 
 </button>
 
@@ -194,200 +191,727 @@ onclick="location.href='mistake.html'">
 
 <div class="container">
 
-<div
-class="card"
-id="testCard">
+<div class="hero">
 
-<h2>
-🔄 Retry Mistakes
-</h2>
+<h1>🔄 Retry Mistakes</h1>
 
-<div
-class="question-number"
-id="questionNumber">
-</div>
-
-<div
-class="question"
-id="question">
-</div>
-
-<div id="options"></div>
-
-<div class="buttons">
-
-<button
-class="secondary"
-onclick="previousQuestion()">
-
-Previous
-
-</button>
-
-<button
-class="primary"
-onclick="nextQuestion()"
-id="nextButton">
-
-Next
-
-</button>
-
-</div>
-
-</div>
-
-
-<div
-class="card"
-id="result"
-style="display:none">
-
-<h2>
-Retry Completed
-</h2>
-
-<div
-class="score"
-id="score">
-</div>
-
-<p
-id="summary">
+<p>
+Practice questions you previously got wrong.
 </p>
 
-<div id="review"></div>
+</div>
 
-<div class="actions">
 
-<button
-class="primary"
-onclick="location.href='mistake.html'">
+<div id="app">
 
-🧠 Mistake Bank
-
-</button>
-
-<button
-class="secondary"
-onclick="location.reload()">
-
-🔄 Retry Again
-
-</button>
-
+<div class="card empty">
+Loading retry questions...
 </div>
 
 </div>
-
 
 </div>
 
 
 <script>
 
+/* =====================================
+LOAD RETRY QUESTIONS
+===================================== */
 
-/* =========================
-LOAD MISTAKES
-========================= */
+let questions=[];
 
-const history=
-JSON.parse(
+let selectedAnswers={};
+
+let submitted=false;
+
+
+try{
+
+const saved=
 localStorage.getItem(
-"cbtHistory"
-) || "[]"
+"cbtRetryQuestions"
 );
 
+if(saved){
 
-let retryQuestions=[];
-
-
-history.forEach(
-(test,testIndex)=>{
-
-(test.questions || [])
-.forEach(
-(q,questionIndex)=>{
-
-if(
-(q.status==="wrong" ||
-q.status==="skipped") &&
-!isMastered(testIndex,questionIndex)
-){
-
-retryQuestions.push({
-
-...q,
-
-originalTest:testIndex,
-
-originalQuestion:questionIndex
-
-});
+questions=
+JSON.parse(saved);
 
 }
 
-});
+if(!Array.isArray(questions)){
 
-});
+questions=[];
 
+}
 
-function isMastered(
-testIndex,
-questionIndex
-){
+}catch(error){
 
-return localStorage.getItem(
-"mastery_"
-+
-testIndex
-+
-"_"
-+
-questionIndex
-)==="true";
+questions=[];
 
 }
 
 
-/* =========================
-STATE
-========================= */
+/* =====================================
+START
+===================================== */
 
-let current=0;
-
-let answers=
-new Array(
-retryQuestions.length
-).fill(null);
+render();
 
 
-/* =========================
-EMPTY
-========================= */
+/* =====================================
+RENDER TEST
+===================================== */
 
-if(retryQuestions.length===0){
+function render(){
 
-document.getElementById(
-"testCard"
-).innerHTML=
+const app=
+document.getElementById("app");
 
+
+app.innerHTML="";
+
+
+if(questions.length===0){
+
+app.innerHTML=
 `
-<div class="empty">
+<div class="card empty">
 
-<h2>
-🎉 No mistakes to retry!
-</h2>
+<h2>🎉 No Mistakes Available</h2>
 
 <p>
-You have mastered all currently available mistakes.
+Complete a CBT and save some wrong questions first.
 </p>
 
 <button
-class="primary"
+class="back"
 onclick="location.href='mistake.html'">
 
-Back to Mistake Bank
+← Back to Mistake Bank
+
+</button>
+
+</div>
+`;
+
+return;
+
+}
+
+
+const info=
+document.createElement("div");
+
+info.className="info";
+
+info.innerHTML=
+`
+<strong>${questions.length}</strong>
+mistake question(s) ready for retry.
+`;
+
+app.appendChild(info);
+
+
+questions.forEach(
+function(question,index){
+
+renderQuestion(
+question,
+index,
+app
+);
+
+});
+
+
+const submit=
+document.createElement("button");
+
+submit.className="submit";
+
+submit.textContent=
+"Submit Retry Test";
+
+submit.onclick=
+submitTest;
+
+app.appendChild(submit);
+
+}
+
+
+/* =====================================
+QUESTION
+===================================== */
+
+function renderQuestion(
+question,
+index,
+app
+){
+
+const card=
+document.createElement("div");
+
+card.className="question";
+
+
+const number=
+document.createElement("div");
+
+number.className="qno";
+
+number.textContent=
+"Question "
++
+(index+1)
++
+" of "
++
+questions.length;
+
+
+card.appendChild(number);
+
+
+const text=
+document.createElement("div");
+
+text.className="qtext";
+
+text.textContent=
+getQuestionText(question);
+
+card.appendChild(text);
+
+
+const options=
+getOptions(question);
+
+
+if(options.length===0){
+
+const noOptions=
+document.createElement("div");
+
+noOptions.className="empty";
+
+noOptions.textContent=
+"Options are not available for this saved question.";
+
+card.appendChild(noOptions);
+
+}else{
+
+options.forEach(
+function(option,optionIndex){
+
+const button=
+document.createElement("button");
+
+button.className="option";
+
+button.textContent=
+getOptionText(option);
+
+
+button.onclick=
+function(){
+
+selectAnswer(
+index,
+optionIndex,
+card
+);
+
+};
+
+
+card.appendChild(button);
+
+});
+
+}
+
+
+app.appendChild(card);
+
+}
+
+
+/* =====================================
+GET QUESTION TEXT
+===================================== */
+
+function getQuestionText(q){
+
+return (
+
+q.question ||
+
+q.text ||
+
+q.questionText ||
+
+q.title ||
+
+"Question text unavailable"
+
+);
+
+}
+
+
+/* =====================================
+GET OPTIONS
+===================================== */
+
+function getOptions(q){
+
+let options=
+q.options ||
+q.choices ||
+q.answers ||
+[];
+
+
+if(Array.isArray(options)){
+
+return options;
+
+}
+
+
+if(
+typeof options==="object" &&
+options!==null
+){
+
+return Object.values(options);
+
+}
+
+
+return [];
+
+}
+
+
+/* =====================================
+OPTION TEXT
+===================================== */
+
+function getOptionText(option){
+
+if(
+typeof option==="object" &&
+option!==null
+){
+
+return (
+
+option.text ||
+
+option.label ||
+
+option.value ||
+
+JSON.stringify(option)
+
+);
+
+}
+
+return String(option);
+
+}
+
+
+/* =====================================
+SELECT ANSWER
+===================================== */
+
+function selectAnswer(
+questionIndex,
+optionIndex,
+card
+){
+
+if(submitted)return;
+
+
+selectedAnswers[
+questionIndex
+]=optionIndex;
+
+
+const buttons=
+card.querySelectorAll(
+".option"
+);
+
+
+buttons.forEach(
+function(button,index){
+
+button.classList.remove(
+"selected"
+);
+
+if(index===optionIndex){
+
+button.classList.add(
+"selected"
+);
+
+}
+
+});
+
+}
+
+
+/* =====================================
+FIND CORRECT ANSWER
+===================================== */
+
+function getCorrectIndex(q){
+
+if(
+typeof q.correctIndex==="number"
+){
+
+return q.correctIndex;
+
+}
+
+
+if(
+typeof q.answerIndex==="number"
+){
+
+return q.answerIndex;
+
+}
+
+
+if(
+typeof q.correctOption==="number"
+){
+
+return q.correctOption;
+
+}
+
+
+if(
+typeof q.correct==="number"
+){
+
+return q.correct;
+
+}
+
+
+/* Numeric strings */
+
+if(
+q.correctIndex!==undefined &&
+!isNaN(Number(q.correctIndex))
+){
+
+return Number(q.correctIndex);
+
+}
+
+
+/* Answer can be A/B/C/D */
+
+const answer=
+q.correctAnswer ??
+q.answer;
+
+
+if(typeof answer==="string"){
+
+const value=
+answer.trim().toUpperCase();
+
+
+if(
+["A","B","C","D","E"].includes(value)
+){
+
+return value.charCodeAt(0)-65;
+
+}
+
+
+const options=
+getOptions(q);
+
+
+for(
+let i=0;
+i<options.length;
+i++
+){
+
+if(
+getOptionText(options[i])
+.trim()
+.toLowerCase()
+===
+answer
+.trim()
+.toLowerCase()
+){
+
+return i;
+
+}
+
+}
+
+}
+
+
+return null;
+
+}
+
+
+/* =====================================
+CHECK ANSWER
+===================================== */
+
+function isCorrect(
+q,
+selected
+){
+
+const correct=
+getCorrectIndex(q);
+
+
+if(correct===null){
+
+return false;
+
+}
+
+
+return Number(selected)===Number(correct);
+
+}
+
+
+/* =====================================
+SUBMIT
+===================================== */
+
+function submitTest(){
+
+if(submitted)return;
+
+
+submitted=true;
+
+
+let correct=0;
+let wrong=0;
+let skipped=0;
+
+
+questions.forEach(
+function(q,index){
+
+const selected=
+selectedAnswers[index];
+
+
+if(selected===undefined){
+
+skipped++;
+
+return;
+
+}
+
+
+if(
+isCorrect(q,selected)
+){
+
+correct++;
+
+}else{
+
+wrong++;
+
+}
+
+});
+
+
+saveRetryResult(
+correct,
+wrong,
+skipped
+);
+
+
+showResult(
+correct,
+wrong,
+skipped
+);
+
+}
+
+
+/* =====================================
+SAVE RETRY RESULT
+===================================== */
+
+function saveRetryResult(
+correct,
+wrong,
+skipped
+){
+
+let retryHistory=[];
+
+
+try{
+
+retryHistory=
+JSON.parse(
+localStorage.getItem(
+"retryHistory"
+) || "[]"
+);
+
+if(!Array.isArray(retryHistory)){
+
+retryHistory=[];
+
+}
+
+}catch(e){
+
+retryHistory=[];
+
+}
+
+
+retryHistory.push({
+
+date:
+new Date().toLocaleString(),
+
+total:
+questions.length,
+
+correct:
+correct,
+
+wrong:
+wrong,
+
+skipped:
+skipped,
+
+accuracy:
+questions.length===0
+?
+0
+:
+Math.round(
+(correct/questions.length)*100
+)
+
+});
+
+
+localStorage.setItem(
+"retryHistory",
+JSON.stringify(
+retryHistory
+)
+);
+
+}
+
+
+/* =====================================
+RESULT
+===================================== */
+
+function showResult(
+correct,
+wrong,
+skipped
+){
+
+const total=
+questions.length;
+
+
+const accuracy=
+total===0
+?
+0
+:
+Math.round(
+(correct/total)*100
+);
+
+
+const app=
+document.getElementById("app");
+
+
+app.innerHTML=
+`
+<div class="card result">
+
+<h2>🔄 Retry Complete</h2>
+
+<div class="score">
+${correct}/${total}
+</div>
+
+<p>
+<strong>Accuracy: ${accuracy}%</strong>
+</p>
+
+<p>✅ Correct: ${correct}</p>
+
+<p>❌ Wrong: ${wrong}</p>
+
+<p>⏭️ Skipped: ${skipped}</p>
+
+<br>
+
+<button
+class="back"
+onclick="location.href='mistake.html'">
+
+🧠 Back to Mistake Bank
+
+</button>
+
+<br><br>
+
+<button
+class="back"
+onclick="location.href='analysis.html'">
+
+📊 Open Performance Dashboard
 
 </button>
 
@@ -397,337 +921,25 @@ Back to Mistake Bank
 }
 
 
-/* =========================
-RENDER
-========================= */
+/* =====================================
+ESCAPE
+===================================== */
 
-function renderQuestion(){
+function escapeHTML(value){
 
-if(retryQuestions.length===0)return;
+return String(value)
 
-const q=
-retryQuestions[current];
+.replace(/&/g,"&amp;")
 
+.replace(/</g,"&lt;")
 
-document.getElementById(
-"questionNumber"
-).textContent=
-"Retry Question "
-+
-(current+1)
-+
-" of "
-+
-retryQuestions.length
-+
-" • "
-+
-(q.subject || "General");
+.replace(/>/g,"&gt;")
 
+.replace(/"/g,"&quot;")
 
-document.getElementById(
-"question"
-).textContent=
-q.question;
-
-
-const box=
-document.getElementById(
-"options"
-);
-
-box.innerHTML="";
-
-
-q.options.forEach(
-(option,index)=>{
-
-const button=
-document.createElement(
-"button"
-);
-
-button.className=
-"option";
-
-
-if(
-answers[current]===index
-){
-
-button.classList.add(
-"selected"
-);
+.replace(/'/g,"&#039;");
 
 }
-
-
-button.textContent=
-String.fromCharCode(
-65+index
-)
-+
-". "
-+
-option;
-
-
-button.onclick=
-function(){
-
-answers[current]=index;
-
-renderQuestion();
-
-};
-
-
-box.appendChild(
-button
-);
-
-});
-
-
-document.getElementById(
-"nextButton"
-).textContent=
-current===
-retryQuestions.length-1
-?
-"Finish"
-:
-"Next";
-
-}
-
-
-/* =========================
-NAVIGATION
-========================= */
-
-function nextQuestion(){
-
-if(
-current<
-retryQuestions.length-1
-){
-
-current++;
-
-renderQuestion();
-
-}
-else{
-
-submitRetry();
-
-}
-
-}
-
-
-function previousQuestion(){
-
-if(current>0){
-
-current--;
-
-renderQuestion();
-
-}
-
-}
-
-
-/* =========================
-SUBMIT
-========================= */
-
-function submitRetry(){
-
-let correct=0;
-
-let incorrect=0;
-
-let skipped=0;
-
-
-retryQuestions.forEach(
-(q,index)=>{
-
-if(
-answers[index]===null
-){
-
-skipped++;
-
-}
-else if(
-answers[index]===q.correctIndex
-){
-
-correct++;
-
-}
-else{
-
-incorrect++;
-
-}
-
-});
-
-
-const score=
-(correct*4)-incorrect;
-
-
-document.getElementById(
-"testCard"
-).style.display="none";
-
-
-document.getElementById(
-"result"
-).style.display="block";
-
-
-document.getElementById(
-"score"
-).textContent=
-score
-+
-" / "
-+
-(retryQuestions.length*4);
-
-
-document.getElementById(
-"summary"
-).textContent=
-"Correct: "
-+
-correct
-+
-" | Incorrect: "
-+
-incorrect
-+
-" | Skipped: "
-+
-skipped;
-
-
-generateReview();
-
-}
-
-
-/* =========================
-REVIEW
-========================= */
-
-function generateReview(){
-
-const box=
-document.getElementById(
-"review"
-);
-
-box.innerHTML=
-"<h3>Retry Review</h3>";
-
-
-retryQuestions.forEach(
-(q,index)=>{
-
-const item=
-document.createElement(
-"div"
-);
-
-const correct=
-answers[index]===q.correctIndex;
-
-
-item.className=
-"review "
-+
-(
-correct
-?
-"correct"
-:
-"incorrect"
-);
-
-
-const selected=
-answers[index]===null
-?
-"Not answered"
-:
-q.options[
-answers[index]
-];
-
-
-item.innerHTML=
-
-"<strong>"
-+
-"Question "
-+
-(index+1)
-+
-"</strong>"
-
-+
-
-"<p>"
-+
-q.question
-+
-"</p>"
-
-+
-
-"<p><strong>Your answer:</strong> "
-+
-selected
-+
-"</p>"
-
-+
-
-"<p><strong>Correct answer:</strong> "
-+
-q.correctAnswer
-+
-"</p>"
-
-+
-
-"<p><strong>Solution:</strong> "
-+
-(q.solution || "Review this concept again.")
-+
-"</p>";
-
-
-box.appendChild(item);
-
-});
-
-}
-
-
-/* =========================
-START
-========================= */
-
-renderQuestion();
 
 </script>
 
