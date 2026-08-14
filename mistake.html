@@ -1,38 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>CBT Analyzer Pro — Mistake Bank</title>
 
 <style>
-
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 html,body{
 margin:0;
-padding:0;
+padding:0
 }
 
 body{
 font-family:Arial,sans-serif;
 background:#f1f5f9;
 color:#0f172a;
--webkit-tap-highlight-color:transparent;
+-webkit-tap-highlight-color:transparent
 }
 
 header{
 background:#fff;
 border-bottom:1px solid #e2e8f0;
-padding:16px 20px;
+padding:16px 20px
 }
 
 .header{
@@ -41,20 +33,20 @@ margin:auto;
 display:flex;
 align-items:center;
 justify-content:space-between;
-gap:12px;
+gap:12px
 }
 
 .logo{
 font-size:20px;
-font-weight:800;
+font-weight:800
 }
 
 .logo span{
-color:#4f46e5;
+color:#4f46e5
 }
 
 button{
-font-family:inherit;
+font-family:inherit
 }
 
 .dashboard{
@@ -64,14 +56,13 @@ color:#fff;
 padding:12px 16px;
 border-radius:10px;
 font-weight:700;
-cursor:pointer;
-touch-action:manipulation;
+cursor:pointer
 }
 
 .container{
 max-width:1100px;
 margin:25px auto;
-padding:0 15px;
+padding:0 15px
 }
 
 .hero{
@@ -79,16 +70,16 @@ background:#4f46e5;
 color:#fff;
 padding:25px;
 border-radius:18px;
-margin-bottom:20px;
+margin-bottom:20px
 }
 
 .hero h1{
-margin:0 0 8px;
+margin:0 0 8px
 }
 
 .hero p{
 margin:0;
-opacity:.92;
+line-height:1.5
 }
 
 .card{
@@ -96,60 +87,47 @@ background:#fff;
 border-radius:16px;
 padding:20px;
 margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
+box-shadow:0 3px 14px rgba(0,0,0,.07)
 }
 
 .stats{
 display:grid;
 grid-template-columns:repeat(4,1fr);
-gap:12px;
+gap:12px
 }
 
 .overview-button{
-appearance:none;
--webkit-appearance:none;
 display:block;
 width:100%;
 border:0;
-outline:0;
 background:#f8fafc;
 padding:18px 10px;
 border-radius:12px;
 text-align:center;
-cursor:pointer;
-touch-action:manipulation;
-user-select:none;
-position:relative;
+cursor:pointer
 }
 
 .overview-button strong{
 display:block;
 font-size:28px;
-margin-bottom:5px;
-pointer-events:none;
+margin-bottom:5px
 }
 
 .overview-button small{
 color:#64748b;
-font-size:13px;
-pointer-events:none;
-}
-
-.overview-button:active{
-background:#c7d2fe;
-transform:scale(.97);
+font-size:13px
 }
 
 .overview-button.selected{
 background:#eef2ff;
-outline:3px solid #4f46e5;
+outline:3px solid #4f46e5
 }
 
 .filter-grid{
 display:grid;
 grid-template-columns:repeat(2,1fr);
 gap:10px;
-margin-top:18px;
+margin-top:18px
 }
 
 .filter-button{
@@ -160,37 +138,32 @@ padding:14px 10px;
 border-radius:11px;
 font-weight:700;
 min-height:48px;
-cursor:pointer;
-touch-action:manipulation;
-}
-
-.filter-button:active{
-transform:scale(.98);
+cursor:pointer
 }
 
 .filter-button.active{
 background:#4f46e5;
-color:#fff;
+color:#fff
 }
 
 .mistake{
 border:1px solid #e2e8f0;
 border-radius:14px;
 padding:18px;
-margin-top:14px;
+margin-top:14px
 }
 
 .question{
 font-weight:700;
 font-size:17px;
-line-height:1.5;
+line-height:1.5
 }
 
 .meta{
 display:flex;
 flex-wrap:wrap;
 gap:8px;
-margin:12px 0;
+margin:12px 0
 }
 
 .badge{
@@ -199,7 +172,7 @@ border-radius:8px;
 font-size:12px;
 font-weight:800;
 background:#eef2ff;
-color:#3730a3;
+color:#3730a3
 }
 
 .answer{
@@ -207,7 +180,7 @@ background:#f8fafc;
 padding:12px;
 border-radius:9px;
 margin-top:10px;
-line-height:1.5;
+line-height:1.5
 }
 
 .reason{
@@ -216,7 +189,7 @@ border:1px solid #fed7aa;
 padding:13px;
 border-radius:10px;
 margin-top:12px;
-line-height:1.5;
+line-height:1.5
 }
 
 .solution{
@@ -225,7 +198,7 @@ border:1px solid #bbf7d0;
 padding:13px;
 border-radius:10px;
 margin-top:10px;
-line-height:1.5;
+line-height:1.5
 }
 
 .retry{
@@ -238,43 +211,18 @@ background:#4f46e5;
 color:#fff;
 font-weight:700;
 font-size:15px;
-cursor:pointer;
-touch-action:manipulation;
+cursor:pointer
 }
 
 .retry:active{
-transform:scale(.98);
-}
-
-.bookmark-button{
-width:100%;
-margin-top:9px;
-padding:12px;
-border:0;
-border-radius:10px;
-background:#fef3c7;
-color:#92400e;
-font-weight:700;
-cursor:pointer;
-}
-
-.mastered-button{
-width:100%;
-margin-top:9px;
-padding:12px;
-border:0;
-border-radius:10px;
-background:#dcfce7;
-color:#166534;
-font-weight:700;
-cursor:pointer;
+transform:scale(.98)
 }
 
 .empty{
 text-align:center;
 padding:40px 15px;
 color:#64748b;
-line-height:1.6;
+line-height:1.6
 }
 
 .notice{
@@ -282,52 +230,40 @@ background:#eff6ff;
 border:1px solid #bfdbfe;
 padding:13px;
 border-radius:10px;
-line-height:1.5;
+line-height:1.5
 }
 
-.mastery-badge{
-background:#dcfce7;
-color:#166534;
+.mastered{
+border-left:5px solid #16a34a
 }
 
-.retry-badge{
-background:#fef3c7;
-color:#92400e;
-}
-
-#activeSection,
-#masteredSection{
-scroll-margin-top:20px;
-}
-
-.small-info{
-font-size:13px;
-color:#64748b;
-margin-top:7px;
+.retry-count-box{
+margin-top:15px;
+background:#eef2ff;
+border:1px solid #c7d2fe;
+padding:14px;
+border-radius:10px;
+font-weight:700;
+color:#3730a3
 }
 
 @media(max-width:700px){
 
 .stats{
-grid-template-columns:1fr 1fr;
+grid-template-columns:1fr 1fr
 }
 
 .filter-grid{
-grid-template-columns:1fr;
+grid-template-columns:1fr
 }
 
 }
-
 </style>
-
 </head>
-
 
 <body>
 
-
 <header>
-
 <div class="header">
 
 <div class="logo">
@@ -337,34 +273,26 @@ CBT Analyzer <span>Pro</span>
 <button
 type="button"
 class="dashboard"
-id="dashboardButton">
-
+onclick="location.href='index.html'">
 Dashboard
-
 </button>
 
 </div>
-
 </header>
 
-
 <div class="container">
-
 
 <div class="hero">
 
 <h1>🧠 Mistake Bank</h1>
 
 <p>
-Review mistakes, understand the reason, retry them and convert weaknesses into mastery.
+Review mistakes, understand why they happened,
+and retry them until mastery.
 </p>
 
 </div>
 
-
-<!-- =========================
-OVERVIEW
-========================= -->
 
 <div class="card">
 
@@ -372,129 +300,93 @@ OVERVIEW
 
 <div class="stats">
 
-
 <button
-type="button"
 class="overview-button selected"
 id="activeOverview">
 
 <strong id="activeCount">0</strong>
-
-<small>
-❌ Active Mistakes
-</small>
+<small>❌ Active Mistakes</small>
 
 </button>
 
 
 <button
-type="button"
 class="overview-button"
 id="masteredOverview">
 
 <strong id="masteredCount">0</strong>
-
-<small>
-🏆 Mastered
-</small>
+<small>🏆 Mastered</small>
 
 </button>
 
 
 <button
-type="button"
 class="overview-button"
 id="conceptOverview">
 
 <strong id="conceptCount">0</strong>
-
-<small>
-🧠 Concept Gaps
-</small>
+<small>🧠 Concept Gaps</small>
 
 </button>
 
 
 <button
-type="button"
 class="overview-button"
 id="retryOverview">
 
 <strong id="retryCount">0</strong>
-
-<small>
-🔄 Retries
-</small>
+<small>🔄 Retries</small>
 
 </button>
 
+</div>
+
+<div
+class="retry-count-box"
+id="retryInfo">
+
+🔄 Retry system ready.
+Wrong questions will automatically become retry questions.
 
 </div>
 
-
-<!-- =========================
-FILTERS
-========================= -->
 
 <div class="filter-grid">
 
 <button
-type="button"
 class="filter-button active"
 id="allFilter">
-
 📋 All
-
 </button>
 
-
 <button
-type="button"
 class="filter-button"
 id="conceptFilter">
-
 🧠 Concept Gap
-
 </button>
 
-
 <button
-type="button"
 class="filter-button"
 id="calculationFilter">
-
 🧮 Calculation Error
-
 </button>
 
-
 <button
-type="button"
 class="filter-button"
 id="misreadFilter">
-
 👀 Misread
-
 </button>
 
-
 <button
-type="button"
 class="filter-button"
 id="guessingFilter">
-
 🎲 Guessing
-
 </button>
-
 
 <button
-type="button"
 class="filter-button"
 id="timeFilter">
-
 ⏱️ Time Pressure
-
 </button>
 
 </div>
@@ -502,40 +394,18 @@ id="timeFilter">
 </div>
 
 
-<!-- =========================
-ACTIVE MISTAKES
-========================= -->
+<div class="card" id="activeSection">
 
-<div
-class="card"
-id="activeSection">
-
-<h2>
-❌ Active Mistakes
-</h2>
-
-<div
-class="small-info"
-id="activeInfo">
-Questions that still need mastery.
-</div>
+<h2>❌ Active Mistakes</h2>
 
 <div id="mistakeList"></div>
 
 </div>
 
 
-<!-- =========================
-MASTERED
-========================= -->
+<div class="card" id="masteredSection">
 
-<div
-class="card"
-id="masteredSection">
-
-<h2>
-🏆 Mastered Questions
-</h2>
+<h2>🏆 Mastered Questions</h2>
 
 <div id="masteredList"></div>
 
@@ -545,12 +415,12 @@ id="masteredSection">
 
 <strong>Mastery rule:</strong>
 
-A question leaves the active Mistake Bank only after a retry is answered correctly.
+A question becomes mastered only after a
+real retry is answered correctly.
 
 </div>
 
 </div>
-
 
 </div>
 
@@ -561,94 +431,62 @@ A question leaves the active Mistake Bank only after a retry is answered correct
 STORAGE
 ===================================================== */
 
-const STORAGE={
+const HISTORY_KEY="cbtHistory";
 
-history:"cbtHistory",
+const MASTERY_KEY="cbtMasteryV2";
 
-mistakes:"cbtAnalyzer.mistakes",
+const RETRY_QUEUE_KEY="cbtAnalyzer.retryQueue";
 
-bookmarks:"cbtAnalyzer.bookmarks",
+const RETRY_HISTORY_KEY="cbtAnalyzer.retryHistory";
 
-retryQueue:"cbtAnalyzer.retryQueue",
+const RETRY_QUESTION_KEY="cbtRetryQuestion";
 
-mastery:"cbtAnalyzer.mastery",
-
-oldMastery:"cbtMasteryV2",
-
-retryQuestion:"cbtRetryQuestion"
-
-};
-
-
-/* =====================================================
-STATE
-===================================================== */
 
 let history=[];
 
-let mistakes=[];
-
-let bookmarks=[];
-
-let retryQueue=[];
-
 let mastery=[];
+
+let activeMistakes=[];
 
 let currentFilter="all";
 
 
 /* =====================================================
-STORAGE HELPERS
+LOAD
 ===================================================== */
 
-function readStorage(key,fallback){
+function loadData(){
 
 try{
 
-const value=
-localStorage.getItem(key);
-
-if(!value){
-
-return fallback;
-}
-
-const parsed=
-JSON.parse(value);
-
-return parsed;
-
-}catch(error){
-
-console.error(
-"Storage read error:",
-key,
-error
+history=JSON.parse(
+localStorage.getItem(HISTORY_KEY)||"[]"
 );
 
-return fallback;
+if(!Array.isArray(history)){
+history=[];
+}
+
+}catch(e){
+
+history=[];
 
 }
 
-}
-
-
-function writeStorage(key,value){
 
 try{
 
-localStorage.setItem(
-key,
-JSON.stringify(value)
+mastery=JSON.parse(
+localStorage.getItem(MASTERY_KEY)||"[]"
 );
 
-}catch(error){
+if(!Array.isArray(mastery)){
+mastery=[];
+}
 
-console.error(
-"Storage write error:",
-key,
-error
-);
+}catch(e){
+
+mastery=[];
 
 }
 
@@ -670,163 +508,49 @@ return String(value||"")
 
 
 /* =====================================================
-LOAD DATA
+MASTERED SET
 ===================================================== */
 
-function loadData(){
+function getMasteredSet(){
 
-history=
-readStorage(
-STORAGE.history,
-[]
-);
+const set=new Set();
 
-if(!Array.isArray(history)){
-history=[];
-}
-
-
-mistakes=
-readStorage(
-STORAGE.mistakes,
-[]
-);
-
-if(!Array.isArray(mistakes)){
-mistakes=[];
-}
-
-
-bookmarks=
-readStorage(
-STORAGE.bookmarks,
-[]
-);
-
-if(!Array.isArray(bookmarks)){
-bookmarks=[];
-}
-
-
-retryQueue=
-readStorage(
-STORAGE.retryQueue,
-[]
-);
-
-if(!Array.isArray(retryQueue)){
-retryQueue=[];
-}
-
-
-mastery=
-readStorage(
-STORAGE.mastery,
-[]
-);
-
-if(!Array.isArray(mastery)){
-mastery=[];
-}
-
-
-/*
-Backward compatibility:
-old mastery storage
-*/
-
-const oldMastery=
-readStorage(
-STORAGE.oldMastery,
-[]
-);
-
-if(Array.isArray(oldMastery)){
-
-oldMastery.forEach(
-function(item){
-
-if(!item)return;
+mastery.forEach(function(item){
 
 if(
+item &&
 item.type==="mastery" &&
 item.question
 ){
 
-const exists=
-mastery.some(
-m=>
-normalize(m.question)===
+set.add(
 normalize(item.question)
 );
 
-if(!exists){
-
-mastery.push({
-
-type:"mastery",
-
-question:item.question,
-
-date:
-item.date||
-new Date().toISOString(),
-
-source:
-"Legacy Mastery"
-
-});
-
-}
-
 }
 
 });
 
-writeStorage(
-STORAGE.mastery,
-mastery
-);
-
-}
-
-
-/*
-If shared mistake storage is empty,
-recover mistakes from history.
-*/
-
-if(mistakes.length===0){
-
-recoverMistakesFromHistory();
-
-}
-
-
-/*
-Always rebuild retry queue
-*/
-
-rebuildRetryQueue();
+return set;
 
 }
 
 
 /* =====================================================
-RECOVER FROM HISTORY
+BUILD MISTAKES
 ===================================================== */
 
-function recoverMistakesFromHistory(){
+function buildMistakes(){
 
-const map=
-new Map();
+const mastered=getMasteredSet();
+
+const map=new Map();
 
 
-history.forEach(
-function(test){
+history.forEach(function(test){
 
 if(
-!test||
+!test ||
 !Array.isArray(test.questions)
 ){
 
@@ -835,13 +559,19 @@ return;
 }
 
 
-test.questions.forEach(
-function(q,index){
+test.questions.forEach(function(q){
 
 if(
-!q||
+!q ||
 q.status!=="wrong"
 ){
+
+return;
+
+}
+
+
+if(q.mastered===true){
 
 return;
 
@@ -853,88 +583,47 @@ q.question||
 q.text||
 q.questionText;
 
+
 if(!question){
+
 return;
+
 }
 
 
-const key=
-normalize(question);
+const key=normalize(question);
 
 
-if(!map.has(key)){
+if(mastered.has(key)){
+
+return;
+
+}
+
+
+/*
+Newest version replaces older version.
+*/
 
 map.set(
 key,
-createMistakeRecord(
-q,
-test,
-index
-)
-);
+{
 
-}
-
-});
-
-});
-
-
-mistakes=
-Array.from(
-map.values()
-);
-
-writeStorage(
-STORAGE.mistakes,
-mistakes
-);
-
-}
-
-
-/* =====================================================
-CREATE MISTAKE RECORD
-===================================================== */
-
-function createMistakeRecord(
-q,
-test,
-index
-){
-
-return{
-
-id:
-q.id||
-(
-(test&&test.id)
-?
-test.id+"-q-"+index
-:
-"mistake-"+Date.now()+"-"+index
-),
-
-question:
-q.question||
-q.text||
-q.questionText||
-"",
+question:question,
 
 options:
 Array.isArray(q.options)
-?
-q.options
-:
-[],
+?q.options
+:[],
 
 subject:
-q.subject||
-"Unknown",
+q.subject||"Unknown",
 
 topic:
-q.topic||
-"Unknown",
+q.topic||"Unknown",
+
+mistakeType:
+q.mistakeType||"Not Classified",
 
 selectedIndex:
 q.selectedIndex,
@@ -947,12 +636,7 @@ correctIndex:
 q.correctIndex,
 
 correctAnswer:
-q.correctAnswer||
-"",
-
-mistakeType:
-q.mistakeType||
-"Not Classified",
+q.correctAnswer||"",
 
 mistakeReason:
 q.mistakeReason||
@@ -960,76 +644,62 @@ q.mistakeReason||
 
 solution:
 q.solution||
-"Solution not available.",
-
-source:
-"CBT Test",
-
-date:
-q.date||
-(
-test&&test.date
-)||
-new Date().toISOString(),
-
-mastered:false
-
-};
+"Solution not available."
 
 }
 
-
-/* =====================================================
-MASTERED SET
-===================================================== */
-
-function getMasteredSet(){
-
-const set=
-new Set();
-
-
-mastery.forEach(
-function(item){
-
-if(
-item &&
-item.question
-){
-
-set.add(
-normalize(item.question)
 );
 
-}
+});
 
 });
 
 
-return set;
+activeMistakes=
+Array.from(map.values());
 
 }
 
 
 /* =====================================================
-REMOVE MASTERED FROM ACTIVE
+RETRY QUEUE
 ===================================================== */
 
-function getActiveMistakes(){
+function rebuildRetryQueue(){
 
-const mastered=
-getMasteredSet();
+const existing=[];
+
+try{
+
+const data=
+JSON.parse(
+localStorage.getItem(RETRY_QUEUE_KEY)||"[]"
+);
+
+if(Array.isArray(data)){
+
+existing.push(...data);
+
+}
+
+}catch(e){}
 
 
-const map=
-new Map();
+const mastered=getMasteredSet();
+
+const combined=[];
+
+const seen=new Set();
 
 
-mistakes.forEach(
-function(item){
+/*
+Existing retry questions first
+*/
+
+existing.forEach(function(item){
 
 if(
-!item||
+!item ||
 !item.question
 ){
 
@@ -1037,97 +707,92 @@ return;
 
 }
 
+const key=normalize(item.question);
 
-const key=
-normalize(item.question);
+if(mastered.has(key)){
 
+return;
+
+}
+
+if(seen.has(key)){
+
+return;
+
+}
+
+seen.add(key);
+
+combined.push(item);
+
+});
+
+
+/*
+Add all active mistakes
+*/
+
+activeMistakes.forEach(function(item){
+
+const key=normalize(item.question);
 
 if(
-mastered.has(key)
+mastered.has(key) ||
+seen.has(key)
 ){
 
 return;
 
 }
 
+seen.add(key);
 
-/*
-Latest mistake record wins.
-*/
+combined.push({
 
-map.set(
-key,
-item
-);
+id:
+"mistake-"+key,
+
+question:
+item.question,
+
+options:
+item.options,
+
+subject:
+item.subject,
+
+topic:
+item.topic,
+
+mistakeType:
+item.mistakeType,
+
+selectedIndex:
+item.selectedIndex,
+
+selectedAnswer:
+item.selectedAnswer,
+
+correctIndex:
+item.correctIndex,
+
+correctAnswer:
+item.correctAnswer,
+
+mistakeReason:
+item.mistakeReason,
+
+solution:
+item.solution
+
+});
 
 });
 
 
-return Array.from(
-map.values()
-);
-
-}
-
-
-/* =====================================================
-REBUILD RETRY QUEUE
-===================================================== */
-
-function rebuildRetryQueue(){
-
-const active=
-getActiveMistakes();
-
-
-retryQueue=
-active.map(
-function(item){
-
-return{
-
-...item,
-
-retryAvailable:true
-
-};
-
-});
-
-
-writeStorage(
-STORAGE.retryQueue,
-retryQueue
-);
-
-
-/*
-Also keep shared mastery storage current.
-*/
-
-writeStorage(
-STORAGE.mastery,
-mastery
-);
-
-
-/*
-Refresh shared mistakes
-*/
-
-writeStorage(
-STORAGE.mistakes,
-mistakes
-);
-
-
-/*
-Refresh bookmarks
-*/
-
-writeStorage(
-STORAGE.bookmarks,
-bookmarks
+localStorage.setItem(
+RETRY_QUEUE_KEY,
+JSON.stringify(combined)
 );
 
 }
@@ -1139,23 +804,55 @@ RETRY COUNT
 
 function getRetryCount(){
 
-const historyRetry=
-readStorage(
-"cbtAnalyzer.retryHistory",
-[]
+let count=0;
+
+
+/*
+Count actual retry attempts.
+*/
+
+try{
+
+const retryHistory=
+JSON.parse(
+localStorage.getItem(RETRY_HISTORY_KEY)||"[]"
 );
 
+if(Array.isArray(retryHistory)){
 
-if(
-Array.isArray(historyRetry)
-){
+count=retryHistory.length;
 
-return historyRetry.length;
+}
+
+}catch(e){}
+
+
+/*
+If no retry attempt yet, show
+number of questions waiting for retry.
+*/
+
+if(count===0){
+
+try{
+
+const queue=
+JSON.parse(
+localStorage.getItem(RETRY_QUEUE_KEY)||"[]"
+);
+
+if(Array.isArray(queue)){
+
+count=queue.length;
+
+}
+
+}catch(e){}
 
 }
 
 
-return 0;
+return count;
 
 }
 
@@ -1166,29 +863,23 @@ FILTER
 
 function setFilter(filter){
 
-currentFilter=
-filter;
+currentFilter=filter;
 
 
 document.querySelectorAll(
 ".filter-button"
-).forEach(
-function(button){
+).forEach(function(button){
 
-button.classList.remove(
-"active"
-);
+button.classList.remove("active");
 
 });
 
 
 const ids={
 
-all:
-"allFilter",
+all:"allFilter",
 
-"Concept Gap":
-"conceptFilter",
+"Concept Gap":"conceptFilter",
 
 "Calculation Error":
 "calculationFilter",
@@ -1210,12 +901,9 @@ document.getElementById(
 ids[filter]
 );
 
-
 if(button){
 
-button.classList.add(
-"active"
-);
+button.classList.add("active");
 
 }
 
@@ -1231,8 +919,7 @@ FILTER BUTTONS
 
 document.getElementById(
 "allFilter"
-).onclick=
-function(){
+).onclick=function(){
 
 setFilter("all");
 
@@ -1241,8 +928,7 @@ setFilter("all");
 
 document.getElementById(
 "conceptFilter"
-).onclick=
-function(){
+).onclick=function(){
 
 setFilter("Concept Gap");
 
@@ -1251,8 +937,7 @@ setFilter("Concept Gap");
 
 document.getElementById(
 "calculationFilter"
-).onclick=
-function(){
+).onclick=function(){
 
 setFilter("Calculation Error");
 
@@ -1261,8 +946,7 @@ setFilter("Calculation Error");
 
 document.getElementById(
 "misreadFilter"
-).onclick=
-function(){
+).onclick=function(){
 
 setFilter("Misread Question");
 
@@ -1271,8 +955,7 @@ setFilter("Misread Question");
 
 document.getElementById(
 "guessingFilter"
-).onclick=
-function(){
+).onclick=function(){
 
 setFilter("Guessing");
 
@@ -1281,8 +964,7 @@ setFilter("Guessing");
 
 document.getElementById(
 "timeFilter"
-).onclick=
-function(){
+).onclick=function(){
 
 setFilter("Time Pressure");
 
@@ -1290,144 +972,86 @@ setFilter("Time Pressure");
 
 
 /* =====================================================
-OVERVIEW SELECTION
+OVERVIEW
 ===================================================== */
 
-function clearOverviewSelection(){
+function clearOverview(){
 
 document.querySelectorAll(
 ".overview-button"
-).forEach(
-function(button){
+).forEach(function(button){
 
-button.classList.remove(
-"selected"
-);
+button.classList.remove("selected");
 
 });
 
 }
 
 
-/* ACTIVE */
-
 document.getElementById(
 "activeOverview"
-).onclick=
-function(){
+).onclick=function(){
 
-clearOverviewSelection();
+clearOverview();
 
-this.classList.add(
-"selected"
-);
+this.classList.add("selected");
 
 setFilter("all");
 
 document.getElementById(
 "activeSection"
 ).scrollIntoView({
-
-behavior:"smooth",
-
-block:"start"
-
+behavior:"smooth"
 });
 
 };
 
 
-/* MASTERED */
-
 document.getElementById(
 "masteredOverview"
-).onclick=
-function(){
+).onclick=function(){
 
-clearOverviewSelection();
+clearOverview();
 
-this.classList.add(
-"selected"
-);
+this.classList.add("selected");
 
 document.getElementById(
 "masteredSection"
 ).scrollIntoView({
-
-behavior:"smooth",
-
-block:"start"
-
+behavior:"smooth"
 });
 
 };
 
 
-/* CONCEPT */
-
 document.getElementById(
 "conceptOverview"
-).onclick=
-function(){
+).onclick=function(){
 
-clearOverviewSelection();
+clearOverview();
 
-this.classList.add(
-"selected"
-);
+this.classList.add("selected");
 
-setFilter(
-"Concept Gap"
-);
+setFilter("Concept Gap");
 
 document.getElementById(
 "activeSection"
 ).scrollIntoView({
-
-behavior:"smooth",
-
-block:"start"
-
+behavior:"smooth"
 });
 
 };
 
 
-/* RETRIES */
-
 document.getElementById(
 "retryOverview"
-).onclick=
-function(){
+).onclick=function(){
 
-clearOverviewSelection();
+clearOverview();
 
-this.classList.add(
-"selected"
-);
+this.classList.add("selected");
 
-const count=
-getRetryCount();
-
-alert(
-"Total retry attempts: "+
-count
-);
-
-};
-
-
-/* =====================================================
-DASHBOARD
-===================================================== */
-
-document.getElementById(
-"dashboardButton"
-).onclick=
-function(){
-
-location.href=
-"index.html";
+location.href="retry.html";
 
 };
 
@@ -1439,32 +1063,103 @@ START RETRY
 function startRetry(question){
 
 /*
-Save selected mistake
+Create/update retry queue
 */
 
-writeStorage(
-STORAGE.retryQuestion,
-question
+rebuildRetryQueue();
+
+
+/*
+Put selected question first
+*/
+
+let queue=[];
+
+try{
+
+queue=JSON.parse(
+localStorage.getItem(RETRY_QUEUE_KEY)||"[]"
+);
+
+if(!Array.isArray(queue)){
+queue=[];
+}
+
+}catch(e){
+
+queue=[];
+
+}
+
+
+const key=normalize(question.question);
+
+
+const index=queue.findIndex(function(item){
+
+return item &&
+item.question &&
+normalize(item.question)===key;
+
+});
+
+
+if(index>0){
+
+const selected=
+queue.splice(index,1)[0];
+
+queue.unshift(selected);
+
+}
+
+
+if(index===-1){
+
+queue.unshift({
+
+id:"retry-"+Date.now(),
+
+question:question.question,
+
+options:question.options,
+
+subject:question.subject,
+
+topic:question.topic,
+
+mistakeType:question.mistakeType,
+
+selectedIndex:question.selectedIndex,
+
+selectedAnswer:question.selectedAnswer,
+
+correctIndex:question.correctIndex,
+
+correctAnswer:question.correctAnswer,
+
+mistakeReason:question.mistakeReason,
+
+solution:question.solution
+
+});
+
+}
+
+
+localStorage.setItem(
+RETRY_QUEUE_KEY,
+JSON.stringify(queue)
 );
 
 
 /*
-Also save a retry queue containing
-the selected question first.
+Also save selected question.
 */
 
-const queue=[
-question,
-...getActiveMistakes().filter(
-item=>
-item.id!==question.id
-)
-];
-
-
-writeStorage(
-STORAGE.retryQueue,
-queue
+localStorage.setItem(
+RETRY_QUESTION_KEY,
+JSON.stringify(question)
 );
 
 
@@ -1472,8 +1167,28 @@ queue
 Open retry engine
 */
 
-location.href=
-"retry.html";
+location.href="retry.html";
+
+}
+
+
+/* =====================================================
+GET FILTERED
+===================================================== */
+
+function getFilteredMistakes(){
+
+if(currentFilter==="all"){
+
+return activeMistakes;
+
+}
+
+return activeMistakes.filter(function(item){
+
+return item.mistakeType===currentFilter;
+
+});
 
 }
 
@@ -1484,25 +1199,18 @@ COUNTS
 
 function renderCounts(){
 
-const active=
-getActiveMistakes();
-
-
 const concept=
-active.filter(
-function(item){
+activeMistakes.filter(function(item){
 
-return item.mistakeType===
-"Concept Gap";
+return item.mistakeType==="Concept Gap";
 
-}
-).length;
+}).length;
 
 
 document.getElementById(
 "activeCount"
 ).textContent=
-active.length;
+activeMistakes.length;
 
 
 document.getElementById(
@@ -1522,78 +1230,20 @@ document.getElementById(
 ).textContent=
 getRetryCount();
 
-}
+
+const retryCount=
+getRetryCount();
 
 
-/* =====================================================
-FILTERED MISTAKES
-===================================================== */
-
-function getFilteredMistakes(){
-
-const active=
-getActiveMistakes();
-
-
-if(
-currentFilter==="all"
-){
-
-return active;
-
-}
-
-
-return active.filter(
-function(item){
-
-return normalize(
-item.mistakeType
-)===
-normalize(
-currentFilter
-);
-
-}
-);
-
-}
-
-
-/* =====================================================
-ESCAPE HTML
-===================================================== */
-
-function escapeHTML(value){
-
-return String(
-value===undefined||
-value===null
+document.getElementById(
+"retryInfo"
+).textContent=
+retryCount>0
 ?
-""
+"🔄 "+retryCount+
+" question(s) are ready for the Retry → Mastery engine."
 :
-value
-)
-.replace(
-/&/g,
-"&amp;"
-)
-.replace(
-/</g,
-"&lt;"
-)
-.replace(
-/>/g,
-"&gt;"
-)
-.replace(
-/"/g,
-"&quot;"
-)
-.replace(
-/'/g,
-"&#039;"
-);
+"🔄 No retry attempts yet. Wrong questions will appear here automatically.";
 
 }
 
@@ -1616,45 +1266,13 @@ const list=
 getFilteredMistakes();
 
 
-document.getElementById(
-"activeInfo"
-).textContent=
-
-list.length+
-" active mistake"+
-(
-list.length===1
-?
-""
-:
-"s"
-)+
-" shown";
-
-
 if(list.length===0){
 
 box.innerHTML=`
 
 <div class="empty">
 
-${
-currentFilter==="all"
-?
-"🎉 No active mistakes yet."
-:
-"🔎 No mistakes found in this category."
-}
-
-<br><br>
-
-${
-currentFilter==="all"
-?
-"Complete a CBT test and your incorrect questions will automatically appear here."
-:
-"Try another mistake category."
-}
+❌ No active mistakes in this category.
 
 </div>
 
@@ -1665,22 +1283,12 @@ return;
 }
 
 
-list.forEach(
-function(q,index){
+list.forEach(function(q,index){
 
 const div=
-document.createElement(
-"div"
-);
+document.createElement("div");
 
-div.className=
-"mistake";
-
-
-const retryCount=
-getQuestionRetryCount(
-q.question
-);
+div.className="mistake";
 
 
 div.innerHTML=`
@@ -1689,78 +1297,39 @@ div.innerHTML=`
 ❌ Mistake ${index+1}
 </h3>
 
-
 <div class="question">
-
-${escapeHTML(
-q.question
-)}
-
+${escapeHTML(q.question)}
 </div>
-
 
 <div class="meta">
 
 <span class="badge">
-${escapeHTML(
-q.subject
-)}
+${escapeHTML(q.subject)}
 </span>
 
 <span class="badge">
-${escapeHTML(
-q.topic
-)}
+${escapeHTML(q.topic)}
 </span>
 
 <span class="badge">
-${escapeHTML(
-q.mistakeType
-)}
+${escapeHTML(q.mistakeType)}
 </span>
-
-${
-retryCount>0
-?
-`
-<span class="badge retry-badge">
-🔄 ${retryCount} Retr${retryCount===1?"y":"ies"}
-</span>
-`
-:
-""
-}
 
 </div>
-
 
 <div class="answer">
 
-<strong>
-Your answer:
-</strong>
-
+<strong>Your answer:</strong>
 <br>
-
-${escapeHTML(
-q.selectedAnswer||
-"Not answered"
-)}
+${escapeHTML(q.selectedAnswer)}
 
 <br><br>
 
-<strong>
-Correct answer:
-</strong>
-
+<strong>Correct answer:</strong>
 <br>
-
-${escapeHTML(
-q.correctAnswer
-)}
+${escapeHTML(q.correctAnswer)}
 
 </div>
-
 
 <div class="reason">
 
@@ -1770,12 +1339,9 @@ q.correctAnswer
 
 <br><br>
 
-${escapeHTML(
-q.mistakeReason
-)}
+${escapeHTML(q.mistakeReason)}
 
 </div>
-
 
 <div class="solution">
 
@@ -1785,93 +1351,33 @@ q.mistakeReason
 
 <br><br>
 
-${escapeHTML(
-q.solution
-)}
+${escapeHTML(q.solution)}
 
 </div>
 
 `;
 
 
-/* RETRY */
-
 const retryButton=
-document.createElement(
-"button"
-);
+document.createElement("button");
 
-retryButton.type=
-"button";
+retryButton.type="button";
 
-retryButton.className=
-"retry";
+retryButton.className="retry";
 
 retryButton.textContent=
 "🔄 Retry This Mistake";
 
-retryButton.onclick=
-function(){
+retryButton.onclick=function(){
 
 startRetry(q);
 
 };
 
-div.appendChild(
-retryButton
-);
 
+div.appendChild(retryButton);
 
-/* BOOKMARK STATUS */
-
-const bookmark=
-bookmarks.some(
-function(item){
-
-return (
-item.id===q.id ||
-normalize(item.question)===
-normalize(q.question)
-);
-
-}
-);
-
-
-const bookmarkButton=
-document.createElement(
-"button"
-);
-
-bookmarkButton.type=
-"button";
-
-bookmarkButton.className=
-"bookmark-button";
-
-bookmarkButton.textContent=
-bookmark
-?
-"🔖 Bookmarked"
-:
-"☆ Add Bookmark";
-
-bookmarkButton.onclick=
-function(){
-
-toggleBookmark(q);
-
-};
-
-
-div.appendChild(
-bookmarkButton
-);
-
-
-box.appendChild(
-div
-);
+box.appendChild(div);
 
 });
 
@@ -1879,13 +1385,121 @@ div
 
 
 /* =====================================================
-RETRY COUNT FOR QUESTION
+MASTERED
 ===================================================== */
 
-function getQuestionRetryCount(
-question
-){
+function renderMastered(){
 
-const retryHistory=
-readStorage(
-"cbtAnalyzer.retryHis
+const box=
+document.getElementById(
+"masteredList"
+);
+
+box.innerHTML="";
+
+
+const list=
+mastery.filter(function(item){
+
+return item &&
+item.type==="mastery" &&
+item.question;
+
+});
+
+
+if(list.length===0){
+
+box.innerHTML=`
+
+<div class="empty">
+
+🏆 No mastered questions yet.
+
+<br><br>
+
+Complete a correct retry to create mastery.
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+list.forEach(function(item,index){
+
+const div=
+document.createElement("div");
+
+div.className=
+"mistake mastered";
+
+
+div.innerHTML=`
+
+<h3>
+🏆 Mastered #${index+1}
+</h3>
+
+<div class="question">
+
+${escapeHTML(item.question)}
+
+</div>
+
+<div class="meta">
+
+<span class="badge">
+🏆 Mastered
+</span>
+
+</div>
+
+`;
+
+box.appendChild(div);
+
+});
+
+}
+
+
+/* =====================================================
+ESCAPE
+===================================================== */
+
+function escapeHTML(value){
+
+return String(value||"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+START
+===================================================== */
+
+loadData();
+
+buildMistakes();
+
+rebuildRetryQueue();
+
+renderCounts();
+
+renderMistakes();
+
+renderMastered();
+
+</script>
+
+</body>
+</html>
