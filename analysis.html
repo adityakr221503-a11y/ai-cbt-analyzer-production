@@ -7,22 +7,19 @@
 <title>CBT Analyzer Pro — Performance Dashboard</title>
 
 <style>
-
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#f1f5f9;
-color:#0f172a;
+color:#0f172a
 }
 
 header{
 background:#fff;
 padding:16px 20px;
-border-bottom:1px solid #e2e8f0;
+border-bottom:1px solid #e2e8f0
 }
 
 .header{
@@ -30,22 +27,22 @@ max-width:1100px;
 margin:auto;
 display:flex;
 justify-content:space-between;
-align-items:center;
+align-items:center
 }
 
 .logo{
 font-size:20px;
-font-weight:800;
+font-weight:800
 }
 
 .logo span{
-color:#4f46e5;
+color:#4f46e5
 }
 
 .container{
 max-width:1100px;
 margin:25px auto;
-padding:0 15px;
+padding:0 15px
 }
 
 .hero{
@@ -53,16 +50,16 @@ background:linear-gradient(135deg,#4f46e5,#6366f1);
 color:white;
 padding:25px;
 border-radius:18px;
-margin-bottom:20px;
+margin-bottom:20px
 }
 
 .hero h1{
-margin:0 0 8px;
+margin:0 0 8px
 }
 
 .hero p{
 margin:0;
-opacity:.9;
+opacity:.9
 }
 
 .card{
@@ -70,55 +67,55 @@ background:#fff;
 border-radius:16px;
 padding:20px;
 margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
+box-shadow:0 3px 14px rgba(0,0,0,.07)
 }
 
 .stats{
 display:grid;
 grid-template-columns:repeat(4,1fr);
-gap:12px;
+gap:12px
 }
 
 .stat{
 background:#f8fafc;
 padding:18px;
 border-radius:12px;
-text-align:center;
+text-align:center
 }
 
 .stat strong{
 display:block;
 font-size:27px;
-margin-bottom:5px;
+margin-bottom:5px
 }
 
 .stat small{
-color:#64748b;
+color:#64748b
 }
 
 .subject{
 border:1px solid #e2e8f0;
 border-radius:12px;
 padding:16px;
-margin-top:12px;
+margin-top:12px
 }
 
 .subject-title{
 font-size:17px;
 font-weight:800;
-margin-bottom:10px;
+margin-bottom:10px
 }
 
 .topic{
 background:#f8fafc;
 border-radius:10px;
 padding:13px;
-margin-top:10px;
+margin-top:10px
 }
 
 .topic-title{
 font-weight:700;
-margin-bottom:8px;
+margin-bottom:8px
 }
 
 .bar{
@@ -126,13 +123,13 @@ height:11px;
 background:#e2e8f0;
 border-radius:20px;
 overflow:hidden;
-margin-top:7px;
+margin-top:7px
 }
 
 .bar-fill{
 height:100%;
 background:#4f46e5;
-border-radius:20px;
+border-radius:20px
 }
 
 .row{
@@ -141,6 +138,7 @@ justify-content:space-between;
 gap:10px;
 margin-top:8px;
 font-size:14px;
+flex-wrap:wrap
 }
 
 .insight{
@@ -148,23 +146,23 @@ padding:15px;
 border-radius:11px;
 background:#eef2ff;
 margin-top:10px;
-line-height:1.6;
+line-height:1.6
 }
 
 .focus{
 border-left:5px solid #dc2626;
-background:#fff7ed;
+background:#fff7ed
 }
 
 .strength{
 border-left:5px solid #16a34a;
-background:#ecfdf5;
+background:#ecfdf5
 }
 
 .empty{
 text-align:center;
 padding:45px 15px;
-color:#64748b;
+color:#64748b
 }
 
 button{
@@ -172,33 +170,30 @@ border:0;
 border-radius:9px;
 padding:11px 15px;
 font-weight:700;
-cursor:pointer;
+cursor:pointer
 }
 
 .primary{
 background:#4f46e5;
-color:white;
+color:white
 }
 
 .secondary{
 background:#e2e8f0;
-color:#0f172a;
+color:#0f172a
 }
 
 @media(max-width:800px){
 
 .stats{
-grid-template-columns:1fr 1fr;
+grid-template-columns:1fr 1fr
 }
 
 }
-
 </style>
 </head>
 
-
 <body>
-
 
 <header>
 
@@ -211,9 +206,7 @@ CBT Analyzer <span>Pro</span>
 <button
 class="primary"
 onclick="location.href='cbt.html'">
-
 Take CBT
-
 </button>
 
 </div>
@@ -223,12 +216,9 @@ Take CBT
 
 <div class="container">
 
-
 <div class="hero">
 
-<h1>
-📊 Performance Dashboard
-</h1>
+<h1>📊 Performance Dashboard</h1>
 
 <p>
 Understand your strengths, weaknesses and progress.
@@ -241,61 +231,28 @@ Understand your strengths, weaknesses and progress.
 
 <div class="card">
 
-<h2>
-Overall Performance
-</h2>
+<h2>Overall Performance</h2>
 
 <div class="stats">
 
 <div class="stat">
-
-<strong id="tests">
-0
-</strong>
-
-<small>
-Tests
-</small>
-
+<strong id="tests">0</strong>
+<small>Tests</small>
 </div>
 
-
 <div class="stat">
-
-<strong id="accuracy">
-0%
-</strong>
-
-<small>
-Accuracy
-</small>
-
+<strong id="accuracy">0%</strong>
+<small>Accuracy</small>
 </div>
 
-
 <div class="stat">
-
-<strong id="correct">
-0
-</strong>
-
-<small>
-Correct
-</small>
-
+<strong id="correct">0</strong>
+<small>Correct</small>
 </div>
 
-
 <div class="stat">
-
-<strong id="wrong">
-0
-</strong>
-
-<small>
-Wrong
-</small>
-
+<strong id="wrong">0</strong>
+<small>Wrong</small>
 </div>
 
 </div>
@@ -307,9 +264,7 @@ Wrong
 
 <div class="card">
 
-<h2>
-📚 Subject Performance
-</h2>
+<h2>📚 Subject Performance</h2>
 
 <div id="subjects"></div>
 
@@ -320,11 +275,20 @@ Wrong
 
 <div class="card">
 
-<h2>
-🎯 Topic / Chapter Performance
-</h2>
+<h2>🎯 Topic / Chapter Performance</h2>
 
 <div id="topics"></div>
+
+</div>
+
+
+<!-- PROGRESS -->
+
+<div class="card">
+
+<h2>📈 Progress Over Attempts</h2>
+
+<div id="progress"></div>
 
 </div>
 
@@ -333,9 +297,7 @@ Wrong
 
 <div class="card">
 
-<h2>
-🧠 Performance Insights
-</h2>
+<h2>🧠 Performance Insights</h2>
 
 <div id="insights"></div>
 
@@ -347,25 +309,19 @@ Wrong
 <button
 class="secondary"
 onclick="location.href='mistake.html'">
-
 Open Mistake Bank
-
 </button>
 
 </div>
-
 
 </div>
 
 
 <script>
 
-
-const history=
+const history =
 JSON.parse(
-localStorage.getItem(
-"cbtHistory"
-) || "[]"
+localStorage.getItem("cbtHistory") || "[]"
 );
 
 
@@ -383,29 +339,20 @@ return;
 
 }
 
-
 let total=0;
-
 let correct=0;
-
 let wrong=0;
-
 let skipped=0;
 
-
 const subjects={};
-
 const topics={};
 
 
-history.forEach(
-test=>{
+history.forEach(function(test){
 
-(test.questions || [])
-.forEach(q=>{
+(test.questions || []).forEach(function(q){
 
 total++;
-
 
 if(q.status==="correct"){
 correct++;
@@ -420,16 +367,11 @@ skipped++;
 }
 
 
-const subject=
+/* SUBJECT */
+
+const subject =
 q.subject || "General";
 
-
-const topic=
-q.topic ||
-"General";
-
-
-/* SUBJECT */
 
 if(!subjects[subject]){
 
@@ -442,9 +384,7 @@ skipped:0
 
 }
 
-
 subjects[subject].total++;
-
 
 if(q.status==="correct"){
 subjects[subject].correct++;
@@ -461,13 +401,16 @@ subjects[subject].skipped++;
 
 /* TOPIC */
 
-const topicKey=
-subject+"|||"+topic;
+const topic =
+q.topic || "General";
+
+const key =
+subject + "|||" + topic;
 
 
-if(!topics[topicKey]){
+if(!topics[key]){
 
-topics[topicKey]={
+topics[key]={
 subject:subject,
 topic:topic,
 total:0,
@@ -478,20 +421,18 @@ skipped:0
 
 }
 
-
-topics[topicKey].total++;
-
+topics[key].total++;
 
 if(q.status==="correct"){
-topics[topicKey].correct++;
+topics[key].correct++;
 }
 
 if(q.status==="wrong"){
-topics[topicKey].wrong++;
+topics[key].wrong++;
 }
 
 if(q.status==="skipped"){
-topics[topicKey].skipped++;
+topics[key].skipped++;
 }
 
 });
@@ -499,47 +440,37 @@ topics[topicKey].skipped++;
 });
 
 
-const attempted=
-correct+wrong;
+const attempted =
+correct + wrong;
 
-
-const accuracy=
+const accuracy =
 attempted===0
 ?
 0
 :
 Math.round(
-(correct/attempted)*100
+(correct / attempted) * 100
 );
 
 
-document.getElementById(
-"tests"
-).textContent=
-history.length;
+document.getElementById("tests")
+.textContent = history.length;
 
+document.getElementById("accuracy")
+.textContent = accuracy + "%";
 
-document.getElementById(
-"accuracy"
-).textContent=
-accuracy+"%";
+document.getElementById("correct")
+.textContent = correct;
 
-
-document.getElementById(
-"correct"
-).textContent=
-correct;
-
-
-document.getElementById(
-"wrong"
-).textContent=
-wrong;
+document.getElementById("wrong")
+.textContent = wrong;
 
 
 renderSubjects(subjects);
 
 renderTopics(topics);
+
+renderProgress();
 
 generateInsights(
 correct,
@@ -559,94 +490,87 @@ EMPTY
 
 function showEmpty(){
 
-document.getElementById(
-"subjects"
-).innerHTML=
+document.getElementById("subjects").innerHTML =
 `
 <div class="empty">
-
 No test data available yet.
-
 <br><br>
-
 Complete a CBT to generate analysis.
-
 </div>
 `;
 
-document.getElementById(
-"topics"
-).innerHTML="";
+document.getElementById("topics").innerHTML =
+`
+<div class="empty">
+No topic data available yet.
+</div>
+`;
 
-document.getElementById(
-"insights"
-).innerHTML="";
+document.getElementById("progress").innerHTML =
+`
+<div class="empty">
+Complete a CBT to start tracking progress.
+</div>
+`;
+
+document.getElementById("insights").innerHTML =
+`
+<div class="empty">
+Your performance insights will appear after your first test.
+</div>
+`;
 
 }
 
 
 /* =========================
-SUBJECTS
+SUBJECT PERFORMANCE
 ========================= */
 
 function renderSubjects(subjects){
 
-const box=
-document.getElementById(
-"subjects"
-);
+const box =
+document.getElementById("subjects");
 
-box.innerHTML="";
+box.innerHTML = "";
 
 
 Object.keys(subjects)
 .sort()
-.forEach(subject=>{
+.forEach(function(subject){
 
-const data=
+const data =
 subjects[subject];
 
+const attempted =
+data.correct + data.wrong;
 
-const attempted=
-data.correct+
-data.wrong;
-
-
-const accuracy=
+const accuracy =
 attempted===0
 ?
 0
 :
 Math.round(
-(data.correct/attempted)*100
+(data.correct / attempted) * 100
 );
 
 
-const item=
-document.createElement(
-"div"
-);
+const item =
+document.createElement("div");
 
-item.className="subject";
+item.className = "subject";
 
 
-item.innerHTML=
+item.innerHTML =
 
 `
 <div class="subject-title">
-${subject}
+${escapeHTML(subject)}
 </div>
 
 <div class="row">
-
-<span>
-Accuracy
-</span>
-
-<strong>
-${accuracy}%
-</strong>
-
+<span>Accuracy</span>
+<strong>${accuracy}%</strong>
 </div>
 
 <div class="bar">
@@ -660,17 +584,11 @@ style="width:${accuracy}%">
 
 <div class="row">
 
-<span>
-Correct: ${data.correct}
-</span>
+<span>✅ Correct: ${data.correct}</span>
 
-<span>
-Wrong: ${data.wrong}
-</span>
+<span>❌ Wrong: ${data.wrong}</span>
 
-<span>
-Skipped: ${data.skipped}
-</span>
+<span>⏭️ Skipped: ${data.skipped}</span>
 
 </div>
 `;
@@ -684,140 +602,241 @@ box.appendChild(item);
 
 
 /* =========================
-TOPICS
+TOPIC PERFORMANCE
 ========================= */
 
 function renderTopics(topics){
 
-const box=
-document.getElementById(
-"topics"
-);
+const box =
+document.getElementById("topics");
 
-box.innerHTML="";
+box.innerHTML = "";
 
 
-const list=
-Object.values(topics)
-.sort(
-(a,b)=>{
+const list =
+Object.values(topics).sort(function(a,b){
 
-const aAttempted=
-a.correct+a.wrong;
+const aAttempted =
+a.correct + a.wrong;
 
-const bAttempted=
-b.correct+b.wrong;
+const bAttempted =
+b.correct + b.wrong;
 
-const aAcc=
+const aAccuracy =
 aAttempted===0
 ?
 0
 :
-a.correct/aAttempted;
+a.correct / aAttempted;
 
-const bAcc=
+const bAccuracy =
 bAttempted===0
 ?
 0
 :
-b.correct/bAttempted;
+b.correct / bAttempted;
 
-return aAcc-bAcc;
-
-}
-);
-
-
-list.forEach(data=>{
-
-const attempted=
-data.correct+
-data.wrong;
-
-
-const accuracy=
-attempted===0
-?
-0
-:
-Math.round(
-(data.correct/attempted)*100
-);
-
-
-const item=
-document.createElement(
-"div"
-);
-
-item.className="topic";
-
-
-item.innerHTML=
-
-`
-<div class="topic-title">
-
-${data.subject}
-→
-${data.topic}
-
-</div>
-
-<div class="row">
-
-<span>
-Accuracy
-</span>
-
-<strong>
-${accuracy}%
-</strong>
-
-</div>
-
-<div class="bar">
-
-<div
-class="bar-fill"
-style="width:${accuracy}%">
-</div>
-
-</div>
-
-<div class="row">
-
-<span>
-Correct: ${data.correct}
-</span>
-
-<span>
-Wrong: ${data.wrong}
-</span>
-
-<span>
-Skipped: ${data.skipped}
-</span>
-
-</div>
-`;
-
-
-box.appendChild(item);
+return aAccuracy - bAccuracy;
 
 });
 
 
 if(list.length===0){
 
-box.innerHTML=
+box.innerHTML =
 `
 <div class="empty">
 No topic data available.
 </div>
 `;
 
+return;
+
 }
+
+
+list.forEach(function(data){
+
+const attempted =
+data.correct + data.wrong;
+
+const accuracy =
+attempted===0
+?
+0
+:
+Math.round(
+(data.correct / attempted) * 100
+);
+
+
+const item =
+document.createElement("div");
+
+item.className = "topic";
+
+
+item.innerHTML =
+
+`
+<div class="topic-title">
+
+${escapeHTML(data.subject)}
+→
+${escapeHTML(data.topic)}
+
+</div>
+
+<div class="row">
+
+<span>Accuracy</span>
+
+<strong>${accuracy}%</strong>
+
+</div>
+
+<div class="bar">
+
+<div
+class="bar-fill"
+style="width:${accuracy}%">
+</div>
+
+</div>
+
+<div class="row">
+
+<span>✅ ${data.correct}</span>
+
+<span>❌ ${data.wrong}</span>
+
+<span>⏭️ ${data.skipped}</span>
+
+</div>
+`;
+
+
+box.appendChild(item);
+
+});
+
+}
+
+
+/* =========================
+PROGRESS
+========================= */
+
+function renderProgress(){
+
+const box =
+document.getElementById("progress");
+
+box.innerHTML = "";
+
+
+if(history.length===0){
+
+box.innerHTML =
+`
+<div class="empty">
+Complete a CBT to start tracking progress.
+</div>
+`;
+
+return;
+
+}
+
+
+history.forEach(function(test,index){
+
+const correct =
+Number(test.correct) || 0;
+
+const wrong =
+Number(test.incorrect) || 0;
+
+const skipped =
+Number(test.skipped) || 0;
+
+const score =
+Number(test.score) || 0;
+
+const attempted =
+correct + wrong;
+
+const accuracy =
+attempted===0
+?
+0
+:
+Math.round(
+(correct / attempted) * 100
+);
+
+
+const item =
+document.createElement("div");
+
+item.className = "subject";
+
+
+item.innerHTML =
+
+`
+<div class="subject-title">
+Attempt #${index + 1}
+</div>
+
+<div class="row">
+
+<span>Score</span>
+
+<strong>${score}</strong>
+
+</div>
+
+<div class="row">
+
+<span>Accuracy</span>
+
+<strong>${accuracy}%</strong>
+
+</div>
+
+<div class="bar">
+
+<div
+class="bar-fill"
+style="width:${accuracy}%">
+</div>
+
+</div>
+
+<div class="row">
+
+<span>✅ Correct: ${correct}</span>
+
+<span>❌ Wrong: ${wrong}</span>
+
+<span>⏭️ Skipped: ${skipped}</span>
+
+</div>
+
+<div class="row">
+
+<span>
+📅 ${escapeHTML(test.date || "Unknown date")}
+</span>
+
+</div>
+`;
+
+
+box.appendChild(item);
+
+});
 
 }
 
@@ -835,13 +854,10 @@ subjects,
 topics
 ){
 
-const box=
-document.getElementById(
-"insights"
-);
+const box =
+document.getElementById("insights");
 
-box.innerHTML="";
-
+box.innerHTML = "";
 
 let messages=[];
 
@@ -849,56 +865,62 @@ let messages=[];
 if(accuracy>=80){
 
 messages.push({
+
 type:"strength",
+
 text:
 "🔥 Strong performance. Your current accuracy is high."
+
 });
 
 }
 else if(accuracy>=60){
 
 messages.push({
+
 type:"",
+
 text:
 "📈 Your foundation is developing. Focus on reducing repeated mistakes."
+
 });
 
 }
 else{
 
 messages.push({
+
 type:"focus",
+
 text:
 "🎯 Accuracy needs attention. Use the Mistake Bank for targeted revision."
+
 });
 
 }
 
 
-let weakestTopic=null;
+/* WEAKEST TOPIC */
 
+let weakestTopic=null;
 let weakestAccuracy=101;
 
 
 Object.values(topics)
-.forEach(data=>{
+.forEach(function(data){
 
-const attempted=
-data.correct+
-data.wrong;
-
+const attempted =
+data.correct + data.wrong;
 
 if(attempted===0)return;
 
+const acc =
+(data.correct / attempted) * 100;
 
-const acc=
-(data.correct/attempted)*100;
 
-
-if(acc<weakestAccuracy){
+if(acc < weakestAccuracy){
 
 weakestAccuracy=acc;
-
 weakestTopic=data;
 
 }
@@ -932,30 +954,27 @@ Math.round(weakestAccuracy)
 }
 
 
-let strongestTopic=null;
+/* STRONGEST TOPIC */
 
+let strongestTopic=null;
 let strongestAccuracy=-1;
 
 
 Object.values(topics)
-.forEach(data=>{
+.forEach(function(data){
 
-const attempted=
-data.correct+
-data.wrong;
-
+const attempted =
+data.correct + data.wrong;
 
 if(attempted===0)return;
 
+const acc =
+(data.correct / attempted) * 100;
 
-const acc=
-(data.correct/attempted)*100;
 
-
-if(acc>strongestAccuracy){
+if(acc > strongestAccuracy){
 
 strongestAccuracy=acc;
-
 strongestTopic=data;
 
 }
@@ -989,6 +1008,8 @@ Math.round(strongestAccuracy)
 }
 
 
+/* SKIPPED */
+
 if(skipped>0){
 
 messages.push({
@@ -1000,12 +1021,14 @@ text:
 +
 skipped
 +
-" skipped questions. Review time-management and question-selection strategy."
+" skipped questions. Review your time-management strategy."
 
 });
 
 }
 
+
+/* WRONG */
 
 if(wrong>0){
 
@@ -1018,31 +1041,46 @@ text:
 +
 wrong
 +
-" questions are currently wrong. These are the highest-priority questions for Mistake Bank revision."
+" questions are currently wrong. These should be prioritized in Mistake Bank revision."
 
 });
 
 }
 
 
-messages.forEach(message=>{
+/* RENDER */
 
-const div=
-document.createElement(
-"div"
-);
+messages.forEach(function(message){
 
-div.className=
-"insight "
-+
+const div =
+document.createElement("div");
+
+div.className =
+"insight " +
 message.type;
 
-div.textContent=
+div.textContent =
 message.text;
 
 box.appendChild(div);
 
 });
+
+}
+
+
+/* =========================
+SECURITY / TEXT SAFETY
+========================= */
+
+function escapeHTML(value){
+
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
