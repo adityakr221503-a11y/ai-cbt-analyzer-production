@@ -4,17 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>CBT Analyzer Pro — Mistake Bank</title>
+<title>CBT Analyzer Pro — Retry</title>
 
 <style>
 
 *{
 box-sizing:border-box;
-}
-
-html,body{
-margin:0;
-padding:0;
 }
 
 body{
@@ -32,12 +27,12 @@ padding:16px 20px;
 }
 
 .header{
-max-width:1100px;
+max-width:900px;
 margin:auto;
 display:flex;
 align-items:center;
 justify-content:space-between;
-gap:12px;
+gap:10px;
 }
 
 .logo{
@@ -49,15 +44,10 @@ font-weight:800;
 color:#4f46e5;
 }
 
-button{
-font-family:inherit;
-}
-
-.dashboard{
+.back{
 border:0;
-background:#4f46e5;
-color:#fff;
-padding:12px 16px;
+background:#e2e8f0;
+padding:11px 15px;
 border-radius:10px;
 font-weight:700;
 cursor:pointer;
@@ -65,16 +55,23 @@ touch-action:manipulation;
 }
 
 .container{
-max-width:1100px;
+max-width:900px;
 margin:25px auto;
 padding:0 15px;
+}
+
+.card{
+background:#fff;
+border-radius:16px;
+padding:22px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .hero{
 background:#4f46e5;
 color:#fff;
-padding:25px;
-border-radius:18px;
+padding:22px;
+border-radius:16px;
 margin-bottom:20px;
 }
 
@@ -82,176 +79,160 @@ margin-bottom:20px;
 margin:0 0 8px;
 }
 
-.card{
-background:#fff;
-border-radius:16px;
-padding:20px;
-margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
-}
-
-.stats{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:12px;
-}
-
-
-/* =================================
-OVERVIEW BUTTONS
-================================= */
-
-.overview-button{
-appearance:none;
--webkit-appearance:none;
-display:block;
-width:100%;
-border:0;
-outline:0;
-background:#f8fafc;
-padding:18px 10px;
-border-radius:12px;
-text-align:center;
-cursor:pointer;
-touch-action:manipulation;
-user-select:none;
--webkit-user-select:none;
-position:relative;
-z-index:20;
-}
-
-.overview-button strong{
-display:block;
-font-size:28px;
-margin-bottom:5px;
-pointer-events:none;
-}
-
-.overview-button small{
-color:#64748b;
-font-size:13px;
-pointer-events:none;
-}
-
-.overview-button:active{
-background:#c7d2fe;
-transform:scale(.97);
-}
-
-.overview-button.selected{
-background:#eef2ff;
-outline:3px solid #4f46e5;
-}
-
-
-/* =================================
-FILTER BUTTONS
-================================= */
-
-.filter-grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-margin-top:18px;
-}
-
-.filter-button{
-border:0;
-background:#e2e8f0;
-color:#0f172a;
-padding:14px 10px;
-border-radius:11px;
-font-weight:700;
-min-height:48px;
-cursor:pointer;
-touch-action:manipulation;
-}
-
-.filter-button:active{
-transform:scale(.98);
-}
-
-.filter-button.active{
-background:#4f46e5;
-color:#fff;
-}
-
-
-/* =================================
-MISTAKES
-================================= */
-
-.mistake{
-border:1px solid #e2e8f0;
-border-radius:14px;
-padding:18px;
-margin-top:14px;
-}
-
-.question{
-font-weight:700;
-font-size:17px;
-line-height:1.5;
-}
-
 .meta{
 display:flex;
 flex-wrap:wrap;
 gap:8px;
-margin:12px 0;
+margin:15px 0;
 }
 
 .badge{
-padding:6px 9px;
+background:#eef2ff;
+color:#3730a3;
+padding:7px 10px;
 border-radius:8px;
 font-size:12px;
 font-weight:800;
-background:#eef2ff;
-color:#3730a3;
 }
 
-.answer{
+.question-number{
+color:#64748b;
+font-weight:700;
+margin-bottom:12px;
+}
+
+.question{
+font-size:20px;
+font-weight:800;
+line-height:1.5;
+margin-bottom:20px;
+}
+
+.option{
+display:block;
+width:100%;
+border:2px solid #e2e8f0;
+background:#fff;
+padding:16px;
+margin:10px 0;
+border-radius:12px;
+text-align:left;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+touch-action:manipulation;
+-webkit-tap-highlight-color:transparent;
+}
+
+.option:hover{
 background:#f8fafc;
-padding:12px;
-border-radius:9px;
-margin-top:10px;
+}
+
+.option.selected{
+border-color:#4f46e5;
+background:#eef2ff;
+color:#312e81;
+}
+
+.actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:20px;
+}
+
+button{
+font-family:inherit;
+}
+
+.primary{
+border:0;
+background:#4f46e5;
+color:#fff;
+padding:14px;
+border-radius:10px;
+font-weight:800;
+font-size:15px;
+cursor:pointer;
+touch-action:manipulation;
+}
+
+.secondary{
+border:0;
+background:#e2e8f0;
+color:#0f172a;
+padding:14px;
+border-radius:10px;
+font-weight:800;
+font-size:15px;
+cursor:pointer;
+touch-action:manipulation;
+}
+
+.result{
+display:none;
+}
+
+.result-box{
+padding:20px;
+border-radius:14px;
+background:#f8fafc;
+text-align:center;
+}
+
+.result-score{
+font-size:42px;
+font-weight:900;
+margin:10px 0;
+}
+
+.success{
+background:#ecfdf5;
+border:1px solid #bbf7d0;
+padding:16px;
+border-radius:12px;
+margin-top:15px;
 line-height:1.5;
 }
 
-.reason{
+.failure{
 background:#fff7ed;
 border:1px solid #fed7aa;
-padding:13px;
-border-radius:10px;
-margin-top:12px;
+padding:16px;
+border-radius:12px;
+margin-top:15px;
 line-height:1.5;
 }
 
 .solution{
 background:#f0fdf4;
 border:1px solid #bbf7d0;
-padding:13px;
-border-radius:10px;
-margin-top:10px;
+padding:16px;
+border-radius:12px;
+margin-top:15px;
+line-height:1.6;
+}
+
+.original{
+background:#f8fafc;
+padding:15px;
+border-radius:12px;
+margin-top:15px;
 line-height:1.5;
 }
 
-.retry{
+.big-button{
 width:100%;
-margin-top:14px;
-padding:13px;
 border:0;
-border-radius:10px;
 background:#4f46e5;
-color:#fff;
-font-weight:700;
-font-size:15px;
+color:white;
+padding:15px;
+border-radius:10px;
+font-weight:800;
+font-size:16px;
+margin-top:15px;
 cursor:pointer;
 touch-action:manipulation;
-}
-
-.retry:active{
-transform:scale(.98);
 }
 
 .empty{
@@ -261,28 +242,14 @@ color:#64748b;
 line-height:1.6;
 }
 
-.notice{
-background:#eff6ff;
-border:1px solid #bfdbfe;
-padding:13px;
-border-radius:10px;
-line-height:1.5;
-}
+@media(max-width:600px){
 
-#activeSection,
-#masteredSection{
-scroll-margin-top:20px;
-}
-
-
-@media(max-width:700px){
-
-.stats{
-grid-template-columns:1fr 1fr;
-}
-
-.filter-grid{
+.actions{
 grid-template-columns:1fr;
+}
+
+.question{
+font-size:18px;
 }
 
 }
@@ -290,9 +257,7 @@ grid-template-columns:1fr;
 </style>
 </head>
 
-
 <body>
-
 
 <header>
 
@@ -304,10 +269,10 @@ CBT Analyzer <span>Pro</span>
 
 <button
 type="button"
-class="dashboard"
-id="dashboardButton">
+class="back"
+onclick="goBack()">
 
-Dashboard
+← Mistake Bank
 
 </button>
 
@@ -318,281 +283,125 @@ Dashboard
 
 <div class="container">
 
+<div id="retryScreen">
 
 <div class="hero">
 
-<h1>🧠 Mistake Bank</h1>
+<h1>🔄 Retry Mistake</h1>
 
 <p>
-Review your mistakes and understand why they happened.
+Answer this question again without looking at your previous answer.
 </p>
 
 </div>
 
 
-<!-- =================================
-MISTAKE OVERVIEW
-================================= -->
+<div class="card">
+
+<div
+class="question-number"
+id="questionNumber">
+Retry Question
+</div>
+
+<div
+class="meta"
+id="meta">
+</div>
+
+<div
+class="question"
+id="question">
+Loading question...
+</div>
+
+<div id="options"></div>
+
+<div class="actions">
+
+<button
+type="button"
+class="secondary"
+onclick="clearSelection()">
+
+Clear Answer
+
+</button>
+
+<button
+type="button"
+class="primary"
+onclick="submitRetry()">
+
+Submit Retry
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div
+id="result"
+class="result">
 
 <div class="card">
 
-<h2>📊 Mistake Overview</h2>
-
-<div class="stats">
-
-
-<button
-type="button"
-class="overview-button selected"
-id="activeOverview">
-
-<strong id="activeCount">0</strong>
-
-<small>
-❌ Active Mistakes
-</small>
-
-</button>
-
-
-<button
-type="button"
-class="overview-button"
-id="masteredOverview">
-
-<strong id="masteredCount">0</strong>
-
-<small>
-🏆 Mastered
-</small>
-
-</button>
-
-
-<button
-type="button"
-class="overview-button"
-id="conceptOverview">
-
-<strong id="conceptCount">0</strong>
-
-<small>
-🧠 Concept Gaps
-</small>
-
-</button>
-
-
-<button
-type="button"
-class="overview-button"
-id="retryOverview">
-
-<strong id="retryCount">0</strong>
-
-<small>
-🔄 Retries
-</small>
-
-</button>
-
-
-</div>
-
-
-<!-- =================================
-FILTERS
-================================= -->
-
-<div class="filter-grid">
-
-<button
-type="button"
-class="filter-button active"
-id="allFilter">
-
-📋 All
-
-</button>
-
-
-<button
-type="button"
-class="filter-button"
-id="conceptFilter">
-
-🧠 Concept Gap
-
-</button>
-
-
-<button
-type="button"
-class="filter-button"
-id="calculationFilter">
-
-🧮 Calculation Error
-
-</button>
-
-
-<button
-type="button"
-class="filter-button"
-id="misreadFilter">
-
-👀 Misread
-
-</button>
-
-
-<button
-type="button"
-class="filter-button"
-id="guessingFilter">
-
-🎲 Guessing
-
-</button>
-
-
-<button
-type="button"
-class="filter-button"
-id="timeFilter">
-
-⏱️ Time Pressure
-
-</button>
-
-</div>
-
-</div>
-
-
-<!-- =================================
-ACTIVE MISTAKES
-================================= -->
-
-<div
-class="card"
-id="activeSection">
-
 <h2>
-❌ Active Mistakes
+🔄 Retry Result
 </h2>
 
-<div id="mistakeList"></div>
-
-</div>
-
-
-<!-- =================================
-MASTERED
-================================= -->
+<div class="result-box">
 
 <div
-class="card"
-id="masteredSection">
+class="result-score"
+id="resultScore">
+</div>
 
-<h2>
-🏆 Mastered Questions
-</h2>
-
-<div id="masteredList"></div>
-
-<br>
-
-<div class="notice">
-
-<strong>Mastery rule:</strong>
-
-A question becomes mastered only after
-a real retry is answered correctly.
-
+<div id="resultMessage">
 </div>
 
 </div>
 
+<div id="originalInfo"></div>
+
+<div id="solutionBox"></div>
+
+<button
+type="button"
+class="big-button"
+onclick="goBack()">
+
+← Return to Mistake Bank
+
+</button>
+
+</div>
+
+</div>
 
 </div>
 
 
 <script>
 
+/* =========================================
+LOAD RETRY QUESTION
+========================================= */
 
-/* =================================
-DATA
-================================= */
+let retryQuestion=null;
 
-const MASTERY_KEY="cbtMasteryV2";
+let selectedAnswer=null;
 
-let history=[];
-
-let mastery=[];
-
-let activeMistakes=[];
-
-let currentFilter="all";
+let submitted=false;
 
 
-/* =================================
-LOAD HISTORY
-================================= */
-
-function loadHistory(){
-
-try{
-
-const data=
-JSON.parse(
-localStorage.getItem("cbtHistory")||"[]"
-);
-
-history=
-Array.isArray(data)
-?data
-:[];
-
-}catch(error){
-
-history=[];
-
-}
-
-}
-
-
-/* =================================
-LOAD MASTERY
-================================= */
-
-function loadMastery(){
-
-try{
-
-const data=
-JSON.parse(
-localStorage.getItem(MASTERY_KEY)||"[]"
-);
-
-mastery=
-Array.isArray(data)
-?data
-:[];
-
-}catch(error){
-
-mastery=[];
-
-}
-
-}
-
-
-/* =================================
+/* =========================================
 NORMALIZE
-================================= */
+========================================= */
 
 function normalize(value){
 
@@ -604,816 +413,828 @@ return String(value||"")
 }
 
 
-/* =================================
-MASTERED SET
-================================= */
+/* =========================================
+LOAD QUESTION
+========================================= */
 
-function getMasteredSet(){
+function loadRetryQuestion(){
 
-const set=new Set();
+try{
 
-mastery.forEach(
-function(item){
+const raw=
+localStorage.getItem(
+"cbtRetryQuestion"
+);
+
+if(!raw){
+
+showNoQuestion();
+
+return;
+
+}
+
+retryQuestion=
+JSON.parse(raw);
+
+}catch(error){
+
+console.error(error);
+
+showNoQuestion();
+
+return;
+
+}
+
 
 if(
-item &&
-item.type==="mastery" &&
-item.question
+!retryQuestion ||
+typeof retryQuestion!=="object"
 ){
 
-set.add(
-normalize(item.question)
+showNoQuestion();
+
+return;
+
+}
+
+
+if(
+!retryQuestion.question ||
+!Array.isArray(retryQuestion.options) ||
+retryQuestion.options.length===0
+){
+
+showNoQuestion();
+
+return;
+
+}
+
+
+renderRetryQuestion();
+
+}
+
+
+/* =========================================
+NO QUESTION
+========================================= */
+
+function showNoQuestion(){
+
+document.getElementById(
+"retryScreen"
+).innerHTML=`
+
+<div class="card">
+
+<div class="empty">
+
+<h2>⚠️ No Retry Question</h2>
+
+<p>
+No mistake question was selected.
+</p>
+
+<p>
+Please return to Mistake Bank and tap
+<strong>🔄 Retry This Mistake</strong>.
+</p>
+
+<button
+type="button"
+class="big-button"
+onclick="goBack()">
+
+← Return to Mistake Bank
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================
+RENDER QUESTION
+========================================= */
+
+function renderRetryQuestion(){
+
+document.getElementById(
+"questionNumber"
+).textContent=
+"🔄 Retry • "+
+(
+retryQuestion.subject ||
+"Question"
+);
+
+
+const meta=
+document.getElementById(
+"meta"
+);
+
+meta.innerHTML="";
+
+
+if(retryQuestion.subject){
+
+const subject=
+document.createElement("span");
+
+subject.className="badge";
+
+subject.textContent=
+retryQuestion.subject;
+
+meta.appendChild(subject);
+
+}
+
+
+if(retryQuestion.topic){
+
+const topic=
+document.createElement("span");
+
+topic.className="badge";
+
+topic.textContent=
+retryQuestion.topic;
+
+meta.appendChild(topic);
+
+}
+
+
+if(retryQuestion.mistakeType){
+
+const type=
+document.createElement("span");
+
+type.className="badge";
+
+type.textContent=
+retryQuestion.mistakeType;
+
+meta.appendChild(type);
+
+}
+
+
+document.getElementById(
+"question"
+).textContent=
+retryQuestion.question;
+
+
+renderOptions();
+
+}
+
+
+/* =========================================
+RENDER OPTIONS
+========================================= */
+
+function renderOptions(){
+
+const box=
+document.getElementById(
+"options"
+);
+
+box.innerHTML="";
+
+
+retryQuestion.options.forEach(
+function(option,index){
+
+const button=
+document.createElement("button");
+
+button.type="button";
+
+button.className="option";
+
+
+if(
+selectedAnswer===index
+){
+
+button.classList.add(
+"selected"
 );
 
 }
 
+
+button.textContent=
+String.fromCharCode(65+index)
++
+". "
++
+option;
+
+
+/*
+IMPORTANT:
+Real DOM click handler.
+This makes the option reliably tappable
+on Android/mobile browsers.
+*/
+
+button.addEventListener(
+"click",
+function(){
+
+if(submitted)return;
+
+selectedAnswer=index;
+
+renderOptions();
+
+}
+);
+
+
+box.appendChild(button);
+
 });
 
-return set;
+}
+
+
+/* =========================================
+CLEAR ANSWER
+========================================= */
+
+function clearSelection(){
+
+if(submitted)return;
+
+selectedAnswer=null;
+
+renderOptions();
 
 }
 
 
-/* =================================
-BUILD ACTIVE MISTAKES
-================================= */
+/* =========================================
+SUBMIT RETRY
+========================================= */
 
-function buildMistakes(){
+function submitRetry(){
 
-const mastered=
-getMasteredSet();
-
-const map=
-new Map();
+if(submitted)return;
 
 
-history.forEach(
-function(test){
+if(selectedAnswer===null){
 
-if(
-!test ||
-!Array.isArray(test.questions)
-){
+alert(
+"Please select an answer first."
+);
 
 return;
 
 }
 
 
-test.questions.forEach(
-function(q){
+submitted=true;
 
-if(
-!q ||
-q.status!=="wrong"
+
+const correctIndex=
+Number(
+retryQuestion.correctIndex
+);
+
+
+const correct=
+selectedAnswer===correctIndex;
+
+
+saveRetry(
+correct,
+selectedAnswer
+);
+
+
+if(correct){
+
+markMastered();
+
+}
+
+
+showResult(
+correct,
+selectedAnswer
+);
+
+}
+
+
+/* =========================================
+SAVE RETRY
+========================================= */
+
+function saveRetry(
+correct,
+selectedIndex
 ){
 
-return;
+const KEY=
+"cbtMasteryV2";
+
+let data=[];
+
+
+try{
+
+const raw=
+localStorage.getItem(KEY);
+
+const parsed=
+JSON.parse(raw||"[]");
+
+if(Array.isArray(parsed)){
+
+data=parsed;
+
+}
+
+}catch(error){
+
+data=[];
 
 }
 
 
 const question=
-q.question||
-q.text||
-q.questionText;
-
-if(!question){
-
-return;
-
-}
+retryQuestion.question;
 
 
-const key=
+const questionKey=
 normalize(question);
 
 
-if(mastered.has(key)){
-
-return;
-
-}
-
-
 /*
-Use existing mistake type.
-If old CBT data doesn't contain one,
-keep it as Not Classified.
+Remove duplicate retry records for
+the same exact retry event only if needed.
+We keep retry history.
 */
 
-map.set(
-key,
-{
+data.push({
+
+type:"retry",
 
 question:question,
 
-options:
-Array.isArray(q.options)
-?q.options
-:[],
+questionKey:questionKey,
 
 subject:
-q.subject||
+retryQuestion.subject||
 "Unknown",
 
 topic:
-q.topic||
+retryQuestion.topic||
 "Unknown",
 
-mistakeType:
-q.mistakeType||
-"Not Classified",
+correct:correct,
 
-selectedIndex:
-q.selectedIndex,
+selectedIndex:selectedIndex,
 
-selectedAnswer:
-q.selectedAnswer||
-"Not answered",
-
-correctIndex:
-q.correctIndex,
-
-correctAnswer:
-q.correctAnswer||
-"",
-
-mistakeReason:
-q.mistakeReason||
-"Review the concept and identify why the answer was incorrect.",
-
-solution:
-q.solution||
-"Solution not available."
-
-}
-
-);
+date:new Date().toLocaleString()
 
 });
 
-});
-
-
-activeMistakes=
-Array.from(map.values());
-
-}
-
-
-/* =================================
-FILTER
-================================= */
-
-function setFilter(filter){
-
-currentFilter=
-filter;
-
-
-document.querySelectorAll(
-".filter-button"
-).forEach(
-function(button){
-
-button.classList.remove(
-"active"
-);
-
-});
-
-
-const ids={
-
-"all":
-"allFilter",
-
-"Concept Gap":
-"conceptFilter",
-
-"Calculation Error":
-"calculationFilter",
-
-"Misread Question":
-"misreadFilter",
-
-"Guessing":
-"guessingFilter",
-
-"Time Pressure":
-"timeFilter"
-
-};
-
-
-const button=
-document.getElementById(
-ids[filter]
-);
-
-if(button){
-
-button.classList.add(
-"active"
-);
-
-}
-
-
-renderMistakes();
-
-}
-
-
-/* =================================
-FILTER BUTTONS
-================================= */
-
-document.getElementById(
-"allFilter"
-).onclick=
-function(){
-
-setFilter("all");
-
-};
-
-
-document.getElementById(
-"conceptFilter"
-).onclick=
-function(){
-
-setFilter("Concept Gap");
-
-};
-
-
-document.getElementById(
-"calculationFilter"
-).onclick=
-function(){
-
-setFilter("Calculation Error");
-
-};
-
-
-document.getElementById(
-"misreadFilter"
-).onclick=
-function(){
-
-setFilter("Misread Question");
-
-};
-
-
-document.getElementById(
-"guessingFilter"
-).onclick=
-function(){
-
-setFilter("Guessing");
-
-};
-
-
-document.getElementById(
-"timeFilter"
-).onclick=
-function(){
-
-setFilter("Time Pressure");
-
-};
-
-
-/* =================================
-OVERVIEW SELECTION
-================================= */
-
-function clearOverviewSelection(){
-
-document.querySelectorAll(
-".overview-button"
-).forEach(
-function(button){
-
-button.classList.remove(
-"selected"
-);
-
-});
-
-}
-
-
-/* =================================
-ACTIVE OVERVIEW
-================================= */
-
-document.getElementById(
-"activeOverview"
-).onclick=
-function(){
-
-clearOverviewSelection();
-
-this.classList.add(
-"selected"
-);
-
-setFilter("all");
-
-document.getElementById(
-"activeSection"
-).scrollIntoView({
-
-behavior:"smooth",
-
-block:"start"
-
-});
-
-};
-
-
-/* =================================
-MASTERED OVERVIEW
-================================= */
-
-document.getElementById(
-"masteredOverview"
-).onclick=
-function(){
-
-clearOverviewSelection();
-
-this.classList.add(
-"selected"
-);
-
-document.getElementById(
-"masteredSection"
-).scrollIntoView({
-
-behavior:"smooth",
-
-block:"start"
-
-});
-
-};
-
-
-/* =================================
-CONCEPT OVERVIEW
-================================= */
-
-document.getElementById(
-"conceptOverview"
-).onclick=
-function(){
-
-clearOverviewSelection();
-
-this.classList.add(
-"selected"
-);
-
-setFilter(
-"Concept Gap"
-);
-
-document.getElementById(
-"activeSection"
-).scrollIntoView({
-
-behavior:"smooth",
-
-block:"start"
-
-});
-
-};
-
-
-/* =================================
-RETRY OVERVIEW
-================================= */
-
-document.getElementById(
-"retryOverview"
-).onclick=
-function(){
-
-clearOverviewSelection();
-
-this.classList.add(
-"selected"
-);
-
-alert(
-"Retry attempts: "+
-getRetryCount()
-);
-
-};
-
-
-/* =================================
-DASHBOARD
-================================= */
-
-document.getElementById(
-"dashboardButton"
-).onclick=
-function(){
-
-location.href=
-"index.html";
-
-};
-
-
-/* =================================
-RETRY THIS MISTAKE
-================================= */
-
-function startRetry(question){
-
-/*
-Store the complete question.
-The existing retry.html will read this.
-*/
 
 localStorage.setItem(
-"cbtRetryQuestion",
-JSON.stringify(question)
+KEY,
+JSON.stringify(data)
 );
 
 
 /*
-Open existing retry page.
+Also maintain the older retryHistory
+format used by the dashboard.
 */
 
-location.href=
-"retry.html";
-
-}
+let retryHistory=[];
 
 
-/* =================================
-RETRY COUNT
-================================= */
+try{
 
-function getRetryCount(){
-
-return mastery.filter(
-function(item){
-
-return item &&
-item.type==="retry";
-
-}
-).length;
-
-}
-
-
-/* =================================
-FILTERED LIST
-================================= */
-
-function getFilteredMistakes(){
-
-if(
-currentFilter==="all"
-){
-
-return activeMistakes;
-
-}
-
-return activeMistakes.filter(
-function(item){
-
-return item.mistakeType===
-currentFilter;
-
-}
+const raw=
+localStorage.getItem(
+"retryHistory"
 );
 
-}
+const parsed=
+JSON.parse(raw||"[]");
 
+if(Array.isArray(parsed)){
 
-/* =================================
-COUNTS
-================================= */
-
-function renderCounts(){
-
-const concept=
-activeMistakes.filter(
-function(item){
-
-return item.mistakeType===
-"Concept Gap";
+retryHistory=parsed;
 
 }
-).length;
 
+}catch(error){
 
-document.getElementById(
-"activeCount"
-).textContent=
-activeMistakes.length;
-
-
-document.getElementById(
-"masteredCount"
-).textContent=
-getMasteredSet().size;
-
-
-document.getElementById(
-"conceptCount"
-).textContent=
-concept;
-
-
-document.getElementById(
-"retryCount"
-).textContent=
-getRetryCount();
+retryHistory=[];
 
 }
 
 
-/* =================================
-RENDER MISTAKES
-================================= */
+retryHistory.push({
 
-function renderMistakes(){
+date:new Date().toLocaleString(),
 
-const box=
-document.getElementById(
-"mistakeList"
-);
+total:1,
 
-box.innerHTML="";
+correct:correct?1:0,
 
+wrong:correct?0:1,
 
-const list=
-getFilteredMistakes();
+skipped:0,
 
-
-if(list.length===0){
-
-box.innerHTML=`
-
-<div class="empty">
-
-${
-currentFilter==="all"
-?
-"No active mistakes yet."
-:
-"No mistakes found in this category."
-}
-
-</div>
-
-`;
-
-return;
-
-}
-
-
-list.forEach(
-function(q,index){
-
-const div=
-document.createElement(
-"div"
-);
-
-div.className=
-"mistake";
-
-
-/*
-Build the text safely.
-*/
-
-div.innerHTML=`
-
-<h3>
-❌ Mistake ${index+1}
-</h3>
-
-<div class="question">
-${escapeHTML(q.question)}
-</div>
-
-<div class="meta">
-
-<span class="badge">
-${escapeHTML(q.subject)}
-</span>
-
-<span class="badge">
-${escapeHTML(q.topic)}
-</span>
-
-<span class="badge">
-${escapeHTML(q.mistakeType)}
-</span>
-
-</div>
-
-<div class="answer">
-
-<strong>Your answer:</strong>
-
-<br>
-
-${escapeHTML(q.selectedAnswer)}
-
-<br><br>
-
-<strong>Correct answer:</strong>
-
-<br>
-
-${escapeHTML(q.correctAnswer)}
-
-</div>
-
-<div class="reason">
-
-<strong>
-🧠 Mistake Reason
-</strong>
-
-<br><br>
-
-${escapeHTML(q.mistakeReason)}
-
-</div>
-
-<div class="solution">
-
-<strong>
-💡 Solution
-</strong>
-
-<br><br>
-
-${escapeHTML(q.solution)}
-
-</div>
-
-`;
-
-
-/*
-Create Retry button as a REAL DOM button.
-This avoids putting question JSON inside HTML.
-*/
-
-const retryButton=
-document.createElement(
-"button"
-);
-
-retryButton.type=
-"button";
-
-retryButton.className=
-"retry";
-
-retryButton.textContent=
-"🔄 Retry This Mistake";
-
-
-retryButton.addEventListener(
-"click",
-function(){
-
-startRetry(q);
-
-}
-);
-
-
-div.appendChild(
-retryButton
-);
-
-box.appendChild(
-div
-);
+mastered:correct?1:0
 
 });
 
+
+localStorage.setItem(
+"retryHistory",
+JSON.stringify(retryHistory)
+);
+
 }
 
 
-/* =================================
-MASTERED
-================================= */
+/* =========================================
+MARK MASTERED
+========================================= */
 
-function renderMastered(){
+function markMastered(){
 
-const box=
-document.getElementById(
-"masteredList"
+const KEY=
+"cbtMasteryV2";
+
+let data=[];
+
+
+try{
+
+const raw=
+localStorage.getItem(KEY);
+
+const parsed=
+JSON.parse(raw||"[]");
+
+if(Array.isArray(parsed)){
+
+data=parsed;
+
+}
+
+}catch(error){
+
+data=[];
+
+}
+
+
+const questionKey=
+normalize(
+retryQuestion.question
 );
 
-box.innerHTML="";
 
+/*
+Check whether this question is already mastered.
+*/
 
-const list=
-mastery.filter(
+const alreadyMastered=
+data.some(
 function(item){
 
 return item &&
 item.type==="mastery" &&
-item.question;
+normalize(item.question)===questionKey;
 
 }
 );
 
 
-if(list.length===0){
+if(!alreadyMastered){
 
-box.innerHTML=`
+data.push({
 
-<div class="empty">
+type:"mastery",
 
-🏆 No mastered questions yet.
+question:
+retryQuestion.question,
 
-<br><br>
+questionKey:
+questionKey,
 
-Complete a correct retry to create mastery.
+subject:
+retryQuestion.subject||
+"Unknown",
 
-</div>
+topic:
+retryQuestion.topic||
+"Unknown",
 
-`;
+date:
+new Date().toLocaleString(),
 
-return;
-
-}
-
-
-list.forEach(
-function(item,index){
-
-const div=
-document.createElement(
-"div"
-);
-
-div.className=
-"mistake";
-
-
-div.innerHTML=`
-
-<h3>
-🏆 Mastered #${index+1}
-</h3>
-
-<div class="question">
-
-${escapeHTML(item.question)}
-
-</div>
-
-<div class="meta">
-
-<span class="badge">
-🏆 Mastered
-</span>
-
-</div>
-
-`;
-
-box.appendChild(div);
+source:"real-retry"
 
 });
 
 }
 
 
-/* =================================
+localStorage.setItem(
+KEY,
+JSON.stringify(data)
+);
+
+
+/*
+Also update the dashboard's
+legacy mastered-question storage.
+*/
+
+let oldMastered=[];
+
+
+try{
+
+const raw=
+localStorage.getItem(
+"cbtMasteredQuestions"
+);
+
+const parsed=
+JSON.parse(raw||"[]");
+
+if(Array.isArray(parsed)){
+
+oldMastered=parsed;
+
+}
+
+}catch(error){
+
+oldMastered=[];
+
+}
+
+
+const oldExists=
+oldMastered.some(
+function(item){
+
+const text=
+typeof item==="string"
+?
+item
+:
+(
+item &&
+(
+item.question ||
+item.text ||
+item.questionText
+)
+);
+
+return normalize(text)===questionKey;
+
+}
+);
+
+
+if(!oldExists){
+
+oldMastered.push({
+
+question:
+retryQuestion.question,
+
+subject:
+retryQuestion.subject||
+"Unknown",
+
+topic:
+retryQuestion.topic||
+"Unknown",
+
+masteredAt:
+new Date().toLocaleString(),
+
+source:"real-retry"
+
+});
+
+}
+
+
+localStorage.setItem(
+"cbtMasteredQuestions",
+JSON.stringify(oldMastered)
+);
+
+
+/*
+Tell the dashboard that mastery changed.
+*/
+
+localStorage.setItem(
+"cbtMasteryUpdatedAt",
+String(Date.now())
+);
+
+}
+
+
+/* =========================================
+SHOW RESULT
+========================================= */
+
+function showResult(
+correct,
+selectedIndex
+){
+
+document.getElementById(
+"retryScreen"
+).style.display="none";
+
+
+document.getElementById(
+"result"
+).style.display="block";
+
+
+const resultScore=
+document.getElementById(
+"resultScore"
+);
+
+
+const message=
+document.getElementById(
+"resultMessage"
+);
+
+
+if(correct){
+
+resultScore.textContent=
+"🏆 Correct";
+
+message.className=
+"success";
+
+message.innerHTML=
+"<strong>Excellent!</strong><br>"+
+"This mistake has now been converted into mastery.";
+
+}
+else{
+
+resultScore.textContent=
+"❌ Incorrect";
+
+message.className=
+"failure";
+
+message.innerHTML=
+"<strong>Not mastered yet.</strong><br>"+
+"Review the solution and retry this question again.";
+
+}
+
+
+const original=
+document.getElementById(
+"originalInfo"
+);
+
+
+original.innerHTML=`
+
+<div class="original">
+
+<strong>Question</strong>
+
+<p>
+${escapeHTML(
+retryQuestion.question
+)}
+</p>
+
+<strong>Your retry answer:</strong>
+
+<p>
+${escapeHTML(
+retryQuestion.options[selectedIndex]
+)}
+</p>
+
+<strong>Correct answer:</strong>
+
+<p>
+${escapeHTML(
+retryQuestion.correctAnswer ||
+retryQuestion.options[correctIndexSafe()]
+)}
+</p>
+
+</div>
+
+`;
+
+
+const solution=
+document.getElementById(
+"solutionBox"
+);
+
+
+solution.innerHTML=`
+
+<div class="solution">
+
+<strong>💡 Solution</strong>
+
+<p>
+${escapeHTML(
+retryQuestion.solution ||
+"Review the original solution carefully."
+)}
+</p>
+
+${
+retryQuestion.mistakeReason
+?
+"<strong>🧠 Previous Mistake Reason</strong><p>"+
+escapeHTML(
+retryQuestion.mistakeReason
+)+
+"</p>"
+:
+""
+}
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================
+SAFE CORRECT INDEX
+========================================= */
+
+function correctIndexSafe(){
+
+const index=
+Number(
+retryQuestion.correctIndex
+);
+
+if(
+Number.isInteger(index) &&
+index>=0 &&
+index<
+retryQuestion.options.length
+){
+
+return index;
+
+}
+
+return 0;
+
+}
+
+
+/* =========================================
 ESCAPE HTML
-================================= */
+========================================= */
 
 function escapeHTML(value){
 
@@ -1427,21 +1248,23 @@ return String(value||"")
 }
 
 
-/* =================================
+/* =========================================
+BACK
+========================================= */
+
+function goBack(){
+
+location.href=
+"mistake.html";
+
+}
+
+
+/* =========================================
 START
-================================= */
+========================================= */
 
-loadHistory();
-
-loadMastery();
-
-buildMistakes();
-
-renderCounts();
-
-renderMistakes();
-
-renderMastered();
+loadRetryQuestion();
 
 </script>
 
