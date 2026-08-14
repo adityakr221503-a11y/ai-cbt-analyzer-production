@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>CBT Analyzer Pro - Performance</title>
+<title>CBT Analyzer Pro — Performance Dashboard</title>
 
 <style>
 *{box-sizing:border-box}
@@ -57,11 +57,6 @@ margin-bottom:20px;
 margin:0 0 8px;
 }
 
-.hero p{
-margin:0;
-opacity:.9;
-}
-
 .card{
 background:#fff;
 border-radius:16px;
@@ -107,20 +102,6 @@ font-weight:800;
 margin-bottom:12px;
 }
 
-.subject{
-border:1px solid #e2e8f0;
-border-radius:12px;
-padding:15px;
-margin-top:12px;
-}
-
-.topic{
-background:#f8fafc;
-border-radius:10px;
-padding:14px;
-margin-top:10px;
-}
-
 .progress-bar{
 height:12px;
 background:#e2e8f0;
@@ -135,6 +116,12 @@ background:#4f46e5;
 border-radius:20px;
 }
 
+.retry-fill{
+height:100%;
+background:#16a34a;
+border-radius:20px;
+}
+
 .row{
 display:flex;
 justify-content:space-between;
@@ -142,6 +129,14 @@ gap:10px;
 flex-wrap:wrap;
 margin-top:8px;
 font-size:14px;
+}
+
+.subject,
+.topic{
+border:1px solid #e2e8f0;
+border-radius:12px;
+padding:15px;
+margin-top:12px;
 }
 
 .insight{
@@ -157,7 +152,7 @@ background:#fff7ed;
 border-left:5px solid #dc2626;
 }
 
-.strength{
+.success{
 background:#ecfdf5;
 border-left:5px solid #16a34a;
 }
@@ -178,7 +173,7 @@ cursor:pointer;
 
 .primary{
 background:#4f46e5;
-color:white;
+color:#fff;
 }
 
 .secondary{
@@ -208,8 +203,10 @@ CBT Analyzer <span>Pro</span>
 
 <button
 class="primary"
-onclick="location.href='cbt.html'">
-Take CBT
+onclick="location.href='mistake.html'">
+
+🧠 Mistake Bank
+
 </button>
 
 </div>
@@ -225,7 +222,7 @@ Take CBT
 <h1>📊 Performance Dashboard</h1>
 
 <p>
-Track your CBT performance, progress and mistake patterns.
+Track CBT performance, mistakes, retries and mastery.
 </p>
 
 </div>
@@ -264,19 +261,35 @@ Track your CBT performance, progress and mistake patterns.
 </div>
 
 
-<!-- PROGRESS -->
+<!-- PROGRESS OVER ATTEMPTS -->
 
 <div class="card">
 
 <h2>📈 Progress Over Attempts</h2>
 
-<div id="progress">
-
-<div class="empty">
-Loading progress...
-</div>
+<div id="progress"></div>
 
 </div>
+
+
+<!-- RETRY PROGRESS -->
+
+<div class="card">
+
+<h2>🔄 Retry Progress</h2>
+
+<div id="retryProgress"></div>
+
+</div>
+
+
+<!-- MASTERY -->
+
+<div class="card">
+
+<h2>🏆 Mistake Mastery</h2>
+
+<div id="mastery"></div>
 
 </div>
 
@@ -287,30 +300,18 @@ Loading progress...
 
 <h2>📚 Subject Performance</h2>
 
-<div id="subjects">
-
-<div class="empty">
-Loading subject performance...
-</div>
-
-</div>
+<div id="subjects"></div>
 
 </div>
 
 
-<!-- TOPIC -->
+<!-- TOPICS -->
 
 <div class="card">
 
 <h2>🎯 Topic / Chapter Performance</h2>
 
-<div id="topics">
-
-<div class="empty">
-Loading topic performance...
-</div>
-
-</div>
+<div id="topics"></div>
 
 </div>
 
@@ -321,13 +322,7 @@ Loading topic performance...
 
 <h2>🧠 Mistake Pattern Detection</h2>
 
-<div id="patterns">
-
-<div class="empty">
-Analyzing your mistakes...
-</div>
-
-</div>
+<div id="patterns"></div>
 
 </div>
 
@@ -343,28 +338,15 @@ Analyzing your mistakes...
 </div>
 
 
-<!-- MISTAKE BANK -->
-
-<div class="card">
-
-<button
-class="secondary"
-onclick="location.href='mistake.html'">
-Open Mistake Bank
-</button>
-
-</div>
-
-
 </div>
 
 
 <script>
 
 
-/* ==========================
-LOAD HISTORY
-========================== */
+/* =========================
+LOAD CBT HISTORY
+========================= */
 
 let history=[];
 
@@ -379,29 +361,78 @@ if(!Array.isArray(history)){
 history=[];
 }
 
-}catch(error){
+}catch(e){
 
 history=[];
 
 }
 
 
-/* ==========================
+/* =========================
+LOAD RETRY HISTORY
+========================= */
+
+let retryHistory=[];
+
+try{
+
+retryHistory=
+JSON.parse(
+localStorage.getItem("retryHistory") || "[]"
+);
+
+if(!Array.isArray(retryHistory)){
+retryHistory=[];
+}
+
+}catch(e){
+
+retryHistory=[];
+
+}
+
+
+/* =========================
+LOAD MASTERED
+========================= */
+
+let mastered=[];
+
+try{
+
+mastered=
+JSON.parse(
+localStorage.getItem(
+"cbtMasteredQuestions"
+) || "[]"
+);
+
+if(!Array.isArray(mastered)){
+mastered=[];
+}
+
+}catch(e){
+
+mastered=[];
+
+}
+
+
+/* =========================
 OVERALL
-========================== */
+========================= */
 
 function calculateOverall(){
 
 let correct=0;
 let wrong=0;
 
-
 history.forEach(function(test){
 
-correct +=
-Number(test.correct) || 0;
+correct+=
+Number(test.correct)||0;
 
-wrong +=
+wrong+=
 Number(
 test.incorrect ??
 test.wrong ??
@@ -410,10 +441,8 @@ test.wrong ??
 
 });
 
-
 const attempted=
 correct+wrong;
-
 
 const accuracy=
 attempted===0
@@ -424,32 +453,24 @@ Math.round(
 (correct/attempted)*100
 );
 
-
 document.getElementById("tests")
-.textContent=
-history.length;
-
+.textContent=history.length;
 
 document.getElementById("accuracy")
-.textContent=
-accuracy+"%";
-
+.textContent=accuracy+"%";
 
 document.getElementById("correct")
-.textContent=
-correct;
-
+.textContent=correct;
 
 document.getElementById("wrong")
-.textContent=
-wrong;
+.textContent=wrong;
 
 }
 
 
-/* ==========================
+/* =========================
 PROGRESS
-========================== */
+========================= */
 
 function renderProgress(){
 
@@ -458,19 +479,12 @@ document.getElementById("progress");
 
 box.innerHTML="";
 
-
 if(history.length===0){
 
 box.innerHTML=
 `
 <div class="empty">
-
-No completed tests yet.
-
-<br><br>
-
 Complete a CBT to start tracking progress.
-
 </div>
 `;
 
@@ -478,14 +492,10 @@ return;
 
 }
 
-
 history.forEach(function(test,index){
 
-const score=
-Number(test.score) || 0;
-
 const correct=
-Number(test.correct) || 0;
+Number(test.correct)||0;
 
 const wrong=
 Number(
@@ -495,12 +505,10 @@ test.wrong ??
 );
 
 const skipped=
-Number(test.skipped) || 0;
-
+Number(test.skipped)||0;
 
 const attempted=
 correct+wrong;
-
 
 const accuracy=
 attempted===0
@@ -511,67 +519,44 @@ Math.round(
 (correct/attempted)*100
 );
 
-
 const div=
 document.createElement("div");
 
 div.className="attempt";
 
-
 div.innerHTML=
-
 `
 <div class="attempt-title">
-
 📋 Attempt #${index+1}
-
 </div>
 
 <div class="row">
-
 <span>🎯 Score</span>
-
-<strong>${score}</strong>
-
+<strong>${Number(test.score)||0}</strong>
 </div>
 
 <div class="row">
-
 <span>📊 Accuracy</span>
-
 <strong>${accuracy}%</strong>
-
 </div>
 
 <div class="progress-bar">
-
 <div
 class="progress-fill"
 style="width:${accuracy}%">
 </div>
-
 </div>
 
 <div class="row">
-
-<span>✅ Correct: ${correct}</span>
-
-<span>❌ Wrong: ${wrong}</span>
-
-<span>⏭️ Skipped: ${skipped}</span>
-
+<span>✅ ${correct}</span>
+<span>❌ ${wrong}</span>
+<span>⏭️ ${skipped}</span>
 </div>
 
 <div class="row">
-
-<span>
-📅 ${escapeHTML(test.date || "Date unavailable")}
-</span>
-
+<span>📅 ${escapeHTML(test.date||"Date unavailable")}</span>
 </div>
-
 `;
-
 
 box.appendChild(div);
 
@@ -580,9 +565,248 @@ box.appendChild(div);
 }
 
 
-/* ==========================
-SUBJECT
-========================== */
+/* =========================
+RETRY PROGRESS
+========================= */
+
+function renderRetryProgress(){
+
+const box=
+document.getElementById(
+"retryProgress"
+);
+
+box.innerHTML="";
+
+if(retryHistory.length===0){
+
+box.innerHTML=
+`
+<div class="empty">
+No retry attempts yet.
+<br><br>
+Go to Mistake Bank and tap
+<strong>🔄 Retry Mistakes</strong>.
+</div>
+`;
+
+return;
+
+}
+
+retryHistory.forEach(function(retry,index){
+
+const total=
+Number(retry.total)||0;
+
+const correct=
+Number(retry.correct)||0;
+
+const wrong=
+Number(retry.wrong)||0;
+
+const skipped=
+Number(retry.skipped)||0;
+
+const accuracy=
+total===0
+?
+0
+:
+Math.round(
+(correct/total)*100
+);
+
+const div=
+document.createElement("div");
+
+div.className="attempt";
+
+div.innerHTML=
+`
+<div class="attempt-title">
+🔄 Retry #${index+1}
+</div>
+
+<div class="row">
+<span>📊 Accuracy</span>
+<strong>${accuracy}%</strong>
+</div>
+
+<div class="progress-bar">
+<div
+class="retry-fill"
+style="width:${accuracy}%">
+</div>
+</div>
+
+<div class="row">
+<span>✅ Correct: ${correct}</span>
+<span>❌ Wrong: ${wrong}</span>
+<span>⏭️ Skipped: ${skipped}</span>
+</div>
+
+<div class="row">
+<span>🏆 Mastered: ${Number(retry.mastered)||0}</span>
+<span>🎯 Still Wrong: ${Number(retry.stillWrong)||wrong}</span>
+</div>
+
+<div class="row">
+<span>📅 ${escapeHTML(retry.date||"Date unavailable")}</span>
+</div>
+`;
+
+box.appendChild(div);
+
+});
+
+}
+
+
+/* =========================
+MASTERY
+========================= */
+
+function renderMastery(){
+
+const box=
+document.getElementById("mastery");
+
+const active=
+getActiveMistakesCount();
+
+const total=
+mastered.length+active;
+
+box.innerHTML="";
+
+if(total===0){
+
+box.innerHTML=
+`
+<div class="empty">
+No mistake mastery data yet.
+</div>
+`;
+
+return;
+
+}
+
+const percentage=
+Math.round(
+(mastered.length/total)*100
+);
+
+box.innerHTML=
+`
+<div class="row">
+
+<span>🏆 Mastered</span>
+
+<strong>
+${mastered.length}
+</strong>
+
+</div>
+
+<div class="progress-bar">
+
+<div
+class="retry-fill"
+style="width:${percentage}%">
+</div>
+
+</div>
+
+<div class="row">
+
+<span>❌ Active Mistakes</span>
+
+<strong>
+${active}
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>📈 Mastery Rate</span>
+
+<strong>
+${percentage}%
+</strong>
+
+</div>
+
+<div class="insight success">
+
+${
+percentage>=80
+?
+"🔥 Excellent mistake mastery. Keep maintaining it."
+:
+percentage>=50
+?
+"📈 Good progress. Continue retrying your remaining mistakes."
+:
+"🎯 Keep retrying your mistake questions until the concepts become reliable."
+}
+
+</div>
+`;
+
+}
+
+
+/* =========================
+ACTIVE MISTAKES COUNT
+========================= */
+
+function getActiveMistakesCount(){
+
+const ids=new Set();
+
+history.forEach(function(test){
+
+if(!Array.isArray(test.questions))
+return;
+
+test.questions.forEach(function(q){
+
+if(q.status==="wrong"){
+
+const id=
+q.retryQuestionId ||
+String(
+q.question ||
+q.text ||
+q.questionText ||
+""
+)
+.trim()
+.toLowerCase();
+
+if(!mastered.includes(id)){
+
+ids.add(id);
+
+}
+
+}
+
+});
+
+});
+
+return ids.size;
+
+}
+
+
+/* =========================
+SUBJECTS
+========================= */
 
 function renderSubjects(){
 
@@ -591,19 +815,15 @@ document.getElementById("subjects");
 
 const subjects={};
 
-
 history.forEach(function(test){
 
-if(!Array.isArray(test.questions)){
+if(!Array.isArray(test.questions))
 return;
-}
-
 
 test.questions.forEach(function(q){
 
 const subject=
-q.subject || "General";
-
+q.subject||"General";
 
 if(!subjects[subject]){
 
@@ -614,7 +834,6 @@ skipped:0
 };
 
 }
-
 
 if(q.status==="correct")
 subjects[subject].correct++;
@@ -629,20 +848,15 @@ subjects[subject].skipped++;
 
 });
 
-
 const names=
 Object.keys(subjects);
-
 
 if(names.length===0){
 
 box.innerHTML=
 `
 <div class="empty">
-
-Subject data will appear after a CBT
-containing subject information.
-
+Subject data will appear after CBT attempts.
 </div>
 `;
 
@@ -650,19 +864,15 @@ return;
 
 }
 
-
 box.innerHTML="";
-
 
 names.forEach(function(name){
 
 const d=
 subjects[name];
 
-
 const attempted=
 d.correct+d.wrong;
-
 
 const accuracy=
 attempted===0
@@ -673,37 +883,27 @@ Math.round(
 (d.correct/attempted)*100
 );
 
-
 const div=
 document.createElement("div");
 
 div.className="subject";
 
-
 div.innerHTML=
-
 `
 <strong>${escapeHTML(name)}</strong>
 
 <div class="progress-bar">
-
 <div
 class="progress-fill"
 style="width:${accuracy}%">
 </div>
-
 </div>
 
 <div class="row">
-
 <span>Accuracy: ${accuracy}%</span>
-
 <span>✅ ${d.correct}</span>
-
 <span>❌ ${d.wrong}</span>
-
 <span>⏭️ ${d.skipped}</span>
-
 </div>
 `;
 
@@ -714,9 +914,9 @@ box.appendChild(div);
 }
 
 
-/* ==========================
+/* =========================
 TOPICS
-========================== */
+========================= */
 
 function renderTopics(){
 
@@ -725,26 +925,21 @@ document.getElementById("topics");
 
 const topics={};
 
-
 history.forEach(function(test){
 
-if(!Array.isArray(test.questions)){
+if(!Array.isArray(test.questions))
 return;
-}
-
 
 test.questions.forEach(function(q){
 
 const subject=
-q.subject || "General";
+q.subject||"General";
 
 const topic=
-q.topic || "General";
-
+q.topic||"General";
 
 const key=
 subject+" → "+topic;
-
 
 if(!topics[key]){
 
@@ -755,7 +950,6 @@ skipped:0
 };
 
 }
-
 
 if(q.status==="correct")
 topics[key].correct++;
@@ -770,20 +964,15 @@ topics[key].skipped++;
 
 });
 
-
 const names=
 Object.keys(topics);
-
 
 if(names.length===0){
 
 box.innerHTML=
 `
 <div class="empty">
-
-Topic data will appear after a CBT
-containing topic information.
-
+Topic data will appear after CBT attempts.
 </div>
 `;
 
@@ -791,19 +980,15 @@ return;
 
 }
 
-
 box.innerHTML="";
-
 
 names.forEach(function(name){
 
 const d=
 topics[name];
 
-
 const attempted=
 d.correct+d.wrong;
-
 
 const accuracy=
 attempted===0
@@ -814,37 +999,27 @@ Math.round(
 (d.correct/attempted)*100
 );
 
-
 const div=
 document.createElement("div");
 
 div.className="topic";
 
-
 div.innerHTML=
-
 `
 <strong>${escapeHTML(name)}</strong>
 
 <div class="progress-bar">
-
 <div
 class="progress-fill"
 style="width:${accuracy}%">
 </div>
-
 </div>
 
 <div class="row">
-
 <span>Accuracy: ${accuracy}%</span>
-
 <span>✅ ${d.correct}</span>
-
 <span>❌ ${d.wrong}</span>
-
 <span>⏭️ ${d.skipped}</span>
-
 </div>
 `;
 
@@ -855,32 +1030,27 @@ box.appendChild(div);
 }
 
 
-/* ==========================
+/* =========================
 MISTAKE PATTERNS
-========================== */
+========================= */
 
-function renderMistakePatterns(){
+function renderPatterns(){
 
 const box=
 document.getElementById("patterns");
 
 box.innerHTML="";
 
-
 let wrong=0;
 let skipped=0;
-
 
 const subjectMistakes={};
 const topicMistakes={};
 
-
 history.forEach(function(test){
 
-if(!Array.isArray(test.questions)){
+if(!Array.isArray(test.questions))
 return;
-}
-
 
 test.questions.forEach(function(q){
 
@@ -888,27 +1058,22 @@ if(q.status==="wrong"){
 
 wrong++;
 
-
 const subject=
-q.subject || "General";
+q.subject||"General";
 
 const topic=
-q.topic || "General";
-
+q.topic||"General";
 
 subjectMistakes[subject]=
-(subjectMistakes[subject] || 0)+1;
-
+(subjectMistakes[subject]||0)+1;
 
 const key=
 subject+" → "+topic;
 
-
 topicMistakes[key]=
-(topicMistakes[key] || 0)+1;
+(topicMistakes[key]||0)+1;
 
 }
-
 
 if(q.status==="skipped"){
 
@@ -920,17 +1085,12 @@ skipped++;
 
 });
 
-
-if(wrong===0 && skipped===0){
+if(wrong===0&&skipped===0){
 
 box.innerHTML=
 `
-<div class="insight strength">
-
+<div class="insight success">
 🎉 No mistake pattern detected yet.
-
-Complete more CBT questions to build your mistake profile.
-
 </div>
 `;
 
@@ -938,41 +1098,29 @@ return;
 
 }
 
-
-/* WRONG COUNT */
-
 if(wrong>0){
 
-const div=
+const d=
 document.createElement("div");
 
-div.className=
-"insight focus";
+d.className="insight focus";
 
-div.textContent=
-"❌ "
-+
-wrong
-+
-" wrong questions detected. These should be prioritized for revision.";
+d.textContent=
+"❌ "+wrong+
+" wrong questions detected for targeted revision.";
 
-box.appendChild(div);
+box.appendChild(d);
 
 }
 
-
-/* WORST SUBJECT */
-
 let worstSubject=null;
 let worstSubjectCount=0;
-
 
 Object.keys(subjectMistakes)
 .forEach(function(subject){
 
 if(
-subjectMistakes[subject]
->
+subjectMistakes[subject]>
 worstSubjectCount
 ){
 
@@ -986,43 +1134,32 @@ subject;
 
 });
 
-
 if(worstSubject){
 
-const div=
+const d=
 document.createElement("div");
 
-div.className=
-"insight focus";
+d.className="insight focus";
 
-div.textContent=
-"📚 Highest mistake concentration: "
-+
-worstSubject
-+
-" — "
-+
-worstSubjectCount
-+
+d.textContent=
+"📚 Highest mistake concentration: "+
+worstSubject+
+" — "+
+worstSubjectCount+
 " mistakes.";
 
-box.appendChild(div);
+box.appendChild(d);
 
 }
 
-
-/* WORST TOPIC */
-
 let worstTopic=null;
 let worstTopicCount=0;
-
 
 Object.keys(topicMistakes)
 .forEach(function(topic){
 
 if(
-topicMistakes[topic]
->
+topicMistakes[topic]>
 worstTopicCount
 ){
 
@@ -1036,58 +1173,45 @@ topic;
 
 });
 
-
 if(worstTopic){
 
-const div=
+const d=
 document.createElement("div");
 
-div.className=
-"insight focus";
+d.className="insight focus";
 
-div.textContent=
-"🎯 Priority topic: "
-+
-worstTopic
-+
-" — "
-+
-worstTopicCount
-+
+d.textContent=
+"🎯 Priority topic: "+
+worstTopic+
+" — "+
+worstTopicCount+
 " mistakes.";
 
-box.appendChild(div);
+box.appendChild(d);
 
 }
-
-
-/* SKIPPED */
 
 if(skipped>0){
 
-const div=
+const d=
 document.createElement("div");
 
-div.className=
-"insight";
+d.className="insight";
 
-div.textContent=
-"⏭️ "
-+
-skipped
-+
-" questions were skipped. Work on time management and question selection.";
+d.textContent=
+"⏭️ "+skipped+
+" questions were skipped. Work on time management.";
 
-box.appendChild(div);
+box.appendChild(d);
 
 }
 
 }
 
 
-/* ==========================
+/* =========================
 INSIGHTS
-========================== */
+========================= */
 
 function renderInsights(){
 
@@ -1095,7 +1219,6 @@ const box=
 document.getElementById("insights");
 
 box.innerHTML="";
-
 
 if(history.length===0){
 
@@ -1110,33 +1233,25 @@ return;
 
 }
 
-
 let correct=0;
 let wrong=0;
-let skipped=0;
-
 
 history.forEach(function(test){
 
-correct +=
-Number(test.correct) || 0;
+correct+=
+Number(test.correct)||0;
 
-wrong +=
+wrong+=
 Number(
 test.incorrect ??
 test.wrong ??
 0
 );
 
-skipped +=
-Number(test.skipped) || 0;
-
 });
-
 
 const attempted=
 correct+wrong;
-
 
 const accuracy=
 attempted===0
@@ -1147,86 +1262,71 @@ Math.round(
 (correct/attempted)*100
 );
 
-
-let message;
-
-
-if(accuracy>=80){
-
-message=
-"🔥 Strong performance. Keep maintaining your accuracy.";
-
-}
-else if(accuracy>=60){
-
-message=
-"📈 Your foundation is developing. Focus on reducing repeated mistakes.";
-
-}
-else{
-
-message=
-"🎯 Focus on your Mistake Bank and strengthen weak concepts.";
-
-}
-
-
-const div=
-document.createElement("div");
-
-div.className="insight";
-
-div.textContent=
-message;
-
-box.appendChild(div);
-
-
-if(wrong>0){
-
 const d=
 document.createElement("div");
 
 d.className=
-"insight focus";
-
-d.textContent=
-"🧠 "
-+
-wrong
-+
-" incorrect answers are available for targeted revision.";
-
-box.appendChild(d);
-
-}
-
-
-if(skipped>0){
-
-const d=
-document.createElement("div");
-
-d.className=
+accuracy>=80
+?
+"insight success"
+:
 "insight";
 
 d.textContent=
-"⏭️ "
-+
-skipped
-+
-" skipped questions. Improve time management.";
+accuracy>=80
+?
+"🔥 Strong performance. Maintain your accuracy."
+:
+accuracy>=60
+?
+"📈 Your foundation is developing. Focus on reducing repeated mistakes."
+:
+"🎯 Focus on your active mistakes and strengthen weak concepts.";
 
 box.appendChild(d);
 
-}
+
+if(retryHistory.length>0){
+
+const last=
+retryHistory[
+retryHistory.length-1
+];
+
+const retryAccuracy=
+Number(last.total)===0
+?
+0
+:
+Math.round(
+(
+Number(last.correct)||0
+)/
+Number(last.total)*
+100
+);
+
+const r=
+document.createElement("div");
+
+r.className=
+"insight success";
+
+r.textContent=
+"🔄 Latest retry accuracy: "+
+retryAccuracy+
+"%. Keep converting mistakes into mastery.";
+
+box.appendChild(r);
 
 }
 
+}
 
-/* ==========================
-ESCAPE TEXT
-========================== */
+
+/* =========================
+ESCAPE
+========================= */
 
 function escapeHTML(value){
 
@@ -1245,19 +1345,23 @@ return String(value)
 }
 
 
-/* ==========================
+/* =========================
 START
-========================== */
+========================= */
 
 calculateOverall();
 
 renderProgress();
 
+renderRetryProgress();
+
+renderMastery();
+
 renderSubjects();
 
 renderTopics();
 
-renderMistakePatterns();
+renderPatterns();
 
 renderInsights();
 
