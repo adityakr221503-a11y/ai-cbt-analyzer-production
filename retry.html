@@ -53,10 +53,6 @@ border-radius:18px;
 margin-bottom:20px;
 }
 
-.hero h1{
-margin:0 0 8px;
-}
-
 .card{
 background:#fff;
 border-radius:16px;
@@ -103,16 +99,6 @@ border:2px solid #4f46e5;
 background:#eef2ff;
 }
 
-.option.correct{
-background:#dcfce7;
-border-color:#16a34a;
-}
-
-.option.wrong{
-background:#fee2e2;
-border-color:#dc2626;
-}
-
 .submit{
 width:100%;
 background:#4f46e5;
@@ -121,16 +107,6 @@ border:0;
 border-radius:10px;
 padding:15px;
 font-size:16px;
-font-weight:700;
-cursor:pointer;
-}
-
-.back{
-background:#e2e8f0;
-color:#0f172a;
-border:0;
-border-radius:10px;
-padding:12px 16px;
 font-weight:700;
 cursor:pointer;
 }
@@ -145,23 +121,36 @@ font-weight:800;
 color:#4f46e5;
 }
 
+.mastered{
+background:#dcfce7;
+border-left:5px solid #16a34a;
+padding:14px;
+border-radius:10px;
+margin-top:12px;
+}
+
+.still{
+background:#fee2e2;
+border-left:5px solid #dc2626;
+padding:14px;
+border-radius:10px;
+margin-top:12px;
+}
+
+.back{
+background:#e2e8f0;
+color:#0f172a;
+border:0;
+border-radius:10px;
+padding:12px 16px;
+font-weight:700;
+cursor:pointer;
+}
+
 .empty{
 text-align:center;
 padding:40px 15px;
 color:#64748b;
-}
-
-.info{
-background:#eef2ff;
-padding:14px;
-border-radius:10px;
-margin-bottom:18px;
-}
-
-@media(max-width:600px){
-.container{
-padding:0 10px;
-}
 }
 </style>
 </head>
@@ -196,79 +185,54 @@ Mistake Bank
 <h1>🔄 Retry Mistakes</h1>
 
 <p>
-Practice questions you previously got wrong.
+Turn previous mistakes into mastered questions.
 </p>
 
 </div>
 
-
-<div id="app">
-
-<div class="card empty">
-Loading retry questions...
-</div>
-
-</div>
+<div id="app"></div>
 
 </div>
 
 
 <script>
 
-/* =====================================
-LOAD RETRY QUESTIONS
-===================================== */
-
 let questions=[];
-
-let selectedAnswers={};
-
+let answers={};
 let submitted=false;
 
 
+/* LOAD QUESTIONS */
+
 try{
 
-const saved=
+questions=
+JSON.parse(
 localStorage.getItem(
 "cbtRetryQuestions"
+) || "[]"
 );
 
-if(saved){
-
-questions=
-JSON.parse(saved);
-
-}
-
 if(!Array.isArray(questions)){
+questions=[];
+}
+
+}catch(e){
 
 questions=[];
 
 }
 
-}catch(error){
 
-questions=[];
-
-}
-
-
-/* =====================================
-START
-===================================== */
+/* RENDER */
 
 render();
 
-
-/* =====================================
-RENDER TEST
-===================================== */
 
 function render(){
 
 const app=
 document.getElementById("app");
-
 
 app.innerHTML="";
 
@@ -279,17 +243,17 @@ app.innerHTML=
 `
 <div class="card empty">
 
-<h2>🎉 No Mistakes Available</h2>
+<h2>🎉 No Questions to Retry</h2>
 
 <p>
-Complete a CBT and save some wrong questions first.
+There are no active mistakes available.
 </p>
 
 <button
 class="back"
 onclick="location.href='mistake.html'">
 
-← Back to Mistake Bank
+← Mistake Bank
 
 </button>
 
@@ -301,28 +265,77 @@ return;
 }
 
 
-const info=
+questions.forEach(
+function(q,index){
+
+const card=
 document.createElement("div");
 
-info.className="info";
+card.className="question";
 
-info.innerHTML=
-`
-<strong>${questions.length}</strong>
-mistake question(s) ready for retry.
-`;
+const qno=
+document.createElement("div");
 
-app.appendChild(info);
+qno.className="qno";
+
+qno.textContent=
+"Question "
++
+(index+1)
++
+" of "
++
+questions.length;
+
+card.appendChild(qno);
 
 
-questions.forEach(
-function(question,index){
+const text=
+document.createElement("div");
 
-renderQuestion(
-question,
+text.className="qtext";
+
+text.textContent=
+q.question ||
+q.text ||
+q.questionText ||
+"Question unavailable";
+
+card.appendChild(text);
+
+
+const options=
+getOptions(q);
+
+
+options.forEach(
+function(option,optIndex){
+
+const button=
+document.createElement("button");
+
+button.className="option";
+
+button.textContent=
+getOptionText(option);
+
+button.onclick=
+function(){
+
+selectAnswer(
 index,
-app
+optIndex,
+card
 );
+
+};
+
+card.appendChild(button);
+
+});
+
+
+app.appendChild(card);
 
 });
 
@@ -343,147 +356,19 @@ app.appendChild(submit);
 }
 
 
-/* =====================================
-QUESTION
-===================================== */
-
-function renderQuestion(
-question,
-index,
-app
-){
-
-const card=
-document.createElement("div");
-
-card.className="question";
-
-
-const number=
-document.createElement("div");
-
-number.className="qno";
-
-number.textContent=
-"Question "
-+
-(index+1)
-+
-" of "
-+
-questions.length;
-
-
-card.appendChild(number);
-
-
-const text=
-document.createElement("div");
-
-text.className="qtext";
-
-text.textContent=
-getQuestionText(question);
-
-card.appendChild(text);
-
-
-const options=
-getOptions(question);
-
-
-if(options.length===0){
-
-const noOptions=
-document.createElement("div");
-
-noOptions.className="empty";
-
-noOptions.textContent=
-"Options are not available for this saved question.";
-
-card.appendChild(noOptions);
-
-}else{
-
-options.forEach(
-function(option,optionIndex){
-
-const button=
-document.createElement("button");
-
-button.className="option";
-
-button.textContent=
-getOptionText(option);
-
-
-button.onclick=
-function(){
-
-selectAnswer(
-index,
-optionIndex,
-card
-);
-
-};
-
-
-card.appendChild(button);
-
-});
-
-}
-
-
-app.appendChild(card);
-
-}
-
-
-/* =====================================
-GET QUESTION TEXT
-===================================== */
-
-function getQuestionText(q){
-
-return (
-
-q.question ||
-
-q.text ||
-
-q.questionText ||
-
-q.title ||
-
-"Question text unavailable"
-
-);
-
-}
-
-
-/* =====================================
-GET OPTIONS
-===================================== */
+/* OPTIONS */
 
 function getOptions(q){
 
-let options=
+const options=
 q.options ||
 q.choices ||
 q.answers ||
 [];
 
-
 if(Array.isArray(options)){
-
 return options;
-
 }
-
 
 if(
 typeof options==="object" &&
@@ -494,15 +379,12 @@ return Object.values(options);
 
 }
 
-
 return [];
 
 }
 
 
-/* =====================================
-OPTION TEXT
-===================================== */
+/* OPTION TEXT */
 
 function getOptionText(option){
 
@@ -511,16 +393,11 @@ typeof option==="object" &&
 option!==null
 ){
 
-return (
-
+return(
 option.text ||
-
 option.label ||
-
 option.value ||
-
 JSON.stringify(option)
-
 );
 
 }
@@ -530,9 +407,7 @@ return String(option);
 }
 
 
-/* =====================================
-SELECT ANSWER
-===================================== */
+/* SELECT */
 
 function selectAnswer(
 questionIndex,
@@ -542,17 +417,13 @@ card
 
 if(submitted)return;
 
-
-selectedAnswers[
-questionIndex
-]=optionIndex;
-
+answers[questionIndex]=
+optionIndex;
 
 const buttons=
 card.querySelectorAll(
 ".option"
 );
-
 
 buttons.forEach(
 function(button,index){
@@ -574,9 +445,7 @@ button.classList.add(
 }
 
 
-/* =====================================
-FIND CORRECT ANSWER
-===================================== */
+/* CORRECT ANSWER */
 
 function getCorrectIndex(q){
 
@@ -588,7 +457,6 @@ return q.correctIndex;
 
 }
 
-
 if(
 typeof q.answerIndex==="number"
 ){
@@ -596,7 +464,6 @@ typeof q.answerIndex==="number"
 return q.answerIndex;
 
 }
-
 
 if(
 typeof q.correctOption==="number"
@@ -606,7 +473,6 @@ return q.correctOption;
 
 }
 
-
 if(
 typeof q.correct==="number"
 ){
@@ -615,20 +481,6 @@ return q.correct;
 
 }
 
-
-/* Numeric strings */
-
-if(
-q.correctIndex!==undefined &&
-!isNaN(Number(q.correctIndex))
-){
-
-return Number(q.correctIndex);
-
-}
-
-
-/* Answer can be A/B/C/D */
 
 const answer=
 q.correctAnswer ??
@@ -678,113 +530,120 @@ return i;
 
 }
 
-
 return null;
 
 }
 
 
-/* =====================================
-CHECK ANSWER
-===================================== */
-
-function isCorrect(
-q,
-selected
-){
-
-const correct=
-getCorrectIndex(q);
-
-
-if(correct===null){
-
-return false;
-
-}
-
-
-return Number(selected)===Number(correct);
-
-}
-
-
-/* =====================================
-SUBMIT
-===================================== */
+/* SUBMIT */
 
 function submitTest(){
 
 if(submitted)return;
 
-
 submitted=true;
-
 
 let correct=0;
 let wrong=0;
 let skipped=0;
 
+const masteredIds=[];
+const stillWrongIds=[];
+
 
 questions.forEach(
 function(q,index){
 
+const id=
+q.retryQuestionId ||
+createQuestionId(q);
+
+
 const selected=
-selectedAnswers[index];
+answers[index];
 
 
 if(selected===undefined){
 
 skipped++;
 
+stillWrongIds.push(id);
+
 return;
 
 }
 
 
+const correctIndex=
+getCorrectIndex(q);
+
+
 if(
-isCorrect(q,selected)
+correctIndex!==null &&
+Number(selected)===
+Number(correctIndex)
 ){
 
 correct++;
 
+masteredIds.push(id);
+
 }else{
 
 wrong++;
+
+stillWrongIds.push(id);
 
 }
 
 });
 
 
-saveRetryResult(
-correct,
-wrong,
-skipped
+/* SAVE MASTERED */
+
+let mastered=[];
+
+try{
+
+mastered=
+JSON.parse(
+localStorage.getItem(
+"cbtMasteredQuestions"
+) || "[]"
 );
 
+if(!Array.isArray(mastered)){
+mastered=[];
+}
 
-showResult(
-correct,
-wrong,
-skipped
-);
+}catch(e){
+
+mastered=[];
 
 }
 
 
-/* =====================================
-SAVE RETRY RESULT
-===================================== */
+masteredIds.forEach(
+function(id){
 
-function saveRetryResult(
-correct,
-wrong,
-skipped
-){
+if(!mastered.includes(id)){
+
+mastered.push(id);
+
+}
+
+});
+
+
+localStorage.setItem(
+"cbtMasteredQuestions",
+JSON.stringify(mastered)
+);
+
+
+/* SAVE RETRY RESULT */
 
 let retryHistory=[];
-
 
 try{
 
@@ -796,9 +655,7 @@ localStorage.getItem(
 );
 
 if(!Array.isArray(retryHistory)){
-
 retryHistory=[];
-
 }
 
 }catch(e){
@@ -825,14 +682,11 @@ wrong,
 skipped:
 skipped,
 
-accuracy:
-questions.length===0
-?
-0
-:
-Math.round(
-(correct/questions.length)*100
-)
+mastered:
+masteredIds.length,
+
+stillWrong:
+stillWrongIds.length
 
 });
 
@@ -844,22 +698,69 @@ retryHistory
 )
 );
 
+
+/* UPDATE ACTIVE RETRY SET */
+
+const active=
+questions.filter(
+function(q,index){
+
+const id=
+q.retryQuestionId ||
+createQuestionId(q);
+
+return !masteredIds.includes(id);
+
+});
+
+
+localStorage.setItem(
+"cbtRetryQuestions",
+JSON.stringify(active)
+);
+
+
+/* SHOW RESULT */
+
+showResult(
+correct,
+wrong,
+skipped,
+masteredIds.length
+);
+
 }
 
 
-/* =====================================
-RESULT
-===================================== */
+/* ID */
+
+function createQuestionId(q){
+
+return(
+String(
+q.question ||
+q.text ||
+q.questionText ||
+""
+)
+.trim()
+.toLowerCase()
+);
+
+}
+
+
+/* RESULT */
 
 function showResult(
 correct,
 wrong,
-skipped
+skipped,
+mastered
 ){
 
 const total=
 questions.length;
-
 
 const accuracy=
 total===0
@@ -886,14 +787,41 @@ ${correct}/${total}
 </div>
 
 <p>
-<strong>Accuracy: ${accuracy}%</strong>
+Accuracy: <strong>${accuracy}%</strong>
 </p>
 
-<p>✅ Correct: ${correct}</p>
+<div class="mastered">
 
-<p>❌ Wrong: ${wrong}</p>
+✅ <strong>
+${mastered}
+question(s) mastered
+</strong>
 
-<p>⏭️ Skipped: ${skipped}</p>
+<br>
+
+These questions will no longer appear
+in the active Mistake Bank.
+
+</div>
+
+
+<div class="still">
+
+❌ <strong>
+${wrong}
+question(s) still need practice
+</strong>
+
+<br>
+
+These remain available for another retry.
+
+</div>
+
+
+<p>
+⏭️ Skipped: ${skipped}
+</p>
 
 <br>
 
@@ -901,7 +829,7 @@ ${correct}/${total}
 class="back"
 onclick="location.href='mistake.html'">
 
-🧠 Back to Mistake Bank
+🧠 Open Mistake Bank
 
 </button>
 
@@ -911,33 +839,12 @@ onclick="location.href='mistake.html'">
 class="back"
 onclick="location.href='analysis.html'">
 
-📊 Open Performance Dashboard
+📊 Open Dashboard
 
 </button>
 
 </div>
 `;
-
-}
-
-
-/* =====================================
-ESCAPE
-===================================== */
-
-function escapeHTML(value){
-
-return String(value)
-
-.replace(/&/g,"&amp;")
-
-.replace(/</g,"&lt;")
-
-.replace(/>/g,"&gt;")
-
-.replace(/"/g,"&quot;")
-
-.replace(/'/g,"&#039;");
 
 }
 
