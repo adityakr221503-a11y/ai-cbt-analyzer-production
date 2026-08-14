@@ -3,19 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>CBT Analyzer Pro — Mistake Bank</title>
+<title>CBT Analyzer Pro - Mistake Bank</title>
 
 <style>
-
-*{
-box-sizing:border-box;
-}
-
-html,body{
-margin:0;
-padding:0;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
@@ -25,22 +16,21 @@ color:#0f172a;
 }
 
 header{
-background:#fff;
+background:white;
+padding:16px;
 border-bottom:1px solid #e2e8f0;
-padding:16px 20px;
 }
 
 .header{
 max-width:1000px;
 margin:auto;
 display:flex;
-align-items:center;
 justify-content:space-between;
-gap:10px;
+align-items:center;
 }
 
 .logo{
-font-size:20px;
+font-size:21px;
 font-weight:800;
 }
 
@@ -49,98 +39,74 @@ color:#4f46e5;
 }
 
 button{
-font-family:Arial,sans-serif;
+border:0;
 cursor:pointer;
-touch-action:manipulation;
+font-family:inherit;
 }
 
 .dashboard{
-border:0;
 background:#4f46e5;
-color:#fff;
-padding:12px 18px;
-border-radius:11px;
+color:white;
+padding:12px 17px;
+border-radius:10px;
 font-weight:800;
 }
 
 .container{
 max-width:1000px;
-margin:25px auto;
+margin:20px auto;
 padding:0 15px;
 }
 
 .hero{
 background:#4f46e5;
-color:#fff;
-padding:28px;
-border-radius:20px;
-margin-bottom:20px;
+color:white;
+padding:25px;
+border-radius:18px;
+margin-bottom:18px;
 }
 
 .hero h1{
-margin:0 0 10px;
-font-size:32px;
-}
-
-.hero p{
-margin:0;
-line-height:1.5;
+margin:0 0 8px;
 }
 
 .card{
-background:#fff;
-border-radius:18px;
-padding:22px;
-margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
-}
-
-.title{
-font-size:24px;
-font-weight:800;
+background:white;
+padding:20px;
+border-radius:16px;
 margin-bottom:18px;
+box-shadow:0 3px 12px rgba(0,0,0,.07);
 }
 
 .stats{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:15px;
+gap:12px;
 }
 
 .stat{
-width:100%;
-border:0;
 background:#f8fafc;
-border-radius:16px;
-padding:22px;
+padding:20px;
+border-radius:14px;
 text-align:left;
 }
 
-.stat:active{
-transform:scale(.98);
-}
-
-.icon{
-font-size:30px;
-}
-
 .number{
-font-size:38px;
+font-size:35px;
 font-weight:800;
 margin:5px 0;
 }
 
 .label{
-font-size:17px;
 color:#64748b;
-font-weight:600;
+font-weight:700;
 }
 
 .hint{
-margin-top:7px;
 color:#4f46e5;
 font-size:13px;
 font-weight:800;
+margin-top:8px;
 }
 
 .actions{
@@ -150,55 +116,49 @@ gap:10px;
 }
 
 .action{
-border:0;
 padding:14px;
-border-radius:11px;
-font-size:16px;
+border-radius:10px;
+font-size:15px;
 font-weight:800;
-cursor:pointer;
 }
 
 .primary{
 background:#4f46e5;
-color:#fff;
+color:white;
 }
 
 .secondary{
 background:#e2e8f0;
-color:#0f172a;
 }
 
 .back{
-border:0;
 background:#e2e8f0;
 padding:11px 15px;
 border-radius:10px;
 font-weight:800;
-cursor:pointer;
-margin-bottom:15px;
 }
 
 .item{
 border:1px solid #e2e8f0;
-border-radius:14px;
-padding:17px;
-margin-top:14px;
+padding:16px;
+border-radius:13px;
+margin-top:12px;
 }
 
-.mastered-item{
+.mastered{
 background:#f0fdf4;
-border:1px solid #bbf7d0;
+border-color:#bbf7d0;
 }
 
 .badge{
 display:inline-block;
+padding:6px 8px;
 background:#eef2ff;
 color:#3730a3;
-padding:6px 9px;
-border-radius:8px;
+border-radius:7px;
 font-size:12px;
 font-weight:800;
-margin:0 5px 5px 0;
+margin:2px;
 }
 
 .question{
@@ -209,7 +169,7 @@ margin-top:12px;
 }
 
 .info{
-background:#fff;
+background:#f8fafc;
 padding:13px;
 border-radius:10px;
 margin-top:12px;
@@ -223,59 +183,36 @@ font-weight:800;
 
 .retry{
 width:100%;
-border:0;
 background:#4f46e5;
-color:#fff;
+color:white;
 padding:13px;
 border-radius:10px;
-font-size:16px;
 font-weight:800;
-margin-top:13px;
-cursor:pointer;
+font-size:15px;
+margin-top:12px;
 }
 
 .empty{
 text-align:center;
-padding:35px 15px;
+padding:35px 10px;
 color:#64748b;
 }
 
-.empty-icon{
-font-size:55px;
-}
-
 @media(max-width:600px){
-
-.stats{
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
-
-.stat{
-padding:16px;
-}
-
-.number{
-font-size:32px;
-}
-
 .actions{
 grid-template-columns:1fr;
 }
 
 .card{
-padding:17px;
+padding:16px;
 }
-
 }
-
 </style>
 </head>
 
 <body>
 
 <header>
-
 <div class="header">
 
 <div class="logo">
@@ -284,48 +221,34 @@ CBT Analyzer <span>Pro</span>
 
 <button
 class="dashboard"
-type="button"
 onclick="goDashboard()">
-
 Dashboard
-
 </button>
 
 </div>
-
 </header>
-
 
 <div class="container">
 
 <div class="hero">
-
 <h1>🧠 Mistake Bank</h1>
-
 <p>
 Turn mistakes into mastery. Retry difficult questions
-and review everything you have already mastered.
+and review mastered questions.
 </p>
-
 </div>
-
 
 <div class="card">
 
-<div class="title">
-📊 Performance
-</div>
+<h2>📊 Performance</h2>
 
 <div class="stats">
 
 <button
-type="button"
 class="stat"
 onclick="showActive()">
 
-<div class="icon">
-❌
-</div>
+<div>❌</div>
 
 <div
 class="number"
@@ -343,15 +266,11 @@ Tap to View →
 
 </button>
 
-
 <button
-type="button"
 class="stat"
 onclick="showMastered()">
 
-<div class="icon">
-🏆
-</div>
+<div>🏆</div>
 
 <div
 class="number"
@@ -370,9 +289,7 @@ Tap to View →
 </button>
 
 </div>
-
 </div>
-
 
 <div class="card">
 
@@ -380,8 +297,7 @@ Tap to View →
 
 <button
 class="action primary"
-type="button"
-onclick="openRetry()">
+onclick="retryAll()">
 
 🔄 Retry Active Mistakes
 
@@ -389,7 +305,6 @@ onclick="openRetry()">
 
 <button
 class="action secondary"
-type="button"
 onclick="goCBT()">
 
 📝 Start CBT
@@ -400,12 +315,11 @@ onclick="goCBT()">
 
 </div>
 
-
 <div class="card">
 
 <div id="controls"></div>
 
-<h2 id="sectionTitle">
+<h2 id="title">
 ❌ Active Mistakes
 </h2>
 
@@ -415,65 +329,30 @@ onclick="goCBT()">
 
 </div>
 
-
 <script>
 
-/* =====================================================
-STORAGE
-===================================================== */
-
-const HISTORY_KEY="cbtHistory";
-
-const MASTERY_KEY="cbtMasteryV2";
-
-const RETRY_QUEUE_KEY=
-"cbtAnalyzer.retryQueue";
-
-const RETRY_QUESTION_KEY=
-"cbtRetryQuestion";
+var HISTORY_KEY="cbtHistory";
+var MASTERY_KEY="cbtMasteryV2";
+var RETRY_QUEUE="cbtAnalyzer.retryQueue";
+var RETRY_QUESTION="cbtRetryQuestion";
 
 
-/* =====================================================
-READ STORAGE
-===================================================== */
-
-function readJSON(key){
+function read(key){
 
 try{
-
-const raw=
-localStorage.getItem(key);
-
-if(!raw){
-return [];
-}
-
-const data=
-JSON.parse(raw);
-
-return data;
-
-}catch(error){
-
-console.error(
-"Storage error:",
-error
+return JSON.parse(
+localStorage.getItem(key)||"[]"
 );
-
+}catch(e){
 return [];
-
 }
 
 }
 
 
-/* =====================================================
-NORMALIZE
-===================================================== */
+function norm(x){
 
-function normalize(value){
-
-return String(value||"")
+return String(x||"")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -481,20 +360,9 @@ return String(value||"")
 }
 
 
-/* =====================================================
-ESCAPE HTML
-===================================================== */
+function esc(x){
 
-function escapeHTML(value){
-
-return String(
-value===undefined ||
-value===null
-?
-""
-:
-value
-)
+return String(x==null?"":x)
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -504,711 +372,326 @@ value
 }
 
 
-/* =====================================================
-GET MASTERY
-===================================================== */
+/* MASTERED */
 
-function getMastered(){
+function mastered(){
 
-const data=
-readJSON(
-MASTERY_KEY
-);
+var data=read(MASTERY_KEY);
 
-if(
-!Array.isArray(data)
-){
-
+if(!Array.isArray(data))
 return [];
 
-}
+var map={};
 
-const map=
-new Map();
+data.forEach(function(q){
 
+if(q && q.question){
 
-data.forEach(
-function(q){
-
-if(
-!q ||
-!q.question
-){
-
-return;
-
-}
-
-const key=
-normalize(q.question);
-
-if(key){
-
-map.set(
-key,
-q
-);
+map[norm(q.question)]=q;
 
 }
 
 });
 
-
-return Array.from(
-map.values()
-);
-
-}
-
-
-/* =====================================================
-GET MASTERED SET
-===================================================== */
-
-function getMasteredSet(){
-
-return new Set(
-getMastered().map(
-function(q){
-
-return normalize(
-q.question
-);
-
-})
-);
+return Object.keys(map).map(function(k){
+return map[k];
+});
 
 }
 
 
-/* =====================================================
-GET HISTORY
-===================================================== */
+/* ACTIVE */
 
-function getHistory(){
+function active(){
 
-const data=
-readJSON(
-HISTORY_KEY
-);
+var history=read(HISTORY_KEY);
 
-return Array.isArray(data)
-?
-data
-:
-[];
+if(!Array.isArray(history))
+return [];
 
-}
+var masteredMap={};
 
+mastered().forEach(function(q){
 
-/* =====================================================
-GET ACTIVE MISTAKES
-===================================================== */
+masteredMap[norm(q.question)]=true;
 
-function getActiveMistakes(){
+});
 
-const history=
-getHistory();
+var map={};
 
-const mastered=
-getMasteredSet();
+history.forEach(function(test){
 
-const map=
-new Map();
-
-
-history.forEach(
-function(test){
-
-if(
-!test ||
-!Array.isArray(
-test.questions
-)
-){
-
+if(!test ||
+!Array.isArray(test.questions))
 return;
 
-}
+test.questions.forEach(function(q){
 
-
-test.questions.forEach(
-function(q){
-
-if(
-!q ||
-!q.question
-){
-
+if(!q ||
+!q.question ||
+q.status!=="wrong")
 return;
 
-}
+var key=norm(q.question);
 
-
-if(
-q.status!=="wrong"
-){
-
+if(masteredMap[key])
 return;
 
-}
-
-
-const key=
-normalize(q.question);
-
-
-if(
-mastered.has(key)
-){
-
-return;
-
-}
-
-
-map.set(
-key,
-q
-);
+map[key]=q;
 
 });
 
 });
 
-
-return Array.from(
-map.values()
-);
-
-}
-
-
-/* =====================================================
-COUNTS
-===================================================== */
-
-function updateCounts(){
-
-document.getElementById(
-"activeCount"
-).textContent=
-getActiveMistakes().length;
-
-
-document.getElementById(
-"masteredCount"
-).textContent=
-getMastered().length;
+return Object.keys(map).map(function(k){
+return map[k];
+});
 
 }
 
 
-/* =====================================================
-ACTIVE
-===================================================== */
+/* COUNTS */
+
+function counts(){
+
+document.getElementById("activeCount")
+.textContent=active().length;
+
+document.getElementById("masteredCount")
+.textContent=mastered().length;
+
+}
+
+
+/* ACTIVE VIEW */
 
 function showActive(){
 
-document.getElementById(
-"sectionTitle"
-).textContent=
-"❌ Active Mistakes";
+document.getElementById("title")
+.textContent="❌ Active Mistakes";
 
+document.getElementById("controls")
+.innerHTML="";
 
-document.getElementById(
-"controls"
-).innerHTML="";
-
-
-const list=
-document.getElementById(
-"list"
-);
+var list=document.getElementById("list");
 
 list.innerHTML="";
 
+var data=active();
 
-const mistakes=
-getActiveMistakes();
+if(data.length===0){
 
-
-if(
-mistakes.length===0
-){
-
-list.innerHTML=`
-
-<div class="empty">
-
-<div class="empty-icon">
-🎉
-</div>
-
-<h2>
-No Active Mistakes
-</h2>
-
-<p>
-You have no unresolved mistakes.
-</p>
-
-</div>
-
-`;
+list.innerHTML=
+'<div class="empty">'+
+'<div style="font-size:50px">🎉</div>'+
+'<h2>No Active Mistakes</h2>'+
+'<p>You have no unresolved mistakes.</p>'+
+'</div>';
 
 return;
 
 }
 
+data.forEach(function(q,i){
 
-mistakes.forEach(
-function(q,index){
+var answer=q.correctAnswer||"";
 
-const div=
-document.createElement(
-"div"
-);
+if(!answer &&
+Array.isArray(q.options)){
+
+answer=
+q.options[Number(q.correctIndex)]||"";
+
+}
+
+var div=document.createElement("div");
 
 div.className="item";
 
+div.innerHTML=
+'<span class="badge">❌ Mistake '+(i+1)+'</span>'+
+'<span class="badge">'+esc(q.subject||"Unknown")+'</span>'+
+'<span class="badge">'+esc(q.topic||"Unknown")+'</span>'+
 
-let answer=
-q.correctAnswer||"";
+'<div class="question">'+
+esc(q.question)+
+'</div>'+
 
+'<div class="info">'+
+'<b>Your answer:</b><br>'+
+esc(q.selectedAnswer||"Not answered")+
+'<br><br>'+
+'<b>Correct answer:</b><br>'+
+'<span class="correct">'+
+esc(answer)+
+'</span>'+
+'</div>'+
 
-if(
-!answer &&
-Array.isArray(q.options)
-){
+'<button class="retry" onclick="retryOne('+i+')">'+
+'🔄 Retry This Question'+
+'</button>';
 
-answer=
-q.options[
-Number(q.correctIndex)
-]||"";
-
-}
-
-
-div.innerHTML=`
-
-<div>
-
-<span class="badge">
-❌ Mistake ${index+1}
-</span>
-
-<span class="badge">
-${escapeHTML(
-q.subject||"Unknown"
-)}
-</span>
-
-<span class="badge">
-${escapeHTML(
-q.topic||"Unknown"
-)}
-</span>
-
-</div>
-
-
-<div class="question">
-
-${escapeHTML(
-q.question
-)}
-
-</div>
-
-
-<div class="info">
-
-<strong>
-Your answer:
-</strong>
-
-<br>
-
-${escapeHTML(
-q.selectedAnswer||
-"Not answered"
-)}
-
-<br><br>
-
-<strong>
-Correct answer:
-</strong>
-
-<br>
-
-<span class="correct">
-
-${escapeHTML(answer)}
-
-</span>
-
-</div>
-
-
-<button
-class="retry"
-type="button">
-
-🔄 Retry This Question
-
-</button>
-
-`;
-
-
-div.querySelector(
-".retry"
-).onclick=
-function(){
-
-retryOne(index);
-
-};
-
-
-list.appendChild(
-div
-);
+list.appendChild(div);
 
 });
 
 }
 
 
-/* =====================================================
-MASTERED
-===================================================== */
+/* MASTERED VIEW */
 
 function showMastered(){
 
-document.getElementById(
-"sectionTitle"
-).textContent=
-"🏆 Mastered Questions";
+document.getElementById("title")
+.textContent="🏆 Mastered Questions";
 
+document.getElementById("controls")
+.innerHTML=
+'<button class="back" onclick="showActive()">← Active Mistakes</button>';
 
-document.getElementById(
-"controls"
-).innerHTML=`
-
-<button
-class="back"
-type="button"
-onclick="showActive()">
-
-← Active Mistakes
-
-</button>
-
-`;
-
-
-const list=
-document.getElementById(
-"list"
-);
+var list=document.getElementById("list");
 
 list.innerHTML="";
 
+var data=mastered();
 
-/*
-READ STORAGE AGAIN.
-This is important because
-the retry page may have just
-created a new mastery record.
-*/
+document.getElementById("masteredCount")
+.textContent=data.length;
 
-const mastered=
-getMastered();
+if(data.length===0){
 
-
-document.getElementById(
-"masteredCount"
-).textContent=
-mastered.length;
-
-
-if(
-mastered.length===0
-){
-
-list.innerHTML=`
-
-<div class="empty">
-
-<div class="empty-icon">
-🔎
-</div>
-
-<h2>
-No Mastered Questions Found
-</h2>
-
-<p>
-No mastered questions are currently
-stored in cbtMasteryV2.
-</p>
-
-</div>
-
-`;
+list.innerHTML=
+'<div class="empty">'+
+'<div style="font-size:50px">🔎</div>'+
+'<h2>No Mastered Questions</h2>'+
+'<p>No questions are stored in cbtMasteryV2.</p>'+
+'</div>';
 
 return;
 
 }
 
+data.forEach(function(q,i){
 
-mastered.forEach(
-function(q,index){
+var answer=q.correctAnswer||"";
 
-const div=
-document.createElement(
-"div"
-);
-
-div.className=
-"item mastered-item";
-
-
-let answer=
-q.correctAnswer||"";
-
-
-if(
-!answer &&
-Array.isArray(q.options)
-){
+if(!answer &&
+Array.isArray(q.options)){
 
 answer=
-q.options[
-Number(q.correctIndex)
-]||"";
+q.options[Number(q.correctIndex)]||"";
 
 }
 
-
-if(
-!answer &&
-q.selectedAnswer
-){
-
-answer=
-q.selectedAnswer;
-
-}
-
-
-let solutionHTML="";
-
+var solution="";
 
 if(q.solution){
 
-solutionHTML=`
-
-<br><br>
-
-<strong>
-💡 Solution
-</strong>
-
-<br><br>
-
-${escapeHTML(
-q.solution
-)}
-
-`;
+solution=
+'<br><br><b>💡 Solution</b><br><br>'+
+esc(q.solution);
 
 }
 
+var div=document.createElement("div");
 
-div.innerHTML=`
+div.className="item mastered";
 
-<div>
+div.innerHTML=
+'<span class="badge">🏆 Mastered '+(i+1)+'</span>'+
+'<span class="badge">'+esc(q.subject||"Unknown")+'</span>'+
+'<span class="badge">'+esc(q.topic||"Unknown")+'</span>'+
 
-<span class="badge">
-🏆 Mastered ${index+1}
-</span>
+'<div class="question">'+
+esc(q.question)+
+'</div>'+
 
-<span class="badge">
-${escapeHTML(
-q.subject||"Unknown"
-)}
-</span>
+'<div class="info">'+
+'<span class="correct">✅ Correct Answer</span>'+
+'<br><br>'+
+esc(answer)+
+solution+
+'</div>';
 
-<span class="badge">
-${escapeHTML(
-q.topic||"Unknown"
-)}
-</span>
-
-</div>
-
-
-<div class="question">
-
-${escapeHTML(
-q.question
-)}
-
-</div>
-
-
-<div class="info">
-
-<strong>
-
-<span class="correct">
-✅ Correct Answer
-</span>
-
-</strong>
-
-<br><br>
-
-${escapeHTML(answer)}
-
-${solutionHTML}
-
-</div>
-
-`;
-
-
-list.appendChild(
-div
-);
+list.appendChild(div);
 
 });
 
 }
 
 
-/* =====================================================
-OPEN RETRY
-===================================================== */
+/* RETRY ALL */
 
-function openRetry(){
+function retryAll(){
 
-const mistakes=
-getActiveMistakes();
+var data=active();
 
+if(!data.length){
 
-if(
-mistakes.length===0
-){
-
-alert(
-"No active mistakes available."
-);
+alert("No active mistakes available.");
 
 return;
 
 }
 
-
 localStorage.setItem(
-RETRY_QUEUE_KEY,
-JSON.stringify(
-mistakes
-)
+RETRY_QUEUE,
+JSON.stringify(data)
 );
 
-
 localStorage.setItem(
-RETRY_QUESTION_KEY,
-JSON.stringify(
-mistakes[0]
-)
+RETRY_QUESTION,
+JSON.stringify(data[0])
 );
 
-
-location.href=
-"retry.html";
+location.href="retry.html";
 
 }
 
 
-/* =====================================================
-RETRY ONE
-===================================================== */
+/* RETRY ONE */
 
-function retryOne(index){
+function retryOne(i){
 
-const mistakes=
-getActiveMistakes();
+var data=active();
 
-
-if(
-!mistakes[index]
-){
-
+if(!data[i])
 return;
 
-}
-
-
 localStorage.setItem(
-RETRY_QUEUE_KEY,
-JSON.stringify(
-mistakes
-)
+RETRY_QUEUE,
+JSON.stringify(data)
 );
 
-
 localStorage.setItem(
-RETRY_QUESTION_KEY,
-JSON.stringify(
-mistakes[index]
-)
+RETRY_QUESTION,
+JSON.stringify(data[i])
 );
 
-
-location.href=
-"retry.html";
+location.href="retry.html";
 
 }
 
 
-/* =====================================================
-NAVIGATION
-===================================================== */
+/* NAVIGATION */
 
 function goDashboard(){
 
-location.href=
-"index.html";
+location.href="index.html";
 
 }
 
 
 function goCBT(){
 
-location.href=
-"cbt.html";
+location.href="cbt.html";
 
 }
 
 
-/* =====================================================
-START
-===================================================== */
+/* START */
 
-updateCounts();
-
-
-/*
-If URL contains #mastered,
-open Mastered automatically.
-Otherwise open Active Mistakes.
-*/
+counts();
 
 if(
 location.hash.toLowerCase()==="#mastered"
@@ -1221,56 +704,6 @@ showMastered();
 showActive();
 
 }
-
-
-/* =====================================================
-REFRESH WHEN PAGE RETURNS
-===================================================== */
-
-document.addEventListener(
-"visibilitychange",
-function(){
-
-if(
-!document.hidden
-){
-
-updateCounts();
-
-if(
-location.hash.toLowerCase()==="#mastered"
-){
-
-showMastered();
-
-}
-
-}
-
-});
-
-
-/* =====================================================
-BACK/FORWARD HASH
-===================================================== */
-
-window.addEventListener(
-"hashchange",
-function(){
-
-if(
-location.hash.toLowerCase()==="#mastered"
-){
-
-showMastered();
-
-}else{
-
-showActive();
-
-}
-
-});
 
 </script>
 
