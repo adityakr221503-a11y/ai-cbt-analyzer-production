@@ -69,7 +69,7 @@ margin-bottom:20px;
 
 .hero h1{
 margin:0 0 8px;
-font-size:30px;
+font-size:29px;
 }
 
 .hero p{
@@ -162,6 +162,11 @@ margin-top:13px;
 .mastered-item{
 background:#f0fdf4;
 border-color:#bbf7d0;
+cursor:pointer;
+}
+
+.mastered-item:active{
+transform:scale(.99);
 }
 
 .badge{
@@ -207,6 +212,36 @@ font-weight:800;
 margin-top:13px;
 }
 
+.detail-question{
+font-size:22px;
+font-weight:800;
+line-height:1.6;
+margin:20px 0;
+}
+
+.option{
+padding:13px;
+border:1px solid #e2e8f0;
+border-radius:10px;
+margin-top:8px;
+background:#fff;
+}
+
+.option.correct-option{
+background:#f0fdf4;
+border-color:#86efac;
+font-weight:800;
+}
+
+.solution{
+background:#eff6ff;
+border-left:4px solid #4f46e5;
+padding:16px;
+border-radius:10px;
+margin-top:18px;
+line-height:1.7;
+}
+
 .empty{
 text-align:center;
 padding:35px 15px;
@@ -224,6 +259,10 @@ padding:17px;
 
 .number{
 font-size:31px;
+}
+
+.detail-question{
+font-size:19px;
 }
 }
 </style>
@@ -253,8 +292,7 @@ Dashboard
 <div class="hero">
 <h1>🧠 Mistake Bank</h1>
 <p>
-Turn mistakes into mastery. Retry difficult questions
-and review everything you have already mastered.
+Review mistakes, retry questions and build mastery.
 </p>
 </div>
 
@@ -271,11 +309,7 @@ onclick="showActive()">
 
 <div>❌</div>
 
-<div
-class="number"
-id="activeCount">
-0
-</div>
+<div class="number" id="activeCount">0</div>
 
 <div class="label">
 Active Mistakes
@@ -287,7 +321,6 @@ Tap to View →
 
 </button>
 
-
 <button
 class="stat"
 type="button"
@@ -295,11 +328,7 @@ onclick="showMastered()">
 
 <div>🏆</div>
 
-<div
-class="number"
-id="masteredCount">
-0
-</div>
+<div class="number" id="masteredCount">0</div>
 
 <div class="label">
 Mastered
@@ -313,7 +342,6 @@ Tap to View →
 
 </div>
 </div>
-
 
 <div class="card">
 
@@ -341,7 +369,6 @@ onclick="goCBT()">
 
 </div>
 
-
 <div class="card">
 
 <div id="controls"></div>
@@ -356,7 +383,6 @@ onclick="goCBT()">
 
 </div>
 
-
 <script>
 
 var HISTORY_KEY="cbtHistory";
@@ -369,17 +395,13 @@ function readJSON(key){
 
 try{
 
-var value=
-localStorage.getItem(key);
+var value=localStorage.getItem(key);
 
 if(!value){
 return [];
 }
 
-var data=
-JSON.parse(value);
-
-return data;
+return JSON.parse(value);
 
 }catch(e){
 
@@ -403,12 +425,7 @@ return String(value||"")
 function escapeHTML(value){
 
 return String(
-value===undefined ||
-value===null
-?
-""
-:
-value
+value===undefined||value===null?"":value
 )
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
@@ -419,14 +436,11 @@ value
 }
 
 
-/* =========================
-MASTERED
-========================= */
+/* MASTERED */
 
 function getMastered(){
 
-var data=
-readJSON(MASTERY_KEY);
+var data=readJSON(MASTERY_KEY);
 
 if(!Array.isArray(data)){
 return [];
@@ -436,41 +450,32 @@ var map={};
 
 data.forEach(function(q){
 
-if(!q || !q.question){
-return;
-}
+if(q && q.question){
 
-var key=
-normalize(q.question);
+map[normalize(q.question)]=q;
 
-if(key){
-map[key]=q;
 }
 
 });
 
-return Object.keys(map).map(function(key){
-return map[key];
+return Object.keys(map).map(function(k){
+return map[k];
 });
 
 }
 
 
-/* =========================
-ACTIVE
-========================= */
+/* ACTIVE */
 
 function getActive(){
 
-var history=
-readJSON(HISTORY_KEY);
+var history=readJSON(HISTORY_KEY);
 
 if(!Array.isArray(history)){
 return [];
 }
 
-var masteredSet=
-new Set(
+var masteredSet=new Set(
 getMastered().map(function(q){
 return normalize(q.question);
 })
@@ -480,25 +485,21 @@ var map={};
 
 history.forEach(function(test){
 
-if(
-!test ||
-!Array.isArray(test.questions)
-){
+if(!test||!Array.isArray(test.questions)){
 return;
 }
 
 test.questions.forEach(function(q){
 
 if(
-!q ||
-!q.question ||
+!q||
+!q.question||
 q.status!=="wrong"
 ){
 return;
 }
 
-var key=
-normalize(q.question);
+var key=normalize(q.question);
 
 if(masteredSet.has(key)){
 return;
@@ -510,105 +511,73 @@ map[key]=q;
 
 });
 
-return Object.keys(map).map(function(key){
-return map[key];
+return Object.keys(map).map(function(k){
+return map[k];
 });
 
 }
 
 
-/* =========================
-COUNTS
-========================= */
+/* COUNTS */
 
 function updateCounts(){
 
 document.getElementById("activeCount")
-.textContent=
-getActive().length;
+.textContent=getActive().length;
 
 document.getElementById("masteredCount")
-.textContent=
-getMastered().length;
+.textContent=getMastered().length;
 
 }
 
 
-/* =========================
-ACTIVE VIEW
-========================= */
+/* ACTIVE */
 
 function showActive(){
 
 document.getElementById("sectionTitle")
-.textContent=
-"❌ Active Mistakes";
+.textContent="❌ Active Mistakes";
 
 document.getElementById("controls")
 .innerHTML="";
 
-var list=
-document.getElementById("list");
+var list=document.getElementById("list");
 
 list.innerHTML="";
 
-var data=
-getActive();
+var data=getActive();
 
 if(data.length===0){
 
 list.innerHTML=`
-
 <div class="empty">
-
-<div style="font-size:55px">
-🎉
+<div style="font-size:55px">🎉</div>
+<h2>No Active Mistakes</h2>
+<p>You have no unresolved mistakes.</p>
 </div>
-
-<h2>
-No Active Mistakes
-</h2>
-
-<p>
-You have no unresolved mistakes.
-</p>
-
-</div>
-
 `;
 
 return;
 
 }
 
-
 data.forEach(function(q,index){
 
-var answer=
-q.correctAnswer||"";
+var answer=q.correctAnswer||"";
 
-if(
-!answer &&
-Array.isArray(q.options)
-){
+if(!answer&&Array.isArray(q.options)){
 
-answer=
-q.options[
-Number(q.correctIndex)
-]||"";
+answer=q.options[Number(q.correctIndex)]||"";
 
 }
 
-var div=
-document.createElement("div");
+var div=document.createElement("div");
 
 div.className="item";
 
 div.innerHTML=`
 
-<span class="badge">
-❌ Mistake ${index+1}
-</span>
+<span class="badge">❌ Mistake ${index+1}</span>
 
 <span class="badge">
 ${escapeHTML(q.subject||"Unknown")}
@@ -624,22 +593,13 @@ ${escapeHTML(q.question)}
 
 <div class="info">
 
-<strong>
-Your answer:
-</strong>
-
+<strong>Your answer:</strong>
 <br>
-
-${escapeHTML(
-q.selectedAnswer||"Not answered"
-)}
+${escapeHTML(q.selectedAnswer||"Not answered")}
 
 <br><br>
 
-<strong>
-Correct answer:
-</strong>
-
+<strong>Correct answer:</strong>
 <br>
 
 <span class="correct">
@@ -656,7 +616,6 @@ onclick="retryOne(${index})">
 🔄 Retry This Question
 
 </button>
-
 `;
 
 list.appendChild(div);
@@ -666,15 +625,12 @@ list.appendChild(div);
 }
 
 
-/* =========================
-MASTERED VIEW
-========================= */
+/* MASTERED LIST */
 
 function showMastered(){
 
 document.getElementById("sectionTitle")
-.textContent=
-"🏆 Mastered Questions";
+.textContent="🏆 Mastered Questions";
 
 document.getElementById("controls")
 .innerHTML=`
@@ -687,92 +643,52 @@ onclick="showActive()">
 ← Active Mistakes
 
 </button>
-
 `;
 
-var list=
-document.getElementById("list");
+var list=document.getElementById("list");
 
 list.innerHTML="";
 
-var data=
-getMastered();
+var data=getMastered();
 
 document.getElementById("masteredCount")
-.textContent=
-data.length;
-
+.textContent=data.length;
 
 if(data.length===0){
 
 list.innerHTML=`
-
 <div class="empty">
 
-<div style="font-size:55px">
-🔎
-</div>
+<div style="font-size:55px">🔎</div>
 
-<h2>
-No Mastered Questions Found
-</h2>
+<h2>No Mastered Questions Found</h2>
 
 <p>
-No questions are currently stored
-in cbtMasteryV2.
+No questions are currently stored in cbtMasteryV2.
 </p>
 
 </div>
-
 `;
 
 return;
 
 }
 
-
 data.forEach(function(q,index){
 
-var answer=
-q.correctAnswer||"";
+var div=document.createElement("div");
 
-if(
-!answer &&
-Array.isArray(q.options)
-){
+div.className="item mastered-item";
 
-answer=
-q.options[
-Number(q.correctIndex)
-]||"";
+div.setAttribute(
+"role",
+"button"
+);
 
-}
-
-var solution="";
-
-if(q.solution){
-
-solution=`
-
-<br><br>
-
-<strong>
-💡 Solution
-</strong>
-
-<br><br>
-
-${escapeHTML(q.solution)}
-
-`;
-
-}
-
-var div=
-document.createElement("div");
-
-div.className=
-"item mastered-item";
+div.setAttribute(
+"tabindex",
+"0"
+);
 
 div.innerHTML=`
 
@@ -792,21 +708,28 @@ ${escapeHTML(q.topic||"Unknown")}
 ${escapeHTML(q.question)}
 </div>
 
-<div class="info">
-
-<span class="correct">
-✅ Correct Answer
-</span>
-
-<br><br>
-
-${escapeHTML(answer)}
-
-${solution}
-
+<div class="hint">
+Tap to open full question →
 </div>
-
 `;
+
+div.onclick=function(){
+
+openMasteredQuestion(index);
+
+};
+
+div.onkeydown=function(e){
+
+if(e.key==="Enter"||e.key===" "){
+
+e.preventDefault();
+
+openMasteredQuestion(index);
+
+}
+
+};
 
 list.appendChild(div);
 
@@ -815,20 +738,189 @@ list.appendChild(div);
 }
 
 
-/* =========================
-RETRY
-========================= */
+/* MASTERED DETAIL */
+
+function openMasteredQuestion(index){
+
+var data=getMastered();
+
+var q=data[index];
+
+if(!q){
+return;
+}
+
+document.getElementById("sectionTitle")
+.textContent="🏆 Mastered Question";
+
+document.getElementById("controls")
+.innerHTML=`
+
+<button
+class="back"
+type="button"
+onclick="showMastered()">
+
+← Back to Mastered
+
+</button>
+`;
+
+var list=document.getElementById("list");
+
+var answer=q.correctAnswer||"";
+
+if(
+!answer&&
+Array.isArray(q.options)
+){
+
+answer=q.options[
+Number(q.correctIndex)
+]||"";
+
+}
+
+var options="";
+
+if(Array.isArray(q.options)){
+
+options=`
+<h3>📝 Options</h3>
+`;
+
+q.options.forEach(function(option,i){
+
+var isCorrect=
+Number(q.correctIndex)===i;
+
+options+=`
+
+<div class="option ${
+isCorrect?"correct-option":""
+}">
+
+${isCorrect?"✅ ":""}
+
+${escapeHTML(option)}
+
+</div>
+`;
+
+});
+
+}
+
+var solution="";
+
+if(q.solution){
+
+solution=`
+
+<div class="solution">
+
+<strong>💡 Solution</strong>
+
+<br><br>
+
+${escapeHTML(q.solution)}
+
+</div>
+`;
+
+}
+
+list.innerHTML=`
+
+<div class="item">
+
+<span class="badge">
+🏆 MASTERED
+</span>
+
+<span class="badge">
+${escapeHTML(q.subject||"Unknown")}
+</span>
+
+<span class="badge">
+${escapeHTML(q.topic||"Unknown")}
+</span>
+
+<div class="detail-question">
+
+${escapeHTML(q.question)}
+
+</div>
+
+${options}
+
+<div class="info">
+
+<strong>
+✅ Correct Answer
+</strong>
+
+<br><br>
+
+<span class="correct">
+${escapeHTML(answer)}
+</span>
+
+</div>
+
+${solution}
+
+<button
+class="retry"
+type="button"
+onclick="retryMastered()">
+
+🔄 Practice This Question Again
+
+</button>
+
+</div>
+`;
+
+window.currentMasteredQuestion=q;
+
+}
+
+
+/* RETRY MASTERED */
+
+function retryMastered(){
+
+var q=window.currentMasteredQuestion;
+
+if(!q){
+return;
+}
+
+localStorage.setItem(
+RETRY_QUEUE_KEY,
+JSON.stringify([q])
+);
+
+localStorage.setItem(
+RETRY_QUESTION_KEY,
+JSON.stringify(q)
+);
+
+location.href="retry.html";
+
+}
+
+
+/* RETRY ACTIVE */
 
 function openRetry(){
 
-var data=
-getActive();
+var data=getActive();
 
 if(data.length===0){
 
-alert(
-"No active mistakes available."
-);
+alert("No active mistakes available.");
 
 return;
 
@@ -844,16 +936,14 @@ RETRY_QUESTION_KEY,
 JSON.stringify(data[0])
 );
 
-location.href=
-"retry.html";
+location.href="retry.html";
 
 }
 
 
 function retryOne(index){
 
-var data=
-getActive();
+var data=getActive();
 
 if(!data[index]){
 return;
@@ -869,41 +959,31 @@ RETRY_QUESTION_KEY,
 JSON.stringify(data[index])
 );
 
-location.href=
-"retry.html";
+location.href="retry.html";
 
 }
 
 
-/* =========================
-NAVIGATION
-========================= */
+/* NAVIGATION */
 
 function goDashboard(){
 
-location.href=
-"index.html";
+location.href="index.html";
 
 }
-
 
 function goCBT(){
 
-location.href=
-"cbt.html";
+location.href="cbt.html";
 
 }
 
 
-/* =========================
-START
-========================= */
+/* START */
 
 updateCounts();
 
-if(
-location.hash.toLowerCase()==="#mastered"
-){
+if(location.hash.toLowerCase()==="#mastered"){
 
 showMastered();
 
@@ -912,23 +992,6 @@ showMastered();
 showActive();
 
 }
-
-
-/* =========================
-REFRESH
-========================= */
-
-document.addEventListener(
-"visibilitychange",
-function(){
-
-if(!document.hidden){
-
-updateCounts();
-
-}
-
-});
 
 </script>
 
