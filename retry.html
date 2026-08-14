@@ -1,1573 +1,940 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>CBT Analyzer Pro — Retry</title>
-
-<style>
-*{box-sizing:border-box}
-
-html,body{
-margin:0;
-padding:0;
-}
-
-body{
-font-family:Arial,sans-serif;
-background:#f1f5f9;
-color:#0f172a;
-}
-
-header{
-background:#fff;
-border-bottom:1px solid #e2e8f0;
-padding:16px 20px;
-}
-
-.header{
-max-width:1000px;
-margin:auto;
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:10px;
-}
-
-.logo{
-font-size:20px;
-font-weight:800;
-}
-
-.logo span{
-color:#4f46e5;
-}
-
-button{
-font-family:inherit;
-cursor:pointer;
-}
-
-.back{
-border:0;
-background:#e2e8f0;
-padding:11px 15px;
-border-radius:10px;
-font-weight:700;
-}
-
-.container{
-max-width:900px;
-margin:25px auto;
-padding:0 15px;
-}
-
-.hero{
-background:#4f46e5;
-color:white;
-padding:25px;
-border-radius:18px;
-margin-bottom:20px;
-}
-
-.hero h1{
-margin:0 0 8px;
-}
-
-.hero p{
-margin:0;
-line-height:1.5;
-}
-
-.card{
-background:white;
-border-radius:16px;
-padding:22px;
-margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
-}
-
-.retry-info{
-background:#f8fafc;
-padding:15px;
-border-radius:11px;
-line-height:1.5;
-margin-bottom:18px;
-}
-
-.meta{
-display:flex;
-flex-wrap:wrap;
-gap:8px;
-margin-bottom:18px;
-}
-
-.badge{
-padding:7px 10px;
-border-radius:8px;
-font-size:12px;
-font-weight:800;
-background:#eef2ff;
-color:#3730a3;
-}
-
-.progress{
-height:8px;
-background:#e2e8f0;
-border-radius:20px;
-overflow:hidden;
-margin-bottom:22px;
-}
-
-.progress-bar{
-height:100%;
-background:#4f46e5;
-transition:.3s;
-}
-
-.question{
-font-size:21px;
-font-weight:800;
-line-height:1.55;
-margin-bottom:20px;
-}
-
-.option{
-display:block;
-width:100%;
-padding:15px;
-margin:10px 0;
-background:white;
-border:2px solid #e2e8f0;
-border-radius:11px;
-text-align:left;
-font-size:16px;
-font-weight:600;
-}
-
-.option.selected{
-border-color:#4f46e5;
-background:#eef2ff;
-}
-
-.option.correct{
-border-color:#16a34a;
-background:#dcfce7;
-color:#166534;
-}
-
-.option.wrong{
-border-color:#dc2626;
-background:#fee2e2;
-color:#991b1b;
-}
-
-.option:disabled{
-cursor:default;
-}
-
-.action{
-width:100%;
-border:0;
-padding:14px;
-border-radius:11px;
-font-size:16px;
-font-weight:800;
-margin-top:14px;
-}
-
-.primary{
-background:#4f46e5;
-color:white;
-}
-
-.secondary{
-background:#e2e8f0;
-color:#0f172a;
-}
-
-.result{
-display:none;
-text-align:center;
-}
-
-.result-icon{
-font-size:60px;
-}
-
-.result h2{
-font-size:28px;
-}
-
-.result-message{
-color:#475569;
-line-height:1.6;
-font-size:17px;
-}
-
-.solution{
-text-align:left;
-background:#f0fdf4;
-border:1px solid #bbf7d0;
-padding:16px;
-border-radius:12px;
-margin-top:18px;
-line-height:1.6;
-}
-
-.failure{
-background:#fff7ed;
-border:1px solid #fed7aa;
-}
-
-.empty{
-display:none;
-text-align:center;
-padding:40px 20px;
-color:#64748b;
-line-height:1.6;
-}
-
-.loading{
-text-align:center;
-padding:40px;
-color:#64748b;
-}
-
-@media(max-width:600px){
-
-.container{
-margin:15px auto;
-}
-
-.card{
-padding:17px;
-}
-
-.question{
-font-size:19px;
-}
-
-}
-</style>
-</head>
-
-<body>
-
-<header>
-
-<div class="header">
-
-<div class="logo">
-CBT Analyzer <span>Pro</span>
-</div>
-
-<button
-class="back"
-type="button"
-onclick="location.href='mistake.html'">
-
-← Mistake Bank
-
-</button>
-
-</div>
-
-</header>
-
-
-<div class="container">
-
-<div class="hero">
-
-<h1>🔄 Retry → Mastery</h1>
-
-<p>
-Retry questions you previously got wrong.
-A correct retry moves the question to your Mastered section.
-</p>
-
-</div>
-
-
-<section
-id="loading"
-class="card loading">
-
-Loading Retry Engine...
-
-</section>
-
-
-<section
-id="retryCard"
-class="card"
-style="display:none">
-
-<div class="retry-info">
-
-<strong>🎯 Mastery Challenge</strong>
-
-<br><br>
-
-Answer the question again without looking at your previous answer.
-
-<br><br>
-
-<strong>
-Correct retry → 🏆 Mastered
-</strong>
-
-<br>
-
-Wrong retry → ❌ Remains in Mistake Bank
-
-</div>
-
-
-<div class="meta">
-
-<span
-class="badge"
-id="subject">
-
-Subject
-
-</span>
-
-<span
-class="badge"
-id="topic">
-
-Topic
-
-</span>
-
-<span class="badge">
-🔄 Retry
-</span>
-
-</div>
-
-
-<div class="progress">
-
-<div
-id="progressBar"
-class="progress-bar">
-</div>
-
-</div>
-
-
-<div
-id="question"
-class="question">
-</div>
-
-
-<div id="options"></div>
-
-
-<button
-id="checkButton"
-class="action primary"
-type="button"
-onclick="checkAnswer()">
-
-Check Answer
-
-</button>
-
-</section>
-
-
-<section
-id="resultCard"
-class="card result">
-
-<div
-id="resultIcon"
-class="result-icon">
-</div>
-
-<h2
-id="resultTitle">
-</h2>
-
-<div
-id="resultMessage"
-class="result-message">
-</div>
-
-<div id="resultDetails"></div>
-
-
-<button
-id="nextButton"
-class="action primary"
-type="button"
-onclick="nextQuestion()">
-
-Next Mistake
-
-</button>
-
-
-<button
-class="action secondary"
-type="button"
-onclick="location.href='mistake.html'">
-
-🧠 Mistake Bank
-
-</button>
-
-
-<button
-class="action secondary"
-type="button"
-onclick="location.href='index.html'">
-
-🏠 Dashboard
-
-</button>
-
-</section>
-
-
-<section
-id="empty"
-class="card empty">
-
-<div style="font-size:55px">
-🏆
-</div>
-
-<h2>
-No Active Retry Questions
-</h2>
-
-<p>
-There are currently no unanswered mistakes available for retry.
-Complete a CBT test and get a question wrong to create a retry.
-</p>
-
-<button
-class="action primary"
-type="button"
-onclick="location.href='mistake.html'">
-
-Open Mistake Bank
-
-</button>
-
-</section>
-
-</div>
-
-
 <script>
 
-/* =====================================================
-STATE
-===================================================== */
-
 let retryQuestions = [];
-
 let currentIndex = 0;
-
 let selectedAnswer = null;
-
 let submitted = false;
 
-
-/* =====================================================
-NORMALIZE
-===================================================== */
-
 function normalize(value){
-
-return String(value || "")
-.trim()
-.toLowerCase()
-.replace(/\s+/g," ");
-
+    return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g," ");
 }
-
-
-/* =====================================================
-READ HISTORY
-===================================================== */
 
 function getHistory(){
-
-try{
-
-const data =
-JSON.parse(
-localStorage.getItem("cbtHistory") || "[]"
-);
-
-return Array.isArray(data)
-? data
-: [];
-
-}catch(error){
-
-console.error(
-"History read error:",
-error
-);
-
-return [];
-
+    try{
+        const data = JSON.parse(
+            localStorage.getItem("cbtHistory") || "[]"
+        );
+        return Array.isArray(data) ? data : [];
+    }catch(e){
+        return [];
+    }
 }
-
-}
-
-
-/* =====================================================
-READ MASTERY
-===================================================== */
 
 function getMastered(){
+    try{
+        const data = JSON.parse(
+            localStorage.getItem("cbtMasteryV2") || "[]"
+        );
 
-const mastered = new Set();
+        if(!Array.isArray(data)) return new Set();
 
-try{
-
-const data =
-JSON.parse(
-localStorage.getItem("cbtMasteryV2") || "[]"
-);
-
-if(Array.isArray(data)){
-
-data.forEach(function(item){
-
-if(
-item &&
-item.question
-){
-
-mastered.add(
-normalize(item.question)
-);
-
+        return new Set(
+            data
+                .filter(x => x && x.question)
+                .map(x => normalize(x.question))
+        );
+    }catch(e){
+        return new Set();
+    }
 }
 
-});
 
-}
+/* =====================================================
+   IMPORTANT:
+   LOAD THE QUESTION SELECTED BY "PRACTICE AGAIN"
+===================================================== */
 
-}catch(error){
+function getDirectRetryQuestion(){
 
-console.error(
-"Mastery read error:",
-error
-);
+    try{
 
-}
+        const raw =
+            localStorage.getItem("cbtRetryQuestion");
 
-return mastered;
+        if(!raw){
+            return null;
+        }
+
+        const q = JSON.parse(raw);
+
+        if(
+            !q ||
+            !q.question ||
+            !Array.isArray(q.options)
+        ){
+            return null;
+        }
+
+        return {
+
+            id:
+                q.id ||
+                "retry-" + Date.now(),
+
+            question:
+                q.question,
+
+            options:
+                q.options,
+
+            subject:
+                q.subject || "Unknown",
+
+            topic:
+                q.topic || "Unknown",
+
+            correctIndex:
+                Number(q.correctIndex),
+
+            correctAnswer:
+                q.correctAnswer ||
+                q.options[Number(q.correctIndex)] ||
+                "",
+
+            solution:
+                q.solution ||
+                "Solution not available.",
+
+            mistakeType:
+                q.mistakeType ||
+                "Not Classified",
+
+            mistakeReason:
+                q.mistakeReason ||
+                ""
+
+        };
+
+    }catch(e){
+
+        console.error(
+            "Direct retry question error:",
+            e
+        );
+
+        return null;
+
+    }
 
 }
 
 
 /* =====================================================
-BUILD RETRY QUESTIONS
+   BUILD RETRY LIST
 ===================================================== */
 
 function buildRetryQuestions(){
 
-const history = getHistory();
+    retryQuestions = [];
 
-const mastered = getMastered();
+    const direct =
+        getDirectRetryQuestion();
 
-const map = new Map();
+    /*
+       Practice Again has priority.
+    */
 
+    if(direct){
 
-history.forEach(function(test){
+        retryQuestions.push(direct);
 
-if(
-!test ||
-!Array.isArray(test.questions)
-){
-
-return;
-
-}
+        return;
+    }
 
 
-test.questions.forEach(function(q){
+    /*
+       Otherwise load active mistakes.
+    */
 
-if(
-!q ||
-!q.question
-){
+    const history = getHistory();
 
-return;
+    const mastered = getMastered();
 
-}
-
-
-/*
-ONLY ACTIVE WRONG QUESTIONS
-*/
-
-if(
-q.status !== "wrong" ||
-q.mastered === true ||
-q.masteryStatus === "Mastered"
-){
-
-return;
-
-}
+    const map = new Map();
 
 
-const key =
-normalize(q.question);
+    history.forEach(function(test){
+
+        if(
+            !test ||
+            !Array.isArray(test.questions)
+        ){
+            return;
+        }
 
 
-/*
-ALREADY MASTERED
-*/
+        test.questions.forEach(function(q){
 
-if(mastered.has(key)){
-
-return;
-
-}
-
-
-/*
-KEEP ONE COPY
-*/
-
-map.set(
-key,
-{
-
-id:
-q.id ||
-"retry-" + key,
-
-question:
-q.question,
-
-options:
-Array.isArray(q.options)
-? q.options
-: [],
-
-subject:
-q.subject ||
-"Unknown",
-
-topic:
-q.topic ||
-"Unknown",
-
-selectedIndex:
-q.selectedIndex,
-
-selectedAnswer:
-q.selectedAnswer ||
-"",
-
-correctIndex:
-Number(q.correctIndex),
-
-correctAnswer:
-q.correctAnswer ||
-(
-Array.isArray(q.options)
-?
-q.options[
-Number(q.correctIndex)
-]
-:
-""
-),
-
-mistakeType:
-q.mistakeType ||
-"Not Classified",
-
-mistakeReason:
-q.mistakeReason ||
-"Review the concept and identify why the answer was incorrect.",
-
-solution:
-q.solution ||
-"Solution not available."
-
-}
-
-);
-
-});
-
-});
+            if(
+                !q ||
+                !q.question
+            ){
+                return;
+            }
 
 
-retryQuestions =
-Array.from(map.values());
+            if(
+                q.status !== "wrong" ||
+                q.mastered === true ||
+                q.masteryStatus === "Mastered"
+            ){
+                return;
+            }
+
+
+            const key =
+                normalize(q.question);
+
+
+            if(mastered.has(key)){
+                return;
+            }
+
+
+            map.set(key,{
+
+                id:
+                    q.id ||
+                    "retry-" + key,
+
+                question:
+                    q.question,
+
+                options:
+                    Array.isArray(q.options)
+                    ? q.options
+                    : [],
+
+                subject:
+                    q.subject || "Unknown",
+
+                topic:
+                    q.topic || "Unknown",
+
+                correctIndex:
+                    Number(q.correctIndex),
+
+                correctAnswer:
+                    q.correctAnswer ||
+                    (
+                        Array.isArray(q.options)
+                        ? q.options[
+                            Number(q.correctIndex)
+                          ]
+                        : ""
+                    ),
+
+                solution:
+                    q.solution ||
+                    "Solution not available.",
+
+                mistakeType:
+                    q.mistakeType ||
+                    "Not Classified",
+
+                mistakeReason:
+                    q.mistakeReason ||
+                    ""
+
+            });
+
+        });
+
+    });
+
+
+    retryQuestions =
+        Array.from(map.values());
 
 }
 
 
 /* =====================================================
-SHOW RETRY
+   SHOW / HIDE
 ===================================================== */
 
 function showRetry(){
 
-document.getElementById(
-"loading"
-).style.display = "none";
+    document.getElementById("loading")
+        .style.display = "none";
 
-document.getElementById(
-"empty"
-).style.display = "none";
+    document.getElementById("empty")
+        .style.display = "none";
 
-document.getElementById(
-"resultCard"
-).style.display = "none";
+    document.getElementById("resultCard")
+        .style.display = "none";
 
-document.getElementById(
-"retryCard"
-).style.display = "block";
+    document.getElementById("retryCard")
+        .style.display = "block";
 
 }
 
-
-/* =====================================================
-SHOW EMPTY
-===================================================== */
 
 function showEmpty(){
 
-document.getElementById(
-"loading"
-).style.display = "none";
+    document.getElementById("loading")
+        .style.display = "none";
 
-document.getElementById(
-"retryCard"
-).style.display = "none";
+    document.getElementById("retryCard")
+        .style.display = "none";
 
-document.getElementById(
-"resultCard"
-).style.display = "none";
+    document.getElementById("resultCard")
+        .style.display = "none";
 
-document.getElementById(
-"empty"
-).style.display = "block";
+    document.getElementById("empty")
+        .style.display = "block";
 
 }
 
 
 /* =====================================================
-RENDER QUESTION
+   RENDER
 ===================================================== */
 
 function renderQuestion(){
 
-if(
-retryQuestions.length === 0
-){
+    if(!retryQuestions.length){
 
-showEmpty();
+        showEmpty();
+        return;
 
-return;
-
-}
+    }
 
 
-if(
-currentIndex >= retryQuestions.length
-){
+    if(
+        currentIndex >= retryQuestions.length
+    ){
 
-location.href = "mistake.html";
+        location.href = "mistake.html";
+        return;
 
-return;
-
-}
-
-
-const q =
-retryQuestions[currentIndex];
+    }
 
 
-selectedAnswer = null;
-
-submitted = false;
-
-
-showRetry();
+    const q =
+        retryQuestions[currentIndex];
 
 
-document.getElementById(
-"subject"
-).textContent =
-q.subject;
+    selectedAnswer = null;
+    submitted = false;
 
 
-document.getElementById(
-"topic"
-).textContent =
-q.topic;
+    showRetry();
 
 
-document.getElementById(
-"question"
-).textContent =
-q.question;
+    document.getElementById("subject")
+        .textContent =
+        q.subject;
 
 
-const progress =
-(
-(currentIndex + 1) /
-retryQuestions.length
-) * 100;
+    document.getElementById("topic")
+        .textContent =
+        q.topic;
 
 
-document.getElementById(
-"progressBar"
-).style.width =
-progress + "%";
+    document.getElementById("question")
+        .textContent =
+        q.question;
 
 
-const options =
-document.getElementById(
-"options"
-);
-
-options.innerHTML = "";
-
-
-q.options.forEach(
-function(option,index){
-
-const button =
-document.createElement("button");
-
-button.type = "button";
-
-button.className = "option";
-
-button.textContent =
-String.fromCharCode(65 + index) +
-". " +
-option;
+    document.getElementById("progressBar")
+        .style.width =
+        (
+            ((currentIndex + 1) /
+            retryQuestions.length) * 100
+        ) + "%";
 
 
-button.onclick = function(){
+    const options =
+        document.getElementById("options");
 
-if(submitted){
-return;
-}
-
-selectedAnswer = index;
+    options.innerHTML = "";
 
 
-document.querySelectorAll(
-".option"
-).forEach(
-function(btn,i){
+    q.options.forEach(function(option,index){
 
-btn.classList.toggle(
-"selected",
-i === index
-);
-
-});
-
-};
+        const button =
+            document.createElement("button");
 
 
-options.appendChild(button);
+        button.type = "button";
 
-});
+        button.className = "option";
+
+        button.textContent =
+            String.fromCharCode(65 + index) +
+            ". " +
+            option;
 
 
-const checkButton =
-document.getElementById(
-"checkButton"
-);
+        button.onclick = function(){
 
-checkButton.disabled = false;
+            if(submitted) return;
 
-checkButton.textContent =
-"Check Answer";
+            selectedAnswer = index;
+
+
+            document
+                .querySelectorAll(".option")
+                .forEach(function(btn,i){
+
+                    btn.classList.toggle(
+                        "selected",
+                        i === index
+                    );
+
+                });
+
+        };
+
+
+        options.appendChild(button);
+
+    });
+
+
+    const check =
+        document.getElementById("checkButton");
+
+    check.disabled = false;
+
+    check.textContent =
+        "Check Answer";
 
 }
 
 
 /* =====================================================
-CHECK ANSWER
+   CHECK
 ===================================================== */
 
 function checkAnswer(){
 
-if(submitted){
-return;
-}
+    if(submitted) return;
 
 
-if(selectedAnswer === null){
+    if(selectedAnswer === null){
 
-alert(
-"Please select an answer first."
-);
+        alert(
+            "Please select an answer first."
+        );
 
-return;
+        return;
 
-}
-
-
-submitted = true;
+    }
 
 
-const q =
-retryQuestions[currentIndex];
+    submitted = true;
 
 
-const correctIndex =
-Number(q.correctIndex);
+    const q =
+        retryQuestions[currentIndex];
 
 
-const correct =
-selectedAnswer === correctIndex;
+    const correctIndex =
+        Number(q.correctIndex);
 
 
-/*
-HIGHLIGHT ANSWERS
-*/
-
-document.querySelectorAll(
-".option"
-).forEach(
-function(button,index){
-
-button.disabled = true;
+    const correct =
+        selectedAnswer === correctIndex;
 
 
-if(index === correctIndex){
+    document
+        .querySelectorAll(".option")
+        .forEach(function(button,index){
 
-button.classList.add(
-"correct"
-);
-
-}
+            button.disabled = true;
 
 
-if(
-index === selectedAnswer &&
-!correct
-){
+            if(index === correctIndex){
 
-button.classList.add(
-"wrong"
-);
+                button.classList.add(
+                    "correct"
+                );
 
-}
-
-});
+            }
 
 
-/*
-SAVE RETRY
-*/
+            if(
+                index === selectedAnswer &&
+                !correct
+            ){
 
-saveRetryAttempt(
-q,
-correct
-);
+                button.classList.add(
+                    "wrong"
+                );
+
+            }
+
+        });
 
 
-/*
-CORRECT = MASTERED
-*/
+    saveRetryAttempt(
+        q,
+        correct
+    );
 
-if(correct){
 
-markMastered(q);
+    if(correct){
 
-showSuccess(q);
+        markMastered(q);
 
-}else{
+        showSuccess(q);
 
-showFailure(q);
+    }else{
 
-}
+        showFailure(q);
+
+    }
 
 }
 
 
 /* =====================================================
-SAVE RETRY ATTEMPT
+   SAVE RETRY
 ===================================================== */
 
-function saveRetryAttempt(
-q,
-correct
-){
+function saveRetryAttempt(q,correct){
 
-let attempts = [];
+    let attempts = [];
 
+    try{
 
-try{
+        attempts =
+            JSON.parse(
+                localStorage.getItem(
+                    "cbtRetryHistory"
+                ) || "[]"
+            );
 
-attempts =
-JSON.parse(
-localStorage.getItem(
-"cbtRetryHistory"
-) || "[]"
-);
+        if(!Array.isArray(attempts)){
+            attempts = [];
+        }
 
-if(!Array.isArray(attempts)){
+    }catch(e){
 
-attempts = [];
+        attempts = [];
 
-}
-
-}catch(error){
-
-attempts = [];
-
-}
+    }
 
 
-attempts.push({
+    attempts.push({
 
-question:
-q.question,
+        question:
+            q.question,
 
-subject:
-q.subject,
+        subject:
+            q.subject,
 
-topic:
-q.topic,
+        topic:
+            q.topic,
 
-selectedIndex:
-selectedAnswer,
+        selectedIndex:
+            selectedAnswer,
 
-selectedAnswer:
-q.options[selectedAnswer] || "",
+        selectedAnswer:
+            q.options[selectedAnswer] || "",
 
-correctIndex:
-q.correctIndex,
+        correctIndex:
+            q.correctIndex,
 
-correctAnswer:
-q.correctAnswer,
+        correctAnswer:
+            q.correctAnswer,
 
-correct:
-correct,
+        correct:
+            correct,
 
-date:
-new Date().toISOString()
+        date:
+            new Date().toISOString()
 
-});
+    });
 
 
-localStorage.setItem(
-"cbtRetryHistory",
-JSON.stringify(attempts)
-);
+    localStorage.setItem(
+        "cbtRetryHistory",
+        JSON.stringify(attempts)
+    );
 
 }
 
 
 /* =====================================================
-MARK MASTERED — FIXED
+   MASTERED — FINAL FIX
 ===================================================== */
 
 function markMastered(q){
 
-const key =
-normalize(q.question);
+    const key =
+        normalize(q.question);
 
 
-/* --------------------------------
-1. SAVE TO MASTERY
--------------------------------- */
+    /* SAVE MASTERY */
 
-let mastery = [];
+    let mastery = [];
 
+    try{
 
-try{
+        mastery =
+            JSON.parse(
+                localStorage.getItem(
+                    "cbtMasteryV2"
+                ) || "[]"
+            );
 
-mastery =
-JSON.parse(
-localStorage.getItem(
-"cbtMasteryV2"
-) || "[]"
-);
+        if(!Array.isArray(mastery)){
+            mastery = [];
+        }
 
-if(!Array.isArray(mastery)){
+    }catch(e){
 
-mastery = [];
+        mastery = [];
 
-}
+    }
 
-}catch(error){
 
-console.error(
-"Mastery storage error:",
-error
-);
+    const exists =
+        mastery.some(function(item){
 
-mastery = [];
+            return (
+                item &&
+                item.question &&
+                normalize(item.question) === key
+            );
 
-}
+        });
 
 
-const alreadyMastered =
-mastery.some(
-function(item){
+    if(!exists){
 
-return (
-item &&
-item.question &&
-normalize(item.question) === key
-);
+        mastery.push({
 
-});
+            type:
+                "mastery",
 
+            id:
+                q.id,
 
-if(!alreadyMastered){
+            question:
+                q.question,
 
-mastery.push({
+            options:
+                q.options,
 
-type:
-"mastery",
+            subject:
+                q.subject,
 
-id:
-q.id ||
-"mastered-" +
-Date.now(),
+            topic:
+                q.topic,
 
-question:
-q.question,
+            correctIndex:
+                Number(q.correctIndex),
 
-options:
-Array.isArray(q.options)
-?
-q.options
-:
-[],
+            correctAnswer:
+                q.correctAnswer,
 
-subject:
-q.subject || "",
+            solution:
+                q.solution,
 
-topic:
-q.topic || "",
+            mistakeType:
+                q.mistakeType,
 
-correctIndex:
-Number(q.correctIndex),
+            mistakeReason:
+                q.mistakeReason,
 
-correctAnswer:
-q.correctAnswer || "",
+            masteredAt:
+                new Date().toISOString(),
 
-solution:
-q.solution || "",
+            source:
+                "Retry Engine"
 
-mistakeType:
-q.mistakeType || "",
+        });
 
-mistakeReason:
-q.mistakeReason || "",
+    }
 
-masteredAt:
-new Date().toISOString(),
 
-source:
-"Retry Engine"
+    localStorage.setItem(
+        "cbtMasteryV2",
+        JSON.stringify(mastery)
+    );
 
-});
 
-}
+    /* UPDATE HISTORY */
 
+    const history =
+        getHistory();
 
-localStorage.setItem(
-"cbtMasteryV2",
-JSON.stringify(mastery)
-);
 
+    history.forEach(function(test){
 
-/* --------------------------------
-2. UPDATE CBT HISTORY
--------------------------------- */
+        if(
+            !test ||
+            !Array.isArray(test.questions)
+        ){
+            return;
+        }
 
-const history =
-getHistory();
 
-let changed = false;
+        test.questions.forEach(function(question){
 
+            if(
+                question &&
+                question.question &&
+                normalize(question.question) === key
+            ){
 
-history.forEach(
-function(test){
+                /*
+                 IMPORTANT:
+                 WRONG → MASTERED
+                */
 
-if(
-!test ||
-!Array.isArray(test.questions)
-){
+                question.status =
+                    "mastered";
 
-return;
+                question.mastered =
+                    true;
 
-}
+                question.masteryStatus =
+                    "Mastered";
 
+                question.retryMastered =
+                    true;
 
-test.questions.forEach(
-function(question){
+                question.retryCorrect =
+                    true;
 
-if(
-!question ||
-!question.question
-){
+                question.masteredAt =
+                    new Date().toISOString();
 
-return;
+            }
 
-}
+        });
 
+    });
 
-if(
-normalize(question.question) !== key
-){
 
-return;
+    localStorage.setItem(
+        "cbtHistory",
+        JSON.stringify(history)
+    );
 
-}
 
+    /*
+       REMOVE DIRECT RETRY TARGET
+       AFTER SUCCESS
+    */
 
-/*
-IMPORTANT FIX:
-CHANGE WRONG → MASTERED
-*/
+    localStorage.removeItem(
+        "cbtRetryQuestion"
+    );
 
-question.status =
-"mastered";
 
-question.mastered =
-true;
-
-question.masteryStatus =
-"Mastered";
-
-question.masteredAt =
-new Date().toISOString();
-
-question.retryMastered =
-true;
-
-question.retryCorrect =
-true;
-
-changed = true;
-
-});
-
-});
-
-
-if(changed){
-
-localStorage.setItem(
-"cbtHistory",
-JSON.stringify(history)
-);
-
-}
-
-
-/* --------------------------------
-3. SAVE LAST MASTERED
--------------------------------- */
-
-localStorage.setItem(
-"cbtLastMastered",
-JSON.stringify({
-
-question:
-q.question,
-
-subject:
-q.subject || "",
-
-topic:
-q.topic || "",
-
-masteredAt:
-new Date().toISOString()
-
-})
-);
-
-
-/* --------------------------------
-4. SAVE LAST STATUS
--------------------------------- */
-
-localStorage.setItem(
-"cbtLastMasteryStatus",
-"mastered"
-);
+    localStorage.setItem(
+        "cbtLastMasteryStatus",
+        "mastered"
+    );
 
 }
 
 
 /* =====================================================
-SUCCESS
+   SUCCESS
 ===================================================== */
 
 function showSuccess(q){
 
-document.getElementById(
-"retryCard"
-).style.display = "none";
-
-document.getElementById(
-"resultCard"
-).style.display = "block";
+    document.getElementById("retryCard")
+        .style.display = "none";
 
 
-document.getElementById(
-"resultIcon"
-).textContent =
-"🏆";
+    document.getElementById("resultCard")
+        .style.display = "block";
 
 
-document.getElementById(
-"resultTitle"
-).textContent =
-"Mastery Achieved!";
+    document.getElementById("resultIcon")
+        .textContent = "🏆";
 
 
-document.getElementById(
-"resultMessage"
-).innerHTML =
-"Excellent! You answered the question correctly on retry.";
+    document.getElementById("resultTitle")
+        .textContent =
+        "Mastery Achieved!";
 
 
-document.getElementById(
-"resultDetails"
-).innerHTML = `
-
-<div class="solution">
-
-<strong>
-🏆 Mastered
-</strong>
-
-<br><br>
-
-This question has been added to your
-<strong>Mastered Questions</strong>.
-
-<br><br>
-
-<strong>
-Solution:
-</strong>
-
-<br><br>
-
-${escapeHTML(q.solution)}
-
-</div>
-
-`;
+    document.getElementById("resultMessage")
+        .innerHTML =
+        "Excellent! You answered the question correctly on retry.";
 
 
-const next =
-document.getElementById(
-"nextButton"
-);
+    document.getElementById("resultDetails")
+        .innerHTML = `
+
+        <div class="solution">
+
+        <strong>🏆 Mastered</strong>
+
+        <br><br>
+
+        This question is now saved in
+        <strong>Mastered Questions</strong>.
+
+        <br><br>
+
+        <strong>Solution:</strong>
+
+        <br><br>
+
+        ${escapeHTML(q.solution)}
+
+        </div>
+
+        `;
 
 
-if(
-currentIndex <
-retryQuestions.length - 1
-){
+    const next =
+        document.getElementById("nextButton");
 
-next.style.display = "block";
 
-next.textContent =
-"🔄 Retry Next Mistake";
+    next.style.display = "block";
 
-}else{
-
-next.style.display = "block";
-
-next.textContent =
-"🧠 Back to Mistake Bank";
-
-}
+    next.textContent =
+        currentIndex <
+        retryQuestions.length - 1
+        ?
+        "🔄 Retry Next Mistake"
+        :
+        "🧠 Back to Mistake Bank";
 
 }
 
 
 /* =====================================================
-FAILURE
+   FAILURE
 ===================================================== */
 
 function showFailure(q){
 
-document.getElementById(
-"retryCard"
-).style.display = "none";
-
-document.getElementById(
-"resultCard"
-).style.display = "block";
+    document.getElementById("retryCard")
+        .style.display = "none";
 
 
-document.getElementById(
-"resultIcon"
-).textContent =
-"🔁";
+    document.getElementById("resultCard")
+        .style.display = "block";
 
 
-document.getElementById(
-"resultTitle"
-).textContent =
-"Not Mastered Yet";
+    document.getElementById("resultIcon")
+        .textContent = "🔁";
 
 
-document.getElementById(
-"resultMessage"
-).innerHTML =
-"The question remains in your Mistake Bank. Review the concept and try again later.";
+    document.getElementById("resultTitle")
+        .textContent =
+        "Not Mastered Yet";
 
 
-document.getElementById(
-"resultDetails"
-).innerHTML = `
-
-<div class="solution failure">
-
-<strong>
-❌ Correct Answer
-</strong>
-
-<br><br>
-
-${escapeHTML(q.correctAnswer)}
-
-<br><br>
-
-<strong>
-💡 Solution
-</strong>
-
-<br><br>
-
-${escapeHTML(q.solution)}
-
-</div>
-
-`;
+    document.getElementById("resultMessage")
+        .innerHTML =
+        "The question remains in your Mistake Bank. Review the concept and try again later.";
 
 
-const next =
-document.getElementById(
-"nextButton"
-);
+    document.getElementById("resultDetails")
+        .innerHTML = `
+
+        <div class="solution failure">
+
+        <strong>❌ Correct Answer</strong>
+
+        <br><br>
+
+        ${escapeHTML(q.correctAnswer)}
+
+        <br><br>
+
+        <strong>💡 Solution</strong>
+
+        <br><br>
+
+        ${escapeHTML(q.solution)}
+
+        </div>
+
+        `;
 
 
-next.style.display = "block";
+    const next =
+        document.getElementById("nextButton");
 
 
-if(
-currentIndex <
-retryQuestions.length - 1
-){
+    next.style.display = "block";
 
-next.textContent =
-"🔄 Try Next Mistake";
-
-}else{
-
-next.textContent =
-"🧠 Back to Mistake Bank";
-
-}
+    next.textContent =
+        currentIndex <
+        retryQuestions.length - 1
+        ?
+        "🔄 Try Next Mistake"
+        :
+        "🧠 Back to Mistake Bank";
 
 }
 
 
 /* =====================================================
-NEXT QUESTION
+   NEXT
 ===================================================== */
 
 function nextQuestion(){
 
-if(
-currentIndex <
-retryQuestions.length - 1
-){
+    if(
+        currentIndex <
+        retryQuestions.length - 1
+    ){
 
-currentIndex++;
+        currentIndex++;
 
-renderQuestion();
+        renderQuestion();
 
-}else{
+    }else{
 
-location.href =
-"mistake.html";
+        location.href =
+            "mistake.html";
 
-}
+    }
 
 }
 
 
 /* =====================================================
-ESCAPE HTML
+   ESCAPE
 ===================================================== */
 
 function escapeHTML(value){
 
-return String(
-value === undefined ||
-value === null
-?
-""
-:
-value
-)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
+    return String(
+        value ?? ""
+    )
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
 
 /* =====================================================
-START
+   START
 ===================================================== */
 
 buildRetryQuestions();
 
+if(retryQuestions.length){
 
-if(
-retryQuestions.length === 0
-){
-
-showEmpty();
+    renderQuestion();
 
 }else{
 
-renderQuestion();
+    showEmpty();
 
 }
 
 </script>
-
-</body>
-</html>
