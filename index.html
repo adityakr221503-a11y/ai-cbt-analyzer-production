@@ -7,10 +7,7 @@
 <title>CBT Analyzer Pro — Dashboard</title>
 
 <style>
-
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 html,body{
 margin:0;
@@ -63,8 +60,6 @@ margin:25px auto;
 padding:0 15px;
 }
 
-/* HERO */
-
 .hero{
 background:#4f46e5;
 color:#fff;
@@ -111,8 +106,6 @@ background:#312e81;
 color:#fff;
 }
 
-/* CARDS */
-
 .card{
 background:#fff;
 border-radius:16px;
@@ -124,8 +117,6 @@ box-shadow:0 3px 14px rgba(0,0,0,.07);
 .card h2{
 margin-top:0;
 }
-
-/* STATS */
 
 .stats{
 display:grid;
@@ -152,7 +143,16 @@ color:#64748b;
 font-weight:600;
 }
 
-/* QUICK ACTIONS */
+.mastered-stat{
+cursor:pointer;
+border:0;
+width:100%;
+font-family:inherit;
+}
+
+.mastered-stat:hover{
+background:#f0fdf4;
+}
 
 .actions{
 display:grid;
@@ -180,8 +180,6 @@ display:block;
 font-size:27px;
 margin-bottom:8px;
 }
-
-/* PERFORMANCE */
 
 .performance{
 display:grid;
@@ -214,8 +212,6 @@ background:#4f46e5;
 transition:.4s;
 }
 
-/* SUBJECT */
-
 .subject-grid{
 display:grid;
 grid-template-columns:repeat(3,1fr);
@@ -237,8 +233,6 @@ margin-bottom:6px;
 .subject small{
 color:#64748b;
 }
-
-/* HISTORY */
 
 .history-item{
 border:1px solid #e2e8f0;
@@ -272,16 +266,12 @@ color:#64748b;
 line-height:1.6;
 }
 
-/* FOOTER */
-
 .footer{
 text-align:center;
 padding:15px;
 color:#94a3b8;
 font-size:13px;
 }
-
-/* MOBILE */
 
 @media(max-width:800px){
 
@@ -326,10 +316,8 @@ padding:17px;
 }
 
 }
-
 </style>
 </head>
-
 
 <body>
 
@@ -388,7 +376,7 @@ onclick="location.href='mistake.html'">
 </section>
 
 
-<!-- STATISTICS -->
+<!-- PERFORMANCE -->
 
 <section class="card">
 
@@ -398,9 +386,7 @@ onclick="location.href='mistake.html'">
 
 <div class="stat">
 
-<strong id="testsCount">
-0
-</strong>
+<strong id="testsCount">0</strong>
 
 <span>
 Tests Completed
@@ -411,9 +397,7 @@ Tests Completed
 
 <div class="stat">
 
-<strong id="totalQuestions">
-0
-</strong>
+<strong id="totalQuestions">0</strong>
 
 <span>
 Questions Attempted
@@ -424,9 +408,7 @@ Questions Attempted
 
 <div class="stat">
 
-<strong id="accuracy">
-0%
-</strong>
+<strong id="accuracy">0%</strong>
 
 <span>
 Accuracy
@@ -435,7 +417,12 @@ Accuracy
 </div>
 
 
-<div class="stat">
+<!-- MASTERED -->
+
+<button
+class="stat mastered-stat"
+type="button"
+onclick="location.href='mastered.html'">
 
 <strong id="mastered">
 0
@@ -445,7 +432,7 @@ Accuracy
 🏆 Mastered
 </span>
 
-</div>
+</button>
 
 </div>
 
@@ -465,9 +452,7 @@ class="action"
 type="button"
 onclick="location.href='cbt.html'">
 
-<span class="action-icon">
-📝
-</span>
+<span class="action-icon">📝</span>
 
 New CBT
 
@@ -479,9 +464,7 @@ class="action"
 type="button"
 onclick="location.href='mistake.html'">
 
-<span class="action-icon">
-❌
-</span>
+<span class="action-icon">❌</span>
 
 Mistake Bank
 
@@ -493,9 +476,7 @@ class="action"
 type="button"
 onclick="location.href='retry.html'">
 
-<span class="action-icon">
-🔄
-</span>
+<span class="action-icon">🔄</span>
 
 Retry
 
@@ -507,9 +488,7 @@ class="action"
 type="button"
 onclick="scrollToHistory()">
 
-<span class="action-icon">
-📜
-</span>
+<span class="action-icon">📜</span>
 
 History
 
@@ -520,7 +499,7 @@ History
 </section>
 
 
-<!-- MISTAKE SUMMARY -->
+<!-- MISTAKE INTELLIGENCE -->
 
 <section class="card">
 
@@ -537,9 +516,7 @@ History
 <strong
 id="activeMistakes"
 style="font-size:30px">
-
 0
-
 </strong>
 
 <p>
@@ -549,6 +526,7 @@ Questions that still need revision.
 <button
 class="action"
 style="width:100%"
+type="button"
 onclick="location.href='mistake.html'">
 
 Review Mistakes
@@ -567,9 +545,7 @@ Review Mistakes
 <strong
 id="retryAttempts"
 style="font-size:30px">
-
 0
-
 </strong>
 
 <p>
@@ -579,6 +555,7 @@ Total retry attempts recorded.
 <button
 class="action"
 style="width:100%"
+type="button"
 onclick="location.href='retry.html'">
 
 Start Retry
@@ -603,9 +580,7 @@ Start Retry
 <strong
 id="accuracyLarge"
 style="font-size:34px">
-
 0%
-
 </strong>
 
 <div class="progress">
@@ -634,12 +609,9 @@ Complete a CBT test to start building your performance profile.
 
 <div class="subject-grid">
 
-
 <div class="subject">
 
-<strong>
-⚡ Physics
-</strong>
+<strong>⚡ Physics</strong>
 
 <div>
 Questions:
@@ -661,9 +633,7 @@ Accuracy:
 
 <div class="subject">
 
-<strong>
-🧪 Chemistry
-</strong>
+<strong>🧪 Chemistry</strong>
 
 <div>
 Questions:
@@ -685,9 +655,7 @@ Accuracy:
 
 <div class="subject">
 
-<strong>
-🧬 Biology
-</strong>
+<strong>🧬 Biology</strong>
 
 <div>
 Questions:
@@ -711,7 +679,7 @@ Accuracy:
 </section>
 
 
-<!-- TEST HISTORY -->
+<!-- HISTORY -->
 
 <section
 class="card"
@@ -732,47 +700,54 @@ CBT Analyzer Pro • Student First Learning System
 
 </div>
 
-
 </div>
 
 
 <script>
 
 /* =====================================================
-STORAGE
+EXACT STORAGE
 ===================================================== */
 
-const HISTORY_KEY="cbtHistory";
+const HISTORY_KEY =
+"cbtHistory";
 
-const MASTERY_KEYS=[
-"cbtMasteryV2",
-"cbtAnalyzer.mastery"
-];
+const MASTERY_KEY =
+"cbtMasteryV2";
 
-const RETRY_KEY=
-"cbtAnalyzer.retryHistory";
+const RETRY_KEY =
+"cbtRetryHistory";
 
 
 /* =====================================================
-HELPERS
+READ JSON
 ===================================================== */
 
 function readJSON(key,fallback){
 
 try{
 
-const data=
-JSON.parse(
-localStorage.getItem(key)||"null"
-);
+const raw =
+localStorage.getItem(key);
 
-return data===null
+if(!raw){
+
+return fallback;
+
+}
+
+const data =
+JSON.parse(raw);
+
+return data === null
 ?
 fallback
 :
 data;
 
 }catch(error){
+
+console.error(error);
 
 return fallback;
 
@@ -781,9 +756,13 @@ return fallback;
 }
 
 
+/* =====================================================
+NORMALIZE
+===================================================== */
+
 function normalize(value){
 
-return String(value||"")
+return String(value || "")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -792,132 +771,52 @@ return String(value||"")
 
 
 /* =====================================================
-LOAD DATA
+HISTORY
 ===================================================== */
 
-const history=
+function getHistory(){
+
+const data =
 readJSON(
 HISTORY_KEY,
 []
 );
 
-
-const tests=
-Array.isArray(history)
+return Array.isArray(data)
 ?
-history
-:[];
-
-
-/* =====================================================
-CALCULATE GLOBAL STATS
-===================================================== */
-
-let totalQuestions=0;
-
-let totalAttempted=0;
-
-let totalCorrect=0;
-
-let totalWrong=0;
-
-let totalSkipped=0;
-
-
-tests.forEach(
-function(test){
-
-if(!test)return;
-
-
-if(
-Array.isArray(test.questions)
-){
-
-test.questions.forEach(
-function(q){
-
-if(!q)return;
-
-totalQuestions++;
-
-
-if(q.status==="correct"){
-
-totalCorrect++;
-
-totalAttempted++;
-
-}
-
-else if(q.status==="wrong"){
-
-totalWrong++;
-
-totalAttempted++;
-
-}
-
-else if(q.status==="skipped"){
-
-totalSkipped++;
-
-}
-
-else if(
-q.selectedIndex!==null &&
-q.selectedIndex!==undefined
-){
-
-totalAttempted++;
-
-}
-
-});
-
-}
-
-else{
-
-totalCorrect+=
-Number(test.correct)||0;
-
-totalWrong+=
-Number(test.incorrect||test.wrong)||0;
-
-totalSkipped+=
-Number(test.skipped)||0;
-
-}
-
-});
-
-
-const accuracy=
-totalAttempted>0
-?
-Math.round(
-(totalCorrect/totalAttempted)*100
-)
+data
 :
-0;
+[];
+
+}
+
+
+const tests =
+getHistory();
 
 
 /* =====================================================
 MASTERY
+EXACT SAME KEY AS retry.html
 ===================================================== */
 
-function getMastery(){
+function getMastered(){
 
-const set=new Set();
+const data =
+readJSON(
+MASTERY_KEY,
+[]
+);
 
-MASTERY_KEYS.forEach(
-function(key){
+if(!Array.isArray(data)){
 
-const data=
-readJSON(key,[]);
+return new Set();
 
-if(!Array.isArray(data))return;
+}
+
+const set =
+new Set();
+
 
 data.forEach(
 function(item){
@@ -928,22 +827,23 @@ item.question
 ){
 
 set.add(
-normalize(item.question)
+normalize(
+item.question
+)
 );
 
 }
 
 });
 
-});
 
 return set;
 
 }
 
 
-const masterySet=
-getMastery();
+const masterySet =
+getMastered();
 
 
 /* =====================================================
@@ -952,30 +852,48 @@ ACTIVE MISTAKES
 
 function getActiveMistakes(){
 
-const map=new Map();
+const map =
+new Map();
+
 
 tests.forEach(
 function(test){
 
 if(
 !test ||
-!Array.isArray(test.questions)
-)return;
+!Array.isArray(
+test.questions
+)
+){
+
+return;
+
+}
+
 
 test.questions.forEach(
 function(q){
 
 if(
 !q ||
-q.status!=="wrong" ||
+q.status !== "wrong" ||
 !q.question
-)return;
+){
 
-const key=
-normalize(q.question);
+return;
+
+}
 
 
-if(masterySet.has(key)){
+const key =
+normalize(
+q.question
+);
+
+
+if(
+masterySet.has(key)
+){
 
 return;
 
@@ -997,22 +915,21 @@ return map.size;
 }
 
 
-const activeMistakes=
+const activeMistakes =
 getActiveMistakes();
 
 
 /* =====================================================
-RETRY COUNT
+RETRY
 ===================================================== */
 
-const retryHistory=
+const retryHistory =
 readJSON(
 RETRY_KEY,
 []
 );
 
-
-const retryAttempts=
+const retryAttempts =
 Array.isArray(retryHistory)
 ?
 retryHistory.length
@@ -1021,55 +938,143 @@ retryHistory.length
 
 
 /* =====================================================
-UPDATE TOP STATS
+GLOBAL STATS
+===================================================== */
+
+let totalQuestions = 0;
+let totalAttempted = 0;
+let totalCorrect = 0;
+
+
+tests.forEach(
+function(test){
+
+if(!test){
+
+return;
+
+}
+
+
+if(
+Array.isArray(test.questions)
+){
+
+test.questions.forEach(
+function(q){
+
+if(!q){
+
+return;
+
+}
+
+
+totalQuestions++;
+
+
+if(q.status === "correct"){
+
+totalCorrect++;
+totalAttempted++;
+
+}
+else if(q.status === "wrong"){
+
+totalAttempted++;
+
+}
+else if(q.selectedIndex !== null &&
+q.selectedIndex !== undefined){
+
+totalAttempted++;
+
+}
+
+});
+
+}
+else{
+
+const correct =
+Number(test.correct) || 0;
+
+const wrong =
+Number(
+test.incorrect ||
+test.wrong
+) || 0;
+
+totalCorrect += correct;
+
+totalAttempted +=
+correct + wrong;
+
+}
+
+});
+
+
+const accuracy =
+totalAttempted > 0
+?
+Math.round(
+(totalCorrect / totalAttempted) * 100
+)
+:
+0;
+
+
+/* =====================================================
+DISPLAY TOP STATS
 ===================================================== */
 
 document.getElementById(
 "testsCount"
-).textContent=
+).textContent =
 tests.length;
 
 
 document.getElementById(
 "totalQuestions"
-).textContent=
-totalQuestions;
+).textContent =
+totalAttempted;
 
 
 document.getElementById(
 "accuracy"
-).textContent=
-accuracy+"%";
+).textContent =
+accuracy + "%";
 
 
 document.getElementById(
 "mastered"
-).textContent=
+).textContent =
 masterySet.size;
 
 
 document.getElementById(
 "activeMistakes"
-).textContent=
+).textContent =
 activeMistakes;
 
 
 document.getElementById(
 "retryAttempts"
-).textContent=
+).textContent =
 retryAttempts;
 
 
 document.getElementById(
 "accuracyLarge"
-).textContent=
-accuracy+"%";
+).textContent =
+accuracy + "%";
 
 
 document.getElementById(
 "accuracyBar"
-).style.width=
-accuracy+"%";
+).style.width =
+accuracy + "%";
 
 
 /* =====================================================
@@ -1078,33 +1083,33 @@ ACCURACY MESSAGE
 
 let message;
 
-if(totalAttempted===0){
+if(totalAttempted === 0){
 
-message=
+message =
 "Complete a CBT test to start building your performance profile.";
 
 }
-else if(accuracy>=85){
+else if(accuracy >= 85){
 
-message=
+message =
 "🔥 Excellent accuracy. Focus on difficult and recurring mistakes.";
 
 }
-else if(accuracy>=70){
+else if(accuracy >= 70){
 
-message=
+message =
 "👍 Good progress. Use the Mistake Bank to push your accuracy higher.";
 
 }
-else if(accuracy>=50){
+else if(accuracy >= 50){
 
-message=
+message =
 "📈 Keep practicing. Review mistakes and retry them regularly.";
 
 }
 else{
 
-message=
+message =
 "🎯 Start with concept revision, then use Retry → Mastery.";
 
 }
@@ -1112,15 +1117,15 @@ message=
 
 document.getElementById(
 "accuracyMessage"
-).textContent=
+).textContent =
 message;
 
 
 /* =====================================================
-SUBJECT STATS
+SUBJECTS
 ===================================================== */
 
-const subjects={
+const subjects = {
 
 Physics:{
 questions:0,
@@ -1145,18 +1150,30 @@ function(test){
 
 if(
 !test ||
-!Array.isArray(test.questions)
-)return;
+!Array.isArray(
+test.questions
+)
+){
+
+return;
+
+}
+
 
 test.questions.forEach(
 function(q){
 
-if(!q)return;
+if(!q){
+
+return;
+
+}
 
 
-const subject=
-String(q.subject||"")
-.trim();
+const subject =
+String(
+q.subject || ""
+).trim();
 
 
 if(
@@ -1169,8 +1186,8 @@ return;
 
 
 if(
-q.status==="correct" ||
-q.status==="wrong"
+q.status === "correct" ||
+q.status === "wrong"
 ){
 
 subjects[subject].questions++;
@@ -1178,7 +1195,9 @@ subjects[subject].questions++;
 }
 
 
-if(q.status==="correct"){
+if(
+q.status === "correct"
+){
 
 subjects[subject].correct++;
 
@@ -1196,26 +1215,28 @@ correctId,
 accuracyId
 ){
 
-const data=
+const data =
 subjects[subject];
+
 
 document.getElementById(
 questionId
-).textContent=
+).textContent =
 data.questions;
 
 
 document.getElementById(
 correctId
-).textContent=
+).textContent =
 data.correct;
 
 
-const acc=
-data.questions>0
+const acc =
+data.questions > 0
 ?
 Math.round(
-(data.correct/data.questions)*100
+(data.correct /
+data.questions) * 100
 )
 :
 0;
@@ -1223,8 +1244,8 @@ Math.round(
 
 document.getElementById(
 accuracyId
-).textContent=
-acc+"%";
+).textContent =
+acc + "%";
 
 }
 
@@ -1259,17 +1280,17 @@ HISTORY
 
 function renderHistory(){
 
-const box=
+const box =
 document.getElementById(
 "historyList"
 );
 
-box.innerHTML="";
+box.innerHTML = "";
 
 
-if(tests.length===0){
+if(tests.length === 0){
 
-box.innerHTML=`
+box.innerHTML = `
 
 <div class="empty">
 
@@ -1283,6 +1304,7 @@ Start your first CBT test to see your performance here.
 
 <button
 class="action"
+type="button"
 onclick="location.href='cbt.html'">
 
 📝 Start First CBT
@@ -1298,7 +1320,7 @@ return;
 }
 
 
-const recent=
+const recent =
 tests
 .slice()
 .reverse()
@@ -1308,46 +1330,54 @@ tests
 recent.forEach(
 function(test,index){
 
-const div=
-document.createElement("div");
+const div =
+document.createElement(
+"div"
+);
 
-div.className=
+div.className =
 "history-item";
 
 
-const correct=
-Number(test.correct)||0;
-
-const wrong=
+const correct =
 Number(
-test.incorrect||
+test.correct
+) || 0;
+
+
+const wrong =
+Number(
+test.incorrect ||
 test.wrong
-)||0;
-
-const skipped=
-Number(test.skipped)||0;
+) || 0;
 
 
-const total=
-correct+
-wrong+
+const skipped =
+Number(
+test.skipped
+) || 0;
+
+
+const total =
+correct +
+wrong +
 skipped;
 
 
-const score=
-test.score!==undefined
+const score =
+test.score !== undefined
 ?
 test.score
 :
-(correct*4)-wrong;
+(correct * 4) - wrong;
 
 
-const date=
-test.date||
+const date =
+test.date ||
 "Unknown date";
 
 
-div.innerHTML=`
+div.innerHTML = `
 
 <div class="history-top">
 
@@ -1388,9 +1418,20 @@ box.appendChild(div);
 }
 
 
+/* =====================================================
+ESCAPE
+===================================================== */
+
 function escapeHTML(value){
 
-return String(value||"")
+return String(
+value === undefined ||
+value === null
+?
+""
+:
+value
+)
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -1399,6 +1440,10 @@ return String(value||"")
 
 }
 
+
+/* =====================================================
+HISTORY SCROLL
+===================================================== */
 
 function scrollToHistory(){
 
@@ -1416,6 +1461,35 @@ block:"start"
 
 
 renderHistory();
+
+
+/* =====================================================
+REFRESH DASHBOARD WHEN RETURNING
+===================================================== */
+
+window.addEventListener(
+"pageshow",
+function(){
+
+const latest =
+readJSON(
+MASTERY_KEY,
+[]
+);
+
+const count =
+Array.isArray(latest)
+?
+latest.length
+:
+0;
+
+document.getElementById(
+"mastered"
+).textContent =
+count;
+
+});
 
 </script>
 
