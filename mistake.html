@@ -21,10 +21,6 @@ body{
 font-family:Arial,sans-serif;
 background:#f1f5f9;
 color:#0f172a;
-}
-
-button{
-font-family:inherit;
 -webkit-tap-highlight-color:transparent;
 }
 
@@ -40,6 +36,7 @@ margin:auto;
 display:flex;
 align-items:center;
 justify-content:space-between;
+gap:12px;
 }
 
 .logo{
@@ -51,6 +48,10 @@ font-weight:800;
 color:#4f46e5;
 }
 
+button{
+font-family:inherit;
+}
+
 .dashboard{
 border:0;
 background:#4f46e5;
@@ -59,6 +60,7 @@ padding:12px 16px;
 border-radius:10px;
 font-weight:700;
 cursor:pointer;
+touch-action:manipulation;
 }
 
 .container{
@@ -69,7 +71,7 @@ padding:0 15px;
 
 .hero{
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:25px;
 border-radius:18px;
 margin-bottom:20px;
@@ -94,9 +96,9 @@ gap:12px;
 }
 
 
-/* ===================================
-CLICKABLE OVERVIEW CARDS
-=================================== */
+/* ================================
+OVERVIEW CARDS
+================================ */
 
 .overview-button{
 appearance:none;
@@ -130,10 +132,6 @@ font-size:13px;
 pointer-events:none;
 }
 
-.overview-button:hover{
-background:#eef2ff;
-}
-
 .overview-button:active{
 background:#c7d2fe;
 transform:scale(.97);
@@ -145,9 +143,9 @@ outline:3px solid #4f46e5;
 }
 
 
-/* ===================================
+/* ================================
 FILTERS
-=================================== */
+================================ */
 
 .filter-grid{
 display:grid;
@@ -168,15 +166,19 @@ cursor:pointer;
 touch-action:manipulation;
 }
 
+.filter-button:active{
+transform:scale(.98);
+}
+
 .filter-button.active{
 background:#4f46e5;
 color:#fff;
 }
 
 
-/* ===================================
+/* ================================
 MISTAKES
-=================================== */
+================================ */
 
 .mistake{
 border:1px solid #e2e8f0;
@@ -240,10 +242,15 @@ padding:13px;
 border:0;
 border-radius:10px;
 background:#4f46e5;
-color:white;
+color:#fff;
 font-weight:700;
+font-size:15px;
 cursor:pointer;
 touch-action:manipulation;
+}
+
+.retry:active{
+transform:scale(.98);
 }
 
 .empty{
@@ -261,8 +268,8 @@ border-radius:10px;
 line-height:1.5;
 }
 
-#mistakeList,
-#masteredList{
+#activeSection,
+#masteredSection{
 scroll-margin-top:20px;
 }
 
@@ -278,7 +285,6 @@ grid-template-columns:1fr;
 }
 
 }
-
 
 </style>
 </head>
@@ -323,14 +329,11 @@ Review your mistakes and understand why they happened.
 </div>
 
 
-<!-- =================================
-MISTAKE OVERVIEW
-================================= -->
+<!-- MISTAKE OVERVIEW -->
 
 <div class="card">
 
 <h2>📊 Mistake Overview</h2>
-
 
 <div class="stats">
 
@@ -340,9 +343,7 @@ type="button"
 class="overview-button selected"
 id="activeOverview">
 
-<strong id="activeCount">
-0
-</strong>
+<strong id="activeCount">0</strong>
 
 <small>
 ❌ Active Mistakes
@@ -356,9 +357,7 @@ type="button"
 class="overview-button"
 id="masteredOverview">
 
-<strong id="masteredCount">
-0
-</strong>
+<strong id="masteredCount">0</strong>
 
 <small>
 🏆 Mastered
@@ -372,9 +371,7 @@ type="button"
 class="overview-button"
 id="conceptOverview">
 
-<strong id="conceptCount">
-0
-</strong>
+<strong id="conceptCount">0</strong>
 
 <small>
 🧠 Concept Gaps
@@ -388,9 +385,7 @@ type="button"
 class="overview-button"
 id="retryOverview">
 
-<strong id="retryCount">
-0
-</strong>
+<strong id="retryCount">0</strong>
 
 <small>
 🔄 Retries
@@ -402,9 +397,7 @@ id="retryOverview">
 </div>
 
 
-<!-- =================================
-FILTER BUTTONS
-================================= -->
+<!-- FILTERS -->
 
 <div class="filter-grid">
 
@@ -467,15 +460,12 @@ id="timeFilter">
 
 </button>
 
-
 </div>
 
 </div>
 
 
-<!-- =================================
-ACTIVE MISTAKES
-================================= -->
+<!-- ACTIVE MISTAKES -->
 
 <div
 class="card"
@@ -490,9 +480,7 @@ id="activeSection">
 </div>
 
 
-<!-- =================================
-MASTERED
-================================= -->
+<!-- MASTERED -->
 
 <div
 class="card"
@@ -508,7 +496,7 @@ id="masteredSection">
 
 <div class="notice">
 
-<strong>Fresh mastery system:</strong>
+<strong>Mastery rule:</strong>
 
 A question becomes mastered only after
 a real retry is answered correctly.
@@ -524,9 +512,9 @@ a real retry is answered correctly.
 <script>
 
 
-/* ===================================
+/* ================================
 DATA
-=================================== */
+================================ */
 
 const MASTERY_KEY="cbtMasteryV2";
 
@@ -539,9 +527,9 @@ let activeMistakes=[];
 let currentFilter="all";
 
 
-/* ===================================
+/* ================================
 LOAD HISTORY
-=================================== */
+================================ */
 
 function loadHistory(){
 
@@ -557,7 +545,7 @@ Array.isArray(data)
 ?data
 :[];
 
-}catch(e){
+}catch(error){
 
 history=[];
 
@@ -566,9 +554,9 @@ history=[];
 }
 
 
-/* ===================================
+/* ================================
 LOAD MASTERY
-=================================== */
+================================ */
 
 function loadMastery(){
 
@@ -584,7 +572,7 @@ Array.isArray(data)
 ?data
 :[];
 
-}catch(e){
+}catch(error){
 
 mastery=[];
 
@@ -593,9 +581,9 @@ mastery=[];
 }
 
 
-/* ===================================
+/* ================================
 NORMALIZE
-=================================== */
+================================ */
 
 function normalize(value){
 
@@ -607,9 +595,9 @@ return String(value||"")
 }
 
 
-/* ===================================
+/* ================================
 MASTERED SET
-=================================== */
+================================ */
 
 function getMasteredSet(){
 
@@ -637,16 +625,17 @@ return set;
 }
 
 
-/* ===================================
+/* ================================
 BUILD ACTIVE MISTAKES
-=================================== */
+================================ */
 
 function buildMistakes(){
 
 const mastered=
 getMasteredSet();
 
-const map=new Map();
+const map=
+new Map();
 
 
 history.forEach(
@@ -704,6 +693,11 @@ key,
 
 question:question,
 
+options:
+Array.isArray(q.options)
+?q.options
+:[],
+
 subject:
 q.subject||
 "Unknown",
@@ -716,9 +710,15 @@ mistakeType:
 q.mistakeType||
 "Not Classified",
 
+selectedIndex:
+q.selectedIndex,
+
 selectedAnswer:
 q.selectedAnswer||
 "Not answered",
+
+correctIndex:
+q.correctIndex,
 
 correctAnswer:
 q.correctAnswer||
@@ -747,130 +747,135 @@ Array.from(map.values());
 }
 
 
-/* ===================================
+/* ================================
 FILTER
-=================================== */
+================================ */
 
 function setFilter(filter){
 
-currentFilter=filter;
+currentFilter=
+filter;
+
 
 document.querySelectorAll(
 ".filter-button"
 ).forEach(
 function(button){
 
-button.classList.remove("active");
-
-}
+button.classList.remove(
+"active"
 );
 
+});
 
-const map={
+
+const ids={
+
 all:"allFilter",
+
 "Concept Gap":"conceptFilter",
-"Calculation Error":"calculationFilter",
-"Misread Question":"misreadFilter",
-"Guessing":"guessingFilter",
-"Time Pressure":"timeFilter"
+
+"Calculation Error":
+"calculationFilter",
+
+"Misread Question":
+"misreadFilter",
+
+"Guessing":
+"guessingFilter",
+
+"Time Pressure":
+"timeFilter"
+
 };
 
 
 const button=
 document.getElementById(
-map[filter]
+ids[filter]
 );
 
 if(button){
 
-button.classList.add("active");
+button.classList.add(
+"active"
+);
 
 }
+
 
 renderMistakes();
 
 }
 
 
-/* ===================================
+/* ================================
 FILTER BUTTONS
-=================================== */
+================================ */
 
 document.getElementById(
 "allFilter"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 setFilter("all");
 
-}
-);
+};
 
 
 document.getElementById(
 "conceptFilter"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 setFilter("Concept Gap");
 
-}
-);
+};
 
 
 document.getElementById(
 "calculationFilter"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 setFilter("Calculation Error");
 
-}
-);
+};
 
 
 document.getElementById(
 "misreadFilter"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 setFilter("Misread Question");
 
-}
-);
+};
 
 
 document.getElementById(
 "guessingFilter"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 setFilter("Guessing");
 
-}
-);
+};
 
 
 document.getElementById(
 "timeFilter"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 setFilter("Time Pressure");
 
-}
-);
+};
 
 
-/* ===================================
-OVERVIEW CARD NAVIGATION
-=================================== */
+/* ================================
+OVERVIEW SELECTION
+================================ */
 
 function clearOverviewSelection(){
 
@@ -879,10 +884,11 @@ document.querySelectorAll(
 ).forEach(
 function(button){
 
-button.classList.remove("selected");
-
-}
+button.classList.remove(
+"selected"
 );
+
+});
 
 }
 
@@ -891,114 +897,154 @@ button.classList.remove("selected");
 
 document.getElementById(
 "activeOverview"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 clearOverviewSelection();
 
-this.classList.add("selected");
+this.classList.add(
+"selected"
+);
 
 setFilter("all");
 
 document.getElementById(
 "activeSection"
 ).scrollIntoView({
+
 behavior:"smooth",
+
 block:"start"
+
 });
 
-}
-);
+};
 
 
 /* MASTERED */
 
 document.getElementById(
 "masteredOverview"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 clearOverviewSelection();
 
-this.classList.add("selected");
+this.classList.add(
+"selected"
+);
 
 document.getElementById(
 "masteredSection"
 ).scrollIntoView({
+
 behavior:"smooth",
+
 block:"start"
+
 });
 
-}
-);
+};
 
 
 /* CONCEPT GAPS */
 
 document.getElementById(
 "conceptOverview"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 clearOverviewSelection();
 
-this.classList.add("selected");
+this.classList.add(
+"selected"
+);
 
 setFilter("Concept Gap");
 
 document.getElementById(
 "activeSection"
 ).scrollIntoView({
+
 behavior:"smooth",
+
 block:"start"
+
 });
 
-}
-);
+};
 
 
 /* RETRIES */
 
 document.getElementById(
 "retryOverview"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 clearOverviewSelection();
 
-this.classList.add("selected");
+this.classList.add(
+"selected"
+);
 
 alert(
-"Retry history: "+
-getRetryCount()+
-" retry attempt(s)."
+"Retry attempts: "+
+getRetryCount()
 );
 
-}
-);
+};
 
 
 /* DASHBOARD */
 
 document.getElementById(
 "dashboardButton"
-).addEventListener(
-"click",
+).onclick=
 function(){
 
 location.href="index.html";
 
-}
+};
+
+
+/* ================================
+REAL RETRY CONNECTION
+================================ */
+
+function startRetry(question){
+
+localStorage.setItem(
+"cbtRetryQuestion",
+JSON.stringify(question)
 );
 
+location.href="retry.html";
 
-/* ===================================
+}
+
+
+/* ================================
+RETRY COUNT
+================================ */
+
+function getRetryCount(){
+
+return mastery.filter(
+function(item){
+
+return item &&
+item.type==="retry";
+
+}
+).length;
+
+}
+
+
+/* ================================
 FILTERED MISTAKES
-=================================== */
+================================ */
 
 function getFilteredMistakes(){
 
@@ -1022,31 +1068,13 @@ currentFilter;
 }
 
 
-/* ===================================
-RETRY COUNT
-=================================== */
-
-function getRetryCount(){
-
-return mastery.filter(
-function(item){
-
-return item &&
-item.type==="retry";
-
-}
-).length;
-
-}
-
-
-/* ===================================
+/* ================================
 COUNTS
-=================================== */
+================================ */
 
 function renderCounts(){
 
-const conceptCount=
+const concept=
 activeMistakes.filter(
 function(item){
 
@@ -1072,7 +1100,7 @@ getMasteredSet().size;
 document.getElementById(
 "conceptCount"
 ).textContent=
-conceptCount;
+concept;
 
 
 document.getElementById(
@@ -1083,9 +1111,9 @@ getRetryCount();
 }
 
 
-/* ===================================
+/* ================================
 RENDER MISTAKES
-=================================== */
+================================ */
 
 function renderMistakes(){
 
@@ -1128,9 +1156,12 @@ list.forEach(
 function(q,index){
 
 const div=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
-div.className="mistake";
+div.className=
+"mistake";
 
 
 div.innerHTML=`
@@ -1204,28 +1235,49 @@ ${escapeHTML(q.solution)}
 
 </div>
 
-
-<button
-type="button"
-class="retry"
-onclick="retryInfo()">
-
-🔄 Retry This Mistake
-
-</button>
-
 `;
 
-box.appendChild(div);
+
+/* REAL RETRY BUTTON */
+
+const retryButton=
+document.createElement(
+"button"
+);
+
+retryButton.type=
+"button";
+
+retryButton.className=
+"retry";
+
+retryButton.textContent=
+"🔄 Retry This Mistake";
+
+retryButton.onclick=
+function(){
+
+startRetry(q);
+
+};
+
+
+div.appendChild(
+retryButton
+);
+
+box.appendChild(
+div
+);
 
 });
 
 }
 
 
-/* ===================================
+/* ================================
 MASTERED
-=================================== */
+================================ */
 
 function renderMastered(){
 
@@ -1257,6 +1309,10 @@ box.innerHTML=`
 
 🏆 No mastered questions yet.
 
+<br><br>
+
+Complete a correct retry to create mastery.
+
 </div>
 
 `;
@@ -1270,9 +1326,12 @@ list.forEach(
 function(item,index){
 
 const div=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
-div.className="mistake";
+div.className=
+"mistake";
 
 
 div.innerHTML=`
@@ -1282,7 +1341,9 @@ div.innerHTML=`
 </h3>
 
 <div class="question">
+
 ${escapeHTML(item.question)}
+
 </div>
 
 <div class="meta">
@@ -1302,22 +1363,9 @@ box.appendChild(div);
 }
 
 
-/* ===================================
-RETRY PLACEHOLDER
-=================================== */
-
-function retryInfo(){
-
-alert(
-"Retry mode will be connected to the CBT retry engine."
-);
-
-}
-
-
-/* ===================================
+/* ================================
 ESCAPE HTML
-=================================== */
+================================ */
 
 function escapeHTML(value){
 
@@ -1331,9 +1379,9 @@ return String(value||"")
 }
 
 
-/* ===================================
+/* ================================
 START
-=================================== */
+================================ */
 
 loadHistory();
 
