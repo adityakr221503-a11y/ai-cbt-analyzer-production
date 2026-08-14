@@ -13,13 +13,13 @@ body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#f1f5f9;
-color:#0f172a;
+color:#0f172a
 }
 
 header{
 background:#fff;
-padding:16px 20px;
 border-bottom:1px solid #e2e8f0;
+padding:16px 20px
 }
 
 .header{
@@ -28,38 +28,52 @@ margin:auto;
 display:flex;
 justify-content:space-between;
 align-items:center;
+gap:10px
 }
 
 .logo{
 font-size:20px;
-font-weight:800;
+font-weight:800
 }
 
 .logo span{
-color:#4f46e5;
+color:#4f46e5
+}
+
+button{
+border:0;
+border-radius:10px;
+padding:11px 15px;
+font-weight:700;
+cursor:pointer
+}
+
+.primary{
+background:#4f46e5;
+color:white
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a
 }
 
 .container{
 max-width:1100px;
 margin:25px auto;
-padding:0 15px;
+padding:0 15px
 }
 
 .hero{
 background:#4f46e5;
-color:#fff;
+color:white;
 padding:25px;
 border-radius:18px;
-margin-bottom:20px;
+margin-bottom:20px
 }
 
 .hero h1{
-margin:0 0 8px;
-}
-
-.hero p{
-margin:0;
-opacity:.9;
+margin:0 0 8px
 }
 
 .card{
@@ -67,124 +81,136 @@ background:#fff;
 border-radius:16px;
 padding:20px;
 margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
+box-shadow:0 3px 14px rgba(0,0,0,.07)
 }
 
 .stats{
 display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:12px;
+grid-template-columns:repeat(4,1fr);
+gap:12px
 }
 
 .stat{
 background:#f8fafc;
-padding:18px;
+padding:17px;
 border-radius:12px;
-text-align:center;
+text-align:center
 }
 
 .stat strong{
 display:block;
 font-size:27px;
-margin-bottom:5px;
+margin-bottom:5px
 }
 
 .stat small{
-color:#64748b;
+color:#64748b
 }
 
-.question{
+.filters{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:15px
+}
+
+.filter{
+background:#e2e8f0
+}
+
+.filter.active{
+background:#4f46e5;
+color:white
+}
+
+.mistake{
 border:1px solid #e2e8f0;
 border-radius:14px;
 padding:18px;
-margin-top:14px;
+margin-top:14px
 }
 
-.question-number{
-font-weight:800;
-color:#4f46e5;
-margin-bottom:10px;
+.mistake h3{
+margin:0 0 10px
 }
 
-.question-text{
-font-size:16px;
+.question{
 font-weight:700;
-line-height:1.5;
+font-size:17px;
+line-height:1.5
+}
+
+.meta{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin:12px 0
+}
+
+.badge{
+display:inline-block;
+padding:6px 9px;
+border-radius:8px;
+font-size:12px;
+font-weight:800;
+background:#eef2ff;
+color:#3730a3
+}
+
+.reason{
+background:#fff7ed;
+border:1px solid #fed7aa;
+padding:12px;
+border-radius:10px;
+margin-top:12px
+}
+
+.reason strong{
+color:#c2410c
+}
+
+.solution{
+background:#f0fdf4;
+border:1px solid #bbf7d0;
+padding:12px;
+border-radius:10px;
+margin-top:10px;
+line-height:1.5
 }
 
 .answer{
-margin-top:10px;
-padding:11px;
-border-radius:8px;
 background:#f8fafc;
-line-height:1.5;
-}
-
-.correct{
-border-left:4px solid #16a34a;
-}
-
-.wrong{
-border-left:4px solid #dc2626;
-}
-
-.retry{
-width:100%;
-background:#16a34a;
-color:#fff;
-font-size:16px;
-padding:15px;
-border:0;
-border-radius:10px;
-font-weight:800;
-cursor:pointer;
-}
-
-.secondary{
-background:#e2e8f0;
-color:#0f172a;
-border:0;
-border-radius:10px;
-padding:11px 15px;
-font-weight:700;
-cursor:pointer;
+padding:10px;
+border-radius:9px;
+margin-top:10px
 }
 
 .empty{
 text-align:center;
-padding:35px 15px;
-color:#64748b;
+padding:40px 15px;
+color:#64748b
 }
 
-.mastered-card{
-border:1px solid #bbf7d0;
-background:#f0fdf4;
-border-radius:14px;
-padding:18px;
+.retry{
 margin-top:14px;
+width:100%
 }
 
-.mastered-title{
-font-weight:800;
-color:#15803d;
-margin-bottom:10px;
+.mastered{
+opacity:.7;
+border-left:5px solid #16a34a
 }
 
-.mastered-question{
-font-weight:700;
-line-height:1.5;
-}
-
-.mastered-info{
-margin-top:10px;
-font-size:14px;
-color:#475569;
+.active{
+border-left:5px solid #dc2626
 }
 
 @media(max-width:700px){
+
 .stats{
-grid-template-columns:1fr;
+grid-template-columns:1fr 1fr
 }
+
 }
 </style>
 </head>
@@ -192,6 +218,7 @@ grid-template-columns:1fr;
 <body>
 
 <header>
+
 <div class="header">
 
 <div class="logo">
@@ -199,14 +226,13 @@ CBT Analyzer <span>Pro</span>
 </div>
 
 <button
-class="secondary"
-onclick="location.href='analysis.html'">
-
-📊 Dashboard
-
+class="primary"
+onclick="location.href='index.html'">
+Dashboard
 </button>
 
 </div>
+
 </header>
 
 
@@ -217,88 +243,132 @@ onclick="location.href='analysis.html'">
 <h1>🧠 Mistake Bank</h1>
 
 <p>
-Turn every mistake into mastery.
+Review mistakes, understand the reason, and convert mistakes into mastery.
 </p>
 
 </div>
 
 
-<!-- SUMMARY -->
-
 <div class="card">
 
-<h2>📊 Mistake Summary</h2>
+<h2>📊 Mistake Overview</h2>
 
 <div class="stats">
 
 <div class="stat">
-<strong id="totalMistakes">0</strong>
+<strong id="activeCount">0</strong>
 <small>Active Mistakes</small>
 </div>
 
 <div class="stat">
-<strong id="retryCount">0</strong>
-<small>Ready to Retry</small>
-</div>
-
-<div class="stat">
-<strong id="mastered">0</strong>
+<strong id="masteredCount">0</strong>
 <small>Mastered</small>
 </div>
 
+<div class="stat">
+<strong id="conceptCount">0</strong>
+<small>Concept Gaps</small>
 </div>
 
-<br>
+<div class="stat">
+<strong id="retryCount">0</strong>
+<small>Retries</small>
+</div>
+
+</div>
+
+
+<div class="filters">
 
 <button
-class="retry"
-onclick="startRetry()">
+class="filter active"
+id="allFilter"
+onclick="setFilter('all')">
+All
+</button>
 
-🔄 Retry Mistakes
+<button
+class="filter"
+id="conceptFilter"
+onclick="setFilter('Concept Gap')">
+🧠 Concept Gap
+</button>
 
+<button
+class="filter"
+id="calcFilter"
+onclick="setFilter('Calculation Error')">
+🧮 Calculation Error
+</button>
+
+<button
+class="filter"
+id="misreadFilter"
+onclick="setFilter('Misread Question')">
+👀 Misread
+</button>
+
+<button
+class="filter"
+id="guessFilter"
+onclick="setFilter('Guessing')">
+🎲 Guessing
+</button>
+
+<button
+class="filter"
+id="timeFilter"
+onclick="setFilter('Time Pressure')">
+⏱️ Time Pressure
 </button>
 
 </div>
 
+</div>
 
-<!-- ACTIVE MISTAKES -->
 
 <div class="card">
 
 <h2>❌ Active Mistakes</h2>
 
-<div id="mistakes"></div>
+<div id="mistakeList"></div>
 
 </div>
 
-
-<!-- MASTERED QUESTIONS -->
 
 <div class="card">
 
 <h2>🏆 Mastered Questions</h2>
 
-<p style="color:#64748b;">
-Questions you answered correctly during retry.
-</p>
-
-<div id="masteredQuestions"></div>
+<div id="masteredList"></div>
 
 </div>
-
 
 </div>
 
 
 <script>
 
-/* =================================
-LOAD DATA
-================================= */
+/* =========================
+DATA
+========================= */
 
 let history=[];
-let masteredIds=[];
 
+let retryHistory=[];
+
+let mastered=[];
+
+let activeMistakes=[];
+
+let currentFilter="all";
+
+
+/* =========================
+LOAD
+========================= */
+
+function loadData(){
 
 try{
 
@@ -320,36 +390,51 @@ history=[];
 
 try{
 
-masteredIds=
+retryHistory=
 JSON.parse(
-localStorage.getItem(
-"cbtMasteredQuestions"
-) || "[]"
+localStorage.getItem("retryHistory") || "[]"
 );
 
-if(!Array.isArray(masteredIds)){
-masteredIds=[];
+if(!Array.isArray(retryHistory)){
+retryHistory=[];
 }
 
 }catch(e){
 
-masteredIds=[];
+retryHistory=[];
 
 }
 
 
-/* =================================
-QUESTION ID
-================================= */
+try{
 
-function getQuestionId(q){
+mastered=
+JSON.parse(
+localStorage.getItem("cbtMasteredQuestions") || "[]"
+);
 
-return String(
-q.question ||
-q.text ||
-q.questionText ||
-""
-)
+if(!Array.isArray(mastered)){
+mastered=[];
+}
+
+}catch(e){
+
+mastered=[];
+
+}
+
+buildMistakes();
+
+}
+
+
+/* =========================
+NORMALIZE
+========================= */
+
+function normalize(text){
+
+return String(text||"")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -357,13 +442,63 @@ q.questionText ||
 }
 
 
-/* =================================
-ALL WRONG QUESTIONS
-================================= */
+/* =========================
+MASTERED TEXTS
+========================= */
 
-function getAllMistakes(){
+function getMasteredTexts(){
 
 const result=[];
+
+mastered.forEach(function(item){
+
+if(typeof item==="string"){
+
+result.push(
+normalize(item)
+);
+
+}
+else if(item && typeof item==="object"){
+
+const text=
+item.question ||
+item.text ||
+item.questionText;
+
+if(text){
+
+result.push(
+normalize(text)
+);
+
+}
+
+}
+
+});
+
+return [
+...new Set(
+result.filter(Boolean)
+)
+];
+
+}
+
+
+/* =========================
+BUILD MISTAKES
+========================= */
+
+function buildMistakes(){
+
+const masteredTexts=
+getMasteredTexts();
+
+const map=
+new Map();
+
 
 history.forEach(function(test){
 
@@ -373,79 +508,384 @@ return;
 
 test.questions.forEach(function(q){
 
-if(q.status==="wrong"){
-
-result.push(q);
-
+if(q.status!=="wrong"){
+return;
 }
+
+const text=
+q.question ||
+q.text ||
+q.questionText;
+
+if(!text){
+return;
+}
+
+const key=normalize(text);
+
+if(masteredTexts.includes(key)){
+return;
+}
+
+
+/*
+Keep the newest record of the
+same question so the latest
+mistake reason is displayed.
+*/
+
+map.set(key,{
+
+...q,
+
+question:text,
+
+mistakeType:
+q.mistakeType ||
+"Not Classified",
+
+mistakeReason:
+q.mistakeReason ||
+"Student has not selected a mistake reason yet."
 
 });
 
 });
 
-return result;
+});
+
+
+activeMistakes=
+Array.from(map.values());
+
+render();
 
 }
 
 
-/* =================================
-ACTIVE MISTAKES
-================================= */
+/* =========================
+FILTER
+========================= */
 
-function getActiveMistakes(){
+function setFilter(filter){
 
-return getAllMistakes().filter(
-function(q){
+currentFilter=filter;
 
-const id=
-getQuestionId(q);
+document.querySelectorAll(
+".filter"
+).forEach(function(button){
 
-return !masteredIds.includes(id);
+button.classList.remove("active");
+
+});
+
+
+const ids={
+"all":"allFilter",
+"Concept Gap":"conceptFilter",
+"Calculation Error":"calcFilter",
+"Misread Question":"misreadFilter",
+"Guessing":"guessFilter",
+"Time Pressure":"timeFilter"
+};
+
+
+if(ids[filter]){
+
+document.getElementById(
+ids[filter]
+).classList.add("active");
+
+}
+
+render();
+
+}
+
+
+/* =========================
+FILTERED
+========================= */
+
+function getFilteredMistakes(){
+
+if(currentFilter==="all"){
+
+return activeMistakes;
+
+}
+
+return activeMistakes.filter(
+function(item){
+
+return item.mistakeType===currentFilter;
 
 });
 
 }
 
 
-/* =================================
-MASTERED QUESTIONS
-================================= */
+/* =========================
+RENDER
+========================= */
 
-function getMasteredQuestions(){
+function render(){
 
-const result=[];
-const seen=new Set();
+const filtered=
+getFilteredMistakes();
 
-getAllMistakes().forEach(function(q){
+const list=
+document.getElementById(
+"mistakeList"
+);
 
-const id=
-getQuestionId(q);
+list.innerHTML="";
 
-if(
-masteredIds.includes(id) &&
-!seen.has(id)
-){
 
-seen.add(id);
-result.push(q);
+const conceptCount=
+activeMistakes.filter(
+q=>q.mistakeType==="Concept Gap"
+).length;
+
+document.getElementById(
+"activeCount"
+).textContent=
+activeMistakes.length;
+
+document.getElementById(
+"masteredCount"
+).textContent=
+getMasteredTexts().length;
+
+document.getElementById(
+"conceptCount"
+).textContent=
+conceptCount;
+
+document.getElementById(
+"retryCount"
+).textContent=
+retryHistory.length;
+
+
+if(filtered.length===0){
+
+list.innerHTML=`
+
+<div class="empty">
+
+${
+currentFilter==="all"
+?
+"No active mistakes. Complete a CBT to build your Mistake Bank."
+:
+"No active mistakes in the “"+currentFilter+"” category."
+}
+
+</div>
+
+`;
 
 }
+else{
+
+filtered.forEach(function(q,index){
+
+const div=
+document.createElement("div");
+
+div.className="mistake active";
+
+div.innerHTML=`
+
+<h3>
+❌ Question ${index+1}
+</h3>
+
+<div class="question">
+${escapeHTML(q.question)}
+</div>
+
+<div class="meta">
+
+<span class="badge">
+${escapeHTML(q.subject||"")}
+</span>
+
+<span class="badge">
+${escapeHTML(q.topic||"")}
+</span>
+
+<span class="badge">
+${escapeHTML(q.mistakeType||"Not Classified")}
+</span>
+
+</div>
+
+
+<div class="answer">
+
+<strong>
+Your answer:
+</strong>
+
+${escapeHTML(
+q.selectedAnswer || "Not answered"
+)}
+
+<br><br>
+
+<strong>
+Correct answer:
+</strong>
+
+${escapeHTML(
+q.correctAnswer || ""
+)}
+
+</div>
+
+
+<div class="reason">
+
+<strong>
+🧠 Mistake Reason
+</strong>
+
+<br><br>
+
+${escapeHTML(
+q.mistakeReason ||
+"Student has not selected a mistake reason yet."
+)}
+
+</div>
+
+
+<div class="solution">
+
+<strong>
+💡 Solution
+</strong>
+
+<br><br>
+
+${escapeHTML(
+q.solution || "Solution unavailable."
+)}
+
+</div>
+
+
+<button
+class="primary retry"
+onclick="alert('Retry system will be connected next.')">
+
+🔄 Retry This Mistake
+
+</button>
+
+`;
+
+list.appendChild(div);
 
 });
 
-return result;
+}
+
+
+renderMastered();
 
 }
 
 
-/* =================================
+/* =========================
+MASTERED
+========================= */
+
+function renderMastered(){
+
+const box=
+document.getElementById(
+"masteredList"
+);
+
+box.innerHTML="";
+
+
+if(mastered.length===0){
+
+box.innerHTML=`
+
+<div class="empty">
+No mastered questions yet.
+<br>
+Retry your active mistakes to build mastery.
+</div>
+
+`;
+
+return;
+
+}
+
+
+mastered.forEach(function(item,index){
+
+const question=
+typeof item==="string"
+?
+item
+:
+(
+item.question ||
+item.text ||
+item.questionText ||
+""
+);
+
+
+const div=
+document.createElement("div");
+
+div.className=
+"mistake mastered";
+
+
+div.innerHTML=`
+
+<h3>
+🏆 Mastered #${index+1}
+</h3>
+
+<div class="question">
+${escapeHTML(question)}
+</div>
+
+<div class="meta">
+
+<span class="badge">
+Mastered
+</span>
+
+</div>
+
+`;
+
+box.appendChild(div);
+
+});
+
+}
+
+
+/* =========================
 ESCAPE
-================================= */
+========================= */
 
 function escapeHTML(value){
 
-return String(value)
-
+return String(value||"")
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -455,279 +895,11 @@ return String(value)
 }
 
 
-/* =================================
-RENDER ACTIVE
-================================= */
-
-function renderActive(){
-
-const active=
-getActiveMistakes();
-
-const box=
-document.getElementById("mistakes");
-
-box.innerHTML="";
-
-document.getElementById(
-"totalMistakes"
-).textContent=
-active.length;
-
-document.getElementById(
-"retryCount"
-).textContent=
-active.length;
-
-
-if(active.length===0){
-
-box.innerHTML=
-`
-<div class="empty">
-
-🎉 <strong>No active mistakes!</strong>
-
-<br><br>
-
-All currently tracked mistakes have been mastered.
-
-</div>
-`;
-
-return;
-
-}
-
-
-active.forEach(function(q,index){
-
-const question=
-q.question ||
-q.text ||
-q.questionText ||
-"Question unavailable";
-
-const yourAnswer=
-q.selectedAnswer ??
-q.userAnswer ??
-"Not recorded";
-
-const correctAnswer=
-q.correctAnswer ??
-q.correctOption ??
-q.correct ??
-"Not recorded";
-
-const reason=
-q.mistakeReason ||
-q.reason ||
-"Review why the original answer was incorrect.";
-
-const solution=
-q.solution ||
-q.explanation ||
-"No solution recorded.";
-
-const div=
-document.createElement("div");
-
-div.className="question";
-
-div.innerHTML=
-`
-<div class="question-number">
-Mistake #${index+1}
-</div>
-
-<div class="question-text">
-${escapeHTML(question)}
-</div>
-
-<div class="answer wrong">
-<strong>❌ Your Answer</strong><br>
-${escapeHTML(yourAnswer)}
-</div>
-
-<div class="answer correct">
-<strong>✅ Correct Answer</strong><br>
-${escapeHTML(correctAnswer)}
-</div>
-
-<div class="answer">
-<strong>🧠 Mistake Reason</strong><br>
-${escapeHTML(reason)}
-</div>
-
-<div class="answer">
-<strong>💡 Solution</strong><br>
-${escapeHTML(solution)}
-</div>
-`;
-
-box.appendChild(div);
-
-});
-
-}
-
-
-/* =================================
-RENDER MASTERED
-================================= */
-
-function renderMastered(){
-
-const mastered=
-getMasteredQuestions();
-
-const box=
-document.getElementById(
-"masteredQuestions"
-);
-
-box.innerHTML="";
-
-document.getElementById(
-"mastered"
-).textContent=
-mastered.length;
-
-
-if(mastered.length===0){
-
-box.innerHTML=
-`
-<div class="empty">
-
-🏆 No mastered questions yet.
-
-<br><br>
-
-Retry your active mistakes and answer them correctly.
-
-</div>
-`;
-
-return;
-
-}
-
-
-mastered.forEach(function(q,index){
-
-const question=
-q.question ||
-q.text ||
-q.questionText ||
-"Question unavailable";
-
-const correctAnswer=
-q.correctAnswer ??
-q.correctOption ??
-q.correct ??
-"Not recorded";
-
-const div=
-document.createElement("div");
-
-div.className="mastered-card";
-
-div.innerHTML=
-`
-<div class="mastered-title">
-🏆 Mastered Question #${index+1}
-</div>
-
-<div class="mastered-question">
-${escapeHTML(question)}
-</div>
-
-<div class="answer correct">
-
-<strong>✅ Correct Answer</strong><br>
-
-${escapeHTML(correctAnswer)}
-
-</div>
-
-<div class="mastered-info">
-
-🎯 Status: <strong>Mastered</strong><br>
-
-This question was answered correctly during retry
-and has been removed from the active mistake queue.
-
-</div>
-`;
-
-box.appendChild(div);
-
-});
-
-}
-
-
-/* =================================
-START RETRY
-================================= */
-
-function startRetry(){
-
-const active=
-getActiveMistakes();
-
-if(active.length===0){
-
-alert(
-"No active mistakes are available for retry."
-);
-
-return;
-
-}
-
-
-const retryQuestions=
-active.map(function(q){
-
-return{
-
-...q,
-
-retryQuestionId:
-getQuestionId(q)
-
-};
-
-});
-
-
-localStorage.setItem(
-"cbtRetryQuestions",
-JSON.stringify(
-retryQuestions
-)
-);
-
-localStorage.setItem(
-"cbtRetryMode",
-"true"
-);
-
-window.location.href=
-"retry.html";
-
-}
-
-
-/* =================================
+/* =========================
 START
-================================= */
+========================= */
 
-renderActive();
-
-renderMastered();
+loadData();
 
 </script>
 
