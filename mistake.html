@@ -53,11 +53,6 @@ background:#4f46e5;
 color:white
 }
 
-.secondary{
-background:#e2e8f0;
-color:#0f172a
-}
-
 .container{
 max-width:1100px;
 margin:25px auto;
@@ -197,12 +192,20 @@ width:100%
 }
 
 .mastered{
-opacity:.7;
 border-left:5px solid #16a34a
 }
 
 .active{
 border-left:5px solid #dc2626
+}
+
+.notice{
+background:#eff6ff;
+border:1px solid #bfdbfe;
+padding:12px;
+border-radius:10px;
+margin-top:15px;
+line-height:1.5
 }
 
 @media(max-width:700px){
@@ -243,7 +246,8 @@ Dashboard
 <h1>🧠 Mistake Bank</h1>
 
 <p>
-Review mistakes, understand the reason, and convert mistakes into mastery.
+Review mistakes, understand why they happened,
+and convert them into mastery.
 </p>
 
 </div>
@@ -340,7 +344,18 @@ onclick="setFilter('Time Pressure')">
 
 <h2>🏆 Mastered Questions</h2>
 
-<div id="masteredList"></div>
+<div
+id="masteredList">
+</div>
+
+<div class="notice">
+
+<strong>Mastery rule:</strong>
+A question is shown as mastered only after a
+successful retry is recorded. Old mastery data
+from previous versions is ignored.
+
+</div>
 
 </div>
 
@@ -349,24 +364,24 @@ onclick="setFilter('Time Pressure')">
 
 <script>
 
-/* =========================
-DATA
-========================= */
+/* =====================================
+STATE
+===================================== */
 
 let history=[];
 
 let retryHistory=[];
 
-let mastered=[];
-
 let activeMistakes=[];
+
+let verifiedMastered=[];
 
 let currentFilter="all";
 
 
-/* =========================
-LOAD
-========================= */
+/* =====================================
+LOAD HISTORY
+===================================== */
 
 function loadData(){
 
@@ -406,31 +421,28 @@ retryHistory=[];
 }
 
 
-try{
+/*
+IMPORTANT:
 
-mastered=
-JSON.parse(
-localStorage.getItem("cbtMasteredQuestions") || "[]"
-);
+Do NOT read the old
+cbtMasteredQuestions array.
 
-if(!Array.isArray(mastered)){
-mastered=[];
-}
+That old data is the source of
+the incorrect "all mastered" problem.
+*/
 
-}catch(e){
+verifiedMastered=
+getVerifiedMastered();
 
-mastered=[];
-
-}
 
 buildMistakes();
 
 }
 
 
-/* =========================
+/* =====================================
 NORMALIZE
-========================= */
+===================================== */
 
 function normalize(text){
 
@@ -442,102 +454,203 @@ return String(text||"")
 }
 
 
-/* =========================
-MASTERED TEXTS
-========================= */
+/* =====================================
+GET VERIFIED MASTERY
+===================================== */
 
-function getMasteredTexts(){
+function getVerifiedMastered(){
 
 const result=[];
 
-mastered.forEach(function(item){
 
-if(typeof item==="string"){
+/*
+Only retryHistory can create
+verified mastery.
 
-result.push(
-normalize(item)
-);
+Supported formats:
 
+retry.masteredQuestions
+retry.mastered
+*/
+
+retryHistory.forEach(function(retry){
+
+if(!retry || typeof retry!=="object"){
+return;
 }
-else if(item && typeof item==="object"){
+
+
+/* --------------------------------
+Format 1:
+masteredQuestions array
+-------------------------------- */
+
+if(Array.isArray(retry.masteredQuestions)){
+
+retry.masteredQuestions.forEach(
+function(item){
 
 const text=
+typeof item==="string"
+?
+item
+:
+(
+item &&
+(
 item.question ||
 item.text ||
-item.questionText;
+item.questionText
+)
+);
 
 if(text){
 
-result.push(
-normalize(text)
-);
-
-}
+result.push({
+question:normalize(text),
+original:text
+});
 
 }
 
 });
 
-return [
-...new Set(
-result.filter(Boolean)
+}
+
+
+/* --------------------------------
+Format 2:
+mastered array
+-------------------------------- */
+
+if(Array.isArray(retry.mastered)){
+
+retry.mastered.forEach(
+function(item){
+
+const text=
+typeof item==="string"
+?
+item
+:
+(
+item &&
+(
+item.question ||
+item.text ||
+item.questionText
 )
-];
+);
+
+if(text){
+
+result.push({
+question:normalize(text),
+original:text
+});
+
+}
+
+});
+
+}
+
+});
+
+
+/*
+Remove duplicates.
+*/
+
+const map=new Map();
+
+result.forEach(function(item){
+
+if(item.question){
+
+map.set(
+item.question,
+item
+);
+
+}
+
+});
+
+
+return Array.from(
+map.values()
+);
 
 }
 
 
-/* =========================
-BUILD MISTAKES
-========================= */
+/* =====================================
+BUILD ACTIVE MISTAKES
+===================================== */
 
 function buildMistakes(){
 
-const masteredTexts=
-getMasteredTexts();
+const masteredSet=
+new Set(
+verifiedMastered.map(
+item=>item.question
+)
+);
 
-const map=
-new Map();
+const map=new Map();
 
 
 history.forEach(function(test){
 
-if(!Array.isArray(test.questions)){
+if(!test ||
+!Array.isArray(test.questions)){
 return;
 }
+
 
 test.questions.forEach(function(q){
 
-if(q.status!=="wrong"){
+if(!q ||
+q.status!=="wrong"){
 return;
 }
+
 
 const text=
 q.question ||
 q.text ||
 q.questionText;
 
+
 if(!text){
 return;
 }
 
-const key=normalize(text);
 
-if(masteredTexts.includes(key)){
+const key=
+normalize(text);
+
+
+/*
+If a verified retry has mastered
+this question, don't show it
+as active.
+*/
+
+if(masteredSet.has(key)){
 return;
 }
 
 
 /*
-Keep the newest record of the
-same question so the latest
-mistake reason is displayed.
+Newest CBT result wins.
 */
 
-map.set(key,{
-
+map.set(
+key,
+{
 ...q,
-
 question:text,
 
 mistakeType:
@@ -548,7 +661,8 @@ mistakeReason:
 q.mistakeReason ||
 "Student has not selected a mistake reason yet."
 
-});
+}
+);
 
 });
 
@@ -556,37 +670,55 @@ q.mistakeReason ||
 
 
 activeMistakes=
-Array.from(map.values());
+Array.from(
+map.values()
+);
+
 
 render();
 
 }
 
 
-/* =========================
+/* =====================================
 FILTER
-========================= */
+===================================== */
 
 function setFilter(filter){
 
 currentFilter=filter;
 
+
 document.querySelectorAll(
 ".filter"
 ).forEach(function(button){
 
-button.classList.remove("active");
+button.classList.remove(
+"active"
+);
 
 });
 
 
 const ids={
+
 "all":"allFilter",
-"Concept Gap":"conceptFilter",
-"Calculation Error":"calcFilter",
-"Misread Question":"misreadFilter",
-"Guessing":"guessFilter",
-"Time Pressure":"timeFilter"
+
+"Concept Gap":
+"conceptFilter",
+
+"Calculation Error":
+"calcFilter",
+
+"Misread Question":
+"misreadFilter",
+
+"Guessing":
+"guessFilter",
+
+"Time Pressure":
+"timeFilter"
+
 };
 
 
@@ -594,18 +726,21 @@ if(ids[filter]){
 
 document.getElementById(
 ids[filter]
-).classList.add("active");
+).classList.add(
+"active"
+);
 
 }
+
 
 render();
 
 }
 
 
-/* =========================
-FILTERED
-========================= */
+/* =====================================
+FILTERED MISTAKES
+===================================== */
 
 function getFilteredMistakes(){
 
@@ -615,24 +750,27 @@ return activeMistakes;
 
 }
 
+
 return activeMistakes.filter(
 function(item){
 
-return item.mistakeType===currentFilter;
+return item.mistakeType===
+currentFilter;
 
 });
 
 }
 
 
-/* =========================
+/* =====================================
 RENDER
-========================= */
+===================================== */
 
 function render(){
 
 const filtered=
 getFilteredMistakes();
+
 
 const list=
 document.getElementById(
@@ -644,23 +782,32 @@ list.innerHTML="";
 
 const conceptCount=
 activeMistakes.filter(
-q=>q.mistakeType==="Concept Gap"
+function(q){
+
+return q.mistakeType===
+"Concept Gap";
+
+}
 ).length;
+
 
 document.getElementById(
 "activeCount"
 ).textContent=
 activeMistakes.length;
 
+
 document.getElementById(
 "masteredCount"
 ).textContent=
-getMasteredTexts().length;
+verifiedMastered.length;
+
 
 document.getElementById(
 "conceptCount"
 ).textContent=
 conceptCount;
+
 
 document.getElementById(
 "retryCount"
@@ -677,9 +824,9 @@ list.innerHTML=`
 ${
 currentFilter==="all"
 ?
-"No active mistakes. Complete a CBT to build your Mistake Bank."
+"No active mistakes yet. Complete a CBT and submit a wrong answer."
 :
-"No active mistakes in the “"+currentFilter+"” category."
+"No active mistakes in the selected category."
 }
 
 </div>
@@ -689,35 +836,58 @@ currentFilter==="all"
 }
 else{
 
-filtered.forEach(function(q,index){
+filtered.forEach(
+function(q,index){
 
 const div=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
-div.className="mistake active";
+div.className=
+"mistake active";
+
 
 div.innerHTML=`
 
 <h3>
-❌ Question ${index+1}
+❌ Mistake ${index+1}
 </h3>
 
 <div class="question">
-${escapeHTML(q.question)}
+
+${escapeHTML(
+q.question
+)}
+
 </div>
+
 
 <div class="meta">
 
 <span class="badge">
-${escapeHTML(q.subject||"")}
+
+${escapeHTML(
+q.subject || "Subject"
+)}
+
 </span>
 
 <span class="badge">
-${escapeHTML(q.topic||"")}
+
+${escapeHTML(
+q.topic || "Topic"
+)}
+
 </span>
 
 <span class="badge">
-${escapeHTML(q.mistakeType||"Not Classified")}
+
+${escapeHTML(
+q.mistakeType ||
+"Not Classified"
+)}
+
 </span>
 
 </div>
@@ -729,8 +899,11 @@ ${escapeHTML(q.mistakeType||"Not Classified")}
 Your answer:
 </strong>
 
+<br>
+
 ${escapeHTML(
-q.selectedAnswer || "Not answered"
+q.selectedAnswer ||
+"Not answered"
 )}
 
 <br><br>
@@ -739,8 +912,11 @@ q.selectedAnswer || "Not answered"
 Correct answer:
 </strong>
 
+<br>
+
 ${escapeHTML(
-q.correctAnswer || ""
+q.correctAnswer ||
+""
 )}
 
 </div>
@@ -771,7 +947,8 @@ q.mistakeReason ||
 <br><br>
 
 ${escapeHTML(
-q.solution || "Solution unavailable."
+q.solution ||
+"Solution unavailable."
 )}
 
 </div>
@@ -779,13 +956,14 @@ q.solution || "Solution unavailable."
 
 <button
 class="primary retry"
-onclick="alert('Retry system will be connected next.')">
+onclick="showRetryMessage()">
 
 🔄 Retry This Mistake
 
 </button>
 
 `;
+
 
 list.appendChild(div);
 
@@ -799,9 +977,9 @@ renderMastered();
 }
 
 
-/* =========================
+/* =====================================
 MASTERED
-========================= */
+===================================== */
 
 function renderMastered(){
 
@@ -813,14 +991,19 @@ document.getElementById(
 box.innerHTML="";
 
 
-if(mastered.length===0){
+if(verifiedMastered.length===0){
 
 box.innerHTML=`
 
 <div class="empty">
-No mastered questions yet.
-<br>
-Retry your active mistakes to build mastery.
+
+No questions are mastered yet.
+
+<br><br>
+
+Complete a retry and answer the
+mistake correctly to create mastery.
+
 </div>
 
 `;
@@ -830,23 +1013,13 @@ return;
 }
 
 
-mastered.forEach(function(item,index){
-
-const question=
-typeof item==="string"
-?
-item
-:
-(
-item.question ||
-item.text ||
-item.questionText ||
-""
-);
-
+verifiedMastered.forEach(
+function(item,index){
 
 const div=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 div.className=
 "mistake mastered";
@@ -859,13 +1032,17 @@ div.innerHTML=`
 </h3>
 
 <div class="question">
-${escapeHTML(question)}
+
+${escapeHTML(
+item.original
+)}
+
 </div>
 
 <div class="meta">
 
 <span class="badge">
-Mastered
+🏆 Mastered
 </span>
 
 </div>
@@ -879,9 +1056,22 @@ box.appendChild(div);
 }
 
 
-/* =========================
-ESCAPE
-========================= */
+/* =====================================
+RETRY PLACEHOLDER
+===================================== */
+
+function showRetryMessage(){
+
+alert(
+"Retry engine is ready to be connected. The next step is to make Retry Mistakes create a real retry session and mark questions mastered only after a correct retry."
+);
+
+}
+
+
+/* =====================================
+ESCAPE HTML
+===================================== */
 
 function escapeHTML(value){
 
@@ -895,9 +1085,9 @@ return String(value||"")
 }
 
 
-/* =========================
+/* =====================================
 START
-========================= */
+===================================== */
 
 loadData();
 
