@@ -187,21 +187,52 @@ border-radius:8px;
 font-weight:700
 }
 
-.reason-badge{
-display:inline-block;
-margin-top:8px;
-padding:6px 10px;
-border-radius:8px;
-background:#ede9fe;
-color:#4c1d95;
-font-weight:700;
-font-size:13px
+.reason-title{
+font-weight:800;
+margin-top:15px;
+margin-bottom:8px
+}
+
+.reason-options{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin-top:8px
+}
+
+.reason-button{
+background:#fff;
+border:2px solid #e2e8f0;
+color:#0f172a;
+text-align:left;
+padding:11px;
+border-radius:9px;
+font-size:14px
+}
+
+.reason-button.selected-reason{
+border-color:#4f46e5;
+background:#eef2ff;
+color:#3730a3;
+font-weight:800
+}
+
+.reason-status{
+font-size:13px;
+color:#64748b;
+margin-top:8px
 }
 
 @media(max-width:800px){
+
 .container{
 grid-template-columns:1fr
 }
+
+.reason-options{
+grid-template-columns:1fr
+}
+
 }
 </style>
 </head>
@@ -296,9 +327,7 @@ id="score">
 <button
 class="primary"
 onclick="location.href='mistake.html'">
-
 Open Mistake Bank
-
 </button>
 
 </section>
@@ -328,9 +357,7 @@ id="palette">
 class="danger"
 style="width:100%;margin-top:20px"
 onclick="submitTest()">
-
 Submit Test
-
 </button>
 
 </aside>
@@ -349,250 +376,111 @@ const questions=[
 {
 subject:"Physics",
 topic:"Basic Physics",
-
 question:"Which planet is known as the Red Planet?",
-
-options:[
-"Earth",
-"Mars",
-"Jupiter",
-"Venus"
-],
-
+options:["Earth","Mars","Jupiter","Venus"],
 answer:1,
-
-mistakeType:"Concept Gap",
-
-solution:
-"Mars appears reddish because iron minerals in its surface have oxidized.",
-
-mistakeReason:
-"Concept Gap — Review the basic identification and characteristics of planets."
+solution:"Mars appears reddish because iron minerals in its surface have oxidized.",
+mistakeReason:"Review the basic identification and characteristics of planets.",
+mistakeType:"Concept Gap"
 },
-
 
 {
 subject:"Physics",
 topic:"Basic Mathematics",
-
 question:"What is 2 + 2?",
-
-options:[
-"3",
-"4",
-"5",
-"6"
-],
-
+options:["3","4","5","6"],
 answer:1,
-
-mistakeType:"Calculation Error",
-
-solution:
-"Adding 2 and 2 gives 4.",
-
-mistakeReason:
-"Calculation Error — Recheck the basic arithmetic operation."
+solution:"Adding 2 and 2 gives 4.",
+mistakeReason:"Recheck the basic arithmetic operation.",
+mistakeType:"Calculation Error"
 },
-
 
 {
 subject:"Biology",
 topic:"Environment",
-
 question:"Which gas is most abundant in Earth's atmosphere?",
-
-options:[
-"Oxygen",
-"Carbon dioxide",
-"Nitrogen",
-"Hydrogen"
-],
-
+options:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],
 answer:2,
-
-mistakeType:"Concept Gap",
-
-solution:
-"Nitrogen makes up approximately 78% of Earth's atmosphere.",
-
-mistakeReason:
-"Concept Gap — Revise the approximate composition of Earth's atmosphere."
+solution:"Nitrogen makes up approximately 78% of Earth's atmosphere.",
+mistakeReason:"Revise the approximate composition of Earth's atmosphere.",
+mistakeType:"Concept Gap"
 },
-
 
 {
 subject:"Physics",
 topic:"Units",
-
 question:"What is the SI unit of force?",
-
-options:[
-"Joule",
-"Newton",
-"Watt",
-"Pascal"
-],
-
+options:["Joule","Newton","Watt","Pascal"],
 answer:1,
-
-mistakeType:"Misread Question",
-
-solution:
-"The SI unit of force is the newton (N).",
-
-mistakeReason:
-"Misread Question — Carefully distinguish force from energy, power and pressure units."
+solution:"The SI unit of force is the newton (N).",
+mistakeReason:"Carefully distinguish force from energy, power and pressure units.",
+mistakeType:"Misread Question"
 },
-
 
 {
 subject:"Biology",
 topic:"Cell Biology",
-
 question:"Which organelle is known as the powerhouse of the cell?",
-
-options:[
-"Nucleus",
-"Ribosome",
-"Mitochondria",
-"Golgi apparatus"
-],
-
+options:["Nucleus","Ribosome","Mitochondria","Golgi apparatus"],
 answer:2,
-
-mistakeType:"Concept Gap",
-
-solution:
-"Mitochondria are major sites of aerobic cellular respiration and ATP production.",
-
-mistakeReason:
-"Concept Gap — Revise the functions of major cell organelles."
+solution:"Mitochondria are major sites of aerobic cellular respiration and ATP production.",
+mistakeReason:"Revise the functions of major cell organelles.",
+mistakeType:"Concept Gap"
 },
-
 
 {
 subject:"Chemistry",
 topic:"Periodic Table",
-
 question:"What is the chemical symbol for sodium?",
-
-options:[
-"So",
-"Na",
-"S",
-"Sd"
-],
-
+options:["So","Na","S","Sd"],
 answer:1,
-
-mistakeType:"Concept Gap",
-
-solution:
-"The chemical symbol of sodium is Na, derived from its Latin name natrium.",
-
-mistakeReason:
-"Concept Gap — Revise symbols of common elements."
+solution:"The chemical symbol of sodium is Na, derived from its Latin name natrium.",
+mistakeReason:"Revise symbols of common elements.",
+mistakeType:"Concept Gap"
 },
-
 
 {
 subject:"Biology",
 topic:"Cellular Respiration",
-
 question:"Which process produces ATP in mitochondria?",
-
-options:[
-"Photosynthesis",
-"Cellular respiration",
-"Transcription",
-"Translation"
-],
-
+options:["Photosynthesis","Cellular respiration","Transcription","Translation"],
 answer:1,
-
-mistakeType:"Misread Question",
-
-solution:
-"Cellular respiration in mitochondria generates ATP through oxidative phosphorylation and related processes.",
-
-mistakeReason:
-"Misread Question — Differentiate cellular respiration from other cellular processes."
+solution:"Cellular respiration in mitochondria generates ATP through oxidative phosphorylation and related processes.",
+mistakeReason:"Differentiate cellular respiration from other cellular processes.",
+mistakeType:"Misread Question"
 },
-
 
 {
 subject:"Physics",
 topic:"Gravitation",
-
 question:"What is the approximate acceleration due to gravity near Earth's surface?",
-
-options:[
-"4.9 m/s²",
-"9.8 m/s²",
-"19.6 m/s²",
-"98 m/s²"
-],
-
+options:["4.9 m/s²","9.8 m/s²","19.6 m/s²","98 m/s²"],
 answer:1,
-
-mistakeType:"Calculation Error",
-
-solution:
-"The standard approximate value of gravitational acceleration near Earth's surface is 9.8 m/s².",
-
-mistakeReason:
-"Calculation Error — Revise standard physical constants and check numerical values carefully."
+solution:"The standard approximate value of gravitational acceleration near Earth's surface is 9.8 m/s².",
+mistakeReason:"Revise standard physical constants and check numerical values carefully.",
+mistakeType:"Calculation Error"
 },
-
 
 {
 subject:"Biology",
 topic:"Genetics",
-
 question:"Which molecule carries genetic information?",
-
-options:[
-"Protein",
-"Lipid",
-"DNA",
-"Glucose"
-],
-
+options:["Protein","Lipid","DNA","Glucose"],
 answer:2,
-
-mistakeType:"Concept Gap",
-
-solution:
-"DNA stores and transmits hereditary genetic information in most organisms.",
-
-mistakeReason:
-"Concept Gap — Revise the roles of DNA, RNA, proteins and other biomolecules."
+solution:"DNA stores and transmits hereditary genetic information in most organisms.",
+mistakeReason:"Revise the roles of DNA, RNA, proteins and other biomolecules.",
+mistakeType:"Concept Gap"
 },
-
 
 {
 subject:"Physics",
 topic:"Electricity",
-
 question:"Which particle has a negative electric charge?",
-
-options:[
-"Proton",
-"Neutron",
-"Electron",
-"Photon"
-],
-
+options:["Proton","Neutron","Electron","Photon"],
 answer:2,
-
-mistakeType:"Concept Gap",
-
-solution:
-"An electron carries one unit of negative elementary charge.",
-
-mistakeReason:
-"Concept Gap — Revise the basic properties of subatomic particles."
+solution:"An electron carries one unit of negative elementary charge.",
+mistakeReason:"Revise the basic properties of subatomic particles.",
+mistakeType:"Concept Gap"
 }
 
 ];
@@ -605,14 +493,13 @@ STATE
 let current=0;
 
 let answers=
-new Array(
-questions.length
-).fill(null);
+new Array(questions.length).fill(null);
 
 let marked=
-new Array(
-questions.length
-).fill(false);
+new Array(questions.length).fill(false);
+
+let mistakeReasons=
+new Array(questions.length).fill(null);
 
 let submitted=false;
 
@@ -625,28 +512,19 @@ TIMER
 
 function updateTimer(){
 
-let m=
-Math.floor(
-timeLeft/60
-);
+let m=Math.floor(timeLeft/60);
 
-let s=
-timeLeft%60;
+let s=timeLeft%60;
 
-document.getElementById(
-"timer"
-).textContent=
-String(m).padStart(2,"0")
-+
-":"
-+
+document.getElementById("timer").textContent=
+String(m).padStart(2,"0")+
+":"+
 String(s).padStart(2,"0");
 
 }
 
 
-const timerInterval=
-setInterval(function(){
+const timerInterval=setInterval(function(){
 
 if(submitted)return;
 
@@ -658,9 +536,7 @@ timeLeft=0;
 
 updateTimer();
 
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 submitTest();
 
@@ -679,75 +555,38 @@ QUESTION
 
 function renderQuestion(){
 
-const q=
-questions[current];
+const q=questions[current];
 
-
-document.getElementById(
-"questionNumber"
-).textContent=
-"Question "
-+
-(current+1)
-+
-" of "
-+
-questions.length
-+
-" • "
-+
+document.getElementById("questionNumber").textContent=
+"Question "+
+(current+1)+
+" of "+
+questions.length+
+" • "+
 q.subject;
 
+document.getElementById("question").textContent=q.question;
 
-document.getElementById(
-"question"
-).textContent=
-q.question;
-
-
-const box=
-document.getElementById(
-"options"
-);
+const box=document.getElementById("options");
 
 box.innerHTML="";
 
+q.options.forEach(function(option,index){
 
-q.options.forEach(
-function(option,index){
+const button=document.createElement("button");
 
-const button=
-document.createElement(
-"button"
-);
+button.className="option";
 
-button.className=
-"option";
-
-
-if(
-answers[current]===index
-){
-
-button.classList.add(
-"selected"
-);
-
+if(answers[current]===index){
+button.classList.add("selected");
 }
 
-
 button.textContent=
-String.fromCharCode(
-65+index
-)
-+
-". "
-+
+String.fromCharCode(65+index)+
+". "+
 option;
 
-
-button.onclick=
-function(){
+button.onclick=function(){
 
 answers[current]=index;
 
@@ -755,24 +594,16 @@ renderQuestion();
 
 };
 
-
-box.appendChild(
-button
-);
+box.appendChild(button);
 
 });
 
-
-document.getElementById(
-"nextButton"
-).textContent=
-current===
-questions.length-1
+document.getElementById("nextButton").textContent=
+current===questions.length-1
 ?
 "Finish"
 :
 "Next";
-
 
 renderPalette();
 
@@ -785,61 +616,29 @@ PALETTE
 
 function renderPalette(){
 
-const palette=
-document.getElementById(
-"palette"
-);
+const palette=document.getElementById("palette");
 
 palette.innerHTML="";
 
+questions.forEach(function(q,index){
 
-questions.forEach(
-function(q,index){
+const button=document.createElement("button");
 
-const button=
-document.createElement(
-"button"
-);
+button.textContent=index+1;
 
-button.textContent=
-index+1;
-
-
-if(
-answers[index]!==null
-){
-
-button.classList.add(
-"answered"
-);
-
+if(answers[index]!==null){
+button.classList.add("answered");
 }
 
-
-if(
-marked[index]
-){
-
-button.classList.add(
-"review"
-);
-
+if(marked[index]){
+button.classList.add("review");
 }
 
-
-if(
-index===current
-){
-
-button.classList.add(
-"current"
-);
-
+if(index===current){
+button.classList.add("current");
 }
 
-
-button.onclick=
-function(){
+button.onclick=function(){
 
 current=index;
 
@@ -847,10 +646,7 @@ renderQuestion();
 
 };
 
-
-palette.appendChild(
-button
-);
+palette.appendChild(button);
 
 });
 
@@ -863,10 +659,7 @@ NAVIGATION
 
 function nextQuestion(){
 
-if(
-current<
-questions.length-1
-){
+if(current<questions.length-1){
 
 current++;
 
@@ -906,8 +699,7 @@ renderQuestion();
 
 function markReview(){
 
-marked[current]=
-!marked[current];
+marked[current]=!marked[current];
 
 renderPalette();
 
@@ -915,22 +707,52 @@ renderPalette();
 
 
 /* =========================
-MISTAKE REASON
+DEFAULT MISTAKE REASON
 ========================= */
 
-function getMistakeReason(
-q,
-selected
-){
+function getMistakeReason(q,selected){
 
 if(selected===null){
 
-return "Not Classified — Question was skipped. Review the concept before attempting it again.";
+return "Question was skipped. Review the concept before attempting it again.";
 
 }
 
 return q.mistakeReason ||
-"Not Classified — Review the concept and analyze why the selected option was incorrect.";
+"Review the concept and analyze why the selected option was incorrect.";
+
+}
+
+
+/* =========================
+SELECT MISTAKE REASON
+========================= */
+
+function selectMistakeReason(index,reason){
+
+mistakeReasons[index]=reason;
+
+saveSelectedReasons();
+
+generateReview();
+
+}
+
+
+/* =========================
+SAVE SELECTED REASONS
+========================= */
+
+function saveSelectedReasons(){
+
+try{
+
+localStorage.setItem(
+"cbtCurrentMistakeReasons",
+JSON.stringify(mistakeReasons)
+);
+
+}catch(e){}
 
 }
 
@@ -939,12 +761,7 @@ return q.mistakeReason ||
 SAVE TEST
 ========================= */
 
-function saveTest(
-correct,
-incorrect,
-skipped,
-score
-){
+function saveTest(correct,incorrect,skipped,score){
 
 let history=[];
 
@@ -952,9 +769,7 @@ try{
 
 history=
 JSON.parse(
-localStorage.getItem(
-"cbtHistory"
-) || "[]"
+localStorage.getItem("cbtHistory") || "[]"
 );
 
 if(!Array.isArray(history)){
@@ -969,21 +784,16 @@ history=[];
 
 
 const questionData=
-questions.map(
-function(q,index){
+questions.map(function(q,index){
 
 let status;
 
-if(
-answers[index]===null
-){
+if(answers[index]===null){
 
 status="skipped";
 
 }
-else if(
-answers[index]===q.answer
-){
+else if(answers[index]===q.answer){
 
 status="correct";
 
@@ -1000,9 +810,13 @@ answers[index]===null
 ?
 null
 :
-q.options[
-answers[index]
-];
+q.options[answers[index]];
+
+
+const chosenReason=
+mistakeReasons[index] ||
+q.mistakeType ||
+"Not Classified";
 
 
 return {
@@ -1017,43 +831,33 @@ topic:q.topic,
 
 status:status,
 
-selectedIndex:
-answers[index],
+selectedIndex:answers[index],
 
-selectedAnswer:
-selectedAnswer,
+selectedAnswer:selectedAnswer,
 
-correctIndex:
-q.answer,
+correctIndex:q.answer,
 
-correctAnswer:
-q.options[q.answer],
+correctAnswer:q.options[q.answer],
 
-bookmarked:
-marked[index],
+bookmarked:marked[index],
 
 mistakeType:
 status==="wrong"
 ?
-q.mistakeType
+chosenReason
 :
 null,
 
 mistakeReason:
 status==="wrong"
 ?
-getMistakeReason(
-q,
-answers[index]
-)
+getMistakeReason(q,answers[index])
 :
 "Correct answer.",
 
-solution:
-q.solution,
+solution:q.solution,
 
-markedForReview:
-marked[index]
+markedForReview:marked[index]
 
 };
 
@@ -1062,8 +866,7 @@ marked[index]
 
 const testRecord={
 
-date:
-new Date().toLocaleString(),
+date:new Date().toLocaleString(),
 
 score:score,
 
@@ -1080,10 +883,7 @@ questions:questionData
 };
 
 
-history.push(
-testRecord
-);
-
+history.push(testRecord);
 
 localStorage.setItem(
 "cbtHistory",
@@ -1109,19 +909,14 @@ let incorrect=0;
 let skipped=0;
 
 
-questions.forEach(
-function(q,index){
+questions.forEach(function(q,index){
 
-if(
-answers[index]===null
-){
+if(answers[index]===null){
 
 skipped++;
 
 }
-else if(
-answers[index]===q.answer
-){
+else if(answers[index]===q.answer){
 
 correct++;
 
@@ -1135,10 +930,7 @@ incorrect++;
 });
 
 
-const score=
-(correct*4)
--
-incorrect;
+const score=(correct*4)-incorrect;
 
 
 saveTest(
@@ -1151,53 +943,59 @@ score
 
 submitted=true;
 
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 
-document.getElementById(
-"testScreen"
-).style.display="none";
+document.getElementById("testScreen").style.display="none";
+
+document.querySelector("aside").style.display="none";
+
+document.getElementById("result").style.display="block";
 
 
-document.querySelector(
-"aside"
-).style.display="none";
-
-
-document.getElementById(
-"result"
-).style.display="block";
-
-
-document.getElementById(
-"score"
-).textContent=
-score
-+
-" / "
-+
+document.getElementById("score").textContent=
+score+
+" / "+
 (questions.length*4);
 
 
-document.getElementById(
-"summary"
-).textContent=
-"Correct: "
-+
-correct
-+
-" | Incorrect: "
-+
-incorrect
-+
-" | Skipped: "
-+
+document.getElementById("summary").textContent=
+"Correct: "+
+correct+
+" | Incorrect: "+
+incorrect+
+" | Skipped: "+
 skipped;
 
 
 generateReview();
+
+}
+
+
+/* =========================
+REASON BUTTONS
+========================= */
+
+function reasonButton(index,reason,icon){
+
+const selected=
+mistakeReasons[index]===reason
+?
+" selected-reason"
+:
+"";
+
+return `
+<button
+type="button"
+class="reason-button${selected}"
+onclick="selectMistakeReason(${index},'${reason}')">
+
+${icon} ${reason}
+
+</button>
+`;
 
 }
 
@@ -1208,37 +1006,23 @@ REVIEW
 
 function generateReview(){
 
-const box=
-document.getElementById(
-"review"
-);
+const box=document.getElementById("review");
 
-box.innerHTML=
-"<h3>Question Analysis</h3>";
+box.innerHTML="<h3>Question Analysis</h3>";
 
 
-questions.forEach(
-function(q,index){
+questions.forEach(function(q,index){
 
-const item=
-document.createElement(
-"div"
-);
-
+const item=document.createElement("div");
 
 let status;
 
-
-if(
-answers[index]===null
-){
+if(answers[index]===null){
 
 status="skipped";
 
 }
-else if(
-answers[index]===q.answer
-){
+else if(answers[index]===q.answer){
 
 status="correct";
 
@@ -1251,8 +1035,7 @@ status="incorrect";
 
 
 item.className=
-"review-item "
-+
+"review-item "+
 status;
 
 
@@ -1261,96 +1044,111 @@ answers[index]===null
 ?
 "Not answered"
 :
-q.options[
-answers[index]
-];
+q.options[answers[index]];
 
 
 item.innerHTML=
 
-"<strong>Question "
-+
-(index+1)
-+
-" • "
-+
-q.subject
-+
-"</strong>"
+"<strong>Question "+
+(index+1)+
+" • "+
+q.subject+
+"</strong>"+
 
-+
+"<p>"+
+q.question+
+"</p>"+
 
-"<p>"
-+
-q.question
-+
-"</p>"
+"<p><strong>Your answer:</strong> "+
+selected+
+"</p>"+
 
-+
-
-"<p><strong>Your answer:</strong> "
-+
-selected
-+
-"</p>"
-
-+
-
-"<p><strong>Correct answer:</strong> "
-+
-q.options[q.answer]
-+
+"<p><strong>Correct answer:</strong> "+
+q.options[q.answer]+
 "</p>";
 
 
 if(marked[index]){
 
 item.innerHTML+=
-
 '<div class="bookmark">🔖 Bookmarked for review</div>';
 
 }
 
 
-if(status!=="correct"){
+if(status==="incorrect"){
 
-const reason=
-getMistakeReason(
-q,
-answers[index]
-);
+const selectedReason=
+mistakeReasons[index] ||
+"";
 
-item.innerHTML+=
 
-'<div class="analysis">' +
+item.innerHTML+=`
 
-"<strong>🧠 Mistake Reason:</strong><br>" +
+<div class="analysis">
 
-reason +
+<strong>❌ Why did you get this wrong?</strong>
 
-'<br><br>' +
+<div class="reason-options">
 
-'<span class="reason-badge">' +
+${reasonButton(index,"Concept Gap","🧠")}
 
-(q.mistakeType ||
-"Not Classified") +
+${reasonButton(index,"Calculation Error","🧮")}
 
-'</span>' +
+${reasonButton(index,"Misread Question","👀")}
 
-"<br><br>" +
+${reasonButton(index,"Guessing","🎲")}
 
-"<strong>💡 Solution:</strong><br>" +
+${reasonButton(index,"Time Pressure","⏱️")}
 
-q.solution +
+</div>
 
-"</div>";
+<div class="reason-status">
+
+${
+selectedReason
+?
+"Selected: "+selectedReason
+:
+"Select the reason that best describes your mistake."
+}
+
+</div>
+
+<br>
+
+<strong>💡 Solution:</strong><br>
+
+${q.solution}
+
+</div>
+`;
 
 }
 
 
-box.appendChild(
-item
-);
+if(status==="skipped"){
+
+item.innerHTML+=`
+
+<div class="analysis">
+
+<strong>⏭️ Skipped Question</strong>
+
+<br><br>
+
+<strong>💡 Solution:</strong><br>
+
+${q.solution}
+
+</div>
+
+`;
+
+}
+
+
+box.appendChild(item);
 
 });
 
