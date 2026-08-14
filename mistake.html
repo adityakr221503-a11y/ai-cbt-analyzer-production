@@ -7,13 +7,16 @@
 <title>CBT Analyzer Pro — Mistake Bank</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#f1f5f9;
-color:#0f172a
+color:#0f172a;
 }
 
 header{
@@ -22,7 +25,7 @@ border-bottom:1px solid #e2e8f0;
 padding:16px 20px;
 position:sticky;
 top:0;
-z-index:10
+z-index:10;
 }
 
 .header{
@@ -31,22 +34,22 @@ margin:auto;
 display:flex;
 justify-content:space-between;
 align-items:center;
-gap:10px
+gap:10px;
 }
 
 .logo{
 font-size:20px;
-font-weight:800
+font-weight:800;
 }
 
 .logo span{
-color:#4f46e5
+color:#4f46e5;
 }
 
 .container{
 max-width:1100px;
 margin:25px auto;
-padding:0 15px
+padding:0 15px;
 }
 
 .hero{
@@ -54,16 +57,16 @@ background:linear-gradient(135deg,#4f46e5,#6366f1);
 color:white;
 padding:25px;
 border-radius:18px;
-margin-bottom:20px
+margin-bottom:20px;
 }
 
 .hero h1{
-margin:0 0 8px
+margin:0 0 8px;
 }
 
 .hero p{
 margin:0;
-opacity:.9
+opacity:.9;
 }
 
 .card{
@@ -71,52 +74,64 @@ background:#fff;
 border-radius:16px;
 padding:20px;
 margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07)
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .stats{
 display:grid;
 grid-template-columns:repeat(4,1fr);
-gap:12px
+gap:12px;
 }
 
 .stat{
+border:0;
+font-family:Arial,sans-serif;
+width:100%;
 background:#f8fafc;
+color:#0f172a;
 padding:18px;
 border-radius:12px;
 text-align:center;
 cursor:pointer;
-transition:.15s
+-webkit-tap-highlight-color:transparent;
+touch-action:manipulation;
+transition:.15s;
 }
 
 .stat:hover{
 transform:translateY(-2px);
-box-shadow:0 3px 10px rgba(0,0,0,.08)
+box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.stat:active{
+transform:scale(.97);
 }
 
 .stat strong{
 display:block;
 font-size:27px;
-margin-bottom:5px
+margin-bottom:5px;
 }
 
 .stat small{
-color:#64748b
+color:#64748b;
+font-size:13px;
 }
 
 .filters{
 display:grid;
 grid-template-columns:1fr 1fr 1fr;
-gap:10px
+gap:10px;
 }
 
-select,input{
+select,
+input{
 width:100%;
 padding:12px;
 border:1px solid #cbd5e1;
 border-radius:9px;
 font-size:14px;
-background:#fff
+background:#fff;
 }
 
 .mistake{
@@ -124,19 +139,19 @@ border:1px solid #e2e8f0;
 border-left:5px solid #dc2626;
 border-radius:14px;
 padding:18px;
-margin-top:15px
+margin-top:15px;
 }
 
 .mistake.mastered{
 border-left-color:#16a34a;
-opacity:.75
+opacity:.75;
 }
 
 .badges{
 display:flex;
 gap:7px;
 flex-wrap:wrap;
-margin-bottom:12px
+margin-bottom:12px;
 }
 
 .badge{
@@ -145,44 +160,44 @@ border-radius:7px;
 font-size:12px;
 font-weight:700;
 background:#fee2e2;
-color:#991b1b
+color:#991b1b;
 }
 
 .badge.subject{
 background:#eef2ff;
-color:#4338ca
+color:#4338ca;
 }
 
 .badge.bookmark{
 background:#fef3c7;
-color:#92400e
+color:#92400e;
 }
 
 .badge.mastered{
 background:#dcfce7;
-color:#166534
+color:#166534;
 }
 
 .question{
 font-size:17px;
 font-weight:700;
 line-height:1.6;
-margin-bottom:15px
+margin-bottom:15px;
 }
 
 .answer{
 padding:12px;
 border-radius:9px;
 margin-top:8px;
-line-height:1.5
+line-height:1.5;
 }
 
 .your{
-background:#fff7ed
+background:#fff7ed;
 }
 
 .correct-answer{
-background:#ecfdf5
+background:#ecfdf5;
 }
 
 .reason{
@@ -190,7 +205,7 @@ background:#eef2ff;
 padding:14px;
 border-radius:10px;
 margin-top:12px;
-line-height:1.6
+line-height:1.6;
 }
 
 .solution{
@@ -198,65 +213,64 @@ background:#f8fafc;
 padding:14px;
 border-radius:10px;
 margin-top:12px;
-line-height:1.6
+line-height:1.6;
 }
 
 .details{
 color:#64748b;
-margin-top:10px
+margin-top:10px;
 }
 
 .actions{
 display:flex;
 gap:8px;
 flex-wrap:wrap;
-margin-top:15px
+margin-top:15px;
 }
 
-button{
+.action-button{
 border:0;
 border-radius:9px;
 padding:11px 15px;
 font-weight:700;
-cursor:pointer
+cursor:pointer;
+touch-action:manipulation;
 }
 
 .primary{
 background:#4f46e5;
-color:white
-}
-
-.secondary{
-background:#e2e8f0;
-color:#0f172a
+color:white;
 }
 
 .success{
 background:#16a34a;
-color:white
+color:white;
 }
 
 .empty{
 text-align:center;
 padding:45px 15px;
-color:#64748b
+color:#64748b;
 }
 
 @media(max-width:800px){
 
 .stats{
-grid-template-columns:1fr 1fr
+grid-template-columns:1fr 1fr;
 }
 
 .filters{
-grid-template-columns:1fr
+grid-template-columns:1fr;
 }
 
 }
+
 </style>
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -267,20 +281,26 @@ CBT Analyzer <span>Pro</span>
 </div>
 
 <button
-class="primary"
+class="action-button primary"
 onclick="location.href='cbt.html'">
+
 ➕ Take CBT
+
 </button>
 
 </div>
 
 </header>
 
+
 <div class="container">
+
 
 <div class="hero">
 
-<h1>🧠 Mistake Bank</h1>
+<h1>
+🧠 Mistake Bank
+</h1>
 
 <p>
 Turn every mistake into a future strength.
@@ -293,48 +313,70 @@ Turn every mistake into a future strength.
 
 <div class="stats">
 
-<div
+
+<button
+type="button"
 class="stat"
 onclick="showAllMistakes()">
 
-<strong id="total">0</strong>
+<strong id="total">
+0
+</strong>
 
-<small>Total Mistakes</small>
+<small>
+Total Mistakes
+</small>
 
-</div>
+</button>
 
 
-<div
+<button
+type="button"
 class="stat"
 onclick="showBookmarked()">
 
-<strong id="bookmarked">0</strong>
+<strong id="bookmarked">
+0
+</strong>
 
-<small>Bookmarked</small>
+<small>
+Bookmarked
+</small>
 
-</div>
+</button>
 
 
-<div
+<button
+type="button"
 class="stat"
 onclick="showMastered()">
 
-<strong id="mastered">0</strong>
+<strong id="mastered">
+0
+</strong>
 
-<small>Mastered</small>
+<small>
+Mastered
+</small>
 
-</div>
+</button>
 
 
-<div
+<button
+type="button"
 class="stat"
 onclick="showUnmastered()">
 
-<strong id="remaining">0</strong>
+<strong id="remaining">
+0
+</strong>
 
-<small>To Review</small>
+<small>
+To Review
+</small>
 
-</div>
+</button>
+
 
 </div>
 
@@ -343,9 +385,12 @@ onclick="showUnmastered()">
 
 <div class="card">
 
-<h2>🔎 Filter Mistakes</h2>
+<h2>
+🔎 Filter Mistakes
+</h2>
 
 <div class="filters">
+
 
 <select
 id="subjectFilter"
@@ -400,24 +445,30 @@ oninput="renderMistakes()">
 </div>
 
 
-<div class="card" id="mistakeList">
+<div
+class="card"
+id="mistakeList">
 
-<h2>📚 Questions to Master</h2>
+<h2>
+📚 Questions to Master
+</h2>
 
 <div id="mistakes"></div>
 
 </div>
+
 
 </div>
 
 
 <script>
 
+
 let mistakes=[];
 
 
 /* =========================
-LOAD DATA
+LOAD CBT HISTORY
 ========================= */
 
 function loadMistakes(){
@@ -428,6 +479,7 @@ localStorage.getItem("cbtHistory") || "[]"
 );
 
 mistakes=[];
+
 
 history.forEach(
 (test,testIndex)=>{
@@ -460,9 +512,13 @@ mastered:false
 
 });
 
+
 loadMastery();
+
 populateSubjects();
+
 updateStats();
+
 renderMistakes();
 
 }
@@ -475,9 +531,12 @@ MASTERY
 function masteryKey(item){
 
 return "mastery_"
-+item.testIndex
-+"_"
-+item.questionIndex;
++
+item.testIndex
++
+"_"
++
+item.questionIndex;
 
 }
 
@@ -498,11 +557,13 @@ masteryKey(item)
 
 function toggleMastery(index){
 
-const item=mistakes[index];
+const item=
+mistakes[index];
 
 if(!item)return;
 
-item.mastered=!item.mastered;
+item.mastered=
+!item.mastered;
 
 localStorage.setItem(
 masteryKey(item),
@@ -510,6 +571,7 @@ item.mastered
 );
 
 updateStats();
+
 renderMistakes();
 
 }
@@ -528,6 +590,7 @@ document.getElementById(
 
 const subjects=new Set();
 
+
 mistakes.forEach(item=>{
 
 subjects.add(
@@ -536,12 +599,14 @@ item.subject || "General"
 
 });
 
+
 select.innerHTML=
 `
 <option value="all">
 All Subjects
 </option>
 `;
+
 
 [...subjects]
 .sort()
@@ -551,6 +616,7 @@ const option=
 document.createElement("option");
 
 option.value=subject;
+
 option.textContent=subject;
 
 select.appendChild(option);
@@ -566,7 +632,8 @@ STATS
 
 function updateStats(){
 
-const total=mistakes.length;
+const total=
+mistakes.length;
 
 const bookmarked=
 mistakes.filter(
@@ -578,24 +645,35 @@ mistakes.filter(
 q=>q.mastered
 ).length;
 
-document.getElementById("total")
-.textContent=total;
 
-document.getElementById("bookmarked")
-.textContent=bookmarked;
+document.getElementById(
+"total"
+).textContent=
+total;
 
-document.getElementById("mastered")
-.textContent=mastered;
 
-document.getElementById("remaining")
-.textContent=
+document.getElementById(
+"bookmarked"
+).textContent=
+bookmarked;
+
+
+document.getElementById(
+"mastered"
+).textContent=
+mastered;
+
+
+document.getElementById(
+"remaining"
+).textContent=
 total-mastered;
 
 }
 
 
 /* =========================
-CLICKABLE STAT FILTERS
+RESET FILTERS
 ========================= */
 
 function resetFilters(){
@@ -610,6 +688,10 @@ document.getElementById(
 
 }
 
+
+/* =========================
+TOTAL MISTAKES
+========================= */
 
 function showAllMistakes(){
 
@@ -626,6 +708,10 @@ scrollToList();
 }
 
 
+/* =========================
+BOOKMARKED
+========================= */
+
 function showBookmarked(){
 
 resetFilters();
@@ -640,6 +726,10 @@ scrollToList();
 
 }
 
+
+/* =========================
+MASTERED
+========================= */
 
 function showMastered(){
 
@@ -656,6 +746,10 @@ scrollToList();
 }
 
 
+/* =========================
+TO REVIEW
+========================= */
+
 function showUnmastered(){
 
 resetFilters();
@@ -671,19 +765,28 @@ scrollToList();
 }
 
 
+/* =========================
+SCROLL
+========================= */
+
 function scrollToList(){
+
+setTimeout(function(){
 
 document.getElementById(
 "mistakeList"
 ).scrollIntoView({
-behavior:"smooth"
+behavior:"smooth",
+block:"start"
 });
+
+},50);
 
 }
 
 
 /* =========================
-RENDER
+RENDER MISTAKES
 ========================= */
 
 function renderMistakes(){
@@ -693,15 +796,18 @@ document.getElementById(
 "mistakes"
 );
 
+
 const subject=
 document.getElementById(
 "subjectFilter"
 ).value;
 
+
 const status=
 document.getElementById(
 "statusFilter"
 ).value;
+
 
 const search=
 document.getElementById(
@@ -804,7 +910,9 @@ box.innerHTML=
 `
 <div class="empty">
 
-<h3>No matching mistakes</h3>
+<h3>
+No matching mistakes
+</h3>
 
 <p>
 Try another filter or complete another CBT.
@@ -823,36 +931,43 @@ filtered.forEach(item=>{
 const realIndex=
 mistakes.indexOf(item);
 
+
 const card=
 document.createElement("div");
+
 
 card.className=
 "mistake"
 +
-(item.mastered ? " mastered" : "");
+(
+item.mastered
+?
+" mastered"
+:
+""
+);
 
 
 let html="";
 
 
 html+=
-`<div class="badges">`;
-
-
-html+=
 `
+<div class="badges">
+
 <span class="badge">
 
-${item.status==="wrong"
-?"❌ WRONG"
-:"⏭️ SKIPPED"}
+${
+item.status==="wrong"
+?
+"❌ WRONG"
+:
+"⏭️ SKIPPED"
+}
 
 </span>
-`;
 
 
-html+=
-`
 <span class="badge subject">
 
 📚 ${item.subject || "General"}
@@ -866,7 +981,9 @@ if(item.bookmarked){
 html+=
 `
 <span class="badge bookmark">
+
 🔖 BOOKMARKED
+
 </span>
 `;
 
@@ -878,14 +995,19 @@ if(item.mastered){
 html+=
 `
 <span class="badge mastered">
+
 ✅ MASTERED
+
 </span>
 `;
 
 }
 
 
-html+=`</div>`;
+html+=
+`
+</div>
+`;
 
 
 html+=
@@ -902,7 +1024,9 @@ html+=
 `
 <div class="answer your">
 
-<strong>Your Answer:</strong>
+<strong>
+Your Answer:
+</strong>
 
 <br>
 
@@ -916,7 +1040,9 @@ html+=
 `
 <div class="answer correct-answer">
 
-<strong>Correct Answer:</strong>
+<strong>
+Correct Answer:
+</strong>
 
 <br>
 
@@ -930,12 +1056,16 @@ html+=
 `
 <div class="reason">
 
-<strong>🧠 Mistake Reason</strong>
+<strong>
+🧠 Mistake Reason
+</strong>
 
 <br><br>
 
-${item.mistakeReason ||
-"Review the concept and identify why the selected answer was incorrect."}
+${
+item.mistakeReason ||
+"Review the concept and identify why the selected answer was incorrect."
+}
 
 </div>
 `;
@@ -945,12 +1075,16 @@ html+=
 `
 <div class="solution">
 
-<strong>💡 Solution</strong>
+<strong>
+💡 Solution
+</strong>
 
 <br><br>
 
-${item.solution ||
-"Solution not available."}
+${
+item.solution ||
+"Solution not available."
+}
 
 </div>
 `;
@@ -971,12 +1105,17 @@ html+=
 <div class="actions">
 
 <button
-class="success"
+type="button"
+class="action-button success"
 onclick="toggleMastery(${realIndex})">
 
-${item.mastered
-?"↩️ Review Again"
-:"✅ Mark Mastered"}
+${
+item.mastered
+?
+"↩️ Review Again"
+:
+"✅ Mark Mastered"
+}
 
 </button>
 
@@ -984,7 +1123,9 @@ ${item.mastered
 `;
 
 
-card.innerHTML=html;
+card.innerHTML=
+html;
+
 
 box.appendChild(card);
 
