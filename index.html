@@ -1,231 +1,867 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI CBT Analyzer</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4f46e5">
-  <style>
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { margin: 0; padding: 16px; background: #f8fafc; color: #1e293b; }
-    header { text-align: center; margin-bottom: 20px; }
-    h1 { color: #4f46e5; margin: 0 0 6px 0; font-size: 24px; }
-    p { margin: 0; color: #64748b; font-size: 14px; }
-    .card { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; }
-    label { display: block; font-weight: 600; margin: 12px 0 4px 0; font-size: 14px; }
-    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; background: white; }
-    button { width: 100%; margin-top: 12px; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; }
-    .btn-secondary { background: #0284c7; }
-    .btn-success { background: #10b981; }
-    .btn-danger { background: #ef4444; }
-    .btn-group { display: flex; gap: 8px; margin-top: 12px; }
-    .btn-group button { flex: 1; margin-top: 0; }
-    #analysisOutput { margin-top: 12px; white-space: pre-wrap; background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.5; min-height: 80px; }
-    .history-item { border-bottom: 1px solid #e2e8f0; padding: 10px 0; }
-    .history-item:last-child { border-bottom: none; }
-    .history-date { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-    @media print {
-      body { background: white; color: black; padding: 0; }
-      .no-print, button, input, textarea, select, label[for="apiKey"], label[for="testData"], label[for="examPreset"] { display: none !important; }
-      .card { box-shadow: none; border: none; padding: 0; margin-bottom: 16px; }
-      #analysisOutput { background: #ffffff; border: 1px solid #cbd5e1; padding: 12px; }
-      header p { display: none; }
-      h1::after { content: " - Performance & Mistake Analysis Report"; font-size: 14px; font-weight: normal; color: #475569; }
-    }
-  </style>
+<title>CBT Analyzer Pro</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4f46e5">
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:system-ui,-apple-system,sans-serif;
+}
+
+body{
+margin:0;
+padding:16px;
+background:#f8fafc;
+color:#1e293b;
+}
+
+header{
+text-align:center;
+margin-bottom:20px;
+}
+
+h1{
+color:#4f46e5;
+margin:0 0 6px;
+font-size:28px;
+}
+
+p{
+margin:0;
+color:#64748b;
+font-size:14px;
+}
+
+.card{
+background:#fff;
+padding:18px;
+border-radius:14px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+margin-bottom:16px;
+}
+
+button{
+width:100%;
+margin-top:12px;
+padding:13px;
+background:#4f46e5;
+color:#fff;
+border:0;
+border-radius:9px;
+font-weight:700;
+font-size:15px;
+cursor:pointer;
+touch-action:manipulation;
+}
+
+button:active{
+transform:scale(.98);
+}
+
+.btn-secondary{
+background:#0284c7;
+}
+
+.btn-success{
+background:#10b981;
+}
+
+.btn-danger{
+background:#ef4444;
+}
+
+.btn-dark{
+background:#334155;
+}
+
+.btn-group{
+display:flex;
+gap:8px;
+}
+
+.btn-group button{
+flex:1;
+}
+
+.dashboard-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.stat{
+padding:18px 10px;
+border-radius:12px;
+background:#f1f5f9;
+text-align:center;
+}
+
+.stat strong{
+display:block;
+font-size:26px;
+color:#4f46e5;
+}
+
+.stat span{
+font-size:12px;
+color:#64748b;
+}
+
+#analysisOutput{
+margin-top:12px;
+white-space:pre-wrap;
+background:#f1f5f9;
+padding:14px;
+border-radius:9px;
+font-size:14px;
+line-height:1.6;
+min-height:80px;
+}
+
+.history-item{
+border-bottom:1px solid #e2e8f0;
+padding:12px 0;
+}
+
+.history-item:last-child{
+border-bottom:0;
+}
+
+.history-date{
+font-size:12px;
+color:#64748b;
+margin-bottom:5px;
+}
+
+.notice{
+background:#eff6ff;
+border:1px solid #bfdbfe;
+padding:14px;
+border-radius:10px;
+line-height:1.5;
+}
+
+.success{
+background:#ecfdf5;
+border:1px solid #bbf7d0;
+}
+
+@media(max-width:600px){
+
+.dashboard-grid{
+grid-template-columns:1fr 1fr;
+}
+
+.btn-group{
+flex-direction:column;
+}
+
+}
+
+</style>
 </head>
+
 <body>
 
-  <header>
-    <h1>AI CBT Analyzer</h1>
-    <p>AI-powered platform for educational test analysis</p>
-  </header>
+<header>
 
-  <!-- Input Form Card -->
-  <div class="card no-print">
-    <label for="apiKey">Gemini API Key</label>
-    <input type="password" id="apiKey" placeholder="Paste your API key here...">
+<h1>🧠 CBT Analyzer <span>Pro</span></h1>
 
-    <label for="examPreset">Target Exam Preset</label>
-    <select id="examPreset">
-      <option value="General CBT">General CBT Test</option>
-      <option value="JEE (Main & Advanced)">JEE (Main & Advanced)</option>
-      <option value="NEET UG">NEET UG</option>
-      <option value="UPSC Civil Services">UPSC / Civil Services</option>
-      <option value="SSC / Banking">SSC / Banking / Railways</option>
-      <option value="Custom Competitive Exam">Other Competitive Exam</option>
-    </select>
+<p>
+Student-first CBT analysis and mistake mastery platform
+</p>
 
-    <label for="testData">CBT Test Results / Log</label>
-    <textarea id="testData" rows="5" placeholder="Paste score summary, topic scores, or incorrect questions..."></textarea>
+</header>
 
-    <button onclick="handleAnalyze()">Analyze Test</button>
-  </div>
 
-  <!-- Analysis Output Card -->
-  <div class="card">
-    <label>AI Performance Analysis</label>
-    <div id="analysisOutput">Report will appear here...</div>
-    
-    <div id="actionButtons" class="btn-group no-print" style="display:none;">
-      <button class="btn-secondary" onclick="bookmarkCurrentReport()">⭐ Bookmark</button>
-      <button class="btn-success" onclick="exportToPDF()">📄 Save as PDF</button>
-    </div>
-  </div>
+<!-- DASHBOARD -->
 
-  <!-- Bookmarks & History Cards -->
-  <div class="card no-print">
-    <label>📌 Bookmarked Weak Topics</label>
-    <div id="bookmarksList" style="font-size: 14px; color: #475569; margin-top: 8px;">No bookmarks saved yet.</div>
-  </div>
+<div class="card">
 
-  <div class="card no-print">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <label style="margin:0;">📜 Saved Test History</label>
-      <button class="btn-danger" style="width: auto; padding: 6px 12px; font-size: 12px; margin:0;" onclick="clearHistory()">Clear All</button>
-    </div>
-    <div id="historyList" style="margin-top: 10px;">No previous history.</div>
-  </div>
+<h2>📊 Dashboard</h2>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
-    }
+<div class="dashboard-grid">
 
-    let currentAnalysisText = '';
+<div class="stat">
+<strong id="testCount">0</strong>
+<span>Tests</span>
+</div>
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedKey = localStorage.getItem('gemini_api_key');
-      if (savedKey) document.getElementById('apiKey').value = savedKey;
-      renderHistory();
-      renderBookmarks();
-    });
+<div class="stat">
+<strong id="mistakeCount">0</strong>
+<span>Active Mistakes</span>
+</div>
 
-    async function handleAnalyze() {
-      const apiKey = document.getElementById('apiKey').value.trim();
-      const examPreset = document.getElementById('examPreset').value;
-      const testData = document.getElementById('testData').value.trim();
-      const output = document.getElementById('analysisOutput');
+<div class="stat">
+<strong id="masteredCount">0</strong>
+<span>Mastered</span>
+</div>
 
-      if (!apiKey || !testData) {
-        alert('Please enter both your API key and test results.');
-        return;
-      }
+<div class="stat">
+<strong id="retryCount">0</strong>
+<span>Retries</span>
+</div>
 
-      localStorage.setItem('gemini_api_key', apiKey);
-      output.innerText = `Analyzing for ${examPreset}... Please wait.`;
-      document.getElementById('actionButtons').style.display = 'none';
+</div>
 
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        const prompt = `You are an expert test analyst specializing in ${examPreset}. Analyze the following test log:
-1. Overall Performance Summary (Tailored for ${examPreset} standards and marking dynamics)
-2. Key Weak Topics & High-Yield Mistake Patterns
-3. 3-Step Actionable Revision Strategy (Prioritizing high-weightage areas for ${examPreset})
+</div>
 
-Test Log:
-${testData}`;
 
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
+<!-- CBT -->
 
-        const data = await response.json();
+<div class="card">
 
-        if (data.error) {
-          output.innerText = `Error (${data.error.code}): ${data.error.message}`;
-          return;
-        }
+<h2>📝 CBT Test</h2>
 
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-          currentAnalysisText = `[Exam Target: ${examPreset}]\n\n` + data.candidates[0].content.parts[0].text;
-          output.innerText = currentAnalysisText;
-          document.getElementById('actionButtons').style.display = 'flex';
+<p>
+Start or open your CBT test.
+</p>
 
-          saveToHistory(currentAnalysisText);
-        } else {
-          output.innerText = 'Analysis failed. Unexpected response format from AI.';
-        }
-      } catch (err) {
-        output.innerText = 'Network error: ' + err.message;
-      }
-    }
+<button
+type="button"
+onclick="openCBT()">
 
-    function saveToHistory(reportText) {
-      const history = JSON.parse(localStorage.getItem('cbt_history') || '[]');
-      history.unshift({
-        date: new Date().toLocaleString(),
-        report: reportText
-      });
-      localStorage.setItem('cbt_history', JSON.stringify(history.slice(0, 10)));
-      renderHistory();
-    }
+▶️ Open CBT Test
 
-    function renderHistory() {
-      const history = JSON.parse(localStorage.getItem('cbt_history') || '[]');
-      const container = document.getElementById('historyList');
-      if (history.length === 0) {
-        container.innerHTML = '<div style="font-size:13px; color:#94a3b8;">No previous history.</div>';
-        return;
-      }
-      container.innerHTML = history.map(item => `
-        <div class="history-item">
-          <div class="history-date">📅 ${item.date}</div>
-          <div style="font-size: 13px; color: #334155; white-space: pre-wrap; max-height: 80px; overflow: hidden;">${item.report.substring(0, 150)}...</div>
-        </div>
-      `).join('');
-    }
+</button>
 
-    function bookmarkCurrentReport() {
-      if (!currentAnalysisText) return;
-      const bookmarks = JSON.parse(localStorage.getItem('cbt_bookmarks') || '[]');
-      bookmarks.unshift({
-        date: new Date().toLocaleDateString(),
-        snippet: currentAnalysisText
-      });
-      localStorage.setItem('cbt_bookmarks', JSON.stringify(bookmarks));
-      renderBookmarks();
-      alert('Topics bookmarked successfully!');
-    }
+</div>
 
-    function renderBookmarks() {
-      const bookmarks = JSON.parse(localStorage.getItem('cbt_bookmarks') || '[]');
-      const container = document.getElementById('bookmarksList');
-      if (bookmarks.length === 0) {
-        container.innerText = 'No bookmarks saved yet.';
-        return;
-      }
-      container.innerHTML = bookmarks.map(b => `
-        <div style="background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:6px; border: 1px solid #e2e8f0;">
-          <div style="font-size:11px; color:#64748b;">${b.date}</div>
-          <div style="white-space:pre-wrap;">${b.snippet.substring(0, 120)}...</div>
-        </div>
-      `).join('');
-    }
 
-    function exportToPDF() {
-      window.print();
-    }
+<!-- MISTAKE BANK -->
 
-    function clearHistory() {
-      if (confirm('Clear all history and bookmarks?')) {
-        localStorage.removeItem('cbt_history');
-        localStorage.removeItem('cbt_bookmarks');
-        renderHistory();
-        renderBookmarks();
-      }
-    }
-  </script>
-<script type="module">
-  import * as CBTCore from "./src/core/index.js";
+<div class="card">
 
-  window.CBTCore = CBTCore;
+<h2>❌ Mistake Bank</h2>
 
-  console.log("CBT Production Core loaded:", CBTCore);
+<p>
+Review active mistakes, mistake reasons,
+concept gaps and mastered questions.
+</p>
+
+<button
+type="button"
+onclick="openMistakes()">
+
+🧠 Open Mistake Bank
+
+</button>
+
+</div>
+
+
+<!-- TEST HISTORY -->
+
+<div class="card">
+
+<h2>📜 Test History</h2>
+
+<div id="historyList">
+No previous test history.
+</div>
+
+</div>
+
+
+<!-- AI ANALYSIS -->
+
+<div class="card">
+
+<h2>🤖 Performance Analysis</h2>
+
+<div class="notice">
+
+<strong>No API key required.</strong>
+
+<br><br>
+
+The CBT Analyzer currently uses your saved
+CBT data and local mistake-analysis system.
+
+AI API integration can be added later through
+a secure backend without exposing a secret key
+inside this GitHub Pages application.
+
+</div>
+
+<div id="analysisOutput">
+Ready for CBT analysis.
+</div>
+
+</div>
+
+
+<!-- BOOKMARKS -->
+
+<div class="card">
+
+<h2>⭐ Bookmarks</h2>
+
+<div id="bookmarksList">
+No bookmarks saved yet.
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+SERVICE WORKER
+========================================= */
+
+if(
+"serviceWorker" in navigator
+){
+
+navigator.serviceWorker
+.register("sw.js")
+.catch(
+function(error){
+
+console.log(
+"Service worker:",
+error
+);
+
+});
+
+}
+
+
+/* =========================================
+NAVIGATION
+========================================= */
+
+function openCBT(){
+
+/*
+Try the production CBT page first.
+*/
+
+const pages=[
+"cbt.html",
+"test.html",
+"cbt-test.html"
+];
+
+
+/*
+The first existing page is normally
+cbt.html in the production project.
+*/
+
+location.href="cbt.html";
+
+}
+
+
+function openMistakes(){
+
+location.href="mistake.html";
+
+}
+
+
+/* =========================================
+HISTORY
+========================================= */
+
+function loadHistory(){
+
+let history=[];
+
+
+/*
+Primary CBT history.
+*/
+
+try{
+
+const data=
+JSON.parse(
+localStorage.getItem(
+"cbtHistory"
+)||"[]"
+);
+
+if(Array.isArray(data)){
+
+history=data;
+
+}
+
+}catch(error){
+
+history=[];
+
+}
+
+
+/*
+Fallback to older report history.
+*/
+
+if(history.length===0){
+
+try{
+
+const data=
+JSON.parse(
+localStorage.getItem(
+"cbt_history"
+)||"[]"
+);
+
+if(Array.isArray(data)){
+
+history=data;
+
+}
+
+}catch(error){}
+
+}
+
+
+document.getElementById(
+"testCount"
+).textContent=
+history.length;
+
+
+const container=
+document.getElementById(
+"historyList"
+);
+
+
+if(history.length===0){
+
+container.innerHTML=
+"No previous test history.";
+
+return;
+
+}
+
+
+container.innerHTML=
+history.slice(0,10)
+.map(
+function(item){
+
+const date=
+item.date||
+item.timestamp||
+"Test";
+
+
+const score=
+item.score!==undefined
+?
+"Score: "+item.score
+:
+(
+item.totalScore!==undefined
+?
+"Score: "+item.totalScore
+:
+"CBT attempt"
+);
+
+
+return `
+
+<div class="history-item">
+
+<div class="history-date">
+📅 ${escapeHTML(date)}
+</div>
+
+<strong>
+${escapeHTML(score)}
+</strong>
+
+</div>
+
+`;
+
+}
+)
+.join("");
+
+}
+
+
+/* =========================================
+MISTAKE COUNTS
+========================================= */
+
+function loadMistakeCounts(){
+
+let history=[];
+
+try{
+
+const data=
+JSON.parse(
+localStorage.getItem(
+"cbtHistory"
+)||"[]"
+);
+
+if(Array.isArray(data)){
+
+history=data;
+
+}
+
+}catch(error){}
+
+
+const mastered=
+getMasteredSet();
+
+
+let mistakes=new Set();
+
+
+history.forEach(
+function(test){
+
+if(
+!test ||
+!Array.isArray(test.questions)
+){
+
+return;
+
+}
+
+
+test.questions.forEach(
+function(q){
+
+if(
+q &&
+q.status==="wrong"
+){
+
+const question=
+q.question||
+q.text||
+q.questionText;
+
+if(question){
+
+const key=
+normalize(question);
+
+if(!mastered.has(key)){
+
+mistakes.add(key);
+
+}
+
+}
+
+}
+
+});
+
+});
+
+
+document.getElementById(
+"mistakeCount"
+).textContent=
+mistakes.size;
+
+
+document.getElementById(
+"masteredCount"
+).textContent=
+mastered.size;
+
+
+document.getElementById(
+"retryCount"
+).textContent=
+getRetryCount();
+
+}
+
+
+/* =========================================
+MASTERY
+========================================= */
+
+function getMasteredSet(){
+
+const set=
+new Set();
+
+
+let mastery=[];
+
+
+try{
+
+const data=
+JSON.parse(
+localStorage.getItem(
+"cbtMasteryV2"
+)||"[]"
+);
+
+if(Array.isArray(data)){
+
+mastery=data;
+
+}
+
+}catch(error){}
+
+
+mastery.forEach(
+function(item){
+
+if(
+item &&
+item.type==="mastery" &&
+item.question
+){
+
+set.add(
+normalize(item.question)
+);
+
+}
+
+});
+
+
+return set;
+
+}
+
+
+/* =========================================
+RETRY COUNT
+========================================= */
+
+function getRetryCount(){
+
+let mastery=[];
+
+
+try{
+
+const data=
+JSON.parse(
+localStorage.getItem(
+"cbtMasteryV2"
+)||"[]"
+);
+
+if(Array.isArray(data)){
+
+mastery=data;
+
+}
+
+}catch(error){}
+
+
+return mastery.filter(
+function(item){
+
+return item &&
+item.type==="retry";
+
+}
+).length;
+
+}
+
+
+/* =========================================
+BOOKMARKS
+========================================= */
+
+function loadBookmarks(){
+
+let bookmarks=[];
+
+
+try{
+
+const data=
+JSON.parse(
+localStorage.getItem(
+"cbt_bookmarks"
+)||"[]"
+);
+
+if(Array.isArray(data)){
+
+bookmarks=data;
+
+}
+
+}catch(error){}
+
+
+const box=
+document.getElementById(
+"bookmarksList"
+);
+
+
+if(bookmarks.length===0){
+
+box.textContent=
+"No bookmarks saved yet.";
+
+return;
+
+}
+
+
+box.innerHTML=
+bookmarks.slice(0,10)
+.map(
+function(item){
+
+return `
+
+<div class="history-item">
+
+<div class="history-date">
+⭐ ${escapeHTML(
+item.date||"Bookmark"
+)}
+</div>
+
+<div>
+${escapeHTML(
+item.snippet||item.question||""
+)}
+</div>
+
+</div>
+
+`;
+
+}
+)
+.join("");
+
+}
+
+
+/* =========================================
+NORMALIZE
+========================================= */
+
+function normalize(value){
+
+return String(value||"")
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ");
+
+}
+
+
+/* =========================================
+ESCAPE
+========================================= */
+
+function escapeHTML(value){
+
+return String(value||"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================
+INITIALIZE
+========================================= */
+
+function refreshDashboard(){
+
+loadHistory();
+
+loadMistakeCounts();
+
+loadBookmarks();
+
+}
+
+
+refreshDashboard();
+
+
+/*
+Refresh counts when returning to this page.
+*/
+
+window.addEventListener(
+"pageshow",
+refreshDashboard
+);
+
+
+/* =========================================
+OPTIONAL PRODUCTION CORE
+========================================= */
+
+try{
+
+const script=
+document.createElement("script");
+
+script.type="module";
+
+script.textContent=`
+
+import * as CBTCore
+from "./src/core/index.js";
+
+window.CBTCore=CBTCore;
+
+console.log(
+"CBT Production Core loaded:",
+CBTCore
+);
+
+`;
+
+}catch(error){
+
+console.log(
+"Production core unavailable:",
+error
+);
+
+}
+
 </script>
+
 </body>
 </html>
