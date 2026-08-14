@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>CBT Analyzer Pro — Mistake Bank</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
@@ -25,8 +28,9 @@ padding:16px 20px;
 max-width:1000px;
 margin:auto;
 display:flex;
-justify-content:space-between;
 align-items:center;
+justify-content:space-between;
+gap:10px;
 }
 
 .logo{
@@ -41,14 +45,15 @@ color:#4f46e5;
 button{
 font-family:inherit;
 cursor:pointer;
+touch-action:manipulation;
 }
 
 .dashboard{
 border:0;
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:12px 18px;
-border-radius:10px;
+border-radius:11px;
 font-weight:800;
 }
 
@@ -60,7 +65,7 @@ padding:0 15px;
 
 .hero{
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:28px;
 border-radius:20px;
 margin-bottom:20px;
@@ -77,7 +82,7 @@ line-height:1.5;
 }
 
 .card{
-background:white;
+background:#fff;
 border-radius:18px;
 padding:22px;
 margin-bottom:20px;
@@ -97,12 +102,16 @@ gap:15px;
 }
 
 .stat{
+width:100%;
 border:0;
 background:#f8fafc;
 border-radius:16px;
-padding:20px;
+padding:22px;
 text-align:left;
-width:100%;
+}
+
+.stat:active{
+transform:scale(.98);
 }
 
 .icon{
@@ -117,15 +126,15 @@ margin:5px 0;
 
 .label{
 font-size:17px;
-font-weight:600;
 color:#64748b;
+font-weight:600;
 }
 
 .hint{
+margin-top:7px;
 color:#4f46e5;
 font-size:13px;
 font-weight:800;
-margin-top:7px;
 }
 
 .actions{
@@ -144,7 +153,7 @@ font-weight:800;
 
 .primary{
 background:#4f46e5;
-color:white;
+color:#fff;
 }
 
 .secondary{
@@ -157,11 +166,6 @@ border:1px solid #e2e8f0;
 border-radius:14px;
 padding:17px;
 margin-top:14px;
-}
-
-.mastered-item{
-background:#f0fdf4;
-border-color:#bbf7d0;
 }
 
 .badge{
@@ -199,20 +203,12 @@ font-weight:800;
 width:100%;
 border:0;
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:13px;
 border-radius:10px;
 font-size:16px;
 font-weight:800;
 margin-top:13px;
-}
-
-.back{
-border:0;
-background:#e2e8f0;
-padding:11px 15px;
-border-radius:10px;
-font-weight:800;
 }
 
 .empty{
@@ -221,10 +217,23 @@ padding:35px 15px;
 color:#64748b;
 }
 
+.empty-icon{
+font-size:55px;
+}
+
 @media(max-width:600px){
+
 .stats{
 grid-template-columns:1fr 1fr;
 gap:10px;
+}
+
+.stat{
+padding:16px;
+}
+
+.number{
+font-size:32px;
 }
 
 .actions{
@@ -235,9 +244,6 @@ grid-template-columns:1fr;
 padding:17px;
 }
 
-.number{
-font-size:32px;
-}
 }
 </style>
 </head>
@@ -245,6 +251,7 @@ font-size:32px;
 <body>
 
 <header>
+
 <div class="header">
 
 <div class="logo">
@@ -253,23 +260,31 @@ CBT Analyzer <span>Pro</span>
 
 <button
 class="dashboard"
+type="button"
 onclick="location.href='index.html'">
+
 Dashboard
+
 </button>
 
 </div>
+
 </header>
+
 
 <div class="container">
 
 <div class="hero">
+
 <h1>🧠 Mistake Bank</h1>
 
 <p>
 Turn mistakes into mastery. Retry difficult questions
-and review your mastered questions.
+and review everything you have already mastered.
 </p>
+
 </div>
+
 
 <div class="card">
 
@@ -279,11 +294,17 @@ and review your mastered questions.
 
 <div class="stats">
 
-<button
-class="stat"
-onclick="showActive()">
 
-<div class="icon">❌</div>
+<!-- ACTIVE -->
+
+<button
+type="button"
+class="stat"
+onclick="openActive()">
+
+<div class="icon">
+❌
+</div>
 
 <div
 class="number"
@@ -296,16 +317,22 @@ Active Mistakes
 </div>
 
 <div class="hint">
-View Active →
+Tap to View →
 </div>
 
 </button>
 
-<button
-class="stat"
-onclick="showMastered()">
 
-<div class="icon">🏆</div>
+<!-- MASTERED -->
+
+<button
+type="button"
+class="stat"
+onclick="openMastered()">
+
+<div class="icon">
+🏆
+</div>
 
 <div
 class="number"
@@ -318,13 +345,16 @@ Mastered
 </div>
 
 <div class="hint">
-View Mastered →
+Open Mastered →
 </div>
 
 </button>
 
+
 </div>
+
 </div>
+
 
 <div class="card">
 
@@ -332,6 +362,7 @@ View Mastered →
 
 <button
 class="action primary"
+type="button"
 onclick="openRetry()">
 
 🔄 Retry Active Mistakes
@@ -340,6 +371,7 @@ onclick="openRetry()">
 
 <button
 class="action secondary"
+type="button"
 onclick="location.href='cbt.html'">
 
 📝 Start CBT
@@ -350,9 +382,8 @@ onclick="location.href='cbt.html'">
 
 </div>
 
-<div class="card">
 
-<div id="controls"></div>
+<div class="card">
 
 <h2 id="sectionTitle">
 ❌ Active Mistakes
@@ -364,16 +395,24 @@ onclick="location.href='cbt.html'">
 
 </div>
 
+
 <script>
 
 /* =====================================================
 EXACT STORAGE FROM retry.html
 ===================================================== */
 
-const HISTORY_KEY="cbtHistory";
-const MASTERY_KEY="cbtMasteryV2";
-const RETRY_QUEUE_KEY="cbtAnalyzer.retryQueue";
-const RETRY_QUESTION_KEY="cbtRetryQuestion";
+const HISTORY_KEY =
+"cbtHistory";
+
+const MASTERY_KEY =
+"cbtMasteryV2";
+
+const RETRY_QUEUE_KEY =
+"cbtAnalyzer.retryQueue";
+
+const RETRY_QUESTION_KEY =
+"cbtRetryQuestion";
 
 
 /* =====================================================
@@ -382,7 +421,7 @@ NORMALIZE
 
 function normalize(value){
 
-return String(value||"")
+return String(value || "")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -398,15 +437,22 @@ function getHistory(){
 
 try{
 
-const data=JSON.parse(
-localStorage.getItem(HISTORY_KEY)||"[]"
+const data =
+JSON.parse(
+localStorage.getItem(
+HISTORY_KEY
+) || "[]"
 );
 
-return Array.isArray(data)?data:[];
+return Array.isArray(data)
+? data
+: [];
 
-}catch(e){
+}catch(error){
 
-return[];
+console.error(error);
+
+return [];
 
 }
 
@@ -421,15 +467,22 @@ function getMastery(){
 
 try{
 
-const data=JSON.parse(
-localStorage.getItem(MASTERY_KEY)||"[]"
+const data =
+JSON.parse(
+localStorage.getItem(
+MASTERY_KEY
+) || "[]"
 );
 
-return Array.isArray(data)?data:[];
+return Array.isArray(data)
+? data
+: [];
 
-}catch(e){
+}catch(error){
 
-return[];
+console.error(error);
+
+return [];
 
 }
 
@@ -440,44 +493,92 @@ return[];
 ACTIVE MISTAKES
 ===================================================== */
 
-function getActive(){
+function getActiveMistakes(){
 
-const history=getHistory();
+const history =
+getHistory();
 
-const mastered=new Set(
-getMastery().map(function(q){
-return normalize(q.question);
+const mastered =
+new Set(
+getMastery()
+.map(function(item){
+
+return normalize(
+item.question
+);
+
 })
 );
 
-const map=new Map();
+const map =
+new Map();
 
-history.forEach(function(test){
 
-if(!test||!Array.isArray(test.questions))
-return;
-
-test.questions.forEach(function(q){
+history.forEach(
+function(test){
 
 if(
-!q||
-!q.question||
-q.status!=="wrong"
+!test ||
+!Array.isArray(
+test.questions
 )
+){
+
 return;
 
-const key=normalize(q.question);
+}
 
-if(mastered.has(key))
+
+test.questions.forEach(
+function(q){
+
+if(
+!q ||
+!q.question
+){
+
 return;
 
-map.set(key,q);
+}
+
+
+if(
+q.status !== "wrong"
+){
+
+return;
+
+}
+
+
+const key =
+normalize(
+q.question
+);
+
+
+if(
+mastered.has(key)
+){
+
+return;
+
+}
+
+
+map.set(
+key,
+q
+);
 
 });
 
 });
 
-return Array.from(map.values());
+
+return Array.from(
+map.values()
+);
 
 }
 
@@ -486,9 +587,14 @@ return Array.from(map.values());
 ESCAPE
 ===================================================== */
 
-function esc(value){
+function escapeHTML(value){
 
-return String(value??"")
+return String(
+value === undefined ||
+value === null
+? ""
+: value
+)
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -504,11 +610,45 @@ COUNTS
 
 function updateCounts(){
 
-document.getElementById("activeCount").textContent=
-getActive().length;
+document.getElementById(
+"activeCount"
+).textContent =
+getActiveMistakes().length;
 
-document.getElementById("masteredCount").textContent=
+
+document.getElementById(
+"masteredCount"
+).textContent =
 getMastery().length;
+
+}
+
+
+/* =====================================================
+OPEN MASTERED
+===================================================== */
+
+function openMastered(){
+
+/*
+Open the dedicated mastered page.
+This avoids relying on the
+same-page section switch.
+*/
+
+location.href =
+"mastered.html";
+
+}
+
+
+/* =====================================================
+OPEN ACTIVE
+===================================================== */
+
+function openActive(){
+
+showActive();
 
 }
 
@@ -519,82 +659,146 @@ SHOW ACTIVE
 
 function showActive(){
 
-document.getElementById("sectionTitle").textContent=
+document.getElementById(
+"sectionTitle"
+).textContent =
 "❌ Active Mistakes";
 
-document.getElementById("controls").innerHTML="";
 
-const list=document.getElementById("list");
+const list =
+document.getElementById(
+"list"
+);
 
-list.innerHTML="";
+list.innerHTML =
+"";
 
-const mistakes=getActive();
 
-if(!mistakes.length){
+const mistakes =
+getActiveMistakes();
 
-list.innerHTML=`
+
+if(
+mistakes.length === 0
+){
+
+list.innerHTML = `
+
 <div class="empty">
-<div style="font-size:55px">🎉</div>
-<h2>No Active Mistakes</h2>
-<p>You have no unresolved mistakes.</p>
+
+<div class="empty-icon">
+🎉
 </div>
+
+<h2>
+No Active Mistakes
+</h2>
+
+<p>
+You have no unresolved mistakes.
+</p>
+
+</div>
+
 `;
 
 return;
 
 }
 
-mistakes.forEach(function(q,index){
 
-const answer=
-q.correctAnswer||
-(
-Array.isArray(q.options)
-?q.options[Number(q.correctIndex)]
-:""
+mistakes.forEach(
+function(q,index){
+
+const div =
+document.createElement(
+"div"
 );
 
-const div=document.createElement("div");
+div.className =
+"item";
 
-div.className="item";
 
-div.innerHTML=`
+const answer =
+q.correctAnswer ||
+(
+Array.isArray(q.options)
+?
+q.options[
+Number(q.correctIndex)
+]
+:
+""
+);
+
+
+div.innerHTML = `
+
+<div>
 
 <span class="badge">
 ❌ Mistake ${index+1}
 </span>
 
 <span class="badge">
-${esc(q.subject||"Unknown")}
+${escapeHTML(
+q.subject || "Unknown"
+)}
 </span>
 
 <span class="badge">
-${esc(q.topic||"Unknown")}
+${escapeHTML(
+q.topic || "Unknown"
+)}
 </span>
 
-<div class="question">
-${esc(q.question)}
 </div>
+
+
+<div class="question">
+
+${escapeHTML(
+q.question
+)}
+
+</div>
+
 
 <div class="info">
 
-<strong>Your answer:</strong>
+<strong>
+Your answer:
+</strong>
+
 <br>
-${esc(q.selectedAnswer||"Not answered")}
+
+${escapeHTML(
+q.selectedAnswer ||
+"Not answered"
+)}
 
 <br><br>
 
-<strong>Correct answer:</strong>
+<strong>
+Correct answer:
+</strong>
+
 <br>
 
 <span class="correct">
-${esc(answer)}
+
+${escapeHTML(
+answer
+)}
+
 </span>
 
 </div>
 
+
 <button
 class="retry"
+type="button"
 onclick="retryOne(${index})">
 
 🔄 Retry This Question
@@ -603,137 +807,10 @@ onclick="retryOne(${index})">
 
 `;
 
-list.appendChild(div);
 
-});
-
-}
-
-
-/* =====================================================
-SHOW MASTERED
-===================================================== */
-
-function showMastered(){
-
-document.getElementById("sectionTitle").textContent=
-"🏆 Mastered Questions";
-
-document.getElementById("controls").innerHTML=`
-
-<button
-class="back"
-onclick="showActive()">
-
-← Active Mistakes
-
-</button>
-
-`;
-
-const list=document.getElementById("list");
-
-list.innerHTML="";
-
-/*
-READ DIRECTLY FROM cbtMasteryV2
-*/
-
-const mastered=getMastery();
-
-document.getElementById("masteredCount").textContent=
-mastered.length;
-
-if(!mastered.length){
-
-list.innerHTML=`
-<div class="empty">
-
-<div style="font-size:55px">
-🔎
-</div>
-
-<h2>No Mastered Questions Found</h2>
-
-<p>
-The storage key <strong>cbtMasteryV2</strong>
-currently contains no readable questions.
-</p>
-
-</div>
-`;
-
-return;
-
-}
-
-
-/*
-DISPLAY EVERY MASTERED QUESTION
-*/
-
-mastered.forEach(function(q,index){
-
-const answer=
-q.correctAnswer||
-(
-Array.isArray(q.options)
-?q.options[Number(q.correctIndex)]
-:""
+list.appendChild(
+div
 );
-
-const div=document.createElement("div");
-
-div.className="item mastered-item";
-
-div.innerHTML=`
-
-<span class="badge">
-🏆 Mastered ${index+1}
-</span>
-
-<span class="badge">
-${esc(q.subject||"Unknown")}
-</span>
-
-<span class="badge">
-${esc(q.topic||"Unknown")}
-</span>
-
-<div class="question">
-${esc(q.question)}
-</div>
-
-<div class="info">
-
-<strong class="correct">
-✅ Correct Answer
-</strong>
-
-<br><br>
-
-${esc(answer)}
-
-${
-q.solution
-?
-`
-<br><br>
-
-<strong>💡 Solution</strong>
-
-<br><br>
-
-${esc(q.solution)}
-`
-:""
-}
-
-</div>
-
-`;
-
-list.appendChild(div);
 
 });
 
@@ -746,27 +823,41 @@ RETRY ALL
 
 function openRetry(){
 
-const mistakes=getActive();
+const mistakes =
+getActiveMistakes();
 
-if(!mistakes.length){
 
-alert("No active mistakes available.");
+if(
+mistakes.length === 0
+){
+
+alert(
+"No active mistakes available."
+);
 
 return;
 
 }
 
+
 localStorage.setItem(
 RETRY_QUEUE_KEY,
-JSON.stringify(mistakes)
+JSON.stringify(
+mistakes
+)
 );
+
 
 localStorage.setItem(
 RETRY_QUESTION_KEY,
-JSON.stringify(mistakes[0])
+JSON.stringify(
+mistakes[0]
+)
 );
 
-location.href="retry.html";
+
+location.href =
+"retry.html";
 
 }
 
@@ -777,22 +868,37 @@ RETRY ONE
 
 function retryOne(index){
 
-const mistakes=getActive();
+const mistakes =
+getActiveMistakes();
 
-if(!mistakes[index])
+
+if(
+!mistakes[index]
+){
+
 return;
+
+}
+
 
 localStorage.setItem(
 RETRY_QUEUE_KEY,
-JSON.stringify(mistakes)
+JSON.stringify(
+mistakes
+)
 );
+
 
 localStorage.setItem(
 RETRY_QUESTION_KEY,
-JSON.stringify(mistakes[index])
+JSON.stringify(
+mistakes[index]
+)
 );
 
-location.href="retry.html";
+
+location.href =
+"retry.html";
 
 }
 
@@ -804,6 +910,7 @@ START
 updateCounts();
 
 showActive();
+
 
 </script>
 
