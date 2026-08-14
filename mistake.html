@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>CBT Analyzer Pro — Mistake Bank</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
+}
+
+header{
+background:#fff;
+border-bottom:1px solid #e2e8f0;
+padding:16px 20px;
+position:sticky;
+top:0;
+z-index:10;
+}
+
+.header{
+max-width:1100px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.logo{
+font-size:20px;
+font-weight:800;
+}
+
+.logo span{
+color:#4f46e5;
+}
+
+.container{
+max-width:1100px;
+margin:25px auto;
+padding:0 15px;
+}
+
+.hero{
+background:linear-gradient(
+135deg,
+#4f46e5,
+#6366f1
+);
+color:white;
+padding:25px;
+border-radius:18px;
+margin-bottom:20px;
+}
+
+.hero h1{
+margin:0 0 8px;
+}
+
+.hero p{
+margin:0;
+opacity:.9;
+}
+
+.card{
+background:#fff;
+border-radius:16px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
+}
+
+.stats{
+display:grid;
+grid-template-columns:
+repeat(4,1fr);
+gap:12px;
+}
+
+.stat{
+background:#f8fafc;
+padding:18px;
+border-radius:12px;
+text-align:center;
+}
+
+.stat strong{
+display:block;
+font-size:27px;
+margin-bottom:5px;
+}
+
+.stat small{
+color:#64748b;
+}
+
+.filters{
+display:grid;
+grid-template-columns:
+1fr 1fr 1fr;
+gap:10px;
+}
+
+select,
+input{
+width:100%;
+padding:12px;
+border:1px solid #cbd5e1;
+border-radius:9px;
+font-size:14px;
+background:#fff;
+}
+
+.mistake{
+border:1px solid #e2e8f0;
+border-left:5px solid #dc2626;
+border-radius:14px;
+padding:18px;
+margin-top:15px;
+}
+
+.mistake.mastered{
+border-left-color:#16a34a;
+opacity:.75;
+}
+
+.badges{
+display:flex;
+gap:7px;
+flex-wrap:wrap;
+margin-bottom:12px;
+}
+
+.badge{
+padding:6px 9px;
+border-radius:7px;
+font-size:12px;
+font-weight:700;
+background:#fee2e2;
+color:#991b1b;
+}
+
+.badge.subject{
+background:#eef2ff;
+color:#4338ca;
+}
+
+.badge.bookmark{
+background:#fef3c7;
+color:#92400e;
+}
+
+.badge.mastered{
+background:#dcfce7;
+color:#166534;
+}
+
+.question{
+font-size:17px;
+font-weight:700;
+line-height:1.6;
+margin-bottom:15px;
+}
+
+.answer{
+padding:12px;
+border-radius:9px;
+margin-top:8px;
+line-height:1.5;
+}
+
+.your{
+background:#fff7ed;
+}
+
+.correct-answer{
+background:#ecfdf5;
+}
+
+.reason{
+background:#eef2ff;
+padding:14px;
+border-radius:10px;
+margin-top:12px;
+line-height:1.6;
+}
+
+.solution{
+background:#f8fafc;
+padding:14px;
+border-radius:10px;
+margin-top:12px;
+line-height:1.6;
+}
+
+.actions{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:15px;
+}
+
+button{
+border:0;
+border-radius:9px;
+padding:11px 15px;
+font-weight:700;
+cursor:pointer;
+}
+
+.primary{
+background:#4f46e5;
+color:white;
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.success{
+background:#16a34a;
+color:white;
+}
+
+.empty{
+text-align:center;
+padding:45px 15px;
+color:#64748b;
+}
+
+@media(max-width:800px){
+
+.stats{
+grid-template-columns:
+1fr 1fr;
+}
+
+.filters{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<header>
+
+<div class="header">
+
+<div class="logo">
+CBT Analyzer <span>Pro</span>
+</div>
+
+<button
+class="primary"
+onclick="location.href='cbt.html'">
+
+➕ Take CBT
+
+</button>
+
+</div>
+
+</header>
+
+
+<div class="container">
+
+
+<div class="hero">
+
+<h1>
+🧠 Mistake Bank
+</h1>
+
+<p>
+Turn every mistake into a future strength.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<div class="stats">
+
+<div class="stat">
+
+<strong id="total">
+0
+</strong>
+
+<small>
+Total Mistakes
+</small>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="bookmarked">
+0
+</strong>
+
+<small>
+Bookmarked
+</small>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="mastered">
+0
+</strong>
+
+<small>
+Mastered
+</small>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="remaining">
+0
+</strong>
+
+<small>
+To Review
+</small>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+🔎 Filter Mistakes
+</h2>
+
+<div class="filters">
+
+
+<select id="subjectFilter"
+onchange="renderMistakes()">
+
+<option value="all">
+All Subjects
+</option>
+
+</select>
+
+
+<select id="statusFilter"
+onchange="renderMistakes()">
+
+<option value="all">
+All
+</option>
+
+<option value="wrong">
+Wrong Questions
+</option>
+
+<option value="skipped">
+Skipped Questions
+</option>
+
+<option value="bookmarked">
+Bookmarked
+</option>
+
+<option value="mastered">
+Mastered
+</option>
+
+<option value="unmastered">
+Not Mastered
+</option>
+
+</select>
+
+
+<input
+id="search"
+type="search"
+placeholder="Search questions..."
+oninput="renderMistakes()">
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+📚 Questions to Master
+</h2>
+
+<div id="mistakes"></div>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================
+DATA
+========================= */
+
+
+let mistakes=[];
+
+
+function loadMistakes(){
+
+const history=
+JSON.parse(
+localStorage.getItem(
+"cbtHistory"
+) || "[]"
+);
+
+
+mistakes=[];
+
+
+history.forEach(
+(test,testIndex)=>{
+
+
+(test.questions||[])
+.forEach(
+(q,questionIndex)=>{
+
+
+if(
+q.status==="wrong" ||
+q.status==="skipped"
+){
+
+
+mistakes.push({
+
+...q,
+
+testIndex:
+
+testIndex,
+
+questionIndex:
+
+questionIndex,
+
+date:
+
+test.date ||
+"Unknown date",
+
+mastered:
+
+false
+
+});
+
+
+}
+
+});
+
+});
+
+
+loadMastery();
+
+populateSubjects();
+
+updateStats();
+
+renderMistakes();
+
+}
+
+
+/* =========================
+MASTERY STORAGE
+========================= */
+
+
+function masteryKey(item){
+
+return "mastery_"
++
+item.testIndex
++
+"_"
++
+item.questionIndex;
+
+}
+
+
+function loadMastery(){
+
+mistakes.forEach(item=>{
+
+item.mastered=
+localStorage.getItem(
+masteryKey(item)
+)==="true";
+
+});
+
+}
+
+
+function toggleMastery(index){
+
+const item=
+mistakes[index];
+
+
+if(!item)return;
+
+
+item.mastered=
+!item.mastered;
+
+
+localStorage.setItem(
+masteryKey(item),
+item.mastered
+);
+
+
+updateStats();
+
+renderMistakes();
+
+}
+
+
+/* =========================
+SUBJECT FILTER
+========================= */
+
+
+function populateSubjects(){
+
+const select=
+document.getElementById(
+"subjectFilter"
+);
+
+
+const subjects=
+new Set();
+
+
+mistakes.forEach(item=>{
+
+subjects.add(
+item.subject ||
+"General"
+);
+
+});
+
+
+select.innerHTML=
+`
+<option value="all">
+All Subjects
+</option>
+`;
+
+
+[...subjects]
+.sort()
+.forEach(subject=>{
+
+const option=
+document.createElement(
+"option"
+);
+
+option.value=subject;
+
+option.textContent=subject;
+
+select.appendChild(option);
+
+});
+
+}
+
+
+/* =========================
+STATS
+========================= */
+
+
+function updateStats(){
+
+const total=
+mistakes.length;
+
+
+const bookmarked=
+mistakes.filter(
+q=>q.bookmarked
+).length;
+
+
+const mastered=
+mistakes.filter(
+q=>q.mastered
+).length;
+
+
+document.getElementById(
+"total"
+).textContent=
+total;
+
+
+document.getElementById(
+"bookmarked"
+).textContent=
+bookmarked;
+
+
+document.getElementById(
+"mastered"
+).textContent=
+mastered;
+
+
+document.getElementById(
+"remaining"
+).textContent=
+total-mastered;
+
+}
+
+
+/* =========================
+FILTER
+========================= */
+
+
+function renderMistakes(){
+
+const box=
+document.getElementById(
+"mistakes"
+);
+
+
+const subject=
+document.getElementById(
+"subjectFilter"
+).value;
+
+
+const status=
+document.getElementById(
+"statusFilter"
+).value;
+
+
+const search=
+document.getElementById(
+"search"
+).value
+.toLowerCase()
+.trim();
+
+
+let filtered=
+mistakes.filter(item=>{
+
+
+const itemSubject=
+item.subject ||
+"General";
+
+
+if(
+subject!=="all" &&
+itemSubject!==subject
+){
+
+return false;
+
+}
+
+
+if(
+search &&
+!(
+item.question ||
+""
+).toLowerCase()
+.includes(search)
+){
+
+return false;
+
+}
+
+
+if(status==="wrong" &&
+item.status!=="wrong"
+){
+
+return false;
+
+}
+
+
+if(status==="skipped" &&
+item.status!=="skipped"
+){
+
+return false;
+
+}
+
+
+if(status==="bookmarked" &&
+!item.bookmarked
+){
+
+return false;
+
+}
+
+
+if(status==="mastered" &&
+!item.mastered
+){
+
+return false;
+
+}
+
+
+if(status==="unmastered" &&
+item.mastered
+){
+
+return false;
+
+}
+
+
+return true;
+
+});
+
+
+box.innerHTML="";
+
+
+if(filtered.length===0){
+
+box.innerHTML=
+
+`
+<div class="empty">
+
+<h3>
+No matching mistakes
+</h3>
+
+<p>
+Try another filter or complete another CBT.
+</p>
+
+</div>
+`;
+
+return;
+
+}
+
+
+filtered.forEach(
+(item)=>{
+
+
+const realIndex=
+mistakes.indexOf(item);
+
+
+const card=
+document.createElement(
+"div"
+);
+
+
+card.className=
+"mistake"
++
+(
+item.mastered
+?
+" mastered"
+:
+""
+);
+
+
+let html="";
+
+
+html+=
+`
+<div class="badges">
+
+<span class="badge">
+
+${item.status==="wrong"
+?"❌ WRONG"
+:"⏭️ SKIPPED"}
+
+</span>
+
+
+<span class="badge subject">
+
+📚 ${item.subject || "General"}
+
+</span>
+`;
+
+
+if(item.bookmarked){
+
+html+=
+
+`
+<span class="badge bookmark">
+🔖 BOOKMARKED
+</span>
+`;
+
+}
+
+
+if(item.mastered){
+
+html+=
+
+`
+<span class="badge mastered">
+✅ MASTERED
+</span>
+`;
+
+}
+
+
+html+=
+`</div>`;
+
+
+html+=
+
+`
+<div class="question">
+
+${item.question || "Question unavailable"}
+
+</div>
+`;
+
+
+html+=
+
+`
+<div class="answer your">
+
+<strong>
+Your Answer:
+</strong>
+
+<br>
+
+${item.selectedAnswer || "Not Attempted"}
+
+</div>
+`;
+
+
+html+=
+
+`
+<div class="answer correct-answer">
+
+<strong>
+Correct Answer:
+</strong>
+
+<br>
+
+${item.correctAnswer || "Not Available"}
+
+</div>
+`;
+
+
+html+=
+
+`
+<div class="reason">
+
+<strong>
+🧠 Mistake Reason
+</strong>
+
+<br><br>
+
+${item.mistakeReason ||
+"Review the concept and identify why the selected answer was incorrect."}
+
+</div>
+`;
+
+
+html+=
+
+`
+<div class="solution">
+
+<strong>
+💡 Solution
+</strong>
+
+<br><br>
+
+${item.solution ||
+"Solution not available."}
+
+</div>
+`;
+
+
+html+=
+
+`
+<div class="details">
+
+📅 Test:
+${item.date}
+
+</div>
+`;
+
+
+html+=
+
+`
+<div class="actions">
+
+<button
+class="success"
+onclick="toggleMastery(${realIndex})">
+
+${item.mastered
+?
+"↩️ Review Again"
+:
+"✅ Mark Mastered"}
+
+</button>
+
+</div>
+`;
+
+
+card.innerHTML=
+html;
+
+
+box.appendChild(card);
+
+});
+
+}
+
+
+/* =========================
+START
+========================= */
+
+
+loadMistakes();
+
+</script>
+
+</body>
+
+</html>
