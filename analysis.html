@@ -4,22 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>CBT Analyzer Pro — Performance Analysis</title>
+<title>CBT Analyzer Pro — Performance Dashboard</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#f1f5f9;
-color:#0f172a
+color:#0f172a;
 }
 
 header{
 background:#fff;
 padding:16px 20px;
-border-bottom:1px solid #e2e8f0
+border-bottom:1px solid #e2e8f0;
 }
 
 .header{
@@ -27,22 +30,22 @@ max-width:1100px;
 margin:auto;
 display:flex;
 justify-content:space-between;
-align-items:center
+align-items:center;
 }
 
 .logo{
 font-size:20px;
-font-weight:800
+font-weight:800;
 }
 
 .logo span{
-color:#4f46e5
+color:#4f46e5;
 }
 
 .container{
 max-width:1100px;
 margin:25px auto;
-padding:0 15px
+padding:0 15px;
 }
 
 .hero{
@@ -50,15 +53,16 @@ background:linear-gradient(135deg,#4f46e5,#6366f1);
 color:white;
 padding:25px;
 border-radius:18px;
-margin-bottom:20px
+margin-bottom:20px;
 }
 
 .hero h1{
-margin:0 0 8px
+margin:0 0 8px;
 }
 
 .hero p{
-margin:0
+margin:0;
+opacity:.9;
 }
 
 .card{
@@ -66,57 +70,69 @@ background:#fff;
 border-radius:16px;
 padding:20px;
 margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07)
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .stats{
 display:grid;
 grid-template-columns:repeat(4,1fr);
-gap:12px
+gap:12px;
 }
 
 .stat{
 background:#f8fafc;
 padding:18px;
 border-radius:12px;
-text-align:center
+text-align:center;
 }
 
 .stat strong{
 display:block;
 font-size:27px;
-margin-bottom:5px
+margin-bottom:5px;
 }
 
 .stat small{
-color:#64748b
+color:#64748b;
 }
 
 .subject{
 border:1px solid #e2e8f0;
 border-radius:12px;
-padding:15px;
-margin-top:12px
+padding:16px;
+margin-top:12px;
 }
 
 .subject-title{
-font-weight:800;
 font-size:17px;
-margin-bottom:10px
+font-weight:800;
+margin-bottom:10px;
+}
+
+.topic{
+background:#f8fafc;
+border-radius:10px;
+padding:13px;
+margin-top:10px;
+}
+
+.topic-title{
+font-weight:700;
+margin-bottom:8px;
 }
 
 .bar{
-height:12px;
+height:11px;
 background:#e2e8f0;
 border-radius:20px;
 overflow:hidden;
-margin-top:8px
+margin-top:7px;
 }
 
 .bar-fill{
 height:100%;
 background:#4f46e5;
-border-radius:20px
+border-radius:20px;
 }
 
 .row{
@@ -124,7 +140,7 @@ display:flex;
 justify-content:space-between;
 gap:10px;
 margin-top:8px;
-font-size:14px
+font-size:14px;
 }
 
 .insight{
@@ -132,13 +148,23 @@ padding:15px;
 border-radius:11px;
 background:#eef2ff;
 margin-top:10px;
-line-height:1.6
+line-height:1.6;
+}
+
+.focus{
+border-left:5px solid #dc2626;
+background:#fff7ed;
+}
+
+.strength{
+border-left:5px solid #16a34a;
+background:#ecfdf5;
 }
 
 .empty{
 text-align:center;
 padding:45px 15px;
-color:#64748b
+color:#64748b;
 }
 
 button{
@@ -146,30 +172,33 @@ border:0;
 border-radius:9px;
 padding:11px 15px;
 font-weight:700;
-cursor:pointer
+cursor:pointer;
 }
 
 .primary{
 background:#4f46e5;
-color:white
+color:white;
 }
 
 .secondary{
 background:#e2e8f0;
-color:#0f172a
+color:#0f172a;
 }
 
 @media(max-width:800px){
 
 .stats{
-grid-template-columns:1fr 1fr
+grid-template-columns:1fr 1fr;
 }
 
 }
+
 </style>
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -194,9 +223,12 @@ Take CBT
 
 <div class="container">
 
+
 <div class="hero">
 
-<h1>📊 Performance Dashboard</h1>
+<h1>
+📊 Performance Dashboard
+</h1>
 
 <p>
 Understand your strengths, weaknesses and progress.
@@ -205,49 +237,105 @@ Understand your strengths, weaknesses and progress.
 </div>
 
 
+<!-- OVERALL -->
+
 <div class="card">
 
-<h2>Overall Performance</h2>
+<h2>
+Overall Performance
+</h2>
 
 <div class="stats">
 
 <div class="stat">
-<strong id="tests">0</strong>
-<small>Tests</small>
+
+<strong id="tests">
+0
+</strong>
+
+<small>
+Tests
+</small>
+
 </div>
+
 
 <div class="stat">
-<strong id="accuracy">0%</strong>
-<small>Accuracy</small>
+
+<strong id="accuracy">
+0%
+</strong>
+
+<small>
+Accuracy
+</small>
+
 </div>
+
 
 <div class="stat">
-<strong id="correct">0</strong>
-<small>Correct</small>
+
+<strong id="correct">
+0
+</strong>
+
+<small>
+Correct
+</small>
+
 </div>
+
 
 <div class="stat">
-<strong id="wrong">0</strong>
-<small>Wrong</small>
-</div>
+
+<strong id="wrong">
+0
+</strong>
+
+<small>
+Wrong
+</small>
 
 </div>
 
 </div>
 
+</div>
+
+
+<!-- SUBJECT -->
 
 <div class="card">
 
-<h2>📚 Subject Performance</h2>
+<h2>
+📚 Subject Performance
+</h2>
 
 <div id="subjects"></div>
 
 </div>
 
 
+<!-- TOPIC -->
+
 <div class="card">
 
-<h2>🧠 AI-Style Performance Insights</h2>
+<h2>
+🎯 Topic / Chapter Performance
+</h2>
+
+<div id="topics"></div>
+
+</div>
+
+
+<!-- INSIGHTS -->
+
+<div class="card">
+
+<h2>
+🧠 Performance Insights
+</h2>
 
 <div id="insights"></div>
 
@@ -266,64 +354,82 @@ Open Mistake Bank
 
 </div>
 
+
 </div>
 
 
 <script>
 
+
 const history=
 JSON.parse(
-localStorage.getItem("cbtHistory") || "[]"
+localStorage.getItem(
+"cbtHistory"
+) || "[]"
 );
 
+
+/* =========================
+MAIN CALCULATION
+========================= */
 
 function calculate(){
 
 if(history.length===0){
 
-document.getElementById("subjects").innerHTML=
-`
-<div class="empty">
-No test data available yet.<br><br>
-Complete a CBT to generate your analysis.
-</div>
-`;
+showEmpty();
 
 return;
 
 }
 
 
-let totalQuestions=0;
-let totalCorrect=0;
-let totalWrong=0;
-let totalSkipped=0;
+let total=0;
+
+let correct=0;
+
+let wrong=0;
+
+let skipped=0;
+
 
 const subjects={};
 
+const topics={};
 
-history.forEach(test=>{
 
-(test.questions || []).forEach(q=>{
+history.forEach(
+test=>{
 
-totalQuestions++;
+(test.questions || [])
+.forEach(q=>{
+
+total++;
+
 
 if(q.status==="correct"){
-totalCorrect++;
+correct++;
 }
 
 if(q.status==="wrong"){
-totalWrong++;
+wrong++;
 }
 
 if(q.status==="skipped"){
-totalSkipped++;
+skipped++;
 }
 
 
 const subject=
 q.subject || "General";
 
+
+const topic=
+q.topic ||
+"General";
+
+
+/* SUBJECT */
 
 if(!subjects[subject]){
 
@@ -352,25 +458,49 @@ if(q.status==="skipped"){
 subjects[subject].skipped++;
 }
 
-});
+
+/* TOPIC */
+
+const topicKey=
+subject+"|||"+topic;
+
+
+if(!topics[topicKey]){
+
+topics[topicKey]={
+subject:subject,
+topic:topic,
+total:0,
+correct:0,
+wrong:0,
+skipped:0
+};
+
+}
+
+
+topics[topicKey].total++;
+
+
+if(q.status==="correct"){
+topics[topicKey].correct++;
+}
+
+if(q.status==="wrong"){
+topics[topicKey].wrong++;
+}
+
+if(q.status==="skipped"){
+topics[topicKey].skipped++;
+}
 
 });
 
-
-document.getElementById("tests")
-.textContent=history.length;
-
-
-document.getElementById("correct")
-.textContent=totalCorrect;
-
-
-document.getElementById("wrong")
-.textContent=totalWrong;
+});
 
 
 const attempted=
-totalCorrect+totalWrong;
+correct+wrong;
 
 
 const accuracy=
@@ -379,33 +509,92 @@ attempted===0
 0
 :
 Math.round(
-(totalCorrect/attempted)*100
+(correct/attempted)*100
 );
 
 
-document.getElementById("accuracy")
-.textContent=
+document.getElementById(
+"tests"
+).textContent=
+history.length;
+
+
+document.getElementById(
+"accuracy"
+).textContent=
 accuracy+"%";
+
+
+document.getElementById(
+"correct"
+).textContent=
+correct;
+
+
+document.getElementById(
+"wrong"
+).textContent=
+wrong;
 
 
 renderSubjects(subjects);
 
+renderTopics(topics);
+
 generateInsights(
-totalQuestions,
-totalCorrect,
-totalWrong,
-totalSkipped,
+correct,
+wrong,
+skipped,
 accuracy,
-subjects
+subjects,
+topics
 );
 
 }
 
 
+/* =========================
+EMPTY
+========================= */
+
+function showEmpty(){
+
+document.getElementById(
+"subjects"
+).innerHTML=
+`
+<div class="empty">
+
+No test data available yet.
+
+<br><br>
+
+Complete a CBT to generate analysis.
+
+</div>
+`;
+
+document.getElementById(
+"topics"
+).innerHTML="";
+
+document.getElementById(
+"insights"
+).innerHTML="";
+
+}
+
+
+/* =========================
+SUBJECTS
+========================= */
+
 function renderSubjects(subjects){
 
 const box=
-document.getElementById("subjects");
+document.getElementById(
+"subjects"
+);
 
 box.innerHTML="";
 
@@ -434,7 +623,9 @@ Math.round(
 
 
 const item=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 item.className="subject";
 
@@ -447,21 +638,40 @@ ${subject}
 </div>
 
 <div class="row">
-<span>Accuracy</span>
-<strong>${accuracy}%</strong>
+
+<span>
+Accuracy
+</span>
+
+<strong>
+${accuracy}%
+</strong>
+
 </div>
 
 <div class="bar">
+
 <div
 class="bar-fill"
 style="width:${accuracy}%">
 </div>
+
 </div>
 
 <div class="row">
-<span>Correct: ${data.correct}</span>
-<span>Wrong: ${data.wrong}</span>
-<span>Skipped: ${data.skipped}</span>
+
+<span>
+Correct: ${data.correct}
+</span>
+
+<span>
+Wrong: ${data.wrong}
+</span>
+
+<span>
+Skipped: ${data.skipped}
+</span>
+
 </div>
 `;
 
@@ -473,17 +683,162 @@ box.appendChild(item);
 }
 
 
+/* =========================
+TOPICS
+========================= */
+
+function renderTopics(topics){
+
+const box=
+document.getElementById(
+"topics"
+);
+
+box.innerHTML="";
+
+
+const list=
+Object.values(topics)
+.sort(
+(a,b)=>{
+
+const aAttempted=
+a.correct+a.wrong;
+
+const bAttempted=
+b.correct+b.wrong;
+
+const aAcc=
+aAttempted===0
+?
+0
+:
+a.correct/aAttempted;
+
+const bAcc=
+bAttempted===0
+?
+0
+:
+b.correct/bAttempted;
+
+return aAcc-bAcc;
+
+}
+);
+
+
+list.forEach(data=>{
+
+const attempted=
+data.correct+
+data.wrong;
+
+
+const accuracy=
+attempted===0
+?
+0
+:
+Math.round(
+(data.correct/attempted)*100
+);
+
+
+const item=
+document.createElement(
+"div"
+);
+
+item.className="topic";
+
+
+item.innerHTML=
+
+`
+<div class="topic-title">
+
+${data.subject}
+→
+${data.topic}
+
+</div>
+
+<div class="row">
+
+<span>
+Accuracy
+</span>
+
+<strong>
+${accuracy}%
+</strong>
+
+</div>
+
+<div class="bar">
+
+<div
+class="bar-fill"
+style="width:${accuracy}%">
+</div>
+
+</div>
+
+<div class="row">
+
+<span>
+Correct: ${data.correct}
+</span>
+
+<span>
+Wrong: ${data.wrong}
+</span>
+
+<span>
+Skipped: ${data.skipped}
+</span>
+
+</div>
+`;
+
+
+box.appendChild(item);
+
+});
+
+
+if(list.length===0){
+
+box.innerHTML=
+`
+<div class="empty">
+No topic data available.
+</div>
+`;
+
+}
+
+}
+
+
+/* =========================
+INSIGHTS
+========================= */
+
 function generateInsights(
-total,
 correct,
 wrong,
 skipped,
 accuracy,
-subjects
+subjects,
+topics
 ){
 
 const box=
-document.getElementById("insights");
+document.getElementById(
+"insights"
+);
 
 box.innerHTML="";
 
@@ -493,78 +848,179 @@ let messages=[];
 
 if(accuracy>=80){
 
-messages.push(
-"🔥 Strong performance. Your overall accuracy is currently high."
-);
+messages.push({
+type:"strength",
+text:
+"🔥 Strong performance. Your current accuracy is high."
+});
 
 }
 else if(accuracy>=60){
 
-messages.push(
+messages.push({
+type:"",
+text:
 "📈 Your foundation is developing. Focus on reducing repeated mistakes."
-);
+});
 
 }
 else{
 
-messages.push(
-"🎯 Your biggest opportunity is improving accuracy through targeted mistake review."
-);
+messages.push({
+type:"focus",
+text:
+"🎯 Accuracy needs attention. Use the Mistake Bank for targeted revision."
+});
 
 }
 
 
-if(wrong>correct){
+let weakestTopic=null;
 
-messages.push(
-"🧠 You currently have more wrong answers than correct answers. Review your Mistake Bank before taking another full test."
-);
-
-}
-
-
-if(skipped>0){
-
-messages.push(
-"⏭️ You have skipped questions. Practice time management and attempt strategy."
-);
-
-}
-
-
-let weakest=null;
 let weakestAccuracy=101;
 
 
-Object.keys(subjects)
-.forEach(subject=>{
-
-const d=subjects[subject];
+Object.values(topics)
+.forEach(data=>{
 
 const attempted=
-d.correct+d.wrong;
+data.correct+
+data.wrong;
+
 
 if(attempted===0)return;
 
+
 const acc=
-(d.correct/attempted)*100;
+(data.correct/attempted)*100;
+
 
 if(acc<weakestAccuracy){
 
 weakestAccuracy=acc;
-weakest=subject;
+
+weakestTopic=data;
 
 }
 
 });
 
 
-if(weakest){
+if(weakestTopic){
 
-messages.push(
-"📚 Focus area: "+weakest+
-" currently has your lowest accuracy."
-);
+messages.push({
+
+type:"focus",
+
+text:
+"📚 Focus topic: "
++
+weakestTopic.subject
++
+" → "
++
+weakestTopic.topic
++
+" ("
++
+Math.round(weakestAccuracy)
++
+"% accuracy)."
+
+});
+
+}
+
+
+let strongestTopic=null;
+
+let strongestAccuracy=-1;
+
+
+Object.values(topics)
+.forEach(data=>{
+
+const attempted=
+data.correct+
+data.wrong;
+
+
+if(attempted===0)return;
+
+
+const acc=
+(data.correct/attempted)*100;
+
+
+if(acc>strongestAccuracy){
+
+strongestAccuracy=acc;
+
+strongestTopic=data;
+
+}
+
+});
+
+
+if(strongestTopic){
+
+messages.push({
+
+type:"strength",
+
+text:
+"⭐ Strongest topic: "
++
+strongestTopic.subject
++
+" → "
++
+strongestTopic.topic
++
+" ("
++
+Math.round(strongestAccuracy)
++
+"% accuracy)."
+
+});
+
+}
+
+
+if(skipped>0){
+
+messages.push({
+
+type:"",
+
+text:
+"⏭️ You have "
++
+skipped
++
+" skipped questions. Review time-management and question-selection strategy."
+
+});
+
+}
+
+
+if(wrong>0){
+
+messages.push({
+
+type:"focus",
+
+text:
+"🧠 "
++
+wrong
++
+" questions are currently wrong. These are the highest-priority questions for Mistake Bank revision."
+
+});
 
 }
 
@@ -572,11 +1028,17 @@ messages.push(
 messages.forEach(message=>{
 
 const div=
-document.createElement("div");
+document.createElement(
+"div"
+);
 
-div.className="insight";
+div.className=
+"insight "
++
+message.type;
 
-div.textContent=message;
+div.textContent=
+message.text;
 
 box.appendChild(div);
 
@@ -584,6 +1046,10 @@ box.appendChild(div);
 
 }
 
+
+/* =========================
+START
+========================= */
 
 calculate();
 
