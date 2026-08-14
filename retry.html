@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>CBT Analyzer Pro — Retry Mistakes</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
+}
+
+header{
+background:#fff;
+padding:16px 20px;
+border-bottom:1px solid #e2e8f0;
+}
+
+.header{
+max-width:1000px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+font-size:20px;
+font-weight:800;
+}
+
+.logo span{
+color:#4f46e5;
+}
+
+.container{
+max-width:1000px;
+margin:25px auto;
+padding:0 15px;
+}
+
+.card{
+background:#fff;
+border-radius:16px;
+padding:22px;
+margin-bottom:20px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
+}
+
+.question-number{
+color:#64748b;
+font-weight:700;
+margin-bottom:12px;
+}
+
+.question{
+font-size:20px;
+font-weight:700;
+line-height:1.5;
+margin-bottom:20px;
+}
+
+.option{
+display:block;
+width:100%;
+text-align:left;
+padding:15px;
+margin:8px 0;
+border:2px solid #e2e8f0;
+background:#fff;
+border-radius:10px;
+font-size:16px;
+cursor:pointer;
+}
+
+.option.selected{
+border-color:#4f46e5;
+background:#eef2ff;
+font-weight:700;
+}
+
+.buttons{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:20px;
+}
+
+button{
+border:0;
+border-radius:10px;
+padding:13px;
+font-weight:700;
+cursor:pointer;
+}
+
+.primary{
+background:#4f46e5;
+color:white;
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.success{
+background:#16a34a;
+color:white;
+}
+
+.danger{
+background:#dc2626;
+color:white;
+}
+
+.score{
+font-size:40px;
+font-weight:800;
+text-align:center;
+margin:20px;
+}
+
+.review{
+padding:15px;
+background:#f8fafc;
+border-radius:10px;
+margin-top:12px;
+}
+
+.correct{
+border-left:5px solid #16a34a;
+}
+
+.incorrect{
+border-left:5px solid #dc2626;
+}
+
+.empty{
+text-align:center;
+padding:50px 15px;
+color:#64748b;
+}
+
+.actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:20px;
+}
+
+@media(max-width:700px){
+
+.buttons{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="header">
+
+<div class="logo">
+CBT Analyzer <span>Pro</span>
+</div>
+
+<button
+class="primary"
+onclick="location.href='mistake.html'">
+
+🧠 Mistake Bank
+
+</button>
+
+</div>
+
+</header>
+
+
+<div class="container">
+
+<div
+class="card"
+id="testCard">
+
+<h2>
+🔄 Retry Mistakes
+</h2>
+
+<div
+class="question-number"
+id="questionNumber">
+</div>
+
+<div
+class="question"
+id="question">
+</div>
+
+<div id="options"></div>
+
+<div class="buttons">
+
+<button
+class="secondary"
+onclick="previousQuestion()">
+
+Previous
+
+</button>
+
+<button
+class="primary"
+onclick="nextQuestion()"
+id="nextButton">
+
+Next
+
+</button>
+
+</div>
+
+</div>
+
+
+<div
+class="card"
+id="result"
+style="display:none">
+
+<h2>
+Retry Completed
+</h2>
+
+<div
+class="score"
+id="score">
+</div>
+
+<p
+id="summary">
+</p>
+
+<div id="review"></div>
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="location.href='mistake.html'">
+
+🧠 Mistake Bank
+
+</button>
+
+<button
+class="secondary"
+onclick="location.reload()">
+
+🔄 Retry Again
+
+</button>
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================
+LOAD MISTAKES
+========================= */
+
+const history=
+JSON.parse(
+localStorage.getItem(
+"cbtHistory"
+) || "[]"
+);
+
+
+let retryQuestions=[];
+
+
+history.forEach(
+(test,testIndex)=>{
+
+(test.questions || [])
+.forEach(
+(q,questionIndex)=>{
+
+if(
+(q.status==="wrong" ||
+q.status==="skipped") &&
+!isMastered(testIndex,questionIndex)
+){
+
+retryQuestions.push({
+
+...q,
+
+originalTest:testIndex,
+
+originalQuestion:questionIndex
+
+});
+
+}
+
+});
+
+});
+
+
+function isMastered(
+testIndex,
+questionIndex
+){
+
+return localStorage.getItem(
+"mastery_"
++
+testIndex
++
+"_"
++
+questionIndex
+)==="true";
+
+}
+
+
+/* =========================
+STATE
+========================= */
+
+let current=0;
+
+let answers=
+new Array(
+retryQuestions.length
+).fill(null);
+
+
+/* =========================
+EMPTY
+========================= */
+
+if(retryQuestions.length===0){
+
+document.getElementById(
+"testCard"
+).innerHTML=
+
+`
+<div class="empty">
+
+<h2>
+🎉 No mistakes to retry!
+</h2>
+
+<p>
+You have mastered all currently available mistakes.
+</p>
+
+<button
+class="primary"
+onclick="location.href='mistake.html'">
+
+Back to Mistake Bank
+
+</button>
+
+</div>
+`;
+
+}
+
+
+/* =========================
+RENDER
+========================= */
+
+function renderQuestion(){
+
+if(retryQuestions.length===0)return;
+
+const q=
+retryQuestions[current];
+
+
+document.getElementById(
+"questionNumber"
+).textContent=
+"Retry Question "
++
+(current+1)
++
+" of "
++
+retryQuestions.length
++
+" • "
++
+(q.subject || "General");
+
+
+document.getElementById(
+"question"
+).textContent=
+q.question;
+
+
+const box=
+document.getElementById(
+"options"
+);
+
+box.innerHTML="";
+
+
+q.options.forEach(
+(option,index)=>{
+
+const button=
+document.createElement(
+"button"
+);
+
+button.className=
+"option";
+
+
+if(
+answers[current]===index
+){
+
+button.classList.add(
+"selected"
+);
+
+}
+
+
+button.textContent=
+String.fromCharCode(
+65+index
+)
++
+". "
++
+option;
+
+
+button.onclick=
+function(){
+
+answers[current]=index;
+
+renderQuestion();
+
+};
+
+
+box.appendChild(
+button
+);
+
+});
+
+
+document.getElementById(
+"nextButton"
+).textContent=
+current===
+retryQuestions.length-1
+?
+"Finish"
+:
+"Next";
+
+}
+
+
+/* =========================
+NAVIGATION
+========================= */
+
+function nextQuestion(){
+
+if(
+current<
+retryQuestions.length-1
+){
+
+current++;
+
+renderQuestion();
+
+}
+else{
+
+submitRetry();
+
+}
+
+}
+
+
+function previousQuestion(){
+
+if(current>0){
+
+current--;
+
+renderQuestion();
+
+}
+
+}
+
+
+/* =========================
+SUBMIT
+========================= */
+
+function submitRetry(){
+
+let correct=0;
+
+let incorrect=0;
+
+let skipped=0;
+
+
+retryQuestions.forEach(
+(q,index)=>{
+
+if(
+answers[index]===null
+){
+
+skipped++;
+
+}
+else if(
+answers[index]===q.correctIndex
+){
+
+correct++;
+
+}
+else{
+
+incorrect++;
+
+}
+
+});
+
+
+const score=
+(correct*4)-incorrect;
+
+
+document.getElementById(
+"testCard"
+).style.display="none";
+
+
+document.getElementById(
+"result"
+).style.display="block";
+
+
+document.getElementById(
+"score"
+).textContent=
+score
++
+" / "
++
+(retryQuestions.length*4);
+
+
+document.getElementById(
+"summary"
+).textContent=
+"Correct: "
++
+correct
++
+" | Incorrect: "
++
+incorrect
++
+" | Skipped: "
++
+skipped;
+
+
+generateReview();
+
+}
+
+
+/* =========================
+REVIEW
+========================= */
+
+function generateReview(){
+
+const box=
+document.getElementById(
+"review"
+);
+
+box.innerHTML=
+"<h3>Retry Review</h3>";
+
+
+retryQuestions.forEach(
+(q,index)=>{
+
+const item=
+document.createElement(
+"div"
+);
+
+const correct=
+answers[index]===q.correctIndex;
+
+
+item.className=
+"review "
++
+(
+correct
+?
+"correct"
+:
+"incorrect"
+);
+
+
+const selected=
+answers[index]===null
+?
+"Not answered"
+:
+q.options[
+answers[index]
+];
+
+
+item.innerHTML=
+
+"<strong>"
++
+"Question "
++
+(index+1)
++
+"</strong>"
+
++
+
+"<p>"
++
+q.question
++
+"</p>"
+
++
+
+"<p><strong>Your answer:</strong> "
++
+selected
++
+"</p>"
+
++
+
+"<p><strong>Correct answer:</strong> "
++
+q.correctAnswer
++
+"</p>"
+
++
+
+"<p><strong>Solution:</strong> "
++
+(q.solution || "Review this concept again.")
++
+"</p>";
+
+
+box.appendChild(item);
+
+});
+
+}
+
+
+/* =========================
+START
+========================= */
+
+renderQuestion();
+
+</script>
+
+</body>
+</html>
