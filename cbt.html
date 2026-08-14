@@ -7,36 +7,27 @@
 <title>CBT Analyzer Pro — CBT Test</title>
 
 <style>
-*{
-box-sizing:border-box;
-}
-
-html,body{
-margin:0;
-padding:0;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#f1f5f9;
 color:#0f172a;
--webkit-tap-highlight-color:transparent;
 }
 
 header{
 background:#fff;
-padding:16px 20px;
 border-bottom:1px solid #e2e8f0;
+padding:16px 20px;
 }
 
 .header{
 max-width:1100px;
 margin:auto;
 display:flex;
-justify-content:space-between;
 align-items:center;
-gap:12px;
+justify-content:space-between;
 }
 
 .logo{
@@ -67,9 +58,9 @@ gap:20px;
 
 .card{
 background:#fff;
-border-radius:15px;
+border-radius:16px;
 padding:22px;
-box-shadow:0 3px 12px rgba(0,0,0,.08);
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .question-number{
@@ -79,28 +70,29 @@ margin-bottom:12px;
 }
 
 .question{
-font-size:20px;
-line-height:1.5;
+font-size:21px;
 font-weight:800;
+line-height:1.55;
 margin-bottom:20px;
 }
 
 .option{
+display:block;
 width:100%;
 padding:15px;
-margin:8px 0;
+margin:10px 0;
 background:#fff;
 border:2px solid #e2e8f0;
-border-radius:10px;
+border-radius:11px;
 text-align:left;
 font-size:16px;
+font-weight:600;
 cursor:pointer;
 }
 
 .option.selected{
 border-color:#4f46e5;
 background:#eef2ff;
-font-weight:700;
 }
 
 .buttons{
@@ -111,13 +103,12 @@ margin-top:20px;
 }
 
 button{
+font-family:inherit;
 border:0;
 border-radius:10px;
 padding:13px;
-font-size:15px;
 font-weight:700;
 cursor:pointer;
-touch-action:manipulation;
 }
 
 .primary{
@@ -164,13 +155,6 @@ background:#fde68a;
 outline:3px solid #4f46e5;
 }
 
-.legend{
-margin-top:15px;
-color:#64748b;
-font-size:13px;
-line-height:1.8;
-}
-
 #result{
 display:none;
 }
@@ -189,12 +173,12 @@ background:#f8fafc;
 border-radius:10px;
 }
 
-.correct{
-border-left:5px solid #16a34a;
-}
-
 .incorrect{
 border-left:5px solid #dc2626;
+}
+
+.correct{
+border-left:5px solid #16a34a;
 }
 
 .skipped{
@@ -203,18 +187,10 @@ border-left:5px solid #f59e0b;
 
 .analysis{
 margin-top:10px;
-padding:12px;
+padding:13px;
 background:#eef2ff;
-border-radius:9px;
+border-radius:10px;
 line-height:1.5;
-}
-
-.bookmark{
-margin-top:10px;
-background:#fef3c7;
-padding:10px;
-border-radius:8px;
-font-weight:700;
 }
 
 .reason-options{
@@ -227,46 +203,24 @@ margin-top:10px;
 .reason-button{
 background:#fff;
 border:2px solid #e2e8f0;
-color:#0f172a;
 text-align:left;
-padding:11px;
-border-radius:9px;
-font-size:14px;
 }
 
-.reason-button.selected-reason{
+.reason-button.selected{
 border-color:#4f46e5;
 background:#eef2ff;
-color:#3730a3;
-font-weight:800;
 }
 
-.reason-status{
-font-size:13px;
-color:#64748b;
-margin-top:8px;
-}
-
-.saved-message{
-margin-top:8px;
-color:#15803d;
-font-weight:700;
-font-size:13px;
-}
-
-.result-actions{
-margin-top:20px;
+.bookmark{
+margin-top:10px;
+padding:10px;
+background:#fef3c7;
+border-radius:8px;
 }
 
 .result-actions button{
 width:100%;
 margin-top:10px;
-}
-
-.empty-message{
-text-align:center;
-padding:20px;
-color:#64748b;
 }
 
 @media(max-width:800px){
@@ -286,7 +240,6 @@ grid-template-columns:1fr;
 <body>
 
 <header>
-
 <div class="header">
 
 <div class="logo">
@@ -294,13 +247,12 @@ CBT Analyzer <span>Pro</span>
 </div>
 
 <div
-class="timer"
-id="timer">
+id="timer"
+class="timer">
 30:00
 </div>
 
 </div>
-
 </header>
 
 
@@ -308,21 +260,17 @@ id="timer">
 
 <main class="card">
 
-<!-- =========================
-TEST SCREEN
-========================= -->
-
 <section id="testScreen">
 
 <div
-class="question-number"
-id="questionNumber">
+id="questionNumber"
+class="question-number">
 Loading...
 </div>
 
 <div
-class="question"
-id="question">
+id="question"
+class="question">
 </div>
 
 <div id="options"></div>
@@ -331,29 +279,25 @@ id="question">
 
 <button
 class="secondary"
-type="button"
 onclick="previousQuestion()">
 Previous
 </button>
 
 <button
 class="warning"
-type="button"
 onclick="markReview()">
-Mark for Review
+Mark Review
 </button>
 
 <button
 class="secondary"
-type="button"
 onclick="clearAnswer()">
-Clear Answer
+Clear
 </button>
 
 <button
-class="primary"
-type="button"
 id="nextButton"
+class="primary"
 onclick="nextQuestion()">
 Next
 </button>
@@ -363,19 +307,13 @@ Next
 </section>
 
 
-<!-- =========================
-RESULT SCREEN
-========================= -->
-
 <section id="result">
 
-<h2>
-Test Completed
-</h2>
+<h2>🎯 Test Completed</h2>
 
 <div
-class="score"
-id="score">
+id="score"
+class="score">
 </div>
 
 <p id="summary"></p>
@@ -383,31 +321,24 @@ id="score">
 <div id="review"></div>
 
 
-<!-- RESULT ACTIONS -->
-
 <div class="result-actions">
 
 <button
 id="retryButton"
 class="primary"
-type="button"
 style="display:none"
 onclick="location.href='retry.html'">
 🔄 Retry Mistakes
 </button>
 
-
 <button
 class="secondary"
-type="button"
 onclick="location.href='mistake.html'">
-🧠 Open Mistake Bank
+🧠 Mistake Bank
 </button>
 
-
 <button
 class="secondary"
-type="button"
 onclick="location.href='index.html'">
 🏠 Dashboard
 </button>
@@ -419,38 +350,20 @@ onclick="location.href='index.html'">
 </main>
 
 
-<!-- =========================
-QUESTION PALETTE
-========================= -->
-
 <aside class="card">
 
-<h3>
-Question Palette
-</h3>
+<h3>Question Palette</h3>
 
 <div
-class="palette"
-id="palette">
-</div>
-
-<div class="legend">
-
-🟩 Answered<br>
-🟨 Marked for review<br>
-⬜ Not answered<br>
-🟦 Current question
-
+id="palette"
+class="palette">
 </div>
 
 <button
 class="danger"
 style="width:100%;margin-top:20px"
-type="button"
 onclick="submitTest()">
-
 Submit Test
-
 </button>
 
 </aside>
@@ -460,9 +373,9 @@ Submit Test
 
 <script>
 
-/* =====================================================
+/* ================================
 QUESTIONS
-===================================================== */
+================================ */
 
 const questions=[
 
@@ -477,50 +390,7 @@ options:[
 "Venus"
 ],
 answer:1,
-solution:
-"Mars appears reddish because iron minerals on its surface have undergone oxidation.",
-mistakeReason:
-"Revise the basic identification and characteristics of planets.",
-mistakeType:
-"Concept Gap"
-},
-
-{
-subject:"Physics",
-topic:"Basic Mathematics",
-question:"What is 2 + 2?",
-options:[
-"3",
-"4",
-"5",
-"6"
-],
-answer:1,
-solution:
-"Adding 2 and 2 gives 4.",
-mistakeReason:
-"Recheck the basic arithmetic operation.",
-mistakeType:
-"Calculation Error"
-},
-
-{
-subject:"Biology",
-topic:"Environment",
-question:"Which gas is most abundant in Earth's atmosphere?",
-options:[
-"Oxygen",
-"Carbon dioxide",
-"Nitrogen",
-"Hydrogen"
-],
-answer:2,
-solution:
-"Nitrogen makes up approximately 78% of Earth's atmosphere.",
-mistakeReason:
-"Revise the approximate composition of Earth's atmosphere.",
-mistakeType:
-"Concept Gap"
+solution:"Mars is called the Red Planet because iron-bearing minerals on its surface give it a reddish appearance."
 },
 
 {
@@ -534,12 +404,7 @@ options:[
 "Pascal"
 ],
 answer:1,
-solution:
-"The SI unit of force is the newton (N).",
-mistakeReason:
-"Distinguish force from energy, power and pressure units.",
-mistakeType:
-"Misread Question"
+solution:"The SI unit of force is the newton (N)."
 },
 
 {
@@ -553,18 +418,13 @@ options:[
 "Golgi apparatus"
 ],
 answer:2,
-solution:
-"Mitochondria are major sites of aerobic cellular respiration and ATP production.",
-mistakeReason:
-"Revise the functions of major cell organelles.",
-mistakeType:
-"Concept Gap"
+solution:"Mitochondria are major sites of ATP production during cellular respiration."
 },
 
 {
 subject:"Chemistry",
 topic:"Periodic Table",
-question:"What is the chemical symbol for sodium?",
+question:"What is the chemical symbol of sodium?",
 options:[
 "So",
 "Na",
@@ -572,31 +432,21 @@ options:[
 "Sd"
 ],
 answer:1,
-solution:
-"The chemical symbol for sodium is Na, derived from its Latin name natrium.",
-mistakeReason:
-"Revise symbols of common elements.",
-mistakeType:
-"Concept Gap"
+solution:"The symbol Na comes from the Latin name natrium."
 },
 
 {
 subject:"Biology",
-topic:"Cellular Respiration",
-question:"Which process produces ATP in mitochondria?",
+topic:"Environment",
+question:"Which gas is most abundant in Earth's atmosphere?",
 options:[
-"Photosynthesis",
-"Cellular respiration",
-"Transcription",
-"Translation"
+"Oxygen",
+"Carbon dioxide",
+"Nitrogen",
+"Hydrogen"
 ],
-answer:1,
-solution:
-"Cellular respiration in mitochondria generates ATP through oxidative phosphorylation and related processes.",
-mistakeReason:
-"Differentiate cellular respiration from other cellular processes.",
-mistakeType:
-"Misread Question"
+answer:2,
+solution:"Nitrogen makes up approximately 78% of Earth's atmosphere."
 },
 
 {
@@ -610,12 +460,7 @@ options:[
 "98 m/s²"
 ],
 answer:1,
-solution:
-"The standard approximate value of gravitational acceleration near Earth's surface is 9.8 m/s².",
-mistakeReason:
-"Revise standard physical constants and numerical values.",
-mistakeType:
-"Calculation Error"
+solution:"The approximate acceleration due to gravity near Earth's surface is 9.8 m/s²."
 },
 
 {
@@ -629,12 +474,7 @@ options:[
 "Glucose"
 ],
 answer:2,
-solution:
-"DNA stores and transmits hereditary genetic information in most organisms.",
-mistakeReason:
-"Revise the roles of DNA, RNA, proteins and other biomolecules.",
-mistakeType:
-"Concept Gap"
+solution:"DNA stores hereditary genetic information in most organisms."
 },
 
 {
@@ -648,48 +488,60 @@ options:[
 "Photon"
 ],
 answer:2,
-solution:
-"An electron carries one unit of negative elementary charge.",
-mistakeReason:
-"Revise the basic properties of subatomic particles.",
-mistakeType:
-"Concept Gap"
+solution:"An electron carries a negative elementary charge."
+},
+
+{
+subject:"Chemistry",
+topic:"Atomic Structure",
+question:"Which particle has no electric charge?",
+options:[
+"Proton",
+"Electron",
+"Neutron",
+"Positron"
+],
+answer:2,
+solution:"A neutron is electrically neutral."
+},
+
+{
+subject:"Biology",
+topic:"Human Physiology",
+question:"Which organ pumps blood throughout the human body?",
+options:[
+"Liver",
+"Kidney",
+"Heart",
+"Lung"
+],
+answer:2,
+solution:"The heart contracts rhythmically to pump blood through the circulatory system."
 }
 
 ];
 
 
-/* =====================================================
+/* ================================
 STATE
-===================================================== */
+================================ */
 
 let current=0;
 
 let answers=
-new Array(
-questions.length
-).fill(null);
+new Array(questions.length).fill(null);
 
 let marked=
-new Array(
-questions.length
-).fill(false);
-
-let mistakeReasons=
-new Array(
-questions.length
-).fill(null);
+new Array(questions.length).fill(false);
 
 let submitted=false;
-
-let savedHistoryIndex=-1;
 
 let timeLeft=1800;
 
 
-/* =====================================================
+/* ================================
 TIMER
-===================================================== */
+================================ */
 
 function updateTimer(){
 
@@ -699,22 +551,18 @@ Math.floor(timeLeft/60);
 const seconds=
 timeLeft%60;
 
-document.getElementById(
-"timer"
-).textContent=
+document.getElementById("timer")
+.textContent=
 String(minutes).padStart(2,"0")+
 ":"+
 String(seconds).padStart(2,"0");
 
 }
 
-
 const timerInterval=
 setInterval(function(){
 
-if(submitted){
-return;
-}
+if(submitted)return;
 
 timeLeft--;
 
@@ -722,11 +570,7 @@ if(timeLeft<=0){
 
 timeLeft=0;
 
-updateTimer();
-
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 submitTest();
 
@@ -739,19 +583,16 @@ updateTimer();
 },1000);
 
 
-/* =====================================================
-QUESTION RENDER
-===================================================== */
+/* ================================
+RENDER QUESTION
+================================ */
 
 function renderQuestion(){
 
-const q=
-questions[current];
+const q=questions[current];
 
-
-document.getElementById(
-"questionNumber"
-).textContent=
+document.getElementById("questionNumber")
+.textContent=
 "Question "+
 (current+1)+
 " of "+
@@ -759,53 +600,33 @@ questions.length+
 " • "+
 q.subject;
 
-
-document.getElementById(
-"question"
-).textContent=
-q.question;
-
+document.getElementById("question")
+.textContent=q.question;
 
 const box=
-document.getElementById(
-"options"
-);
+document.getElementById("options");
 
 box.innerHTML="";
 
-
-q.options.forEach(
-function(option,index){
+q.options.forEach(function(option,index){
 
 const button=
-document.createElement(
-"button"
-);
+document.createElement("button");
 
 button.type="button";
 
-button.className=
-"option";
+button.className="option";
 
+if(answers[current]===index){
 
-if(
-answers[current]===index
-){
-
-button.classList.add(
-"selected"
-);
+button.classList.add("selected");
 
 }
 
-
 button.textContent=
-String.fromCharCode(
-65+index
-)+
+String.fromCharCode(65+index)+
 ". "+
 option;
-
 
 button.onclick=function(){
 
@@ -815,88 +636,56 @@ renderQuestion();
 
 };
 
-
 box.appendChild(button);
 
 });
 
-
-document.getElementById(
-"nextButton"
-).textContent=
-current===
-questions.length-1
-?
-"Finish"
-:
-"Next";
-
+document.getElementById("nextButton")
+.textContent=
+current===questions.length-1
+?"Finish"
+:"Next";
 
 renderPalette();
 
 }
 
 
-/* =====================================================
+/* ================================
 PALETTE
-===================================================== */
+================================ */
 
 function renderPalette(){
 
 const palette=
-document.getElementById(
-"palette"
-);
+document.getElementById("palette");
 
 palette.innerHTML="";
 
-
-questions.forEach(
-function(q,index){
+questions.forEach(function(q,index){
 
 const button=
-document.createElement(
-"button"
-);
+document.createElement("button");
 
-button.type="button";
+button.textContent=index+1;
 
-button.textContent=
-index+1;
+if(answers[index]!==null){
 
-
-if(
-answers[index]!==null
-){
-
-button.classList.add(
-"answered"
-);
+button.classList.add("answered");
 
 }
 
+if(marked[index]){
 
-if(
-marked[index]
-){
-
-button.classList.add(
-"review"
-);
+button.classList.add("review");
 
 }
 
+if(index===current){
 
-if(
-index===current
-){
-
-button.classList.add(
-"current"
-);
+button.classList.add("current");
 
 }
-
 
 button.onclick=function(){
 
@@ -906,26 +695,20 @@ renderQuestion();
 
 };
 
-
-palette.appendChild(
-button
-);
+palette.appendChild(button);
 
 });
 
 }
 
 
-/* =====================================================
+/* ================================
 NAVIGATION
-===================================================== */
+================================ */
 
 function nextQuestion(){
 
-if(
-current<
-questions.length-1
-){
+if(current<questions.length-1){
 
 current++;
 
@@ -939,12 +722,9 @@ submitTest();
 
 }
 
-
 function previousQuestion(){
 
-if(
-current>0
-){
+if(current>0){
 
 current--;
 
@@ -954,7 +734,6 @@ renderQuestion();
 
 }
 
-
 function clearAnswer(){
 
 answers[current]=null;
@@ -963,22 +742,20 @@ renderQuestion();
 
 }
 
-
 function markReview(){
 
-marked[current]=
-!marked[current];
+marked[current]=!marked[current];
 
 renderPalette();
 
 }
 
 
-/* =====================================================
-SAVE TEST HISTORY
-===================================================== */
+/* ================================
+SAVE HISTORY
+================================ */
 
-function saveTest(
+function saveHistory(
 correct,
 incorrect,
 skipped,
@@ -987,19 +764,14 @@ score
 
 let history=[];
 
-
 try{
 
 history=
 JSON.parse(
-localStorage.getItem(
-"cbtHistory"
-) || "[]"
+localStorage.getItem("cbtHistory")||"[]"
 );
 
-if(
-!Array.isArray(history)
-){
+if(!Array.isArray(history)){
 
 history=[];
 
@@ -1012,23 +784,32 @@ history=[];
 }
 
 
-const questionData=
-questions.map(
-function(q,index){
+const record={
+
+date:new Date().toLocaleString(),
+
+timestamp:Date.now(),
+
+score:score,
+
+correct:correct,
+
+incorrect:incorrect,
+
+wrong:incorrect,
+
+skipped:skipped,
+
+questions:questions.map(function(q,index){
 
 let status;
 
-
-if(
-answers[index]===null
-){
+if(answers[index]===null){
 
 status="skipped";
 
 }
-else if(
-answers[index]===q.answer
-){
+else if(answers[index]===q.answer){
 
 status="correct";
 
@@ -1038,16 +819,6 @@ else{
 status="wrong";
 
 }
-
-
-const selectedAnswer=
-answers[index]===null
-?
-null
-:
-q.options[
-answers[index]
-];
 
 
 return{
@@ -1062,80 +833,41 @@ topic:q.topic,
 
 status:status,
 
-selectedIndex:
-answers[index],
+selectedIndex:answers[index],
 
 selectedAnswer:
-selectedAnswer,
+answers[index]===null
+?"Not answered"
+:q.options[answers[index]],
 
-correctIndex:
-q.answer,
+correctIndex:q.answer,
 
-correctAnswer:
-q.options[q.answer],
-
-bookmarked:
-marked[index],
-
-markedForReview:
-marked[index],
+correctAnswer:q.options[q.answer],
 
 mistakeType:
 status==="wrong"
-?
-(
-mistakeReasons[index] ||
-"Not Classified"
-)
+?"Not Classified"
 :null,
 
 mistakeReason:
 status==="wrong"
-?
-(
-mistakeReasons[index] ||
-"Student has not selected a mistake reason yet."
-)
-:"Correct answer.",
+?"Review the concept and identify why the answer was incorrect."
+:null,
 
-solution:q.solution
+solution:q.solution,
+
+bookmarked:marked[index],
+
+markedForReview:marked[index]
 
 };
 
-});
-
-
-const testRecord={
-
-date:
-new Date().toLocaleString(),
-
-timestamp:
-Date.now(),
-
-score:score,
-
-correct:correct,
-
-incorrect:incorrect,
-
-wrong:incorrect,
-
-skipped:skipped,
-
-questions:questionData
+})
 
 };
 
 
-history.push(
-testRecord
-);
-
-
-savedHistoryIndex=
-history.length-1;
-
+history.push(record);
 
 localStorage.setItem(
 "cbtHistory",
@@ -1145,202 +877,41 @@ JSON.stringify(history)
 }
 
 
-/* =====================================================
-MISTAKE REASON EXPLANATION
-===================================================== */
-
-function getReasonExplanation(
-reason
-){
-
-const explanations={
-
-"Concept Gap":
-"Student identified a gap in understanding the underlying concept.",
-
-"Calculation Error":
-"Student identified an error in calculation, arithmetic or numerical processing.",
-
-"Misread Question":
-"Student identified that the question or options were misunderstood or read incorrectly.",
-
-"Guessing":
-"Student identified that the answer was selected without sufficient confidence or reasoning.",
-
-"Time Pressure":
-"Student identified that time pressure affected the answer."
-
-};
-
-
-return explanations[reason] ||
-"Student-selected mistake reason.";
-
-}
-
-
-/* =====================================================
-SAVE REASON
-===================================================== */
-
-function saveReasonToHistory(
-index,
-reason
-){
-
-if(
-savedHistoryIndex<0
-){
-
-return;
-
-}
-
-
-try{
-
-const history=
-JSON.parse(
-localStorage.getItem(
-"cbtHistory"
-) || "[]"
-);
-
-
-if(
-!Array.isArray(history) ||
-!history[savedHistoryIndex] ||
-!Array.isArray(
-history[savedHistoryIndex].questions
-)
-){
-
-return;
-
-}
-
-
-const record=
-history[
-savedHistoryIndex
-].questions[index];
-
-
-if(!record){
-return;
-}
-
-
-record.mistakeType=
-reason;
-
-record.mistakeReason=
-getReasonExplanation(
-reason
-);
-
-
-history[
-savedHistoryIndex
-].questions[index]=
-record;
-
-
-localStorage.setItem(
-"cbtHistory",
-JSON.stringify(history)
-);
-
-}catch(error){
-
-console.error(error);
-
-}
-
-}
-
-
-/* =====================================================
-SELECT MISTAKE REASON
-===================================================== */
-
-function selectMistakeReason(
-index,
-reason
-){
-
-mistakeReasons[index]=
-reason;
-
-saveReasonToHistory(
-index,
-reason
-);
-
-generateReview();
-
-}
-
-
-/* =====================================================
+/* ================================
 RETRY BUTTON
-===================================================== */
+================================ */
 
-function updateRetryButton(
-incorrect
-){
+function updateRetryButton(incorrect){
 
 const button=
-document.getElementById(
-"retryButton"
-);
+document.getElementById("retryButton");
 
+if(incorrect>0){
 
-if(!button){
-return;
-}
-
-
-if(
-incorrect>0
-){
-
-button.style.display=
-"block";
-
+button.style.display="block";
 
 button.textContent=
 "🔄 Retry "+
 incorrect+
 " Mistake"+
-(
-incorrect===1
-?
-""
-:
-"s"
-);
+(incorrect===1?"":"s");
 
 }else{
 
-button.style.display=
-"none";
+button.style.display="none";
 
 }
 
 }
 
 
-/* =====================================================
+/* ================================
 SUBMIT
-===================================================== */
+================================ */
 
 function submitTest(){
 
-if(submitted){
-return;
-}
-
+if(submitted)return;
 
 let correct=0;
 
@@ -1349,19 +920,14 @@ let incorrect=0;
 let skipped=0;
 
 
-questions.forEach(
-function(q,index){
+questions.forEach(function(q,index){
 
-if(
-answers[index]===null
-){
+if(answers[index]===null){
 
 skipped++;
 
 }
-else if(
-answers[index]===q.answer
-){
+else if(answers[index]===q.answer){
 
 correct++;
 
@@ -1379,7 +945,7 @@ const score=
 (correct*4)-incorrect;
 
 
-saveTest(
+saveHistory(
 correct,
 incorrect,
 skipped,
@@ -1389,42 +955,28 @@ score
 
 submitted=true;
 
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 
-document.getElementById(
-"testScreen"
-).style.display=
-"none";
+document.getElementById("testScreen")
+.style.display="none";
+
+document.querySelector("aside")
+.style.display="none";
+
+document.getElementById("result")
+.style.display="block";
 
 
-document.querySelector(
-"aside"
-).style.display=
-"none";
-
-
-document.getElementById(
-"result"
-).style.display=
-"block";
-
-
-document.getElementById(
-"score"
-).textContent=
+document.getElementById("score")
+.textContent=
 score+
 " / "+
-(
-questions.length*4
-);
+(questions.length*4);
 
 
-document.getElementById(
-"summary"
-).textContent=
+document.getElementById("summary")
+.textContent=
 "Correct: "+
 correct+
 " | Incorrect: "+
@@ -1433,93 +985,37 @@ incorrect+
 skipped;
 
 
-/*
-IMPORTANT:
-Show Retry only when
-there are wrong questions.
-*/
-
-updateRetryButton(
-incorrect
-);
-
+updateRetryButton(incorrect);
 
 generateReview();
 
 }
 
 
-/* =====================================================
-REASON BUTTON
-===================================================== */
-
-function reasonButton(
-index,
-reason,
-icon
-){
-
-const selected=
-mistakeReasons[index]===reason
-?
-" selected-reason"
-:
-"";
-
-
-return `
-
-<button
-type="button"
-class="reason-button${selected}"
-onclick="selectMistakeReason(${index},'${reason}')">
-
-${icon} ${reason}
-
-</button>
-
-`;
-
-}
-
-
-/* =====================================================
+/* ================================
 REVIEW
-===================================================== */
+================================ */
 
 function generateReview(){
 
 const box=
-document.getElementById(
-"review"
-);
+document.getElementById("review");
 
-box.innerHTML=
-"<h3>Question Analysis</h3>";
+box.innerHTML="<h3>Question Analysis</h3>";
 
-
-questions.forEach(
-function(q,index){
+questions.forEach(function(q,index){
 
 const item=
-document.createElement(
-"div"
-);
-
+document.createElement("div");
 
 let status;
 
-
-if(
-answers[index]===null
-){
+if(answers[index]===null){
 
 status="skipped";
 
 }
-else if(
-answers[index]===q.answer
-){
+else if(answers[index]===q.answer){
 
 status="correct";
 
@@ -1530,28 +1026,20 @@ status="incorrect";
 
 }
 
-
 item.className=
 "review-item "+
 status;
 
-
-const selected=
+const yourAnswer=
 answers[index]===null
-?
-"Not answered"
-:
-q.options[
-answers[index]
-];
+?"Not answered"
+:q.options[answers[index]];
 
 
 item.innerHTML=
 
 "<strong>Question "+
 (index+1)+
-" • "+
-q.subject+
 "</strong>"+
 
 "<p>"+
@@ -1559,7 +1047,7 @@ escapeHTML(q.question)+
 "</p>"+
 
 "<p><strong>Your answer:</strong> "+
-escapeHTML(selected)+
+escapeHTML(yourAnswer)+
 "</p>"+
 
 "<p><strong>Correct answer:</strong> "+
@@ -1567,94 +1055,21 @@ escapeHTML(q.options[q.answer])+
 "</p>";
 
 
-if(
-marked[index]
-){
-
-item.innerHTML+=
-'<div class="bookmark">🔖 Bookmarked for review</div>';
-
-}
-
-
-if(
-status==="incorrect"
-){
-
-const selectedReason=
-mistakeReasons[index];
-
+if(status==="incorrect"){
 
 item.innerHTML+=`
 
 <div class="analysis">
 
-<strong>
-❌ Why did you get this wrong?
-</strong>
+<strong>❌ Mistake detected</strong>
 
-<div class="reason-options">
+<br><br>
 
-${reasonButton(
-index,
-"Concept Gap",
-"🧠"
-)}
+Review the concept before retrying this question.
 
-${reasonButton(
-index,
-"Calculation Error",
-"🧮"
-)}
+<br><br>
 
-${reasonButton(
-index,
-"Misread Question",
-"👀"
-)}
-
-${reasonButton(
-index,
-"Guessing",
-"🎲"
-)}
-
-${reasonButton(
-index,
-"Time Pressure",
-"⏱️"
-)}
-
-</div>
-
-<div class="reason-status">
-
-${
-selectedReason
-?
-"Selected: "+
-escapeHTML(
-selectedReason
-)
-:
-"Select the reason that best describes your mistake."
-}
-
-</div>
-
-${
-selectedReason
-?
-'<div class="saved-message">✓ Saved to performance history</div>'
-:
-''
-}
-
-<br>
-
-<strong>
-💡 Solution
-</strong>
+<strong>💡 Solution</strong>
 
 <br><br>
 
@@ -1666,88 +1081,32 @@ ${escapeHTML(q.solution)}
 
 }
 
-
-if(
-status==="skipped"
-){
-
-item.innerHTML+=`
-
-<div class="analysis">
-
-<strong>
-⏭️ Skipped Question
-</strong>
-
-<br><br>
-
-<strong>
-💡 Solution
-</strong>
-
-<br><br>
-
-${escapeHTML(q.solution)}
-
-</div>
-
-`;
-
-}
-
-
-box.appendChild(
-item
-);
+box.appendChild(item);
 
 });
 
 }
 
 
-/* =====================================================
-ESCAPE HTML
-===================================================== */
+/* ================================
+ESCAPE
+================================ */
 
-function escapeHTML(
-value
-){
+function escapeHTML(value){
 
-return String(
-value===undefined||
-value===null
-?
-""
-:
-value
-)
-.replace(
-/&/g,
-"&amp;"
-)
-.replace(
-/</g,
-"&lt;"
-)
-.replace(
-/>/g,
-"&gt;"
-)
-.replace(
-/"/g,
-"&quot;"
-)
-.replace(
-/'/g,
-"&#039;"
-);
+return String(value||"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
 
-/* =====================================================
+/* ================================
 START
-===================================================== */
+================================ */
 
 updateTimer();
 
