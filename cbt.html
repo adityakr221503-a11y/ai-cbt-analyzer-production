@@ -3,280 +3,209 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>CBT Analyzer Pro</title>
+<title>CBT Analyzer Pro — CBT Test</title>
 
 <style>
 *{box-sizing:border-box}
 
 body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#f1f5f9;
-color:#0f172a
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f1f5f9;
+  color:#0f172a;
 }
 
 header{
-background:#fff;
-padding:16px 20px;
-border-bottom:1px solid #e2e8f0
+  background:#fff;
+  padding:16px 20px;
+  border-bottom:1px solid #e2e8f0;
 }
 
 .header{
-max-width:1100px;
-margin:auto;
-display:flex;
-justify-content:space-between;
-align-items:center
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 .logo{
-font-size:20px;
-font-weight:700
+  font-size:20px;
+  font-weight:800;
 }
 
+.logo span{color:#4f46e5}
+
 .timer{
-background:#eef2ff;
-padding:9px 14px;
-border-radius:9px;
-font-weight:700
+  background:#eef2ff;
+  color:#3730a3;
+  padding:10px 15px;
+  border-radius:10px;
+  font-weight:800;
 }
 
 .container{
-max-width:1100px;
-margin:20px auto;
-padding:0 15px;
-display:grid;
-grid-template-columns:1fr 280px;
-gap:20px
+  max-width:1100px;
+  margin:20px auto;
+  padding:0 15px;
+  display:grid;
+  grid-template-columns:1fr 280px;
+  gap:20px;
 }
 
 .card{
-background:#fff;
-border-radius:15px;
-padding:22px;
-box-shadow:0 3px 12px rgba(0,0,0,.08)
+  background:#fff;
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .question-number{
-color:#64748b;
-font-weight:600;
-margin-bottom:12px
+  color:#64748b;
+  font-weight:700;
+  margin-bottom:12px;
 }
 
 .question{
-font-size:20px;
-line-height:1.5;
-font-weight:700;
-margin-bottom:20px
+  font-size:21px;
+  line-height:1.5;
+  font-weight:800;
+  margin-bottom:20px;
 }
 
 .option{
-width:100%;
-padding:15px;
-margin:8px 0;
-background:#fff;
-border:2px solid #e2e8f0;
-border-radius:10px;
-text-align:left;
-font-size:16px;
-cursor:pointer
-}
-
-.option:hover{
-border-color:#818cf8
+  width:100%;
+  padding:15px;
+  margin:8px 0;
+  background:#fff;
+  border:2px solid #e2e8f0;
+  border-radius:11px;
+  text-align:left;
+  font-size:16px;
+  cursor:pointer;
 }
 
 .option.selected{
-border-color:#4f46e5;
-background:#eef2ff;
-font-weight:700
+  border-color:#4f46e5;
+  background:#eef2ff;
+  font-weight:800;
 }
 
 .buttons{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:20px
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:20px;
 }
 
 button{
-border:0;
-border-radius:10px;
-padding:13px;
-font-size:15px;
-font-weight:700;
-cursor:pointer
+  border:0;
+  border-radius:10px;
+  padding:13px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
 }
 
-.primary{
-background:#4f46e5;
-color:white
-}
-
-.secondary{
-background:#e2e8f0;
-color:#0f172a
-}
-
-.warning{
-background:#f59e0b;
-color:white
-}
-
-.danger{
-background:#dc2626;
-color:white
-}
+.primary{background:#4f46e5;color:#fff}
+.secondary{background:#e2e8f0;color:#0f172a}
+.warning{background:#f59e0b;color:#fff}
+.danger{background:#dc2626;color:#fff}
 
 .palette{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:8px;
-margin-top:15px
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-top:15px;
 }
 
 .palette button{
-background:#e2e8f0;
-padding:10px 5px
+  background:#e2e8f0;
+  padding:10px 5px;
 }
 
-.palette .answered{
-background:#bbf7d0
-}
-
-.palette .review{
-background:#fde68a
-}
-
+.palette .answered{background:#bbf7d0}
+.palette .review{background:#fde68a}
 .palette .current{
-outline:3px solid #4f46e5
+  outline:3px solid #4f46e5;
 }
 
 .legend{
-margin-top:15px;
-color:#64748b;
-font-size:13px;
-line-height:1.8
+  margin-top:15px;
+  color:#64748b;
+  font-size:13px;
+  line-height:1.8;
 }
 
-#result{
-display:none
-}
+#result{display:none}
 
 .score{
-font-size:38px;
-font-weight:800;
-text-align:center;
-margin:20px
+  font-size:40px;
+  font-weight:800;
+  text-align:center;
+  margin:20px;
 }
 
 .review-item{
-margin-top:15px;
-padding:15px;
-background:#f8fafc;
-border-radius:10px
+  margin-top:15px;
+  padding:16px;
+  background:#f8fafc;
+  border-radius:10px;
 }
 
-.correct{
-border-left:5px solid #16a34a
-}
-
-.incorrect{
-border-left:5px solid #dc2626
-}
-
-.skipped{
-border-left:5px solid #f59e0b
-}
+.correct{border-left:5px solid #16a34a}
+.incorrect{border-left:5px solid #dc2626}
+.skipped{border-left:5px solid #f59e0b}
 
 .analysis{
-margin-top:10px;
-padding:12px;
-background:#eef2ff;
-border-radius:9px;
-line-height:1.5
+  margin-top:10px;
+  padding:13px;
+  background:#eef2ff;
+  border-radius:9px;
+  line-height:1.5;
 }
 
 .bookmark{
-margin-top:10px;
-background:#fef3c7;
-padding:10px;
-border-radius:8px;
-font-weight:700
+  margin-top:10px;
+  background:#fef3c7;
+  padding:10px;
+  border-radius:8px;
+  font-weight:700;
 }
 
 .reason-options{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin-top:10px
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
 }
 
 .reason-button{
-background:#fff;
-border:2px solid #e2e8f0;
-color:#0f172a;
-text-align:left;
-padding:11px;
-border-radius:9px;
-font-size:14px
+  background:#fff;
+  border:2px solid #e2e8f0;
+  color:#0f172a;
+  text-align:left;
+  padding:11px;
+  border-radius:9px;
 }
 
 .reason-button.selected-reason{
-border-color:#4f46e5;
-background:#eef2ff;
-color:#3730a3;
-font-weight:800
-}
-
-.reason-status{
-font-size:13px;
-color:#64748b;
-margin-top:8px
+  border-color:#4f46e5;
+  background:#eef2ff;
+  color:#3730a3;
+  font-weight:800;
 }
 
 .saved-message{
-margin-top:8px;
-color:#15803d;
-font-weight:700;
-font-size:13px
-}
-
-.result-actions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:20px
-}
-
-.result-actions button{
-flex:1;
-min-width:150px
+  margin-top:8px;
+  color:#15803d;
+  font-weight:700;
+  font-size:13px;
 }
 
 @media(max-width:800px){
-
-.container{
-grid-template-columns:1fr
-}
-
-.reason-options{
-grid-template-columns:1fr
-}
-
-}
-
-@media(max-width:500px){
-
-.question{
-font-size:18px
-}
-
-.buttons{
-grid-template-columns:1fr
-}
-
+  .container{grid-template-columns:1fr}
+  .reason-options{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -284,21 +213,14 @@ grid-template-columns:1fr
 <body>
 
 <header>
-
 <div class="header">
+  <div class="logo">
+    CBT Analyzer <span>Pro</span>
+  </div>
 
-<div class="logo">
-CBT Analyzer Pro
+  <div class="timer" id="timer">30:00</div>
 </div>
-
-<div class="timer" id="timer">
-30:00
-</div>
-
-</div>
-
 </header>
-
 
 <div class="container">
 
@@ -306,43 +228,31 @@ CBT Analyzer Pro
 
 <section id="testScreen">
 
-<div
-class="question-number"
-id="questionNumber">
-Loading...
+<div class="question-number" id="questionNumber">
+Question 1 of 10
 </div>
 
-<div
-class="question"
-id="question">
+<div class="question" id="question">
+Loading question...
 </div>
 
 <div id="options"></div>
 
 <div class="buttons">
 
-<button
-class="secondary"
-onclick="previousQuestion()">
+<button class="secondary" onclick="previousQuestion()">
 Previous
 </button>
 
-<button
-class="warning"
-onclick="markReview()">
+<button class="warning" onclick="markReview()">
 Mark for Review
 </button>
 
-<button
-class="secondary"
-onclick="clearAnswer()">
+<button class="secondary" onclick="clearAnswer()">
 Clear Answer
 </button>
 
-<button
-class="primary"
-id="nextButton"
-onclick="nextQuestion()">
+<button class="primary" id="nextButton" onclick="nextQuestion()">
 Next
 </button>
 
@@ -350,59 +260,39 @@ Next
 
 </section>
 
-
 <section id="result">
 
-<h2>
-Test Completed
-</h2>
+<h2>🎯 Test Completed</h2>
 
-<div
-class="score"
-id="score">
-</div>
+<div class="score" id="score"></div>
 
 <p id="summary"></p>
 
 <div id="review"></div>
 
-<div class="result-actions">
+<br>
 
-<button
-class="primary"
+<button class="primary"
 onclick="location.href='mistake.html'">
-Open Mistake Bank
+🧠 Open Mistake Bank
 </button>
 
-<button
-class="primary"
-onclick="location.href='retry.html'">
-Retry Mistakes
-</button>
+<br><br>
 
-<button
-class="secondary"
+<button class="secondary"
 onclick="location.href='index.html'">
-Dashboard
+🏠 Dashboard
 </button>
-
-</div>
 
 </section>
 
 </main>
 
-
 <aside class="card">
 
-<h3>
-Question Palette
-</h3>
+<h3>Question Palette</h3>
 
-<div
-class="palette"
-id="palette">
-</div>
+<div class="palette" id="palette"></div>
 
 <div class="legend">
 🟩 Answered<br>
@@ -411,8 +301,7 @@ id="palette">
 🟦 Current question
 </div>
 
-<button
-class="danger"
+<button class="danger"
 style="width:100%;margin-top:20px"
 onclick="submitTest()">
 Submit Test
@@ -422,45 +311,13 @@ Submit Test
 
 </div>
 
-
 <script>
 
-/* =========================================================
-   CBT ANALYZER PRO
-   SHARED STORAGE SYSTEM
-========================================================= */
+/* =====================================================
+QUESTIONS
+===================================================== */
 
-const STORAGE = {
-
-history:
-"cbtHistory",
-
-tests:
-"cbtAnalyzer.tests",
-
-mistakes:
-"cbtAnalyzer.mistakes",
-
-bookmarks:
-"cbtAnalyzer.bookmarks",
-
-retryQueue:
-"cbtAnalyzer.retryQueue",
-
-retryHistory:
-"cbtAnalyzer.retryHistory",
-
-mastery:
-"cbtAnalyzer.mastery"
-
-};
-
-
-/* =========================================================
-   QUESTIONS
-========================================================= */
-
-const questions=[
+const questions = [
 
 {
 subject:"Physics",
@@ -468,8 +325,8 @@ topic:"Basic Physics",
 question:"Which planet is known as the Red Planet?",
 options:["Earth","Mars","Jupiter","Venus"],
 answer:1,
-solution:"Mars appears reddish because iron minerals in its surface have oxidized.",
-mistakeReason:"Review the basic identification and characteristics of planets.",
+solution:"Mars is known as the Red Planet because iron-bearing minerals on its surface have undergone oxidation, giving the surface a reddish appearance.",
+mistakeReason:"Revise basic planetary characteristics.",
 mistakeType:"Concept Gap"
 },
 
@@ -479,8 +336,8 @@ topic:"Basic Mathematics",
 question:"What is 2 + 2?",
 options:["3","4","5","6"],
 answer:1,
-solution:"Adding 2 and 2 gives 4.",
-mistakeReason:"Recheck the basic arithmetic operation.",
+solution:"2 + 2 = 4.",
+mistakeReason:"Recheck the arithmetic operation.",
 mistakeType:"Calculation Error"
 },
 
@@ -490,8 +347,8 @@ topic:"Environment",
 question:"Which gas is most abundant in Earth's atmosphere?",
 options:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],
 answer:2,
-solution:"Nitrogen makes up approximately 78% of Earth's atmosphere.",
-mistakeReason:"Revise the approximate composition of Earth's atmosphere.",
+solution:"Nitrogen is the most abundant gas in Earth's atmosphere, making up approximately 78% by volume.",
+mistakeReason:"Revise atmospheric composition.",
 mistakeType:"Concept Gap"
 },
 
@@ -502,7 +359,7 @@ question:"What is the SI unit of force?",
 options:["Joule","Newton","Watt","Pascal"],
 answer:1,
 solution:"The SI unit of force is the newton (N).",
-mistakeReason:"Carefully distinguish force from energy, power and pressure units.",
+mistakeReason:"Differentiate units of force, energy, power and pressure.",
 mistakeType:"Misread Question"
 },
 
@@ -512,8 +369,8 @@ topic:"Cell Biology",
 question:"Which organelle is known as the powerhouse of the cell?",
 options:["Nucleus","Ribosome","Mitochondria","Golgi apparatus"],
 answer:2,
-solution:"Mitochondria are major sites of aerobic cellular respiration and ATP production.",
-mistakeReason:"Revise the functions of major cell organelles.",
+solution:"Mitochondria are major sites of aerobic respiration and ATP production.",
+mistakeReason:"Revise functions of major cell organelles.",
 mistakeType:"Concept Gap"
 },
 
@@ -523,8 +380,8 @@ topic:"Periodic Table",
 question:"What is the chemical symbol for sodium?",
 options:["So","Na","S","Sd"],
 answer:1,
-solution:"The chemical symbol of sodium is Na, derived from its Latin name natrium.",
-mistakeReason:"Revise symbols of common elements.",
+solution:"The symbol of sodium is Na, derived from the Latin name natrium.",
+mistakeReason:"Revise common element symbols.",
 mistakeType:"Concept Gap"
 },
 
@@ -534,8 +391,8 @@ topic:"Cellular Respiration",
 question:"Which process produces ATP in mitochondria?",
 options:["Photosynthesis","Cellular respiration","Transcription","Translation"],
 answer:1,
-solution:"Cellular respiration in mitochondria generates ATP through oxidative phosphorylation and related processes.",
-mistakeReason:"Differentiate cellular respiration from other cellular processes.",
+solution:"Cellular respiration in mitochondria produces ATP, particularly through oxidative phosphorylation.",
+mistakeReason:"Differentiate cellular respiration from transcription and translation.",
 mistakeType:"Misread Question"
 },
 
@@ -545,8 +402,8 @@ topic:"Gravitation",
 question:"What is the approximate acceleration due to gravity near Earth's surface?",
 options:["4.9 m/s²","9.8 m/s²","19.6 m/s²","98 m/s²"],
 answer:1,
-solution:"The standard approximate value of gravitational acceleration near Earth's surface is 9.8 m/s².",
-mistakeReason:"Revise standard physical constants and check numerical values carefully.",
+solution:"The approximate acceleration due to gravity near Earth's surface is 9.8 m/s².",
+mistakeReason:"Revise standard physical constants.",
 mistakeType:"Calculation Error"
 },
 
@@ -557,7 +414,7 @@ question:"Which molecule carries genetic information?",
 options:["Protein","Lipid","DNA","Glucose"],
 answer:2,
 solution:"DNA stores and transmits hereditary genetic information in most organisms.",
-mistakeReason:"Revise the roles of DNA, RNA, proteins and other biomolecules.",
+mistakeReason:"Revise the functions of DNA, RNA and proteins.",
 mistakeType:"Concept Gap"
 },
 
@@ -567,122 +424,60 @@ topic:"Electricity",
 question:"Which particle has a negative electric charge?",
 options:["Proton","Neutron","Electron","Photon"],
 answer:2,
-solution:"An electron carries one unit of negative elementary charge.",
-mistakeReason:"Revise the basic properties of subatomic particles.",
+solution:"An electron carries a negative elementary electric charge.",
+mistakeReason:"Revise the properties of fundamental subatomic particles.",
 mistakeType:"Concept Gap"
 }
 
 ];
 
 
-/* =========================================================
-   STATE
-========================================================= */
+/* =====================================================
+STATE
+===================================================== */
 
-let current=0;
+let current = 0;
 
-let answers=
-new Array(questions.length).fill(null);
+let answers = new Array(questions.length).fill(null);
 
-let marked=
-new Array(questions.length).fill(false);
+let marked = new Array(questions.length).fill(false);
 
-let mistakeReasons=
-new Array(questions.length).fill(null);
+let mistakeReasons = new Array(questions.length).fill(null);
 
-let submitted=false;
+let submitted = false;
 
-let savedHistoryIndex=-1;
+let savedHistoryIndex = -1;
 
-let timeLeft=1800;
+let timeLeft = 1800;
 
 
-/* =========================================================
-   STORAGE HELPERS
-========================================================= */
-
-function readStorage(key,fallback){
-
-try{
-
-const value=
-localStorage.getItem(key);
-
-if(!value){
-
-return fallback;
-}
-
-return JSON.parse(value);
-
-}catch(error){
-
-console.error(
-"Storage read error:",
-error
-);
-
-return fallback;
-
-}
-
-}
-
-
-function writeStorage(key,value){
-
-try{
-
-localStorage.setItem(
-key,
-JSON.stringify(value)
-);
-
-}catch(error){
-
-console.error(
-"Storage write error:",
-error
-);
-
-}
-
-}
-
-
-/* =========================================================
-   TIMER
-========================================================= */
+/* =====================================================
+TIMER
+===================================================== */
 
 function updateTimer(){
 
-const m=
-Math.floor(timeLeft/60);
+const minutes = Math.floor(timeLeft / 60);
 
-const s=
-timeLeft%60;
+const seconds = timeLeft % 60;
 
-document.getElementById(
-"timer"
-).textContent=
-
-String(m).padStart(2,"0")+
-":"+
-String(s).padStart(2,"0");
+document.getElementById("timer").textContent =
+String(minutes).padStart(2,"0") +
+":" +
+String(seconds).padStart(2,"0");
 
 }
 
 
-const timerInterval=
-setInterval(function(){
+const timerInterval = setInterval(function(){
 
-if(submitted)return;
+if(submitted) return;
 
 timeLeft--;
 
-if(timeLeft<=0){
+if(timeLeft <= 0){
 
-timeLeft=0;
+timeLeft = 0;
 
 updateTimer();
 
@@ -699,173 +494,135 @@ updateTimer();
 },1000);
 
 
-/* =========================================================
-   RENDER QUESTION
-========================================================= */
+/* =====================================================
+RENDER QUESTION
+===================================================== */
 
 function renderQuestion(){
 
-const q=
-questions[current];
+const q = questions[current];
 
-document.getElementById(
-"questionNumber"
-).textContent=
+if(!q){
 
-"Question "+
-(current+1)+
-" of "+
-questions.length+
-" • "+
-q.subject;
+document.getElementById("question").textContent =
+"Question unavailable.";
 
-
-document.getElementById(
-"question"
-).textContent=
-q.question;
-
-
-const box=
-document.getElementById(
-"options"
-);
-
-box.innerHTML="";
-
-
-q.options.forEach(function(
-option,
-index
-){
-
-const button=
-document.createElement(
-"button"
-);
-
-button.className=
-"option";
-
-
-if(
-answers[current]===index
-){
-
-button.classList.add(
-"selected"
-);
+return;
 
 }
 
+document.getElementById("questionNumber").textContent =
+"Question " +
+(current + 1) +
+" of " +
+questions.length +
+" • " +
+q.subject;
 
-button.textContent=
+document.getElementById("question").textContent =
+q.question;
 
-String.fromCharCode(
-65+index
-)+
-". "+
+
+const optionsBox =
+document.getElementById("options");
+
+optionsBox.innerHTML = "";
+
+
+q.options.forEach(function(option,index){
+
+const button =
+document.createElement("button");
+
+button.type = "button";
+
+button.className = "option";
+
+button.textContent =
+String.fromCharCode(65 + index) +
+". " +
 option;
 
+if(answers[current] === index){
 
-button.onclick=function(){
+button.classList.add("selected");
 
-answers[current]=index;
+}
+
+button.onclick = function(){
+
+if(submitted) return;
+
+answers[current] = index;
 
 renderQuestion();
 
 };
 
-
-box.appendChild(button);
+optionsBox.appendChild(button);
 
 });
 
 
-document.getElementById(
-"nextButton"
-).textContent=
-
-current===
-questions.length-1
-?
-"Finish"
-:
-"Next";
-
+document.getElementById("nextButton").textContent =
+current === questions.length - 1
+? "Finish"
+: "Next";
 
 renderPalette();
 
 }
 
 
-/* =========================================================
-   PALETTE
-========================================================= */
+/* =====================================================
+PALETTE
+===================================================== */
 
 function renderPalette(){
 
-const palette=
-document.getElementById(
-"palette"
-);
+const palette =
+document.getElementById("palette");
 
-palette.innerHTML="";
+palette.innerHTML = "";
 
 
-questions.forEach(
-function(q,index){
+questions.forEach(function(q,index){
 
-const button=
-document.createElement(
-"button"
-);
+const button =
+document.createElement("button");
 
-button.textContent=
-index+1;
+button.type = "button";
+
+button.textContent = index + 1;
 
 
-if(
-answers[index]!==null
-){
+if(answers[index] !== null){
 
-button.classList.add(
-"answered"
-);
+button.classList.add("answered");
 
 }
 
+if(marked[index]){
 
-if(
-marked[index]
-){
-
-button.classList.add(
-"review"
-);
+button.classList.add("review");
 
 }
 
+if(index === current){
 
-if(
-index===current
-){
-
-button.classList.add(
-"current"
-);
+button.classList.add("current");
 
 }
 
+button.onclick = function(){
 
-button.onclick=function(){
+if(submitted) return;
 
-current=index;
+current = index;
 
 renderQuestion();
 
 };
-
 
 palette.appendChild(button);
 
@@ -874,16 +631,13 @@ palette.appendChild(button);
 }
 
 
-/* =========================================================
-   NAVIGATION
-========================================================= */
+/* =====================================================
+NAVIGATION
+===================================================== */
 
 function nextQuestion(){
 
-if(
-current<
-questions.length-1
-){
+if(current < questions.length - 1){
 
 current++;
 
@@ -900,7 +654,7 @@ submitTest();
 
 function previousQuestion(){
 
-if(current>0){
+if(current > 0){
 
 current--;
 
@@ -913,7 +667,7 @@ renderQuestion();
 
 function clearAnswer(){
 
-answers[current]=null;
+answers[current] = null;
 
 renderQuestion();
 
@@ -922,96 +676,76 @@ renderQuestion();
 
 function markReview(){
 
-marked[current]=
-!marked[current];
+marked[current] = !marked[current];
 
 renderPalette();
 
 }
 
 
-/* =========================================================
-   MISTAKE REASON
-========================================================= */
+/* =====================================================
+MISTAKE REASON
+===================================================== */
 
-function getReasonExplanation(
-reason
-){
+function getReasonExplanation(reason){
 
-const explanations={
+const explanations = {
 
 "Concept Gap":
 "Student identified a gap in understanding the underlying concept.",
 
 "Calculation Error":
-"Student identified an error in calculation, arithmetic or numerical processing.",
+"Student identified an error in calculation or numerical processing.",
 
 "Misread Question":
-"Student identified that the question or options were misunderstood or read incorrectly.",
+"Student identified that the question or options were misunderstood.",
 
 "Guessing":
-"Student identified that the answer was selected without sufficient confidence or reasoning.",
+"Student identified that the answer was selected without sufficient reasoning.",
 
 "Time Pressure":
 "Student identified that time pressure affected the answer."
 
 };
 
-return explanations[reason]||
+return explanations[reason] ||
 "Student-selected mistake reason.";
 
 }
 
 
-function selectMistakeReason(
-index,
-reason
-){
+function selectMistakeReason(index,reason){
 
-mistakeReasons[index]=
-reason;
+mistakeReasons[index] = reason;
 
-saveReasonToHistory(
-index,
-reason
-);
+updateSavedHistoryReason(index,reason);
 
 generateReview();
 
 }
 
 
-/* =========================================================
-   SAVE MISTAKE REASON
-========================================================= */
+/* =====================================================
+SAVE REASON AFTER TEST
+===================================================== */
 
-function saveReasonToHistory(
-index,
-reason
-){
+function updateSavedHistoryReason(index,reason){
 
-const history=
-readStorage(
-STORAGE.history,
-[]
+if(savedHistoryIndex < 0) return;
+
+try{
+
+let history =
+JSON.parse(
+localStorage.getItem("cbtHistory") || "[]"
 );
 
+if(!Array.isArray(history)) return;
 
 if(
-!Array.isArray(history)||
-savedHistoryIndex<0||
-!history[savedHistoryIndex]
-){
-
-return;
-
-}
-
-
-if(
+!history[savedHistoryIndex] ||
 !Array.isArray(
-history[savedHistoryIndex]
-.questions
+history[savedHistoryIndex].questions
 )
 ){
 
@@ -1019,139 +753,36 @@ return;
 
 }
 
+const record =
+history[savedHistoryIndex].questions[index];
 
-const record=
-history[savedHistoryIndex]
-.questions[index];
+if(!record) return;
 
+record.mistakeType = reason;
 
-if(!record)return;
+record.mistakeReason =
+getReasonExplanation(reason);
 
-
-record.mistakeType=
-reason;
-
-record.mistakeReason=
-getReasonExplanation(
-reason
-);
-
-
-history[savedHistoryIndex]
-.questions[index]=
+history[savedHistoryIndex].questions[index] =
 record;
 
-
-writeStorage(
-STORAGE.history,
-history
+localStorage.setItem(
+"cbtHistory",
+JSON.stringify(history)
 );
 
+}catch(error){
 
-/* Update shared mistake */
+console.error(error);
 
-updateSharedMistake(
-record
-);
+}
 
 }
 
 
-/* =========================================================
-   UPDATE SHARED MISTAKE
-========================================================= */
-
-function updateSharedMistake(
-record
-){
-
-let mistakes=
-readStorage(
-STORAGE.mistakes,
-[]
-);
-
-
-if(!Array.isArray(mistakes)){
-
-mistakes=[];
-
-}
-
-
-const existing=
-mistakes.findIndex(
-item=>item.id===record.id
-);
-
-
-const mistake={
-
-id:record.id,
-
-question:record.question,
-
-options:record.options,
-
-subject:record.subject,
-
-topic:record.topic,
-
-selectedIndex:
-record.selectedIndex,
-
-selectedAnswer:
-record.selectedAnswer,
-
-correctIndex:
-record.correctIndex,
-
-correctAnswer:
-record.correctAnswer,
-
-mistakeType:
-record.mistakeType,
-
-mistakeReason:
-record.mistakeReason,
-
-solution:
-record.solution,
-
-source:"CBT Test",
-
-date:new Date().toISOString(),
-
-mastered:false
-
-};
-
-
-if(existing>=0){
-
-mistakes[existing]={
-...mistakes[existing],
-...mistake
-};
-
-}else{
-
-mistakes.push(mistake);
-
-}
-
-
-writeStorage(
-STORAGE.mistakes,
-mistakes
-);
-
-}
-
-
-/* =========================================================
-   SAVE TEST
-========================================================= */
+/* =====================================================
+SAVE TEST HISTORY
+===================================================== */
 
 function saveTest(
 correct,
@@ -1160,124 +791,99 @@ skipped,
 score
 ){
 
-let history=
-readStorage(
-STORAGE.history,
-[]
-);
+let history = [];
 
+try{
+
+history =
+JSON.parse(
+localStorage.getItem("cbtHistory") || "[]"
+);
 
 if(!Array.isArray(history)){
 
-history=[];
+history = [];
+
+}
+
+}catch(error){
+
+history = [];
 
 }
 
 
-const testId=
-"test-"+Date.now();
-
-
-const questionData=
-questions.map(
-function(q,index){
+const questionData =
+questions.map(function(q,index){
 
 let status;
 
+if(answers[index] === null){
 
-if(
-answers[index]===null
-){
-
-status="skipped";
+status = "skipped";
 
 }
-else if(
-answers[index]===q.answer
-){
+else if(answers[index] === q.answer){
 
-status="correct";
+status = "correct";
 
 }
 else{
 
-status="wrong";
+status = "wrong";
 
 }
 
 
-const selectedAnswer=
-answers[index]===null
-?
-null
-:
-q.options[
-answers[index]
-];
+const selectedAnswer =
+answers[index] === null
+? null
+: q.options[answers[index]];
 
 
-return{
+return {
 
-id:
-testId+
-"-q-"+
-index,
+question:q.question,
 
-question:
-q.question,
+options:q.options,
 
-options:
-q.options,
+subject:q.subject,
 
-subject:
-q.subject,
+topic:q.topic,
 
-topic:
-q.topic,
+status:status,
 
-status:
-status,
+selectedIndex:answers[index],
 
-selectedIndex:
-answers[index],
+selectedAnswer:selectedAnswer,
 
-selectedAnswer:
-selectedAnswer,
+correctIndex:q.answer,
 
-correctIndex:
-q.answer,
+correctAnswer:q.options[q.answer],
 
-correctAnswer:
-q.options[q.answer],
+bookmarked:marked[index],
 
-bookmarked:
-marked[index],
+markedForReview:marked[index],
 
 mistakeType:
-status==="wrong"
-?
-(
-mistakeReasons[index]||
+status === "wrong"
+? (
+mistakeReasons[index] ||
+q.mistakeType ||
 "Not Classified"
 )
-:
-null,
+: null,
 
 mistakeReason:
-status==="wrong"
-?
-(
-mistakeReasons[index]||
-"Student has not selected a mistake reason yet."
+status === "wrong"
+? (
+mistakeReasons[index]
+? getReasonExplanation(mistakeReasons[index])
+: q.mistakeReason
 )
-:
-"Correct answer.",
+: "Correct answer.",
 
-solution:
-q.solution,
-
-markedForReview:
-marked[index],
+solution:q.solution,
 
 mastered:false
 
@@ -1286,323 +892,131 @@ mastered:false
 });
 
 
-const testRecord={
+const testRecord = {
 
-id:
-testId,
+id:"test-" + Date.now(),
 
-date:
-new Date().toISOString(),
+date:new Date().toLocaleString(),
 
-displayDate:
-new Date().toLocaleString(),
+timestamp:new Date().toISOString(),
 
-score:
-score,
+score:score,
 
-correct:
+correct:correct,
+
+incorrect:incorrect,
+
+wrong:incorrect,
+
+skipped:skipped,
+
+total:questions.length,
+
+questions:questionData
+
+};
+
+
+history.push(testRecord);
+
+savedHistoryIndex = history.length - 1;
+
+
+localStorage.setItem(
+"cbtHistory",
+JSON.stringify(history)
+);
+
+}
+
+
+/* =====================================================
+SUBMIT
+===================================================== */
+
+function submitTest(){
+
+if(submitted) return;
+
+
+let correct = 0;
+
+let incorrect = 0;
+
+let skipped = 0;
+
+
+questions.forEach(function(q,index){
+
+if(answers[index] === null){
+
+skipped++;
+
+}
+else if(answers[index] === q.answer){
+
+correct++;
+
+}
+else{
+
+incorrect++;
+
+}
+
+});
+
+
+const score =
+(correct * 4) - incorrect;
+
+
+saveTest(
 correct,
-
-incorrect:
 incorrect,
-
-wrong:
-incorrect,
-
-skipped:
 skipped,
-
-total:
-questions.length,
-
-accuracy:
-questions.length
-?
-Math.round(
-correct/
-questions.length*
-100
-)
-:
-0,
-
-questions:
-questionData
-
-};
-
-
-/* Existing history */
-
-history.push(
-testRecord
-);
-
-savedHistoryIndex=
-history.length-1;
-
-writeStorage(
-STORAGE.history,
-history
+score
 );
 
 
-/* Shared tests */
+submitted = true;
 
-const tests=
-readStorage(
-STORAGE.tests,
-[]
-);
-
-tests.push(
-testRecord
-);
-
-writeStorage(
-STORAGE.tests,
-tests
-);
+clearInterval(timerInterval);
 
 
-/* Shared mistakes */
+document.getElementById("testScreen").style.display =
+"none";
 
-let mistakes=
-readStorage(
-STORAGE.mistakes,
-[]
-);
+document.querySelector("aside").style.display =
+"none";
 
-if(!Array.isArray(mistakes)){
+document.getElementById("result").style.display =
+"block";
 
-mistakes=[];
+
+document.getElementById("score").textContent =
+score +
+" / " +
+(questions.length * 4);
+
+
+document.getElementById("summary").textContent =
+"Correct: " +
+correct +
+" | Incorrect: " +
+incorrect +
+" | Skipped: " +
+skipped;
+
+
+generateReview();
 
 }
 
 
-/* Shared bookmarks */
-
-let bookmarks=
-readStorage(
-STORAGE.bookmarks,
-[]
-);
-
-if(!Array.isArray(bookmarks)){
-
-bookmarks=[];
-
-}
-
-
-questionData.forEach(
-function(record){
-
-/* WRONG */
-
-if(
-record.status==="wrong"
-){
-
-const mistake={
-
-id:record.id,
-
-question:record.question,
-
-options:record.options,
-
-subject:record.subject,
-
-topic:record.topic,
-
-selectedIndex:
-record.selectedIndex,
-
-selectedAnswer:
-record.selectedAnswer,
-
-correctIndex:
-record.correctIndex,
-
-correctAnswer:
-record.correctAnswer,
-
-mistakeType:
-record.mistakeType,
-
-mistakeReason:
-record.mistakeReason,
-
-solution:
-record.solution,
-
-source:"CBT Test",
-
-date:
-new Date().toISOString(),
-
-mastered:false
-
-};
-
-
-const exists=
-mistakes.some(
-item=>
-item.id===mistake.id
-);
-
-
-if(!exists){
-
-mistakes.push(
-mistake
-);
-
-}
-
-}
-
-
-/* BOOKMARK */
-
-if(
-record.bookmarked
-){
-
-const bookmark={
-
-id:record.id,
-
-question:
-record.question,
-
-options:
-record.options,
-
-subject:
-record.subject,
-
-topic:
-record.topic,
-
-correctIndex:
-record.correctIndex,
-
-correctAnswer:
-record.correctAnswer,
-
-solution:
-record.solution,
-
-source:"CBT Test",
-
-date:
-new Date().toISOString()
-
-};
-
-
-const exists=
-bookmarks.some(
-item=>
-item.id===bookmark.id
-);
-
-
-if(!exists){
-
-bookmarks.push(
-bookmark
-);
-
-}
-
-}
-
-});
-
-
-writeStorage(
-STORAGE.mistakes,
-mistakes
-);
-
-writeStorage(
-STORAGE.bookmarks,
-bookmarks
-);
-
-
-/* Retry Queue */
-
-createRetryQueue();
-
-}
-
-
-/* =========================================================
-   RETRY QUEUE
-========================================================= */
-
-function createRetryQueue(){
-
-const mistakes=
-readStorage(
-STORAGE.mistakes,
-[]
-);
-
-const bookmarks=
-readStorage(
-STORAGE.bookmarks,
-[]
-);
-
-
-const combined=[
-...mistakes,
-...bookmarks
-];
-
-
-const unique=[];
-
-const seen=
-new Set();
-
-
-combined.forEach(
-function(item){
-
-const id=
-item.id||
-item.question;
-
-
-if(!seen.has(id)){
-
-seen.add(id);
-
-unique.push(item);
-
-}
-
-});
-
-
-writeStorage(
-STORAGE.retryQueue,
-unique
-);
-
-}
-
-
-/* =========================================================
-   REASON BUTTON
-========================================================= */
+/* =====================================================
+REASON BUTTON
+===================================================== */
 
 function reasonButton(
 index,
@@ -1610,83 +1024,248 @@ reason,
 icon
 ){
 
-const selected=
-mistakeReasons[index]===
-reason
-?
-" selected-reason"
-:
-"";
+const selected =
+mistakeReasons[index] === reason
+? " selected-reason"
+: "";
 
 
 return `
-
 <button
 type="button"
 class="reason-button${selected}"
 onclick="selectMistakeReason(${index},'${reason}')">
-
 ${icon} ${reason}
-
 </button>
+`;
+
+}
+
+
+/* =====================================================
+REVIEW
+===================================================== */
+
+function generateReview(){
+
+const box =
+document.getElementById("review");
+
+box.innerHTML =
+"<h3>📊 Question Analysis</h3>";
+
+
+questions.forEach(function(q,index){
+
+const item =
+document.createElement("div");
+
+
+let status;
+
+if(answers[index] === null){
+
+status = "skipped";
+
+}
+else if(answers[index] === q.answer){
+
+status = "correct";
+
+}
+else{
+
+status = "incorrect";
+
+}
+
+
+item.className =
+"review-item " +
+status;
+
+
+const selected =
+answers[index] === null
+? "Not answered"
+: q.options[answers[index]];
+
+
+item.innerHTML =
+
+"<strong>Question " +
+(index + 1) +
+" • " +
+escapeHTML(q.subject) +
+"</strong>" +
+
+"<p>" +
+escapeHTML(q.question) +
+"</p>" +
+
+"<p><strong>Your answer:</strong> " +
+escapeHTML(selected) +
+"</p>" +
+
+"<p><strong>Correct answer:</strong> " +
+escapeHTML(q.options[q.answer]) +
+"</p>";
+
+
+if(marked[index]){
+
+item.innerHTML +=
+'<div class="bookmark">🔖 Bookmarked for review</div>';
+
+}
+
+
+if(status === "incorrect"){
+
+const selectedReason =
+mistakeReasons[index];
+
+
+item.innerHTML += `
+
+<div class="analysis">
+
+<strong>
+❌ Why did you get this wrong?
+</strong>
+
+<div class="reason-options">
+
+${reasonButton(index,"Concept Gap","🧠")}
+
+${reasonButton(index,"Calculation Error","🧮")}
+
+${reasonButton(index,"Misread Question","👀")}
+
+${reasonButton(index,"Guessing","🎲")}
+
+${reasonButton(index,"Time Pressure","⏱️")}
+
+</div>
+
+<div style="margin-top:8px;color:#64748b;font-size:13px">
+
+${
+selectedReason
+? "Selected: " + escapeHTML(selectedReason)
+: "Select the reason that best describes your mistake."
+}
+
+</div>
+
+${
+selectedReason
+?
+'<div class="saved-message">✓ Saved to your performance history</div>'
+:
+''
+}
+
+<br>
+
+<strong>💡 Solution</strong>
+
+<br><br>
+
+${escapeHTML(q.solution)}
+
+</div>
 
 `;
 
 }
 
 
-/* =========================================================
-   REVIEW
-========================================================= */
+if(status === "skipped"){
 
-function generateReview(){
+item.innerHTML += `
 
-const box=
-document.getElementById(
-"review"
+<div class="analysis">
+
+<strong>⏭️ Skipped Question</strong>
+
+<br><br>
+
+<strong>💡 Solution</strong>
+
+<br><br>
+
+${escapeHTML(q.solution)}
+
+</div>
+
+`;
+
+}
+
+
+if(status === "correct"){
+
+item.innerHTML += `
+
+<div class="analysis">
+
+<strong>✅ Correct</strong>
+
+<br><br>
+
+${escapeHTML(q.solution)}
+
+</div>
+
+`;
+
+}
+
+
+box.appendChild(item);
+
+});
+
+}
+
+
+/* =====================================================
+ESCAPE
+===================================================== */
+
+function escapeHTML(value){
+
+return String(
+value === undefined || value === null
+? ""
+: value
+)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+START
+===================================================== */
+
+document.addEventListener(
+"DOMContentLoaded",
+function(){
+
+updateTimer();
+
+renderQuestion();
+
+}
 );
 
-box.innerHTML=
-"<h3>Question Analysis</h3>";
+</script>
 
-
-questions.forEach(
-function(q,index){
-
-const item=
-document.createElement(
-"div"
-);
-
-
-let status;
-
-
-if(
-answers[index]===null
-){
-
-status="skipped";
-
-}
-else if(
-answers[index]===q.answer
-){
-
-status="correct";
-
-}
-else{
-
-status="incorrect";
-
-}
-
-
-item.className=
-"review-item "+
-status;
-
-
-const selected=
-ans
+</body>
+</html>
