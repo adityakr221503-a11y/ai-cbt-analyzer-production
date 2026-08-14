@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CBT Analyzer Pro — CBT Test</title>
+
+<title>CBT Analyzer Pro</title>
 
 <style>
 *{box-sizing:border-box}
@@ -104,25 +105,10 @@ font-weight:700;
 cursor:pointer
 }
 
-.primary{
-background:#4f46e5;
-color:white
-}
-
-.secondary{
-background:#e2e8f0;
-color:#0f172a
-}
-
-.warning{
-background:#f59e0b;
-color:white
-}
-
-.danger{
-background:#dc2626;
-color:white
-}
+.primary{background:#4f46e5;color:white}
+.secondary{background:#e2e8f0;color:#0f172a}
+.warning{background:#f59e0b;color:white}
+.danger{background:#dc2626;color:white}
 
 .palette{
 display:grid;
@@ -185,11 +171,20 @@ border-left:5px solid #dc2626
 border-left:5px solid #f59e0b
 }
 
-.result-actions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:20px
+.analysis{
+margin-top:10px;
+padding:12px;
+background:#eef2ff;
+border-radius:9px;
+line-height:1.5
+}
+
+.bookmark{
+margin-top:10px;
+background:#fef3c7;
+padding:10px;
+border-radius:8px;
+font-weight:700
 }
 
 @media(max-width:800px){
@@ -220,7 +215,6 @@ CBT Analyzer Pro
 
 
 <div class="container">
-
 
 <main class="card">
 
@@ -284,31 +278,17 @@ id="score">
 
 <p id="summary"></p>
 
-<div
-id="review">
-</div>
+<div id="review"></div>
 
-<div class="result-actions">
+<br>
 
 <button
 class="primary"
-onclick="location.href='history.html'">
-📊 Test History
-</button>
-
-<button
-class="secondary"
 onclick="location.href='mistake.html'">
-🧠 Mistake Bank
-</button>
 
-<button
-class="secondary"
-onclick="location.reload()">
-🔄 Restart Test
-</button>
+Open Mistake Bank
 
-</div>
+</button>
 
 </section>
 
@@ -327,12 +307,10 @@ id="palette">
 </div>
 
 <div class="legend">
-
 🟩 Answered<br>
 🟨 Marked for review<br>
 ⬜ Not answered<br>
 🟦 Current question
-
 </div>
 
 <button
@@ -346,146 +324,245 @@ Submit Test
 
 </aside>
 
-
 </div>
 
 
 <script>
 
+
 /* =========================
-QUESTION BANK
+QUESTIONS
 ========================= */
 
 const questions=[
 
 {
-subject:"Biology",
-question:"Which organelle is known as the powerhouse of the cell?",
-options:[
-"Nucleus",
-"Ribosome",
-"Mitochondria",
-"Golgi apparatus"
-],
-answer:2,
-solution:"Mitochondria are the major sites of aerobic cellular respiration and ATP production."
-},
-
-{
 subject:"Physics",
-question:"What is the approximate acceleration due to gravity near Earth's surface?",
-options:[
-"4.9 m/s²",
-"9.8 m/s²",
-"19.6 m/s²",
-"98 m/s²"
-],
-answer:1,
-solution:"The standard approximate value of gravitational acceleration near Earth's surface is 9.8 m/s²."
-},
+topic:"Basic Physics",
 
-{
-subject:"Chemistry",
-question:"What is the chemical symbol for sodium?",
-options:[
-"So",
-"Na",
-"S",
-"Sd"
-],
-answer:1,
-solution:"The symbol Na comes from the Latin name natrium."
-},
-
-{
-subject:"Biology",
-question:"Which molecule carries genetic information?",
-options:[
-"Protein",
-"Lipid",
-"DNA",
-"Glucose"
-],
-answer:2,
-solution:"DNA stores and transmits hereditary genetic information in living organisms."
-},
-
-{
-subject:"Physics",
-question:"Which particle has a negative electric charge?",
-options:[
-"Proton",
-"Neutron",
-"Electron",
-"Photon"
-],
-answer:2,
-solution:"An electron carries a negative elementary electric charge."
-},
-
-{
-subject:"Chemistry",
-question:"Which gas is most abundant in Earth's atmosphere?",
-options:[
-"Oxygen",
-"Carbon dioxide",
-"Nitrogen",
-"Hydrogen"
-],
-answer:2,
-solution:"Nitrogen makes up approximately 78% of Earth's atmosphere by volume."
-},
-
-{
-subject:"Physics",
-question:"What is the SI unit of force?",
-options:[
-"Joule",
-"Newton",
-"Watt",
-"Pascal"
-],
-answer:1,
-solution:"The SI unit of force is the newton (N)."
-},
-
-{
-subject:"Biology",
-question:"Which process produces ATP in mitochondria?",
-options:[
-"Photosynthesis",
-"Cellular respiration",
-"Transcription",
-"Translation"
-],
-answer:1,
-solution:"Cellular respiration in mitochondria generates ATP through oxidative metabolism."
-},
-
-{
-subject:"Physics",
 question:"Which planet is known as the Red Planet?",
+
 options:[
 "Earth",
 "Mars",
 "Jupiter",
 "Venus"
 ],
+
 answer:1,
-solution:"Mars appears reddish because of iron oxides present on its surface."
+
+solution:
+"Mars appears reddish because iron minerals in its surface have oxidized.",
+
+mistakeReason:
+"Review the basic identification and characteristics of planets."
 },
 
+
 {
-subject:"Chemistry",
+subject:"Physics",
+topic:"Basic Mathematics",
+
 question:"What is 2 + 2?",
+
 options:[
 "3",
 "4",
 "5",
 "6"
 ],
+
 answer:1,
-solution:"Adding two and two gives four."
+
+solution:
+"Adding 2 and 2 gives 4.",
+
+mistakeReason:
+"Recheck the basic arithmetic operation."
+},
+
+
+{
+subject:"Biology",
+topic:"Environment",
+
+question:"Which gas is most abundant in Earth's atmosphere?",
+
+options:[
+"Oxygen",
+"Carbon dioxide",
+"Nitrogen",
+"Hydrogen"
+],
+
+answer:2,
+
+solution:
+"Nitrogen makes up approximately 78% of Earth's atmosphere.",
+
+mistakeReason:
+"Revise the approximate composition of Earth's atmosphere."
+},
+
+
+{
+subject:"Physics",
+topic:"Units",
+
+question:"What is the SI unit of force?",
+
+options:[
+"Joule",
+"Newton",
+"Watt",
+"Pascal"
+],
+
+answer:1,
+
+solution:
+"The SI unit of force is the newton (N).",
+
+mistakeReason:
+"Revise SI units of common physical quantities."
+},
+
+
+{
+subject:"Biology",
+topic:"Cell Biology",
+
+question:"Which organelle is known as the powerhouse of the cell?",
+
+options:[
+"Nucleus",
+"Ribosome",
+"Mitochondria",
+"Golgi apparatus"
+],
+
+answer:2,
+
+solution:
+"Mitochondria are the major sites of aerobic cellular respiration and ATP production.",
+
+mistakeReason:
+"Revise the functions of major cell organelles."
+},
+
+
+{
+subject:"Chemistry",
+topic:"Periodic Table",
+
+question:"What is the chemical symbol for sodium?",
+
+options:[
+"So",
+"Na",
+"S",
+"Sd"
+],
+
+answer:1,
+
+solution:
+"The chemical symbol of sodium is Na, derived from its Latin name natrium.",
+
+mistakeReason:
+"Revise symbols of common elements."
+},
+
+
+{
+subject:"Biology",
+topic:"Cellular Respiration",
+
+question:"Which process produces ATP in mitochondria?",
+
+options:[
+"Photosynthesis",
+"Cellular respiration",
+"Transcription",
+"Translation"
+],
+
+answer:1,
+
+solution:
+"Cellular respiration in mitochondria generates ATP through oxidative phosphorylation and related processes.",
+
+mistakeReason:
+"Differentiate cellular respiration from other cellular processes."
+},
+
+
+{
+subject:"Physics",
+topic:"Gravitation",
+
+question:"What is the approximate acceleration due to gravity near Earth's surface?",
+
+options:[
+"4.9 m/s²",
+"9.8 m/s²",
+"19.6 m/s²",
+"98 m/s²"
+],
+
+answer:1,
+
+solution:
+"The standard approximate value of gravitational acceleration near Earth's surface is 9.8 m/s².",
+
+mistakeReason:
+"Revise standard physical constants and their units."
+},
+
+
+{
+subject:"Biology",
+topic:"Genetics",
+
+question:"Which molecule carries genetic information?",
+
+options:[
+"Protein",
+"Lipid",
+"DNA",
+"Glucose"
+],
+
+answer:2,
+
+solution:
+"DNA stores and transmits hereditary genetic information in most organisms.",
+
+mistakeReason:
+"Revise the roles of DNA, RNA, proteins and other biomolecules."
+},
+
+
+{
+subject:"Physics",
+topic:"Electricity",
+
+question:"Which particle has a negative electric charge?",
+
+options:[
+"Proton",
+"Neutron",
+"Electron",
+"Photon"
+],
+
+answer:2,
+
+solution:
+"An electron carries one unit of negative elementary charge.",
+
+mistakeReason:
+"Revise the basic properties of subatomic particles."
 }
 
 ];
@@ -518,17 +595,20 @@ TIMER
 
 function updateTimer(){
 
-const m=
-Math.floor(timeLeft/60);
+let m=
+Math.floor(
+timeLeft/60
+);
 
-const s=
+let s=
 timeLeft%60;
 
 document.getElementById(
 "timer"
 ).textContent=
 String(m).padStart(2,"0")
-+":"
++
+":"
 +
 String(s).padStart(2,"0");
 
@@ -572,6 +652,7 @@ function renderQuestion(){
 const q=
 questions[current];
 
+
 document.getElementById(
 "questionNumber"
 ).textContent=
@@ -586,6 +667,7 @@ questions.length
 " • "
 +
 q.subject;
+
 
 document.getElementById(
 "question"
@@ -637,8 +719,7 @@ option;
 button.onclick=
 function(){
 
-answers[current]=
-index;
+answers[current]=index;
 
 renderQuestion();
 
@@ -705,7 +786,9 @@ button.classList.add(
 }
 
 
-if(marked[index]){
+if(
+marked[index]
+){
 
 button.classList.add(
 "review"
@@ -714,7 +797,9 @@ button.classList.add(
 }
 
 
-if(index===current){
+if(
+index===current
+){
 
 button.classList.add(
 "current"
@@ -804,33 +889,43 @@ MISTAKE REASON
 ========================= */
 
 function getMistakeReason(
-questionIndex
+q,
+selected
 ){
 
-const answer=
-answers[questionIndex];
+if(selected===null){
 
-if(answer===null){
-
-return "Skipped question. Review the concept and attempt it again without looking at the answer.";
+return "Question was skipped. Review the concept before attempting it again.";
 
 }
 
-return "Review the concept, identify why the selected option was chosen, and compare it with the correct reasoning.";
+return q.mistakeReason ||
+"Review the concept and analyze why the selected option was incorrect.";
 
 }
 
 
 /* =========================
-CREATE ATTEMPT DATA
+SAVE TEST
 ========================= */
 
-function buildAttemptData(){
+function saveTest(
+correct,
+incorrect,
+skipped,
+score
+){
 
-const detailedQuestions=[];
+const history=
+JSON.parse(
+localStorage.getItem(
+"cbtHistory"
+) || "[]"
+);
 
 
-questions.forEach(
+const questionData=
+questions.map(
 function(q,index){
 
 let status;
@@ -856,53 +951,91 @@ status="wrong";
 }
 
 
-detailedQuestions.push({
+const selectedAnswer=
+answers[index]===null
+?
+null
+:
+q.options[
+answers[index]
+];
 
-questionNumber:index+1,
 
-subject:q.subject,
+return {
 
 question:q.question,
 
 options:q.options,
 
+subject:q.subject,
+
+topic:q.topic,
+
+status:status,
+
 selectedIndex:
 answers[index],
 
 selectedAnswer:
-answers[index]===null
-?
-"Not Attempted"
-:
-q.options[answers[index]],
+selectedAnswer,
 
-correctIndex:q.answer,
+correctIndex:
+q.answer,
 
 correctAnswer:
 q.options[q.answer],
-
-status:status,
 
 bookmarked:
 marked[index],
 
 mistakeReason:
-status==="wrong" ||
-status==="skipped"
+status==="correct"
 ?
-getMistakeReason(index)
+"Correct answer."
 :
-"",
+getMistakeReason(
+q,
+answers[index]
+),
 
 solution:
-q.solution
+q.solution,
+
+markedForReview:
+marked[index]
+
+};
 
 });
 
-});
+
+const testRecord={
+
+date:
+new Date().toLocaleString(),
+
+score:score,
+
+correct:correct,
+
+incorrect:incorrect,
+
+skipped:skipped,
+
+questions:questionData
+
+};
 
 
-return detailedQuestions;
+history.push(
+testRecord
+);
+
+
+localStorage.setItem(
+"cbtHistory",
+JSON.stringify(history)
+);
 
 }
 
@@ -955,55 +1088,11 @@ const score=
 incorrect;
 
 
-const detailedQuestions=
-buildAttemptData();
-
-
-const attempt={
-
-date:
-new Date().toLocaleString(),
-
-score:score,
-
-correct:correct,
-
-incorrect:incorrect,
-
-skipped:skipped,
-
-totalQuestions:
-questions.length,
-
-questions:
-detailedQuestions
-
-};
-
-
-const history=
-JSON.parse(
-localStorage.getItem(
-"cbtHistory"
-)
-|| "[]"
-);
-
-
-history.push(
-attempt
-);
-
-
-localStorage.setItem(
-"cbtHistory",
-JSON.stringify(history)
-);
-
-
-localStorage.setItem(
-"selectedCBTAttempt",
-JSON.stringify(attempt)
+saveTest(
+correct,
+incorrect,
+skipped,
+score
 );
 
 
@@ -1016,20 +1105,17 @@ timerInterval
 
 document.getElementById(
 "testScreen"
-).style.display=
-"none";
+).style.display="none";
 
 
 document.querySelector(
 "aside"
-).style.display=
-"none";
+).style.display="none";
 
 
 document.getElementById(
 "result"
-).style.display=
-"block";
+).style.display="block";
 
 
 document.getElementById(
@@ -1075,7 +1161,7 @@ document.getElementById(
 );
 
 box.innerHTML=
-"<h3>Question Review</h3>";
+"<h3>Question Analysis</h3>";
 
 
 questions.forEach(
@@ -1085,6 +1171,7 @@ const item=
 document.createElement(
 "div"
 );
+
 
 let status;
 
@@ -1160,15 +1247,40 @@ selected
 +
 q.options[q.answer]
 +
-"</p>"
-
-+
-
-"<p><strong>Solution:</strong> "
-+
-q.solution
-+
 "</p>";
+
+
+if(marked[index]){
+
+item.innerHTML+=
+
+'<div class="bookmark">🔖 Bookmarked for review</div>';
+
+}
+
+
+if(status!=="correct"){
+
+item.innerHTML+=
+
+'<div class="analysis">' +
+
+"<strong>🧠 Mistake Reason:</strong><br>" +
+
+getMistakeReason(
+q,
+answers[index]
+) +
+
+"<br><br>" +
+
+"<strong>💡 Solution:</strong><br>" +
+
+q.solution +
+
+"</div>";
+
+}
 
 
 box.appendChild(
