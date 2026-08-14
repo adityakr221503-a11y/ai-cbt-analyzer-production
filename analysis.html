@@ -7,9 +7,7 @@
 <title>CBT Analyzer Pro - Performance</title>
 
 <style>
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
@@ -19,7 +17,7 @@ color:#0f172a;
 }
 
 header{
-background:white;
+background:#fff;
 padding:16px 20px;
 border-bottom:1px solid #e2e8f0;
 }
@@ -49,7 +47,7 @@ padding:0 15px;
 
 .hero{
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:25px;
 border-radius:18px;
 margin-bottom:20px;
@@ -59,8 +57,13 @@ margin-bottom:20px;
 margin:0 0 8px;
 }
 
+.hero p{
+margin:0;
+opacity:.9;
+}
+
 .card{
-background:white;
+background:#fff;
 border-radius:16px;
 padding:20px;
 margin-bottom:20px;
@@ -104,6 +107,20 @@ font-weight:800;
 margin-bottom:12px;
 }
 
+.subject{
+border:1px solid #e2e8f0;
+border-radius:12px;
+padding:15px;
+margin-top:12px;
+}
+
+.topic{
+background:#f8fafc;
+border-radius:10px;
+padding:14px;
+margin-top:10px;
+}
+
 .progress-bar{
 height:12px;
 background:#e2e8f0;
@@ -127,26 +144,22 @@ margin-top:8px;
 font-size:14px;
 }
 
-.subject{
-border:1px solid #e2e8f0;
-border-radius:12px;
-padding:15px;
-margin-top:12px;
-}
-
-.topic{
-background:#f8fafc;
-border-radius:10px;
-padding:14px;
-margin-top:10px;
-}
-
 .insight{
 padding:15px;
 border-radius:10px;
 background:#eef2ff;
 margin-top:10px;
 line-height:1.5;
+}
+
+.focus{
+background:#fff7ed;
+border-left:5px solid #dc2626;
+}
+
+.strength{
+background:#ecfdf5;
+border-left:5px solid #16a34a;
 }
 
 .empty{
@@ -170,6 +183,7 @@ color:white;
 
 .secondary{
 background:#e2e8f0;
+color:#0f172a;
 }
 
 @media(max-width:700px){
@@ -195,9 +209,7 @@ CBT Analyzer <span>Pro</span>
 <button
 class="primary"
 onclick="location.href='cbt.html'">
-
 Take CBT
-
 </button>
 
 </div>
@@ -213,7 +225,7 @@ Take CBT
 <h1>📊 Performance Dashboard</h1>
 
 <p>
-Track your CBT performance and progress.
+Track your CBT performance, progress and mistake patterns.
 </p>
 
 </div>
@@ -278,7 +290,7 @@ Loading progress...
 <div id="subjects">
 
 <div class="empty">
-No subject data yet.
+Loading subject performance...
 </div>
 
 </div>
@@ -295,7 +307,24 @@ No subject data yet.
 <div id="topics">
 
 <div class="empty">
-No topic data yet.
+Loading topic performance...
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MISTAKE PATTERNS -->
+
+<div class="card">
+
+<h2>🧠 Mistake Pattern Detection</h2>
+
+<div id="patterns">
+
+<div class="empty">
+Analyzing your mistakes...
 </div>
 
 </div>
@@ -307,21 +336,21 @@ No topic data yet.
 
 <div class="card">
 
-<h2>🧠 Performance Insights</h2>
+<h2>💡 Performance Insights</h2>
 
 <div id="insights"></div>
 
 </div>
 
 
+<!-- MISTAKE BANK -->
+
 <div class="card">
 
 <button
 class="secondary"
 onclick="location.href='mistake.html'">
-
 Open Mistake Bank
-
 </button>
 
 </div>
@@ -363,15 +392,8 @@ OVERALL
 
 function calculateOverall(){
 
-document.getElementById("tests")
-.textContent=history.length;
-
-
 let correct=0;
-
 let wrong=0;
-
-let attempted=0;
 
 
 history.forEach(function(test){
@@ -380,16 +402,20 @@ correct +=
 Number(test.correct) || 0;
 
 wrong +=
-Number(test.incorrect) || 0;
+Number(
+test.incorrect ??
+test.wrong ??
+0
+);
 
 });
 
 
-attempted=
+const attempted=
 correct+wrong;
 
 
-let accuracy=
+const accuracy=
 attempted===0
 ?
 0
@@ -397,6 +423,11 @@ attempted===0
 Math.round(
 (correct/attempted)*100
 );
+
+
+document.getElementById("tests")
+.textContent=
+history.length;
 
 
 document.getElementById("accuracy")
@@ -438,7 +469,7 @@ No completed tests yet.
 
 <br><br>
 
-Complete your first CBT to start tracking progress.
+Complete a CBT to start tracking progress.
 
 </div>
 `;
@@ -457,7 +488,11 @@ const correct=
 Number(test.correct) || 0;
 
 const wrong=
-Number(test.incorrect) || 0;
+Number(
+test.incorrect ??
+test.wrong ??
+0
+);
 
 const skipped=
 Number(test.skipped) || 0;
@@ -530,7 +565,7 @@ style="width:${accuracy}%">
 <div class="row">
 
 <span>
-📅 ${test.date || "Date unavailable"}
+📅 ${escapeHTML(test.date || "Date unavailable")}
 </span>
 
 </div>
@@ -604,7 +639,10 @@ if(names.length===0){
 box.innerHTML=
 `
 <div class="empty">
-Subject data will appear after a new CBT attempt.
+
+Subject data will appear after a CBT
+containing subject information.
+
 </div>
 `;
 
@@ -645,7 +683,7 @@ div.className="subject";
 div.innerHTML=
 
 `
-<strong>${name}</strong>
+<strong>${escapeHTML(name)}</strong>
 
 <div class="progress-bar">
 
@@ -703,8 +741,9 @@ q.subject || "General";
 const topic=
 q.topic || "General";
 
+
 const key=
-subject+" - "+topic;
+subject+" → "+topic;
 
 
 if(!topics[key]){
@@ -741,7 +780,10 @@ if(names.length===0){
 box.innerHTML=
 `
 <div class="empty">
-Topic data will appear after a new CBT attempt.
+
+Topic data will appear after a CBT
+containing topic information.
+
 </div>
 `;
 
@@ -782,7 +824,7 @@ div.className="topic";
 div.innerHTML=
 
 `
-<strong>${name}</strong>
+<strong>${escapeHTML(name)}</strong>
 
 <div class="progress-bar">
 
@@ -814,6 +856,236 @@ box.appendChild(div);
 
 
 /* ==========================
+MISTAKE PATTERNS
+========================== */
+
+function renderMistakePatterns(){
+
+const box=
+document.getElementById("patterns");
+
+box.innerHTML="";
+
+
+let wrong=0;
+let skipped=0;
+
+
+const subjectMistakes={};
+const topicMistakes={};
+
+
+history.forEach(function(test){
+
+if(!Array.isArray(test.questions)){
+return;
+}
+
+
+test.questions.forEach(function(q){
+
+if(q.status==="wrong"){
+
+wrong++;
+
+
+const subject=
+q.subject || "General";
+
+const topic=
+q.topic || "General";
+
+
+subjectMistakes[subject]=
+(subjectMistakes[subject] || 0)+1;
+
+
+const key=
+subject+" → "+topic;
+
+
+topicMistakes[key]=
+(topicMistakes[key] || 0)+1;
+
+}
+
+
+if(q.status==="skipped"){
+
+skipped++;
+
+}
+
+});
+
+});
+
+
+if(wrong===0 && skipped===0){
+
+box.innerHTML=
+`
+<div class="insight strength">
+
+🎉 No mistake pattern detected yet.
+
+Complete more CBT questions to build your mistake profile.
+
+</div>
+`;
+
+return;
+
+}
+
+
+/* WRONG COUNT */
+
+if(wrong>0){
+
+const div=
+document.createElement("div");
+
+div.className=
+"insight focus";
+
+div.textContent=
+"❌ "
++
+wrong
++
+" wrong questions detected. These should be prioritized for revision.";
+
+box.appendChild(div);
+
+}
+
+
+/* WORST SUBJECT */
+
+let worstSubject=null;
+let worstSubjectCount=0;
+
+
+Object.keys(subjectMistakes)
+.forEach(function(subject){
+
+if(
+subjectMistakes[subject]
+>
+worstSubjectCount
+){
+
+worstSubjectCount=
+subjectMistakes[subject];
+
+worstSubject=
+subject;
+
+}
+
+});
+
+
+if(worstSubject){
+
+const div=
+document.createElement("div");
+
+div.className=
+"insight focus";
+
+div.textContent=
+"📚 Highest mistake concentration: "
++
+worstSubject
++
+" — "
++
+worstSubjectCount
++
+" mistakes.";
+
+box.appendChild(div);
+
+}
+
+
+/* WORST TOPIC */
+
+let worstTopic=null;
+let worstTopicCount=0;
+
+
+Object.keys(topicMistakes)
+.forEach(function(topic){
+
+if(
+topicMistakes[topic]
+>
+worstTopicCount
+){
+
+worstTopicCount=
+topicMistakes[topic];
+
+worstTopic=
+topic;
+
+}
+
+});
+
+
+if(worstTopic){
+
+const div=
+document.createElement("div");
+
+div.className=
+"insight focus";
+
+div.textContent=
+"🎯 Priority topic: "
++
+worstTopic
++
+" — "
++
+worstTopicCount
++
+" mistakes.";
+
+box.appendChild(div);
+
+}
+
+
+/* SKIPPED */
+
+if(skipped>0){
+
+const div=
+document.createElement("div");
+
+div.className=
+"insight";
+
+div.textContent=
+"⏭️ "
++
+skipped
++
+" questions were skipped. Work on time management and question selection.";
+
+box.appendChild(div);
+
+}
+
+}
+
+
+/* ==========================
 INSIGHTS
 ========================== */
 
@@ -827,15 +1099,20 @@ box.innerHTML="";
 
 if(history.length===0){
 
+box.innerHTML=
+`
+<div class="empty">
+Complete a CBT to generate insights.
+</div>
+`;
+
 return;
 
 }
 
 
 let correct=0;
-
 let wrong=0;
-
 let skipped=0;
 
 
@@ -845,7 +1122,11 @@ correct +=
 Number(test.correct) || 0;
 
 wrong +=
-Number(test.incorrect) || 0;
+Number(
+test.incorrect ??
+test.wrong ??
+0
+);
 
 skipped +=
 Number(test.skipped) || 0;
@@ -873,13 +1154,13 @@ let message;
 if(accuracy>=80){
 
 message=
-"🔥 Strong overall performance. Keep maintaining accuracy.";
+"🔥 Strong performance. Keep maintaining your accuracy.";
 
 }
 else if(accuracy>=60){
 
 message=
-"📈 Your performance is developing. Focus on reducing repeated mistakes.";
+"📈 Your foundation is developing. Focus on reducing repeated mistakes.";
 
 }
 else{
@@ -901,36 +1182,65 @@ message;
 box.appendChild(div);
 
 
-if(skipped>0){
-
-const d=
-document.createElement("div");
-
-d.className="insight";
-
-d.textContent=
-"⏭️ You have "+skipped+
-" skipped questions. Work on time management.";
-
-box.appendChild(d);
-
-}
-
-
 if(wrong>0){
 
 const d=
 document.createElement("div");
 
-d.className="insight";
+d.className=
+"insight focus";
 
 d.textContent=
-"🧠 You have "+wrong+
-" incorrect answers to review in Mistake Bank.";
+"🧠 "
++
+wrong
++
+" incorrect answers are available for targeted revision.";
 
 box.appendChild(d);
 
 }
+
+
+if(skipped>0){
+
+const d=
+document.createElement("div");
+
+d.className=
+"insight";
+
+d.textContent=
+"⏭️ "
++
+skipped
++
+" skipped questions. Improve time management.";
+
+box.appendChild(d);
+
+}
+
+}
+
+
+/* ==========================
+ESCAPE TEXT
+========================== */
+
+function escapeHTML(value){
+
+return String(value)
+
+.replace(/&/g,"&amp;")
+
+.replace(/</g,"&lt;")
+
+.replace(/>/g,"&gt;")
+
+.replace(/"/g,"&quot;")
+
+.replace(/'/g,"&#039;");
 
 }
 
@@ -946,6 +1256,8 @@ renderProgress();
 renderSubjects();
 
 renderTopics();
+
+renderMistakePatterns();
 
 renderInsights();
 
