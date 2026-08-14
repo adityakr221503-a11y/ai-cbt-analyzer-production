@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>CBT Analyzer Pro — Dashboard</title>
 
@@ -36,12 +31,12 @@ padding:16px 20px;
 }
 
 .header{
-max-width:1150px;
+max-width:1100px;
 margin:auto;
 display:flex;
 align-items:center;
 justify-content:space-between;
-gap:12px;
+gap:15px;
 }
 
 .logo{
@@ -53,31 +48,22 @@ font-weight:800;
 color:#4f46e5;
 }
 
-.header-actions{
-display:flex;
-gap:8px;
-}
-
-.header-button{
-border:0;
-padding:11px 14px;
-border-radius:10px;
-font-weight:700;
-cursor:pointer;
-background:#e2e8f0;
-color:#0f172a;
-}
-
-.primary{
-background:#4f46e5;
-color:#fff;
+.header-badge{
+background:#eef2ff;
+color:#3730a3;
+padding:8px 11px;
+border-radius:9px;
+font-size:12px;
+font-weight:800;
 }
 
 .container{
-max-width:1150px;
-margin:24px auto;
+max-width:1100px;
+margin:25px auto;
 padding:0 15px;
 }
+
+/* HERO */
 
 .hero{
 background:#4f46e5;
@@ -85,172 +71,179 @@ color:#fff;
 border-radius:20px;
 padding:28px;
 margin-bottom:20px;
+box-shadow:0 5px 18px rgba(79,70,229,.18);
 }
 
 .hero h1{
 margin:0 0 8px;
-font-size:29px;
+font-size:28px;
 }
 
 .hero p{
 margin:0;
 opacity:.92;
-line-height:1.5;
+line-height:1.6;
 }
 
 .hero-actions{
-display:flex;
+display:grid;
+grid-template-columns:repeat(2,1fr);
 gap:10px;
-flex-wrap:wrap;
-margin-top:20px;
+margin-top:22px;
 }
 
 .hero-button{
 border:0;
-padding:13px 17px;
-border-radius:10px;
+border-radius:11px;
+padding:14px;
 font-weight:800;
+font-size:15px;
 cursor:pointer;
+}
+
+.start{
 background:#fff;
 color:#3730a3;
 }
 
-.stats{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:13px;
-margin-bottom:20px;
+.mistakes{
+background:#312e81;
+color:#fff;
 }
 
-.stat{
-background:#fff;
-border-radius:15px;
-padding:19px;
-box-shadow:0 3px 12px rgba(0,0,0,.06);
-}
-
-.stat-icon{
-font-size:25px;
-}
-
-.stat-value{
-font-size:29px;
-font-weight:800;
-margin-top:7px;
-}
-
-.stat-label{
-font-size:13px;
-color:#64748b;
-margin-top:5px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:20px;
-}
+/* CARDS */
 
 .card{
 background:#fff;
 border-radius:16px;
 padding:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.06);
 margin-bottom:20px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .card h2{
 margin-top:0;
 }
 
-.action-grid{
+/* STATS */
+
+.stats{
 display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+}
+
+.stat{
+background:#f8fafc;
+border-radius:13px;
+padding:17px;
+text-align:center;
+}
+
+.stat strong{
+display:block;
+font-size:29px;
+margin-bottom:5px;
+}
+
+.stat span{
+font-size:13px;
+color:#64748b;
+font-weight:600;
+}
+
+/* QUICK ACTIONS */
+
+.actions{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
 }
 
 .action{
 border:0;
-border-radius:11px;
-padding:15px 10px;
+background:#f8fafc;
+border-radius:13px;
+padding:18px 10px;
 font-weight:800;
 cursor:pointer;
-background:#eef2ff;
-color:#3730a3;
+font-size:14px;
 }
 
-.action:active,
-.header-button:active,
-.hero-button:active{
-transform:scale(.98);
+.action:active{
+transform:scale(.97);
+background:#eef2ff;
 }
+
+.action-icon{
+display:block;
+font-size:27px;
+margin-bottom:8px;
+}
+
+/* PERFORMANCE */
 
 .performance{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:12px;
+gap:15px;
 }
 
 .performance-box{
 background:#f8fafc;
-border-radius:12px;
-padding:15px;
+border-radius:13px;
+padding:18px;
 }
 
-.performance-value{
-font-size:23px;
-font-weight:800;
-margin-top:5px;
+.performance-box h3{
+margin-top:0;
 }
 
-.performance-label{
-font-size:13px;
-color:#64748b;
-}
-
-.bar{
+.progress{
 height:10px;
 background:#e2e8f0;
 border-radius:20px;
 overflow:hidden;
-margin-top:15px;
+margin:12px 0;
 }
 
-.bar-fill{
+.progress-bar{
 height:100%;
 width:0%;
 background:#4f46e5;
 transition:.4s;
 }
 
-.subject{
-margin-top:14px;
+/* SUBJECT */
+
+.subject-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
 }
 
-.subject-row{
-display:flex;
-justify-content:space-between;
-gap:10px;
-font-size:14px;
+.subject{
+background:#f8fafc;
+border-radius:13px;
+padding:17px;
+}
+
+.subject strong{
+display:block;
+font-size:20px;
 margin-bottom:6px;
 }
 
-.subject-bar{
-height:7px;
-background:#e2e8f0;
-border-radius:20px;
-overflow:hidden;
+.subject small{
+color:#64748b;
 }
 
-.subject-fill{
-height:100%;
-background:#6366f1;
-}
+/* HISTORY */
 
 .history-item{
 border:1px solid #e2e8f0;
 border-radius:12px;
-padding:14px;
+padding:15px;
 margin-top:10px;
 }
 
@@ -261,67 +254,56 @@ gap:10px;
 font-weight:800;
 }
 
-.history-date{
-font-size:12px;
-color:#64748b;
-margin-top:5px;
-}
-
 .history-score{
-font-size:20px;
-font-weight:800;
 color:#4f46e5;
 }
 
-.mistake-box{
-background:#fff7ed;
-border:1px solid #fed7aa;
-border-radius:12px;
-padding:15px;
-}
-
-.mastery-box{
-background:#fffbeb;
-border:1px solid #fde68a;
-border-radius:12px;
-padding:15px;
+.history-details{
+margin-top:8px;
+color:#64748b;
+font-size:14px;
+line-height:1.6;
 }
 
 .empty{
 text-align:center;
-padding:28px 10px;
+padding:30px;
 color:#64748b;
 line-height:1.6;
 }
 
-.notice{
-background:#eff6ff;
-border:1px solid #bfdbfe;
-border-radius:11px;
-padding:14px;
-line-height:1.5;
-}
+/* FOOTER */
 
 .footer{
 text-align:center;
-padding:20px;
-color:#64748b;
+padding:15px;
+color:#94a3b8;
 font-size:13px;
 }
 
-@media(max-width:850px){
+/* MOBILE */
+
+@media(max-width:800px){
 
 .stats{
 grid-template-columns:1fr 1fr;
 }
 
-.grid{
+.actions{
+grid-template-columns:1fr 1fr;
+}
+
+.subject-grid{
+grid-template-columns:1fr;
+}
+
+.performance{
 grid-template-columns:1fr;
 }
 
 }
 
-@media(max-width:550px){
+@media(max-width:600px){
 
 .container{
 margin:15px auto;
@@ -335,44 +317,21 @@ padding:21px;
 font-size:24px;
 }
 
-.header{
-align-items:flex-start;
-}
-
-.logo{
-font-size:18px;
-}
-
-.header-actions{
-flex-wrap:wrap;
-justify-content:flex-end;
-}
-
-.action-grid{
+.hero-actions{
 grid-template-columns:1fr;
 }
 
-.stats{
-gap:9px;
-}
-
-.stat{
-padding:15px;
-}
-
-.stat-value{
-font-size:24px;
+.card{
+padding:17px;
 }
 
 }
 
 </style>
-
 </head>
 
 
 <body>
-
 
 <header>
 
@@ -382,26 +341,8 @@ font-size:24px;
 CBT Analyzer <span>Pro</span>
 </div>
 
-<div class="header-actions">
-
-<button
-class="header-button"
-type="button"
-onclick="location.href='mistake.html'">
-
-🧠 Mistakes
-
-</button>
-
-<button
-class="header-button primary"
-type="button"
-onclick="location.href='cbt.html'">
-
-▶ Start CBT
-
-</button>
-
+<div class="header-badge">
+STUDENT DASHBOARD
 </div>
 
 </div>
@@ -412,185 +353,165 @@ onclick="location.href='cbt.html'">
 <div class="container">
 
 
-<!-- =========================
-HERO
-========================= -->
+<!-- HERO -->
 
 <section class="hero">
 
-<h1>
-🎯 Student Performance Dashboard
-</h1>
+<h1>🎯 Your CBT Learning Dashboard</h1>
 
 <p>
-Turn every test into learning. Track your performance,
-find mistakes, retry weak questions and build mastery.
+Test → Analyze → Fix Mistakes → Retry → Master.
 </p>
 
 <div class="hero-actions">
 
 <button
-class="hero-button"
+class="hero-button start"
+type="button"
 onclick="location.href='cbt.html'">
 
-📝 Start New Test
+📝 Start CBT Test
 
 </button>
 
 <button
-class="hero-button"
+class="hero-button mistakes"
+type="button"
 onclick="location.href='mistake.html'">
 
 🧠 Open Mistake Bank
 
 </button>
 
-<button
-class="hero-button"
-onclick="openRetry()">
-
-🔄 Retry Mistakes
-
-</button>
-
 </div>
 
 </section>
 
 
-<!-- =========================
-STATS
-========================= -->
-
-<section class="stats">
-
-
-<div class="stat">
-
-<div class="stat-icon">
-📝
-</div>
-
-<div
-class="stat-value"
-id="testsCount">
-0
-</div>
-
-<div class="stat-label">
-Tests Completed
-</div>
-
-</div>
-
-
-<div class="stat">
-
-<div class="stat-icon">
-🎯
-</div>
-
-<div
-class="stat-value"
-id="accuracy">
-0%
-</div>
-
-<div class="stat-label">
-Overall Accuracy
-</div>
-
-</div>
-
-
-<div class="stat">
-
-<div class="stat-icon">
-❌
-</div>
-
-<div
-class="stat-value"
-id="mistakesCount">
-0
-</div>
-
-<div class="stat-label">
-Active Mistakes
-</div>
-
-</div>
-
-
-<div class="stat">
-
-<div class="stat-icon">
-🏆
-</div>
-
-<div
-class="stat-value"
-id="masteryCount">
-0
-</div>
-
-<div class="stat-label">
-Mastered Questions
-</div>
-
-</div>
-
-
-</section>
-
-
-<div class="grid">
-
-
-<!-- =========================
-LEFT
-========================= -->
-
-<div>
-
+<!-- STATISTICS -->
 
 <section class="card">
 
-<h2>
-⚡ Quick Actions
-</h2>
+<h2>📊 Performance Overview</h2>
 
-<div class="action-grid">
+<div class="stats">
+
+<div class="stat">
+
+<strong id="testsCount">
+0
+</strong>
+
+<span>
+Tests Completed
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="totalQuestions">
+0
+</strong>
+
+<span>
+Questions Attempted
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="accuracy">
+0%
+</strong>
+
+<span>
+Accuracy
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="mastered">
+0
+</strong>
+
+<span>
+🏆 Mastered
+</span>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- QUICK ACTIONS -->
+
+<section class="card">
+
+<h2>⚡ Quick Actions</h2>
+
+<div class="actions">
 
 <button
 class="action"
+type="button"
 onclick="location.href='cbt.html'">
 
-📝 Take CBT Test
+<span class="action-icon">
+📝
+</span>
+
+New CBT
 
 </button>
 
+
 <button
 class="action"
+type="button"
 onclick="location.href='mistake.html'">
 
-🧠 Mistake Bank
+<span class="action-icon">
+❌
+</span>
+
+Mistake Bank
 
 </button>
 
+
 <button
 class="action"
-onclick="openRetry()">
+type="button"
+onclick="location.href='retry.html'">
 
-🔄 Retry → Mastery
+<span class="action-icon">
+🔄
+</span>
+
+Retry
 
 </button>
 
+
 <button
 class="action"
+type="button"
 onclick="scrollToHistory()">
 
-📊 Test History
+<span class="action-icon">
+📜
+</span>
+
+History
 
 </button>
 
@@ -599,241 +520,215 @@ onclick="scrollToHistory()">
 </section>
 
 
+<!-- MISTAKE SUMMARY -->
+
 <section class="card">
 
-<h2>
-📈 Performance
-</h2>
+<h2>🧠 Mistake Intelligence</h2>
 
 <div class="performance">
 
-
 <div class="performance-box">
 
-<div class="performance-label">
-Correct
-</div>
+<h3>
+❌ Active Mistakes
+</h3>
 
-<div
-class="performance-value"
-id="correctCount">
+<strong
+id="activeMistakes"
+style="font-size:30px">
+
 0
-</div>
 
-</div>
+</strong>
 
+<p>
+Questions that still need revision.
+</p>
 
-<div class="performance-box">
+<button
+class="action"
+style="width:100%"
+onclick="location.href='mistake.html'">
 
-<div class="performance-label">
-Incorrect
-</div>
+Review Mistakes
 
-<div
-class="performance-value"
-id="incorrectCount">
-0
-</div>
-
-</div>
-
-
-<div class="performance-box">
-
-<div class="performance-label">
-Skipped
-</div>
-
-<div
-class="performance-value"
-id="skippedCount">
-0
-</div>
+</button>
 
 </div>
 
 
 <div class="performance-box">
 
-<div class="performance-label">
-Average Score
-</div>
+<h3>
+🔄 Retry Attempts
+</h3>
 
-<div
-class="performance-value"
-id="averageScore">
+<strong
+id="retryAttempts"
+style="font-size:30px">
+
 0
-</div>
+
+</strong>
+
+<p>
+Total retry attempts recorded.
+</p>
+
+<button
+class="action"
+style="width:100%"
+onclick="location.href='retry.html'">
+
+Start Retry
+
+</button>
 
 </div>
 
 </div>
 
+</section>
 
-<div class="bar">
+
+<!-- ACCURACY -->
+
+<section class="card">
+
+<h2>🎯 Overall Accuracy</h2>
+
+<div class="performance-box">
+
+<strong
+id="accuracyLarge"
+style="font-size:34px">
+
+0%
+
+</strong>
+
+<div class="progress">
 
 <div
-class="bar-fill"
+class="progress-bar"
 id="accuracyBar">
 </div>
 
 </div>
 
+<p id="accuracyMessage">
+Complete a CBT test to start building your performance profile.
+</p>
+
+</div>
+
 </section>
 
+
+<!-- SUBJECT PERFORMANCE -->
 
 <section class="card">
 
-<h2>
-📚 Subject Performance
-</h2>
+<h2>📚 Subject Performance</h2>
 
-<div id="subjects">
-
-<div class="empty">
-Take a test to see subject performance.
-</div>
-
-</div>
-
-</section>
-
-</div>
+<div class="subject-grid">
 
 
-<!-- =========================
-RIGHT
-========================= -->
+<div class="subject">
+
+<strong>
+⚡ Physics
+</strong>
 
 <div>
+Questions:
+<span id="physicsQuestions">0</span>
+</div>
+
+<div>
+Correct:
+<span id="physicsCorrect">0</span>
+</div>
+
+<small>
+Accuracy:
+<span id="physicsAccuracy">0%</span>
+</small>
+
+</div>
 
 
-<section class="card">
-
-<h2>
-🧠 Learning Status
-</h2>
-
-<div class="mistake-box">
+<div class="subject">
 
 <strong>
-❌ Active Mistakes
+🧪 Chemistry
 </strong>
 
-<br><br>
+<div>
+Questions:
+<span id="chemistryQuestions">0</span>
+</div>
 
-<span id="activeMistakesText">
-0 questions need review.
-</span>
+<div>
+Correct:
+<span id="chemistryCorrect">0</span>
+</div>
 
-<br><br>
-
-<button
-class="action"
-onclick="location.href='mistake.html'">
-
-Review Mistakes →
-
-</button>
+<small>
+Accuracy:
+<span id="chemistryAccuracy">0%</span>
+</small>
 
 </div>
 
 
-<br>
-
-
-<div class="mastery-box">
+<div class="subject">
 
 <strong>
-🏆 Mastery
+🧬 Biology
 </strong>
 
-<br><br>
-
-<span id="masteryText">
-0 questions mastered.
-</span>
-
-<br><br>
-
-<button
-class="action"
-onclick="location.href='mistake.html'">
-
-View Mastery →
-
-</button>
-
+<div>
+Questions:
+<span id="biologyQuestions">0</span>
 </div>
 
-</section>
-
-
-<section class="card">
-
-<h2>
-💡 Smart Study Insight
-</h2>
-
-<div
-class="notice"
-id="insight">
-
-Complete your first CBT test to generate
-your personalized performance insight.
-
+<div>
+Correct:
+<span id="biologyCorrect">0</span>
 </div>
 
-</section>
+<small>
+Accuracy:
+<span id="biologyAccuracy">0%</span>
+</small>
 
-
-<section class="card">
-
-<h2>
-🔄 Retry Queue
-</h2>
-
-<div id="retryStatus">
-
-<div class="empty">
-Checking retry queue...
 </div>
 
 </div>
 
 </section>
 
-</div>
 
-</div>
-
-
-<!-- =========================
-HISTORY
-========================= -->
+<!-- TEST HISTORY -->
 
 <section
 class="card"
 id="historySection">
 
 <h2>
-📊 Recent Test History
+📜 Recent Test History
 </h2>
 
-<div id="historyList">
-
-<div class="empty">
-No tests completed yet.
-</div>
-
-</div>
+<div id="historyList"></div>
 
 </section>
 
 
 <div class="footer">
 
-CBT Analyzer Pro • Student-first learning system
+CBT Analyzer Pro • Student First Learning System
 
 </div>
 
@@ -847,91 +742,48 @@ CBT Analyzer Pro • Student-first learning system
 STORAGE
 ===================================================== */
 
-const HISTORY_KEY=
-"cbtHistory";
+const HISTORY_KEY="cbtHistory";
 
-const MASTERY_KEY=
-"cbtMasteryV2";
+const MASTERY_KEYS=[
+"cbtMasteryV2",
+"cbtAnalyzer.mastery"
+];
 
-const RETRY_QUEUE_KEY=
-"cbtAnalyzer.retryQueue";
-
-const MASTERY_NEW_KEY=
-"cbtAnalyzer.mastery";
+const RETRY_KEY=
+"cbtAnalyzer.retryHistory";
 
 
 /* =====================================================
-STATE
+HELPERS
 ===================================================== */
 
-let history=[];
-
-let mastery=[];
-
-
-/* =====================================================
-LOAD
-===================================================== */
-
-function loadData(){
+function readJSON(key,fallback){
 
 try{
 
 const data=
 JSON.parse(
-localStorage.getItem(
-HISTORY_KEY
-)||"[]"
+localStorage.getItem(key)||"null"
 );
 
-history=
-Array.isArray(data)
+return data===null
 ?
-data
+fallback
 :
-[];
+data;
 
 }catch(error){
 
-history=[];
-
-}
-
-
-try{
-
-const data=
-JSON.parse(
-localStorage.getItem(
-MASTERY_KEY
-)||"[]"
-);
-
-mastery=
-Array.isArray(data)
-?
-data
-:
-[];
-
-}catch(error){
-
-mastery=[];
+return fallback;
 
 }
 
 }
 
-
-/* =====================================================
-NORMALIZE
-===================================================== */
 
 function normalize(value){
 
-return String(
-value||""
-)
+return String(value||"")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -940,52 +792,134 @@ value||""
 
 
 /* =====================================================
-MASTERED QUESTIONS
+LOAD DATA
 ===================================================== */
 
-function getMasteredSet(){
+const history=
+readJSON(
+HISTORY_KEY,
+[]
+);
 
-const set=
-new Set();
+
+const tests=
+Array.isArray(history)
+?
+history
+:[];
 
 
-mastery.forEach(
-function(item){
+/* =====================================================
+CALCULATE GLOBAL STATS
+===================================================== */
+
+let totalQuestions=0;
+
+let totalAttempted=0;
+
+let totalCorrect=0;
+
+let totalWrong=0;
+
+let totalSkipped=0;
+
+
+tests.forEach(
+function(test){
+
+if(!test)return;
+
 
 if(
-item &&
-item.type==="mastery" &&
-item.question
+Array.isArray(test.questions)
 ){
 
-set.add(
-normalize(
-item.question
-)
-);
+test.questions.forEach(
+function(q){
+
+if(!q)return;
+
+totalQuestions++;
+
+
+if(q.status==="correct"){
+
+totalCorrect++;
+
+totalAttempted++;
+
+}
+
+else if(q.status==="wrong"){
+
+totalWrong++;
+
+totalAttempted++;
+
+}
+
+else if(q.status==="skipped"){
+
+totalSkipped++;
+
+}
+
+else if(
+q.selectedIndex!==null &&
+q.selectedIndex!==undefined
+){
+
+totalAttempted++;
+
+}
+
+});
+
+}
+
+else{
+
+totalCorrect+=
+Number(test.correct)||0;
+
+totalWrong+=
+Number(test.incorrect||test.wrong)||0;
+
+totalSkipped+=
+Number(test.skipped)||0;
 
 }
 
 });
 
 
-/*
-Also read newer mastery storage.
-*/
-
-try{
-
-const newMastery=
-JSON.parse(
-localStorage.getItem(
-MASTERY_NEW_KEY
-)||"[]"
-);
+const accuracy=
+totalAttempted>0
+?
+Math.round(
+(totalCorrect/totalAttempted)*100
+)
+:
+0;
 
 
-if(Array.isArray(newMastery)){
+/* =====================================================
+MASTERY
+===================================================== */
 
-newMastery.forEach(
+function getMastery(){
+
+const set=new Set();
+
+MASTERY_KEYS.forEach(
+function(key){
+
+const data=
+readJSON(key,[]);
+
+if(!Array.isArray(data))return;
+
+data.forEach(
 function(item){
 
 if(
@@ -994,23 +928,22 @@ item.question
 ){
 
 set.add(
-normalize(
-item.question
-)
+normalize(item.question)
 );
 
 }
 
 });
 
-}
-
-}catch(e){}
-
+});
 
 return set;
 
 }
+
+
+const masterySet=
+getMastery();
 
 
 /* =====================================================
@@ -1019,25 +952,15 @@ ACTIVE MISTAKES
 
 function getActiveMistakes(){
 
-const mastered=
-getMasteredSet();
+const map=new Map();
 
-const map=
-new Map();
-
-
-history.forEach(
+tests.forEach(
 function(test){
 
 if(
 !test ||
 !Array.isArray(test.questions)
-){
-
-return;
-
-}
-
+)return;
 
 test.questions.forEach(
 function(q){
@@ -1046,22 +969,13 @@ if(
 !q ||
 q.status!=="wrong" ||
 !q.question
-){
-
-return;
-
-}
-
+)return;
 
 const key=
-normalize(
-q.question
-);
+normalize(q.question);
 
 
-if(
-mastered.has(key)
-){
+if(masterySet.has(key)){
 
 return;
 
@@ -1078,214 +992,161 @@ q
 });
 
 
-return Array.from(
-map.values()
-);
+return map.size;
 
 }
 
 
+const activeMistakes=
+getActiveMistakes();
+
+
 /* =====================================================
-STATS
+RETRY COUNT
 ===================================================== */
 
-function renderStats(){
-
-const tests=
-history.length;
-
-
-let correct=0;
-
-let incorrect=0;
-
-let skipped=0;
-
-let totalQuestions=0;
-
-let scoreTotal=0;
-
-
-history.forEach(
-function(test){
-
-correct+=
-Number(
-test.correct||0
-);
-
-incorrect+=
-Number(
-test.incorrect||
-test.wrong||
-0
-);
-
-skipped+=
-Number(
-test.skipped||0
+const retryHistory=
+readJSON(
+RETRY_KEY,
+[]
 );
 
 
-const questionCount=
-Array.isArray(
-test.questions
-)
+const retryAttempts=
+Array.isArray(retryHistory)
 ?
-test.questions.length
-:
-correct+
-incorrect+
-skipped;
-
-
-totalQuestions+=
-questionCount;
-
-
-scoreTotal+=
-Number(
-test.score||0
-);
-
-});
-
-
-const accuracy=
-totalQuestions>0
-?
-Math.round(
-(correct/totalQuestions)*100
-)
+retryHistory.length
 :
 0;
 
 
-const active=
-getActiveMistakes().length;
-
-
-const mastered=
-getMasteredSet().size;
-
+/* =====================================================
+UPDATE TOP STATS
+===================================================== */
 
 document.getElementById(
 "testsCount"
 ).textContent=
-tests;
+tests.length;
+
+
+document.getElementById(
+"totalQuestions"
+).textContent=
+totalQuestions;
 
 
 document.getElementById(
 "accuracy"
 ).textContent=
-accuracy+
-"%";
+accuracy+"%";
 
 
 document.getElementById(
-"mistakesCount"
+"mastered"
 ).textContent=
-active;
+masterySet.size;
 
 
 document.getElementById(
-"masteryCount"
+"activeMistakes"
 ).textContent=
-mastered;
+activeMistakes;
 
 
 document.getElementById(
-"correctCount"
+"retryAttempts"
 ).textContent=
-correct;
+retryAttempts;
 
 
 document.getElementById(
-"incorrectCount"
+"accuracyLarge"
 ).textContent=
-incorrect;
-
-
-document.getElementById(
-"skippedCount"
-).textContent=
-skipped;
-
-
-document.getElementById(
-"averageScore"
-).textContent=
-tests>0
-?
-Math.round(
-scoreTotal/tests
-)
-:
-0;
+accuracy+"%";
 
 
 document.getElementById(
 "accuracyBar"
 ).style.width=
-accuracy+
-"%";
-
-
-document.getElementById(
-"activeMistakesText"
-).textContent=
-active+
-(
-active===1
-?
-" question needs review."
-:
-" questions need review."
-);
-
-
-document.getElementById(
-"masteryText"
-).textContent=
-mastered+
-(
-mastered===1
-?
-" question mastered."
-:
-" questions mastered."
-);
-
-}
+accuracy+"%";
 
 
 /* =====================================================
-SUBJECT PERFORMANCE
+ACCURACY MESSAGE
 ===================================================== */
 
-function renderSubjects(){
+let message;
 
-const box=
-document.getElementById(
-"subjects"
-);
+if(totalAttempted===0){
 
-const subjects={};
+message=
+"Complete a CBT test to start building your performance profile.";
 
+}
+else if(accuracy>=85){
 
-history.forEach(
-function(test){
+message=
+"🔥 Excellent accuracy. Focus on difficult and recurring mistakes.";
 
-if(
-!Array.isArray(
-test.questions
-)
-){
+}
+else if(accuracy>=70){
 
-return;
+message=
+"👍 Good progress. Use the Mistake Bank to push your accuracy higher.";
+
+}
+else if(accuracy>=50){
+
+message=
+"📈 Keep practicing. Review mistakes and retry them regularly.";
+
+}
+else{
+
+message=
+"🎯 Start with concept revision, then use Retry → Mastery.";
 
 }
 
+
+document.getElementById(
+"accuracyMessage"
+).textContent=
+message;
+
+
+/* =====================================================
+SUBJECT STATS
+===================================================== */
+
+const subjects={
+
+Physics:{
+questions:0,
+correct:0
+},
+
+Chemistry:{
+questions:0,
+correct:0
+},
+
+Biology:{
+questions:0,
+correct:0
+}
+
+};
+
+
+tests.forEach(
+function(test){
+
+if(
+!test ||
+!Array.isArray(test.questions)
+)return;
 
 test.questions.forEach(
 function(q){
@@ -1294,21 +1155,27 @@ if(!q)return;
 
 
 const subject=
-q.subject||
-"Other";
+String(q.subject||"")
+.trim();
 
 
-if(!subjects[subject]){
+if(
+!subjects[subject]
+){
 
-subjects[subject]={
-correct:0,
-total:0
-};
+return;
 
 }
 
 
-subjects[subject].total++;
+if(
+q.status==="correct" ||
+q.status==="wrong"
+){
+
+subjects[subject].questions++;
+
+}
 
 
 if(q.status==="correct"){
@@ -1322,282 +1189,68 @@ subjects[subject].correct++;
 });
 
 
-const names=
-Object.keys(subjects);
-
-
-if(names.length===0){
-
-box.innerHTML=
-`
-<div class="empty">
-Take a test to see subject performance.
-</div>
-`;
-
-return;
-
-}
-
-
-box.innerHTML="";
-
-
-names.forEach(
-function(subject){
+function updateSubject(
+subject,
+questionId,
+correctId,
+accuracyId
+){
 
 const data=
 subjects[subject];
 
+document.getElementById(
+questionId
+).textContent=
+data.questions;
 
-const percentage=
-data.total>0
+
+document.getElementById(
+correctId
+).textContent=
+data.correct;
+
+
+const acc=
+data.questions>0
 ?
 Math.round(
-(data.correct/data.total)*100
+(data.correct/data.questions)*100
 )
 :
 0;
 
 
-const div=
-document.createElement(
-"div"
-);
-
-div.className=
-"subject";
-
-
-div.innerHTML=
-
-`
-
-<div class="subject-row">
-
-<strong>
-${escapeHTML(subject)}
-</strong>
-
-<span>
-${percentage}%
-</span>
-
-</div>
-
-<div class="subject-bar">
-
-<div
-class="subject-fill"
-style="width:${percentage}%">
-</div>
-
-</div>
-
-`;
-
-
-box.appendChild(div);
-
-});
-
-}
-
-
-/* =====================================================
-INSIGHT
-===================================================== */
-
-function renderInsight(){
-
-const box=
 document.getElementById(
-"insight"
+accuracyId
+).textContent=
+acc+"%";
+
+}
+
+
+updateSubject(
+"Physics",
+"physicsQuestions",
+"physicsCorrect",
+"physicsAccuracy"
 );
 
 
-if(history.length===0){
-
-box.textContent=
-"Complete your first CBT test to generate your personalized performance insight.";
-
-return;
-
-}
-
-
-const active=
-getActiveMistakes().length;
-
-
-const mastered=
-getMasteredSet().size;
-
-
-let correct=0;
-
-let total=0;
-
-
-history.forEach(
-function(test){
-
-correct+=
-Number(
-test.correct||0
-);
-
-if(
-Array.isArray(
-test.questions
-)
-){
-
-total+=
-test.questions.length;
-
-}
-
-});
-
-
-const accuracy=
-total>0
-?
-Math.round(
-(correct/total)*100
-)
-:
-0;
-
-
-if(active>=5){
-
-box.innerHTML=
-`
-<strong>🧠 Focus Area:</strong><br>
-You currently have ${active} active mistakes.
-Review your Mistake Bank and use Retry → Mastery
-before moving on to too many new topics.
-`;
-
-return;
-
-}
-
-
-if(accuracy<50){
-
-box.innerHTML=
-`
-<strong>🎯 Build the Foundation:</strong><br>
-Your current accuracy is ${accuracy}%.
-Focus on understanding concepts and carefully reviewing
-wrong answers rather than rushing into more questions.
-`;
-
-return;
-
-}
-
-
-if(accuracy<75){
-
-box.innerHTML=
-`
-<strong>📈 Improving:</strong><br>
-Your current accuracy is ${accuracy}%.
-Use the Mistake Bank regularly and retry incorrect
-questions until they become mastered.
-`;
-
-return;
-
-}
-
-
-if(active===0 && mastered>0){
-
-box.innerHTML=
-`
-<strong>🏆 Excellent:</strong><br>
-You have no active mistakes and ${mastered} mastered
-question${mastered===1?"":"s"}. Keep testing yourself
-to maintain your performance.
-`;
-
-return;
-
-}
-
-
-box.innerHTML=
-`
-<strong>🚀 Strong Progress:</strong><br>
-Your current accuracy is ${accuracy}%.
-Keep converting mistakes into mastered questions
-through the Retry Engine.
-`;
-
-}
-
-
-/* =====================================================
-RETRY STATUS
-===================================================== */
-
-function renderRetryStatus(){
-
-const box=
-document.getElementById(
-"retryStatus"
+updateSubject(
+"Chemistry",
+"chemistryQuestions",
+"chemistryCorrect",
+"chemistryAccuracy"
 );
 
 
-const active=
-getActiveMistakes();
-
-
-if(active.length===0){
-
-box.innerHTML=
-`
-<div class="empty">
-🏆 No questions currently waiting for retry.
-</div>
-`;
-
-return;
-
-}
-
-
-box.innerHTML=
-`
-<div class="mistake-box">
-
-<strong>
-🔄 ${active.length} mistake${active.length===1?"":"s"} ready for retry
-</strong>
-
-<br><br>
-
-Turn your mistakes into mastery.
-
-<br><br>
-
-<button
-class="action"
-onclick="openRetry()">
-
-Start Retry →
-
-</button>
-
-</div>
-`;
-
-}
+updateSubject(
+"Biology",
+"biologyQuestions",
+"biologyCorrect",
+"biologyAccuracy"
+);
 
 
 /* =====================================================
@@ -1611,21 +1264,33 @@ document.getElementById(
 "historyList"
 );
 
+box.innerHTML="";
 
-if(history.length===0){
 
-box.innerHTML=
-`
+if(tests.length===0){
+
+box.innerHTML=`
+
 <div class="empty">
 
-📝 No tests completed yet.
+📜 No test history yet.
 
 <br><br>
 
-Start your first CBT test to build your
-performance history.
+Start your first CBT test to see your performance here.
+
+<br><br>
+
+<button
+class="action"
+onclick="location.href='cbt.html'">
+
+📝 Start First CBT
+
+</button>
 
 </div>
+
 `;
 
 return;
@@ -1633,11 +1298,8 @@ return;
 }
 
 
-box.innerHTML="";
-
-
 const recent=
-history
+tests
 .slice()
 .reverse()
 .slice(0,8);
@@ -1647,64 +1309,73 @@ recent.forEach(
 function(test,index){
 
 const div=
-document.createElement(
-"div"
-);
+document.createElement("div");
 
 div.className=
 "history-item";
 
 
 const correct=
-Number(
-test.correct||0
-);
+Number(test.correct)||0;
 
 const wrong=
 Number(
 test.incorrect||
-test.wrong||
-0
-);
+test.wrong
+)||0;
 
 const skipped=
-Number(
-test.skipped||0
-);
+Number(test.skipped)||0;
 
 
-div.innerHTML=
+const total=
+correct+
+wrong+
+skipped;
 
-`
+
+const score=
+test.score!==undefined
+?
+test.score
+:
+(correct*4)-wrong;
+
+
+const date=
+test.date||
+"Unknown date";
+
+
+div.innerHTML=`
 
 <div class="history-top">
 
 <span>
-Test ${history.length-index}
+Test #${tests.length-index}
 </span>
 
 <span class="history-score">
-${escapeHTML(test.score||0)}
+${score} / ${total*4}
 </span>
 
 </div>
 
-<div class="history-date">
+<div class="history-details">
 
-${escapeHTML(
-test.date||
-"Date unavailable"
-)}
+📅 ${escapeHTML(date)}
 
-</div>
+<br>
 
-<div style="margin-top:10px;color:#64748b;font-size:13px">
+✅ Correct: ${correct}
 
-Correct: ${correct}
 &nbsp; • &nbsp;
-Wrong: ${wrong}
+
+❌ Wrong: ${wrong}
+
 &nbsp; • &nbsp;
-Skipped: ${skipped}
+
+⏭️ Skipped: ${skipped}
 
 </div>
 
@@ -1717,84 +1388,17 @@ box.appendChild(div);
 }
 
 
-/* =====================================================
-RETRY
-===================================================== */
+function escapeHTML(value){
 
-function openRetry(){
-
-const active=
-getActiveMistakes();
-
-
-if(active.length===0){
-
-alert(
-"No active mistakes are waiting for retry."
-);
-
-return;
+return String(value||"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
-
-const first=
-active[0];
-
-
-localStorage.setItem(
-"cbtRetryQuestion",
-JSON.stringify({
-
-question:
-first.question,
-
-options:
-first.options||
-[],
-
-subject:
-first.subject||
-"Unknown",
-
-topic:
-first.topic||
-"Unknown",
-
-selectedIndex:
-first.selectedIndex,
-
-selectedAnswer:
-first.selectedAnswer,
-
-correctIndex:
-first.correctIndex,
-
-correctAnswer:
-first.correctAnswer,
-
-mistakeType:
-first.mistakeType,
-
-mistakeReason:
-first.mistakeReason,
-
-solution:
-first.solution
-
-})
-);
-
-
-location.href=
-"retry.html";
-
-}
-
-
-/* =====================================================
-SCROLL
-===================================================== */
 
 function scrollToHistory(){
 
@@ -1811,85 +1415,9 @@ block:"start"
 }
 
 
-/* =====================================================
-ESCAPE
-===================================================== */
-
-function escapeHTML(value){
-
-return String(
-value===undefined||
-value===null
-?
-""
-:
-value
-)
-.replace(
-/&/g,
-"&amp;"
-)
-.replace(
-/</g,
-"&lt;"
-)
-.replace(
-/>/g,
-"&gt;"
-)
-.replace(
-/"/g,
-"&quot;"
-)
-.replace(
-/'/g,
-"&#039;"
-);
-
-}
-
-
-/* =====================================================
-START
-===================================================== */
-
-loadData();
-
-renderStats();
-
-renderSubjects();
-
-renderInsight();
-
-renderRetryStatus();
-
 renderHistory();
-
-
-/*
-Refresh dashboard when returning to it.
-*/
-
-window.addEventListener(
-"pageshow",
-function(){
-
-loadData();
-
-renderStats();
-
-renderSubjects();
-
-renderInsight();
-
-renderRetryStatus();
-
-renderHistory();
-
-});
 
 </script>
 
 </body>
-
 </html>
