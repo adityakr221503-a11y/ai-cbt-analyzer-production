@@ -1,18 +1,576 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CBT Test</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CBT Analyzer Pro</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a
+}
+
+header{
+background:#fff;
+padding:16px 20px;
+border-bottom:1px solid #e2e8f0
+}
+
+.header{
+max-width:1100px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center
+}
+
+.logo{
+font-size:20px;
+font-weight:700
+}
+
+.timer{
+background:#eef2ff;
+padding:9px 14px;
+border-radius:9px;
+font-weight:700
+}
+
+.container{
+max-width:1100px;
+margin:20px auto;
+padding:0 15px;
+display:grid;
+grid-template-columns:1fr 280px;
+gap:20px
+}
+
+.card{
+background:#fff;
+border-radius:15px;
+padding:22px;
+box-shadow:0 3px 12px rgba(0,0,0,.08)
+}
+
+.question-number{
+color:#64748b;
+font-weight:600;
+margin-bottom:12px
+}
+
+.question{
+font-size:20px;
+line-height:1.5;
+font-weight:700;
+margin-bottom:20px
+}
+
+.option{
+width:100%;
+padding:15px;
+margin:8px 0;
+background:#fff;
+border:2px solid #e2e8f0;
+border-radius:10px;
+text-align:left;
+font-size:16px;
+cursor:pointer
+}
+
+.option.selected{
+border-color:#4f46e5;
+background:#eef2ff;
+font-weight:700
+}
+
+.buttons{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:20px
+}
+
+button{
+border:0;
+border-radius:10px;
+padding:13px;
+font-size:15px;
+font-weight:700;
+cursor:pointer
+}
+
+.primary{background:#4f46e5;color:white}
+.secondary{background:#e2e8f0;color:#0f172a}
+.warning{background:#f59e0b;color:white}
+.danger{background:#dc2626;color:white}
+
+.palette{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:8px;
+margin-top:15px
+}
+
+.palette button{
+background:#e2e8f0;
+padding:10px 5px
+}
+
+.palette .answered{background:#bbf7d0}
+.palette .review{background:#fde68a}
+.palette .current{outline:3px solid #4f46e5}
+
+.legend{
+margin-top:15px;
+color:#64748b;
+font-size:13px;
+line-height:1.8
+}
+
+#result{display:none}
+
+.score{
+font-size:38px;
+font-weight:800;
+text-align:center;
+margin:20px
+}
+
+.review-item{
+margin-top:15px;
+padding:15px;
+background:#f8fafc;
+border-radius:10px
+}
+
+.correct{border-left:5px solid #16a34a}
+.incorrect{border-left:5px solid #dc2626}
+.skipped{border-left:5px solid #f59e0b}
+
+@media(max-width:800px){
+.container{grid-template-columns:1fr}
+}
+</style>
 </head>
+
 <body>
-  <h1>CBT Test</h1>
-  <p>Production CBT screen</p>
 
-  <script type="module">
-    import * as CBTCore from "./src/core/index.js";
+<header>
+<div class="header">
+<div class="logo">CBT Analyzer Pro</div>
+<div class="timer" id="timer">30:00</div>
+</div>
+</header>
 
-    console.log("CBT Production Core loaded:", CBTCore);
-  </script>
-</body>
-</html>
+<div class="container">
+
+<main class="card">
+
+<section id="testScreen">
+
+<div class="question-number" id="questionNumber">
+Loading...
+</div>
+
+<div class="question" id="question"></div>
+
+<div id="options"></div>
+
+<div class="buttons">
+
+<button class="secondary" onclick="previousQuestion()">
+Previous
+</button>
+
+<button class="warning" onclick="markReview()">
+Mark for Review
+</button>
+
+<button class="secondary" onclick="clearAnswer()">
+Clear Answer
+</button>
+
+<button class="primary" id="nextButton" onclick="nextQuestion()">
+Next
+</button>
+
+</div>
+
+</section>
+
+<section id="result">
+
+<h2>Test Completed</h2>
+
+<div class="score" id="score"></div>
+
+<p id="summary"></p>
+
+<div id="review"></div>
+
+<button class="primary" onclick="location.reload()">
+Restart Test
+</button>
+
+</section>
+
+</main>
+
+<aside class="card">
+
+<h3>Question Palette</h3>
+
+<div class="palette" id="palette"></div>
+
+<div class="legend">
+🟩 Answered<br>
+🟨 Marked for review<br>
+⬜ Not answered<br>
+🟦 Current question
+</div>
+
+<button
+class="danger"
+style="width:100%;margin-top:20px"
+onclick="submitTest()">
+Submit Test
+</button>
+
+</aside>
+
+</div>
+
+<script>
+
+const questions=[
+
+{
+question:"Which planet is known as the Red Planet?",
+options:["Earth","Mars","Jupiter","Venus"],
+answer:1
+},
+
+{
+question:"What is 2 + 2?",
+options:["3","4","5","6"],
+answer:1
+},
+
+{
+question:"Which gas is most abundant in Earth's atmosphere?",
+options:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],
+answer:2
+},
+
+{
+question:"What is the SI unit of force?",
+options:["Joule","Newton","Watt","Pascal"],
+answer:1
+},
+
+{
+question:"Which organelle is known as the powerhouse of the cell?",
+options:["Nucleus","Ribosome","Mitochondria","Golgi apparatus"],
+answer:2
+},
+
+{
+question:"What is the chemical symbol for sodium?",
+options:["So","Na","S","Sd"],
+answer:1
+},
+
+{
+question:"Which process produces ATP in mitochondria?",
+options:[
+"Photosynthesis",
+"Cellular respiration",
+"Transcription",
+"Translation"
+],
+answer:1
+},
+
+{
+question:"What is the approximate acceleration due to gravity near Earth's surface?",
+options:[
+"4.9 m/s²",
+"9.8 m/s²",
+"19.6 m/s²",
+"98 m/s²"
+],
+answer:1
+},
+
+{
+question:"Which molecule carries genetic information?",
+options:[
+"Protein",
+"Lipid",
+"DNA",
+"Glucose"
+],
+answer:2
+},
+
+{
+question:"Which particle has a negative electric charge?",
+options:[
+"Proton",
+"Neutron",
+"Electron",
+"Photon"
+],
+answer:2
+}
+
+];
+
+let current=0;
+let answers=new Array(questions.length).fill(null);
+let marked=new Array(questions.length).fill(false);
+let submitted=false;
+let timeLeft=1800;
+
+function updateTimer(){
+
+let m=Math.floor(timeLeft/60);
+let s=timeLeft%60;
+
+document.getElementById("timer").textContent=
+String(m).padStart(2,"0")+":"+
+String(s).padStart(2,"0");
+
+}
+
+const timerInterval=setInterval(function(){
+
+if(submitted)return;
+
+timeLeft--;
+
+if(timeLeft<=0){
+
+timeLeft=0;
+updateTimer();
+clearInterval(timerInterval);
+submitTest();
+
+return;
+
+}
+
+updateTimer();
+
+},1000);
+
+function renderQuestion(){
+
+const q=questions[current];
+
+document.getElementById("questionNumber").textContent=
+"Question "+(current+1)+" of "+questions.length;
+
+document.getElementById("question").textContent=q.question;
+
+const box=document.getElementById("options");
+
+box.innerHTML="";
+
+q.options.forEach(function(option,index){
+
+const button=document.createElement("button");
+
+button.className="option";
+
+if(answers[current]===index){
+button.classList.add("selected");
+}
+
+button.textContent=
+String.fromCharCode(65+index)+". "+option;
+
+button.onclick=function(){
+
+answers[current]=index;
+renderQuestion();
+
+};
+
+box.appendChild(button);
+
+});
+
+document.getElementById("nextButton").textContent=
+current===questions.length-1?"Finish":"Next";
+
+renderPalette();
+
+}
+
+function renderPalette(){
+
+const palette=document.getElementById("palette");
+
+palette.innerHTML="";
+
+questions.forEach(function(q,index){
+
+const button=document.createElement("button");
+
+button.textContent=index+1;
+
+if(answers[index]!==null)
+button.classList.add("answered");
+
+if(marked[index])
+button.classList.add("review");
+
+if(index===current)
+button.classList.add("current");
+
+button.onclick=function(){
+
+current=index;
+renderQuestion();
+
+};
+
+palette.appendChild(button);
+
+});
+
+}
+
+function nextQuestion(){
+
+if(current<questions.length-1){
+
+current++;
+renderQuestion();
+
+}else{
+
+submitTest();
+
+}
+
+}
+
+function previousQuestion(){
+
+if(current>0){
+
+current--;
+renderQuestion();
+
+}
+
+}
+
+function clearAnswer(){
+
+answers[current]=null;
+renderQuestion();
+
+}
+
+function markReview(){
+
+marked[current]=!marked[current];
+renderPalette();
+
+}
+
+function submitTest(){
+
+if(submitted)return;
+
+let correct=0;
+let incorrect=0;
+let skipped=0;
+
+questions.forEach(function(q,index){
+
+if(answers[index]===null){
+
+skipped++;
+
+}else if(answers[index]===q.answer){
+
+correct++;
+
+}else{
+
+incorrect++;
+
+}
+
+});
+
+submitted=true;
+
+clearInterval(timerInterval);
+
+document.getElementById("testScreen").style.display="none";
+document.querySelector("aside").style.display="none";
+document.getElementById("result").style.display="block";
+
+const score=(correct*4)-incorrect;
+
+document.getElementById("score").textContent=
+score+" / "+(questions.length*4);
+
+document.getElementById("summary").textContent=
+"Correct: "+correct+
+" | Incorrect: "+incorrect+
+" | Skipped: "+skipped;
+
+generateReview();
+
+}
+
+function generateReview(){
+
+const box=document.getElementById("review");
+
+box.innerHTML="<h3>Question Review</h3>";
+
+questions.forEach(function(q,index){
+
+const item=document.createElement("div");
+
+item.className="review-item";
+
+if(answers[index]===null){
+
+item.classList.add("skipped");
+
+}else if(answers[index]===q.answer){
+
+item.classList.add("correct");
+
+}else{
+
+item.classList.add("incorrect");
+
+}
+
+const selected=
+answers[index]===null
+?"Not answered"
+:q.options[answers[index]];
+
+item.innerHTML=
+"<strong>Question "+(index+1)+"</strong>"+
+"<p>"+q.question+"</p>"+
+"<p><strong>Your answer:</strong> "+selected+"</p>"+
+"<p><strong>Correct answer:</strong> "+
+q.options[q.answer]+"</p>";
+
+box.append
