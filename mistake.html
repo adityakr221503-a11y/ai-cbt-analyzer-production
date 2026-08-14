@@ -42,14 +42,14 @@ color:#4f46e5;
 
 button{
 font-family:inherit;
-touch-action:manipulation;
 cursor:pointer;
+touch-action:manipulation;
 }
 
 .dashboard{
 border:0;
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:12px 18px;
 border-radius:11px;
 font-weight:800;
@@ -63,7 +63,7 @@ padding:0 15px;
 
 .hero{
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:28px;
 border-radius:20px;
 margin-bottom:20px;
@@ -80,7 +80,7 @@ line-height:1.5;
 }
 
 .card{
-background:white;
+background:#fff;
 border-radius:18px;
 padding:22px;
 margin-bottom:20px;
@@ -151,7 +151,7 @@ font-weight:800;
 
 .primary{
 background:#4f46e5;
-color:white;
+color:#fff;
 }
 
 .secondary{
@@ -215,7 +215,7 @@ font-weight:800;
 width:100%;
 border:0;
 background:#4f46e5;
-color:white;
+color:#fff;
 padding:13px;
 border-radius:10px;
 font-size:16px;
@@ -322,7 +322,7 @@ Active Mistakes
 </div>
 
 <div class="hint">
-Tap to Retry →
+Tap to View →
 </div>
 
 </button>
@@ -401,67 +401,27 @@ type="button">
 <script>
 
 /* =====================================================
-AUTHORITATIVE STORAGE
-Same storage used by retry.html
+EXACT STORAGE USED BY retry.html
 ===================================================== */
 
-const HISTORY_KEY="cbtHistory";
+const HISTORY_KEY = "cbtHistory";
+const MASTERY_KEY = "cbtMasteryV2";
 
-const MASTERY_KEY="cbtMasteryV2";
+const RETRY_QUEUE_KEY =
+"cbtAnalyzer.retryQueue";
 
-
-/* =====================================================
-RETRY STORAGE
-Used only for passing selected questions to retry.html
-===================================================== */
-
-const RETRY_QUEUE_KEY="cbtAnalyzer.retryQueue";
-
-const RETRY_QUESTION_KEY="cbtRetryQuestion";
-
-
-/* =====================================================
-SAFE READ
-===================================================== */
-
-function read(key){
-
-try{
-
-const value=
-localStorage.getItem(key);
-
-if(!value){
-
-return null;
-
-}
-
-return JSON.parse(value);
-
-}catch(error){
-
-console.error(
-"Storage read error:",
-key,
-error
-);
-
-return null;
-
-}
-
-}
+const RETRY_QUESTION_KEY =
+"cbtRetryQuestion";
 
 
 /* =====================================================
 NORMALIZE
-EXACT SAME LOGIC AS retry.html
+EXACT SAME AS retry.html
 ===================================================== */
 
 function normalize(value){
 
-return String(value||"")
+return String(value || "")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -470,30 +430,30 @@ return String(value||"")
 
 
 /* =====================================================
-GET HISTORY
-EXACT SAME LOGIC AS retry.html
+READ HISTORY
+EXACT SAME AS retry.html
 ===================================================== */
 
 function getHistory(){
 
 try{
 
-const data=
+const data =
 JSON.parse(
 localStorage.getItem(
 HISTORY_KEY
-)||"[]"
+) || "[]"
 );
 
 return Array.isArray(data)
-?data
-:[];
+? data
+: [];
 
 }catch(error){
 
 console.error(error);
 
-return[];
+return [];
 
 }
 
@@ -501,25 +461,49 @@ return[];
 
 
 /* =====================================================
-GET MASTERED
-EXACT SAME STORAGE AS retry.html
+READ MASTERY
+EXACT SAME AS retry.html
+===================================================== */
+
+function getMasteryData(){
+
+try{
+
+const data =
+JSON.parse(
+localStorage.getItem(
+MASTERY_KEY
+) || "[]"
+);
+
+return Array.isArray(data)
+? data
+: [];
+
+}catch(error){
+
+console.error(error);
+
+return [];
+
+}
+
+}
+
+
+/* =====================================================
+GET MASTERED SET
+EXACT SAME LOGIC AS retry.html
 ===================================================== */
 
 function getMastered(){
 
-const mastered=
+const mastered =
 new Set();
 
-try{
+const data =
+getMasteryData();
 
-const data=
-JSON.parse(
-localStorage.getItem(
-MASTERY_KEY
-)||"[]"
-);
-
-if(Array.isArray(data)){
 
 data.forEach(function(item){
 
@@ -536,13 +520,6 @@ normalize(item.question)
 
 });
 
-}
-
-}catch(error){
-
-console.error(error);
-
-}
 
 return mastered;
 
@@ -550,60 +527,19 @@ return mastered;
 
 
 /* =====================================================
-GET MASTERED QUESTION OBJECTS
-===================================================== */
-
-function getAllMastered(){
-
-try{
-
-const data=
-JSON.parse(
-localStorage.getItem(
-MASTERY_KEY
-)||"[]"
-);
-
-if(!Array.isArray(data)){
-
-return[];
-
-}
-
-return data.filter(function(item){
-
-return(
-item &&
-item.question
-);
-
-});
-
-}catch(error){
-
-console.error(error);
-
-return[];
-
-}
-
-}
-
-
-/* =====================================================
 GET ACTIVE MISTAKES
-EXACT SAME SOURCE LOGIC AS retry.html
+EXACT SAME LOGIC AS retry.html
 ===================================================== */
 
 function getActiveMistakes(){
 
-const history=
+const history =
 getHistory();
 
-const mastered=
+const mastered =
 getMastered();
 
-const map=
+const map =
 new Map();
 
 
@@ -631,12 +567,8 @@ return;
 }
 
 
-/*
-Only currently wrong questions.
-*/
-
 if(
-q.status!=="wrong"
+q.status !== "wrong"
 ){
 
 return;
@@ -644,14 +576,9 @@ return;
 }
 
 
-const key=
+const key =
 normalize(q.question);
 
-
-/*
-Do not show mastered questions
-in Active Mistakes.
-*/
 
 if(
 mastered.has(key)
@@ -661,10 +588,6 @@ return;
 
 }
 
-
-/*
-Keep one copy.
-*/
 
 map.set(
 key,
@@ -684,52 +607,16 @@ map.values()
 
 
 /* =====================================================
-UPDATE COUNTS
-===================================================== */
-
-function updateCounts(){
-
-const active=
-getActiveMistakes();
-
-const mastered=
-getAllMastered();
-
-
-document.getElementById(
-"activeCount"
-).textContent=
-active.length;
-
-
-/*
-IMPORTANT:
-This count comes directly from
-cbtMasteryV2.
-
-If retry.html sees 6,
-this should also see 6.
-*/
-
-document.getElementById(
-"masteredCount"
-).textContent=
-mastered.length;
-
-}
-
-
-/* =====================================================
-ESCAPE HTML
+ESCAPE
 ===================================================== */
 
 function escapeHTML(value){
 
 return String(
-value===undefined ||
-value===null
-?""
-:value
+value === undefined ||
+value === null
+? ""
+: value
 )
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
@@ -741,16 +628,44 @@ value===null
 
 
 /* =====================================================
+UPDATE COUNTS
+===================================================== */
+
+function updateCounts(){
+
+const active =
+getActiveMistakes();
+
+const mastery =
+getMasteryData();
+
+
+document.getElementById(
+"activeCount"
+).textContent =
+active.length;
+
+
+document.getElementById(
+"masteredCount"
+).textContent =
+mastery.length;
+
+}
+
+
+/* =====================================================
 OPEN RETRY
 ===================================================== */
 
 function openRetry(){
 
-const mistakes=
+const mistakes =
 getActiveMistakes();
 
+
 if(
-mistakes.length===0
+mistakes.length === 0
 ){
 
 alert(
@@ -774,20 +689,21 @@ JSON.stringify(mistakes[0])
 );
 
 
-window.location.href=
+window.location.href =
 "retry.html";
 
 }
 
 
 /* =====================================================
-RETRY ONE QUESTION
+RETRY ONE
 ===================================================== */
 
 function retryOne(index){
 
-const mistakes=
+const mistakes =
 getActiveMistakes();
+
 
 if(
 !mistakes[index]
@@ -806,50 +722,52 @@ JSON.stringify(mistakes)
 
 localStorage.setItem(
 RETRY_QUESTION_KEY,
-JSON.stringify(mistakes[index])
+JSON.stringify(
+mistakes[index]
+)
 );
 
 
-window.location.href=
+window.location.href =
 "retry.html";
 
 }
 
 
 /* =====================================================
-SHOW ACTIVE MISTAKES
+SHOW ACTIVE
 ===================================================== */
 
 function showActive(){
 
 document.getElementById(
 "sectionTitle"
-).textContent=
+).textContent =
 "❌ Active Mistakes";
 
 
 document.getElementById(
 "controls"
-).innerHTML="";
+).innerHTML = "";
 
 
-const list=
+const list =
 document.getElementById(
 "list"
 );
 
-list.innerHTML="";
+list.innerHTML = "";
 
 
-const mistakes=
+const mistakes =
 getActiveMistakes();
 
 
 if(
-mistakes.length===0
+mistakes.length === 0
 ){
 
-list.innerHTML=`
+list.innerHTML = `
 
 <div class="empty">
 
@@ -874,15 +792,17 @@ return;
 }
 
 
-mistakes.forEach(function(q,index){
+mistakes.forEach(
+function(q,index){
 
-const div=
+const div =
 document.createElement("div");
 
-div.className="item";
+div.className =
+"item";
 
 
-const answer=
+const answer =
 q.correctAnswer ||
 (
 Array.isArray(q.options)
@@ -895,7 +815,7 @@ Number(q.correctIndex)
 );
 
 
-div.innerHTML=`
+div.innerHTML = `
 
 <div>
 
@@ -904,18 +824,28 @@ div.innerHTML=`
 </span>
 
 <span class="badge">
-${escapeHTML(q.subject||"Unknown")}
+${escapeHTML(
+q.subject || "Unknown"
+)}
 </span>
 
 <span class="badge">
-${escapeHTML(q.topic||"Unknown")}
+${escapeHTML(
+q.topic || "Unknown"
+)}
 </span>
 
 </div>
 
+
 <div class="question">
-${escapeHTML(q.question)}
+
+${escapeHTML(
+q.question
+)}
+
 </div>
+
 
 <div class="info">
 
@@ -926,7 +856,7 @@ Your answer:
 <br>
 
 ${escapeHTML(
-q.selectedAnswer||
+q.selectedAnswer ||
 "Not answered"
 )}
 
@@ -939,15 +869,19 @@ Correct answer:
 <br>
 
 <span class="correct">
-${escapeHTML(answer)}
+
+${escapeHTML(
+answer
+)}
+
 </span>
 
 </div>
 
+
 <button
 class="retry"
-type="button"
-data-index="${index}">
+type="button">
 
 🔄 Retry This Question
 
@@ -977,22 +911,20 @@ list.appendChild(div);
 
 /* =====================================================
 SHOW MASTERED
+DIRECTLY FROM cbtMasteryV2
 ===================================================== */
 
 function showMastered(){
 
 document.getElementById(
 "sectionTitle"
-).textContent=
+).textContent =
 "🏆 Mastered Questions";
 
 
-const controls=
 document.getElementById(
 "controls"
-);
-
-controls.innerHTML=`
+).innerHTML = `
 
 <button
 class="back"
@@ -1008,44 +940,42 @@ type="button">
 
 document.getElementById(
 "backActive"
-).addEventListener(
-"click",
-showActive
-);
+).onclick =
+showActive;
 
 
-const list=
+const list =
 document.getElementById(
 "list"
 );
 
-list.innerHTML="";
+list.innerHTML = "";
 
 
 /*
-READ DIRECTLY FROM cbtMasteryV2
+READ AGAIN FROM THE EXACT
+SAME KEY USED BY retry.html
 */
 
-const mastered=
-getAllMastered();
+const mastered =
+getMasteryData();
 
 
 /*
-Update count again in case
-Retry just changed storage.
+UPDATE COUNT
 */
 
 document.getElementById(
 "masteredCount"
-).textContent=
+).textContent =
 mastered.length;
 
 
 if(
-mastered.length===0
+mastered.length === 0
 ){
 
-list.innerHTML=`
+list.innerHTML = `
 
 <div class="empty">
 
@@ -1058,7 +988,7 @@ No Mastered Questions Found
 </h2>
 
 <p>
-No mastery records are currently stored
+No questions are currently stored
 in cbtMasteryV2.
 </p>
 
@@ -1071,16 +1001,21 @@ return;
 }
 
 
-mastered.forEach(function(q,index){
+/*
+DISPLAY ALL MASTERED QUESTIONS
+*/
 
-const div=
+mastered.forEach(
+function(q,index){
+
+const div =
 document.createElement("div");
 
-div.className=
+div.className =
 "item mastered-item";
 
 
-const answer=
+const answer =
 q.correctAnswer ||
 (
 Array.isArray(q.options)
@@ -1093,7 +1028,7 @@ Number(q.correctIndex)
 );
 
 
-div.innerHTML=`
+div.innerHTML = `
 
 <div>
 
@@ -1103,15 +1038,13 @@ div.innerHTML=`
 
 <span class="badge">
 ${escapeHTML(
-q.subject||
-"Unknown"
+q.subject || "Unknown"
 )}
 </span>
 
 <span class="badge">
 ${escapeHTML(
-q.topic||
-"Unknown"
+q.topic || "Unknown"
 )}
 </span>
 
@@ -1140,6 +1073,7 @@ q.question
 ${escapeHTML(
 answer
 )}
+
 
 ${
 q.solution
@@ -1209,7 +1143,7 @@ document.getElementById(
 "click",
 function(){
 
-window.location.href=
+window.location.href =
 "index.html";
 
 }
@@ -1222,7 +1156,7 @@ document.getElementById(
 "click",
 function(){
 
-window.location.href=
+window.location.href =
 "cbt.html";
 
 }
@@ -1238,10 +1172,9 @@ updateCounts();
 showActive();
 
 
-/*
-Refresh counts when page becomes visible again.
-Useful after returning from retry.html.
-*/
+/* =====================================================
+REFRESH WHEN RETURNING TO PAGE
+===================================================== */
 
 document.addEventListener(
 "visibilitychange",
