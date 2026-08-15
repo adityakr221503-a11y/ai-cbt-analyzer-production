@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CBT Analyzer Pro — Test Details</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
+}
+
+header{
+background:#fff;
+border-bottom:1px solid #e2e8f0;
+padding:16px 20px;
+}
+
+.header{
+max-width:1000px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.logo{
+font-size:20px;
+font-weight:800;
+}
+
+.logo span{
+color:#4f46e5;
+}
+
+button{
+border:0;
+border-radius:10px;
+padding:11px 15px;
+font-weight:800;
+font-family:inherit;
+cursor:pointer;
+}
+
+.back{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.container{
+max-width:1000px;
+margin:22px auto;
+padding:0 15px;
+}
+
+.card{
+background:#fff;
+border-radius:16px;
+padding:20px;
+margin-bottom:18px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
+}
+
+.hero{
+background:#4f46e5;
+color:#fff;
+border-radius:18px;
+padding:24px;
+margin-bottom:18px;
+}
+
+.hero h1{
+margin:0 0 8px;
+}
+
+.hero p{
+margin:0;
+line-height:1.6;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+}
+
+.stat{
+background:#f8fafc;
+border-radius:12px;
+padding:15px;
+text-align:center;
+}
+
+.stat strong{
+display:block;
+font-size:24px;
+margin-bottom:5px;
+}
+
+.stat span{
+font-size:13px;
+color:#64748b;
+font-weight:700;
+}
+
+.question{
+border:1px solid #e2e8f0;
+border-radius:14px;
+padding:18px;
+margin-top:14px;
+}
+
+.question.correct{
+border-left:6px solid #16a34a;
+}
+
+.question.wrong{
+border-left:6px solid #dc2626;
+}
+
+.question.skipped{
+border-left:6px solid #64748b;
+}
+
+.qtop{
+display:flex;
+justify-content:space-between;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.badge{
+display:inline-block;
+padding:6px 9px;
+border-radius:8px;
+font-size:12px;
+font-weight:800;
+background:#eef2ff;
+color:#3730a3;
+}
+
+.correctBadge{
+background:#dcfce7;
+color:#166534;
+}
+
+.wrongBadge{
+background:#fee2e2;
+color:#991b1b;
+}
+
+.skippedBadge{
+background:#e2e8f0;
+color:#475569;
+}
+
+.qtext{
+font-size:18px;
+font-weight:800;
+line-height:1.6;
+margin:15px 0;
+}
+
+.info{
+background:#f8fafc;
+border-radius:10px;
+padding:13px;
+line-height:1.7;
+}
+
+.green{
+color:#15803d;
+font-weight:800;
+}
+
+.red{
+color:#b91c1c;
+font-weight:800;
+}
+
+.empty{
+text-align:center;
+padding:40px 15px;
+color:#64748b;
+line-height:1.6;
+}
+
+.primary{
+background:#4f46e5;
+color:#fff;
+}
+
+@media(max-width:700px){
+
+.stats{
+grid-template-columns:1fr 1fr;
+}
+
+.container{
+margin:15px auto;
+}
+
+.card{
+padding:17px;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="header">
+
+<div class="logo">
+CBT Analyzer <span>Pro</span>
+</div>
+
+<button
+class="back"
+type="button"
+onclick="location.href='history.html'">
+
+← History
+
+</button>
+
+</div>
+
+</header>
+
+
+<div class="container">
+
+<div id="content"></div>
+
+</div>
+
+
+<script>
+
+"use strict";
+
+
+const HISTORY_KEY="cbtHistory";
+
+
+function readHistory(){
+
+try{
+
+const data=
+JSON.parse(
+localStorage.getItem(HISTORY_KEY)||"[]"
+);
+
+return Array.isArray(data)
+?data
+:[];
+
+}catch(e){
+
+return[];
+
+}
+
+}
+
+
+function escapeHTML(value){
+
+return String(
+value==null?"":value
+)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+function getIndex(){
+
+const params=
+new URLSearchParams(
+location.search
+);
+
+const value=
+Number(
+params.get("test")
+);
+
+return Number.isInteger(value)
+?value
+:-1;
+
+}
+
+
+function getAnswer(q){
+
+if(
+q.selectedAnswer!==undefined &&
+q.selectedAnswer!==null &&
+String(q.selectedAnswer)!==""
+){
+
+return q.selectedAnswer;
+
+}
+
+if(
+q.selectedIndex!==undefined &&
+Array.isArray(q.options)
+){
+
+const i=
+Number(q.selectedIndex);
+
+if(
+i>=0 &&
+i<q.options.length
+){
+
+return q.options[i];
+
+}
+
+}
+
+return "Not answered";
+
+}
+
+
+function getCorrectAnswer(q){
+
+if(
+q.correctAnswer!==undefined &&
+q.correctAnswer!==null &&
+String(q.correctAnswer)!==""
+){
+
+return q.correctAnswer;
+
+}
+
+if(
+Array.isArray(q.options)
+){
+
+let index=-1;
+
+if(q.correctIndex!==undefined){
+index=Number(q.correctIndex);
+}
+
+else if(q.answerIndex!==undefined){
+index=Number(q.answerIndex);
+}
+
+if(
+index>=0 &&
+index<q.options.length
+){
+
+return q.options[index];
+
+}
+
+}
+
+return "Not available";
+
+}
+
+
+function render(){
+
+const history=
+readHistory();
+
+const index=
+getIndex();
+
+const content=
+document.getElementById("content");
+
+
+if(
+index<0 ||
+index>=history.length
+){
+
+content.innerHTML=`
+
+<div class="card empty">
+
+<div style="font-size:55px">
+🔎
+</div>
+
+<h2>Test Not Found</h2>
+
+<p>
+The selected test could not be found in your saved history.
+</p>
+
+<button
+class="primary"
+onclick="location.href='history.html'">
+
+← Back to History
+
+</button>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+const test=
+history[index];
+
+
+const questions=
+Array.isArray(test.questions)
+?test.questions
+:[];
+
+
+let correct=
+Number(test.correct)||0;
+
+let wrong=
+Number(
+test.incorrect ??
+test.wrong
+)||0;
+
+let skipped=
+Number(test.skipped)||0;
+
+
+if(questions.length){
+
+correct=0;
+wrong=0;
+skipped=0;
+
+questions.forEach(function(q){
+
+if(q.status==="correct"){
+correct++;
+}
+
+else if(q.status==="wrong"){
+wrong++;
+}
+
+else if(q.status==="skipped"){
+skipped++;
+}
+
+});
+
+}
+
+
+const total=
+questions.length ||
+(correct+wrong+skipped);
+
+
+const score=
+test.score!==undefined
+?test.score
+:(correct*4)-wrong;
+
+
+const accuracy=
+total>0
+?Math.round(
+(correct/total)*100
+)
+:0;
+
+
+let html=`
+
+<div class="hero">
+
+<h1>
+📋 CBT Test Details
+</h1>
+
+<p>
+📅 ${escapeHTML(test.date||"Unknown date")}
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+📊 Test Summary
+</h2>
+
+<div class="stats">
+
+<div class="stat">
+<strong>${score}</strong>
+<span>Score</span>
+</div>
+
+<div class="stat">
+<strong>${correct}</strong>
+<span>Correct</span>
+</div>
+
+<div class="stat">
+<strong>${wrong}</strong>
+<span>Wrong</span>
+</div>
+
+<div class="stat">
+<strong>${accuracy}%</strong>
+<span>Accuracy</span>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+📝 Question-by-Question Review
+</h2>
+`;
+
+
+if(!questions.length){
+
+html+=`
+
+<div class="empty">
+
+No individual question data was saved for this test.
+
+<br><br>
+
+The score is available, but this older test does not contain
+the question-level details required for review.
+
+</div>
+
+`;
+
+}else{
+
+questions.forEach(function(q,i){
+
+const status=
+q.status||
+(
+q.correct===true
+?"correct"
+:
+q.correct===false
+?"wrong"
+:"skipped"
+);
+
+
+let className=
+"question ";
+
+let badgeClass=
+"badge ";
+
+let badgeText="";
+
+
+if(status==="correct"){
+
+className+="correct";
+badgeClass+="correctBadge";
+badgeText="✅ Correct";
+
+}
+
+else if(status==="wrong"){
+
+className+="wrong";
+badgeClass+="wrongBadge";
+badgeText="❌ Wrong";
+
+}
+
+else{
+
+className+="skipped";
+badgeClass+="skippedBadge";
+badgeText="⏭️ Skipped";
+
+}
+
+
+const selected=
+getAnswer(q);
+
+const answer=
+getCorrectAnswer(q);
+
+
+html+=`
+
+<div class="${className}">
+
+<div class="qtop">
+
+<span class="badge">
+Question ${i+1}
+</span>
+
+<span class="${badgeClass}">
+${badgeText}
+</span>
+
+</div>
+
+
+<div class="qtext">
+
+${escapeHTML(q.question)}
+
+</div>
+
+
+<div class="info">
+
+<strong>Your Answer:</strong>
+
+<br>
+
+<span class="${
+status==="correct"
+?"green"
+:
+status==="wrong"
+?"red"
+:""
+}">
+
+${escapeHTML(selected)}
+
+</span>
+
+<br><br>
+
+<strong>Correct Answer:</strong>
+
+<br>
+
+<span class="green">
+
+${escapeHTML(answer)}
+
+</span>
+
+${q.subject?`
+
+<br><br>
+<strong>Subject:</strong>
+${escapeHTML(q.subject)}
+
+`:``}
+
+${q.topic?`
+
+<br>
+<strong>Topic:</strong>
+${escapeHTML(q.topic)}
+
+`:``}
+
+${q.solution||q.explanation?`
+
+<br><br>
+
+<strong>Solution:</strong>
+
+<br>
+
+${escapeHTML(
+q.solution||q.explanation
+)}
+
+`:``}
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+html+=`
+
+</div>
+
+<div class="card">
+
+<button
+class="primary"
+style="width:100%"
+onclick="location.href='history.html'">
+
+← Back to Test History
+
+</button>
+
+</div>
+
+`;
+
+
+content.innerHTML=
+html;
+
+}
+
+
+render();
+
+</script>
+
+</body>
+</html>
