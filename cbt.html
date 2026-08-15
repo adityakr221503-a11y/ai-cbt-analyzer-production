@@ -88,6 +88,7 @@ text-align:left;
 font-size:16px;
 font-weight:600;
 cursor:pointer;
+touch-action:manipulation;
 }
 
 .option.selected{
@@ -109,6 +110,7 @@ border-radius:10px;
 padding:13px;
 font-weight:700;
 cursor:pointer;
+touch-action:manipulation;
 }
 
 .primary{
@@ -163,9 +165,6 @@ z-index:10;
 
 #result h2{
 margin-top:0;
-position:relative;
-z-index:20;
-pointer-events:auto;
 }
 
 .score{
@@ -173,31 +172,16 @@ font-size:38px;
 font-weight:800;
 text-align:center;
 margin:10px 0;
-position:relative;
-z-index:20;
-pointer-events:auto;
-}
-
-#summary{
-position:relative;
-z-index:20;
-pointer-events:auto;
 }
 
 .result-actions{
 margin-top:10px;
-position:relative;
-z-index:30;
-pointer-events:auto;
 }
 
 .result-actions button{
 width:100%;
 margin-top:8px;
 padding:14px;
-position:relative;
-z-index:40;
-pointer-events:auto;
 }
 
 .review-item{
@@ -207,52 +191,35 @@ background:#f8fafc;
 border-radius:10px;
 }
 
-.incorrect{
+.review-item.incorrect{
 border-left:5px solid #dc2626;
 }
 
-.correct{
+.review-item.correct{
 border-left:5px solid #16a34a;
 }
 
-.skipped{
+.review-item.skipped{
 border-left:5px solid #f59e0b;
 }
 
 .analysis{
 margin-top:10px;
-padding:13px;
+padding:14px;
 background:#eef2ff;
 border-radius:10px;
-line-height:1.5;
+line-height:1.6;
 }
 
-/* Hidden test screen must never block result clicks */
-#testScreen[style*="display: none"]{
-pointer-events:none !important;
+.analysis-type{
+font-weight:800;
+color:#3730a3;
 }
 
 @media(max-width:800px){
 
 .container{
 grid-template-columns:1fr;
-}
-
-#result{
-padding-top:0;
-}
-
-#result .score{
-margin:10px 0;
-}
-
-#result .result-actions{
-margin-top:10px;
-}
-
-#result .result-actions button{
-margin-top:8px;
-padding:14px;
 }
 
 }
@@ -299,18 +266,21 @@ class="question">
 
 <button
 class="secondary"
+type="button"
 onclick="previousQuestion()">
 Previous
 </button>
 
 <button
 class="warning"
+type="button"
 onclick="markReview()">
 Mark Review
 </button>
 
 <button
 class="secondary"
+type="button"
 onclick="clearAnswer()">
 Clear
 </button>
@@ -318,6 +288,7 @@ Clear
 <button
 id="nextButton"
 class="primary"
+type="button"
 onclick="nextQuestion()">
 Next
 </button>
@@ -331,37 +302,36 @@ Next
 
 <h2>🎯 Test Completed</h2>
 
-<div id="score"
-class="score">
-</div>
+<div id="score" class="score"></div>
 
 <p id="summary"></p>
-
 
 <div class="result-actions">
 
 <button
 id="retryButton"
 class="primary"
+type="button"
 style="display:none"
-onclick="location.href='retry.html'">
+onclick="openRetry()">
 🔄 Retry Mistakes
 </button>
 
 <button
 class="secondary"
+type="button"
 onclick="location.href='mistake.html'">
 🧠 Mistake Bank
 </button>
 
 <button
 class="secondary"
+type="button"
 onclick="location.href='index.html'">
 🏠 Dashboard
 </button>
 
 </div>
-
 
 <div id="review"></div>
 
@@ -374,12 +344,11 @@ onclick="location.href='index.html'">
 
 <h3>Question Palette</h3>
 
-<div id="palette"
-class="palette">
-</div>
+<div id="palette" class="palette"></div>
 
 <button
 class="danger"
+type="button"
 style="width:100%;margin-top:20px"
 onclick="submitTest()">
 Submit Test
@@ -564,22 +533,20 @@ TIMER
 
 function updateTimer(){
 
-const minutes=
-Math.floor(timeLeft/60);
+const minutes=Math.floor(timeLeft/60);
 
-const seconds=
-timeLeft%60;
+const seconds=timeLeft%60;
 
-document.getElementById("timer")
-.textContent=
+document.getElementById("timer").textContent=
 String(minutes).padStart(2,"0")+
 ":"+
 String(seconds).padStart(2,"0");
 
 }
 
-const timerInterval=
-setInterval(function(){
+updateTimer();
+
+const timerInterval=setInterval(function(){
 
 if(submitted)return;
 
@@ -610,8 +577,7 @@ function renderQuestion(){
 
 const q=questions[current];
 
-document.getElementById("questionNumber")
-.textContent=
+document.getElementById("questionNumber").textContent=
 "Question "+
 (current+1)+
 " of "+
@@ -619,8 +585,8 @@ questions.length+
 " • "+
 q.subject;
 
-document.getElementById("question")
-.textContent=q.question;
+document.getElementById("question").textContent=
+q.question;
 
 const box=
 document.getElementById("options");
@@ -647,20 +613,21 @@ String.fromCharCode(65+index)+
 ". "+
 option;
 
-button.onclick=function(){
+button.addEventListener("click",function(){
+
+if(submitted)return;
 
 answers[current]=index;
 
 renderQuestion();
 
-};
+});
 
 box.appendChild(button);
 
 });
 
-document.getElementById("nextButton")
-.textContent=
+document.getElementById("nextButton").textContent=
 current===questions.length-1
 ?"Finish"
 :"Next";
@@ -686,6 +653,8 @@ questions.forEach(function(q,index){
 const button=
 document.createElement("button");
 
+button.type="button";
+
 button.textContent=index+1;
 
 if(answers[index]!==null){
@@ -706,13 +675,15 @@ button.classList.add("current");
 
 }
 
-button.onclick=function(){
+button.addEventListener("click",function(){
+
+if(submitted)return;
 
 current=index;
 
 renderQuestion();
 
-};
+});
 
 palette.appendChild(button);
 
@@ -726,6 +697,8 @@ NAVIGATION
 ===================================================== */
 
 function nextQuestion(){
+
+if(submitted)return;
 
 if(current<questions.length-1){
 
@@ -741,7 +714,10 @@ submitTest();
 
 }
 
+
 function previousQuestion(){
+
+if(submitted)return;
 
 if(current>0){
 
@@ -753,7 +729,10 @@ renderQuestion();
 
 }
 
+
 function clearAnswer(){
+
+if(submitted)return;
 
 answers[current]=null;
 
@@ -761,11 +740,177 @@ renderQuestion();
 
 }
 
+
 function markReview(){
+
+if(submitted)return;
 
 marked[current]=!marked[current];
 
 renderPalette();
+
+}
+
+
+/* =====================================================
+MISTAKE INTELLIGENCE
+===================================================== */
+
+function classifyMistake(q,selectedIndex){
+
+const question=
+String(q.question||"").toLowerCase();
+
+const topic=
+String(q.topic||"").toLowerCase();
+
+const selected=
+selectedIndex===null||
+selectedIndex===undefined
+?""
+:String(q.options[selectedIndex]||"").toLowerCase();
+
+const correct=
+String(q.options[q.answer]||"").toLowerCase();
+
+
+/* Calculation */
+
+const calculationWords=[
+"calculate",
+"calculation",
+"numerical",
+"value of",
+"find the",
+"velocity",
+"acceleration",
+"force",
+"work",
+"energy",
+"power",
+"current",
+"voltage",
+"resistance",
+"mass",
+"momentum"
+];
+
+if(
+calculationWords.some(function(word){
+return question.includes(word);
+})
+){
+
+return{
+type:"🔢 Calculation Error",
+reason:
+"This question involves a numerical or calculation-style concept. Recheck the formula, units and calculation steps."
+};
+
+}
+
+
+/* Memory */
+
+const memoryWords=[
+"what is",
+"which is",
+"who",
+"symbol",
+"unit",
+"known as",
+"called",
+"most abundant",
+"organ",
+"organelle"
+];
+
+if(
+memoryWords.some(function(word){
+return question.includes(word);
+})
+){
+
+return{
+type:"📚 Memory / Recall Gap",
+reason:
+"This appears to be a factual or definition-based mistake. Revise the key fact and test your recall again."
+};
+
+}
+
+
+/* Concept */
+
+const conceptWords=[
+"why",
+"principle",
+"mechanism",
+"process",
+"function",
+"relationship",
+"reason",
+"concept"
+];
+
+if(
+conceptWords.some(function(word){
+return question.includes(word);
+})||
+topic.includes("concept")
+){
+
+return{
+type:"🧠 Concept Gap",
+reason:
+"The answer suggests that the underlying concept needs revision rather than simple memorisation."
+};
+
+}
+
+
+/* Confusion */
+
+if(
+selected &&
+correct &&
+selected!==correct
+){
+
+const selectedWords=
+selected.split(/\s+/);
+
+const correctWords=
+correct.split(/\s+/);
+
+const overlap=
+selectedWords.filter(function(word){
+
+return word.length>3 &&
+correctWords.includes(word);
+
+}).length;
+
+if(overlap>0){
+
+return{
+type:"🧩 Confused Concepts",
+reason:
+"Your selected answer appears related to the correct answer. Review the distinction between these concepts."
+};
+
+}
+
+}
+
+
+/* Default */
+
+return{
+type:"⚠️ Concept Gap",
+reason:
+"The answer was incorrect. Review the question, compare your answer with the correct concept, and retry it."
+};
 
 }
 
@@ -798,8 +943,7 @@ mastery=[];
 }
 
 
-const wrongQuestions=
-new Set();
+const wrongQuestions=new Set();
 
 
 questions.forEach(function(q,index){
@@ -810,10 +954,7 @@ answers[index]!==q.answer
 ){
 
 wrongQuestions.add(
-String(q.question||"")
-.trim()
-.toLowerCase()
-.replace(/\s+/g," ")
+normalize(q.question)
 );
 
 }
@@ -824,24 +965,15 @@ String(q.question||"")
 mastery=
 mastery.filter(function(item){
 
-if(
-!item ||
-!item.question
-){
+if(!item||!item.question){
 
 return true;
 
 }
 
-
-const key=
-String(item.question)
-.trim()
-.toLowerCase()
-.replace(/\s+/g," ");
-
-
-return !wrongQuestions.has(key);
+return !wrongQuestions.has(
+normalize(item.question)
+);
 
 });
 
@@ -924,6 +1056,19 @@ status="wrong";
 }
 
 
+let intelligence=null;
+
+if(status==="wrong"){
+
+intelligence=
+classifyMistake(
+q,
+answers[index]
+);
+
+}
+
+
 return{
 
 question:q.question,
@@ -948,13 +1093,18 @@ correctIndex:q.answer,
 correctAnswer:q.options[q.answer],
 
 mistakeType:
-status==="wrong"
-?"Not Classified"
+intelligence
+?intelligence.type
 :null,
 
 mistakeReason:
-status==="wrong"
-?"Review the concept and identify why the answer was incorrect."
+intelligence
+?intelligence.reason
+:null,
+
+mistakeConfidence:
+intelligence
+?"Auto Classified"
 :null,
 
 solution:q.solution,
@@ -976,6 +1126,105 @@ localStorage.setItem(
 "cbtHistory",
 JSON.stringify(history)
 );
+
+}
+
+
+/* =====================================================
+NORMALIZE
+===================================================== */
+
+function normalize(value){
+
+return String(value||"")
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ");
+
+}
+
+
+/* =====================================================
+RETRY
+===================================================== */
+
+function openRetry(){
+
+const wrong=[];
+
+questions.forEach(function(q,index){
+
+if(
+answers[index]!==null &&
+answers[index]!==q.answer
+){
+
+const intelligence=
+classifyMistake(
+q,
+answers[index]
+);
+
+wrong.push({
+
+id:"retry-"+Date.now()+"-"+index,
+
+question:q.question,
+
+options:q.options,
+
+subject:q.subject,
+
+topic:q.topic,
+
+correctIndex:q.answer,
+
+correctAnswer:q.options[q.answer],
+
+solution:q.solution,
+
+selectedIndex:answers[index],
+
+selectedAnswer:q.options[answers[index]],
+
+mistakeType:intelligence.type,
+
+mistakeReason:intelligence.reason,
+
+source:"CBT"
+
+});
+
+}
+
+});
+
+
+if(wrong.length===0){
+
+alert("There are no mistakes to retry.");
+
+return;
+
+}
+
+
+localStorage.setItem(
+"cbtAnalyzer.retryQueue",
+JSON.stringify(wrong)
+);
+
+localStorage.setItem(
+"cbtRetryQuestion",
+JSON.stringify(wrong[0])
+);
+
+localStorage.setItem(
+"cbtRetryStartedAt",
+String(Date.now())
+);
+
+window.location.href="retry.html";
 
 }
 
@@ -1107,7 +1356,9 @@ function generateReview(){
 const box=
 document.getElementById("review");
 
-box.innerHTML="<h3>Question Analysis</h3>";
+box.innerHTML=
+"<h3>🧠 Question Analysis</h3>";
+
 
 questions.forEach(function(q,index){
 
@@ -1132,9 +1383,11 @@ status="incorrect";
 
 }
 
+
 item.className=
 "review-item "+
 status;
+
 
 const yourAnswer=
 answers[index]===null
@@ -1163,15 +1416,36 @@ escapeHTML(q.options[q.answer])+
 
 if(status==="incorrect"){
 
+const intelligence=
+classifyMistake(
+q,
+answers[index]
+);
+
+
 item.innerHTML+=`
 
 <div class="analysis">
 
-<strong>❌ Mistake detected</strong>
+<strong>🧠 Mistake Intelligence</strong>
 
 <br><br>
 
-Review the concept before retrying this question.
+<strong>Mistake Type:</strong>
+
+<div class="analysis-type">
+
+${escapeHTML(intelligence.type)}
+
+</div>
+
+<br>
+
+<strong>Why:</strong>
+
+<br>
+
+${escapeHTML(intelligence.reason)}
 
 <br><br>
 
@@ -1187,6 +1461,26 @@ ${escapeHTML(q.solution)}
 
 }
 
+
+if(status==="correct"){
+
+item.innerHTML+=`
+
+<div class="analysis">
+
+<strong>✅ Correct</strong>
+
+<br><br>
+
+${escapeHTML(q.solution)}
+
+</div>
+
+`;
+
+}
+
+
 box.appendChild(item);
 
 });
@@ -1200,7 +1494,7 @@ ESCAPE
 
 function escapeHTML(value){
 
-return String(value||"")
+return String(value??"")
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -1213,8 +1507,6 @@ return String(value||"")
 /* =====================================================
 START
 ===================================================== */
-
-updateTimer();
 
 renderQuestion();
 
