@@ -413,8 +413,6 @@ Accuracy
 </div>
 
 
-<!-- FIXED MASTERED BUTTON -->
-
 <button
 class="stat"
 type="button"
@@ -763,7 +761,6 @@ return String(value||"")
 
 /* =====================================================
 MASTERED QUESTIONS
-EXACT KEY USED BY retry.html
 ===================================================== */
 
 function getMasteredQuestions(){
@@ -794,11 +791,6 @@ OPEN MASTERED
 ===================================================== */
 
 function openMastered(){
-
-/*
-The Mastered count comes from cbtMasteryV2.
-The Mistake Bank then reads the same storage.
-*/
 
 location.href=
 "mistake.html#mastered";
@@ -845,7 +837,6 @@ function(test){
 if(!test){
 return;
 }
-
 
 if(
 Array.isArray(test.questions)
@@ -938,20 +929,8 @@ masteredQuestions.length;
 
 /* =====================================================
 ACTIVE MISTAKES
+LATEST ATTEMPT WINS
 ===================================================== */
-
-const masteredSet=
-new Set(
-masteredQuestions.map(
-function(q){
-
-return normalize(
-q.question
-);
-
-})
-);
-
 
 const activeMap=
 new Map();
@@ -970,12 +949,15 @@ return;
 }
 
 
+const testTime=
+Number(test.timestamp)||0;
+
+
 test.questions.forEach(
 function(q){
 
 if(
 !q ||
-q.status!=="wrong" ||
 !q.question
 ){
 
@@ -988,8 +970,17 @@ const key=
 normalize(q.question);
 
 
+const existing=
+activeMap.get(key);
+
+
+/*
+Latest test attempt wins.
+*/
+
 if(
-masteredSet.has(key)
+existing &&
+(existing._testTime||0)>testTime
 ){
 
 return;
@@ -997,10 +988,33 @@ return;
 }
 
 
+/*
+Wrong = active mistake.
+*/
+
+if(q.status==="wrong"){
+
 activeMap.set(
 key,
-q
+{
+...q,
+_testTime:testTime
+}
 );
+
+}
+
+
+/*
+A later correct attempt clears
+the active mistake.
+*/
+
+else if(q.status==="correct"){
+
+activeMap.delete(key);
+
+}
 
 });
 
