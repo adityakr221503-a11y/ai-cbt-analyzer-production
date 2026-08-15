@@ -9,113 +9,150 @@
 *{box-sizing:border-box}
 
 body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f1f5f9;
-  color:#0f172a;
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
 }
 
 header{
-  background:#fff;
-  padding:18px 20px;
-  border-bottom:1px solid #e2e8f0;
+background:#fff;
+padding:16px 20px;
+border-bottom:1px solid #e2e8f0;
 }
 
 .header{
-  max-width:1000px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+max-width:1000px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
 }
 
 .logo{
-  font-size:20px;
-  font-weight:700;
+font-size:20px;
+font-weight:800;
 }
 
-.container{
-  max-width:1000px;
-  margin:25px auto;
-  padding:0 15px;
+.logo span{
+color:#4f46e5;
 }
 
-.card{
-  background:#fff;
-  border-radius:15px;
-  padding:22px;
-  margin-bottom:18px;
-  box-shadow:0 3px 12px rgba(0,0,0,.08);
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-}
-
-.stat{
-  padding:18px;
-  border-radius:12px;
-  background:#f8fafc;
-  text-align:center;
-}
-
-.stat strong{
-  display:block;
-  font-size:25px;
-  margin-bottom:5px;
-}
-
-.test{
-  border:1px solid #e2e8f0;
-  border-radius:12px;
-  padding:18px;
-  margin-top:15px;
-}
-
-.test-title{
-  font-size:18px;
-  font-weight:700;
-}
-
-.details{
-  color:#64748b;
-  margin-top:8px;
-}
-
-.empty{
-  text-align:center;
-  padding:40px 15px;
-  color:#64748b;
-}
-
-but<button
-  class="primary"
-  onclick="location.href='cbt.html'">
-  ➕ Take CBT
-</button>
-  border:0;
-  border-radius:9px;
-  padding:11px 15px;
-  font-weight:700;
-  cursor:pointer;
+button{
+border:0;
+border-radius:9px;
+padding:11px 15px;
+font-weight:700;
+cursor:pointer;
+font-family:inherit;
 }
 
 .primary{
-  background:#4f46e5;
-  color:white;
+background:#4f46e5;
+color:#fff;
 }
 
-.danger{
-  background:#dc2626;
-  color:white;
+.container{
+max-width:1000px;
+margin:25px auto;
+padding:0 15px;
+}
+
+.card{
+background:#fff;
+border-radius:15px;
+padding:22px;
+margin-bottom:18px;
+box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+}
+
+.stat{
+padding:18px;
+border-radius:12px;
+background:#f8fafc;
+text-align:center;
+}
+
+.stat strong{
+display:block;
+font-size:25px;
+margin-bottom:5px;
+}
+
+.stat span{
+color:#64748b;
+font-size:13px;
+font-weight:600;
+}
+
+.test{
+border:1px solid #e2e8f0;
+border-radius:12px;
+padding:18px;
+margin-top:15px;
+cursor:pointer;
+transition:.2s;
+}
+
+.test:hover{
+background:#f8fafc;
+border-color:#4f46e5;
+}
+
+.test:active{
+transform:scale(.99);
+}
+
+.test-title{
+font-size:18px;
+font-weight:800;
+}
+
+.details{
+color:#64748b;
+margin-top:8px;
+line-height:1.6;
+}
+
+.open{
+margin-top:13px;
+display:inline-block;
+background:#eef2ff;
+color:#3730a3;
+padding:8px 11px;
+border-radius:8px;
+font-size:13px;
+font-weight:800;
+}
+
+.empty{
+text-align:center;
+padding:40px 15px;
+color:#64748b;
+line-height:1.6;
 }
 
 @media(max-width:700px){
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
+
+.stats{
+grid-template-columns:1fr 1fr;
+}
+
+.container{
+margin:15px auto;
+}
+
+.card{
+padding:17px;
+}
+
 }
 </style>
 </head>
@@ -123,17 +160,29 @@ but<button
 <body>
 
 <header>
-<div class="header">
-<div class="logo">CBT Analyzer Pro</div>
 
-<button class="primary"
-onclick="location.href='cbt.html'">
-Take CBT
-</button>
+<div class="header">
+
+<div class="logo">
+CBT Analyzer <span>Pro</span>
 </div>
+
+<button
+class="primary"
+type="button"
+onclick="location.href='cbt.html'">
+
+➕ Take CBT
+
+</button>
+
+</div>
+
 </header>
 
+
 <div class="container">
+
 
 <div class="card">
 
@@ -142,122 +191,417 @@ Take CBT
 <div class="stats">
 
 <div class="stat">
-<strong id="tests">0</strong>
+
+<strong id="tests">
+0
+</strong>
+
+<span>
 Tests
+</span>
+
 </div>
 
+
 <div class="stat">
-<strong id="best">0</strong>
+
+<strong id="best">
+0
+</strong>
+
+<span>
 Best Score
+</span>
+
 </div>
 
-<div class="stat">
-<strong id="average">0</strong>
-Average
-</div>
 
 <div class="stat">
-<strong id="attempts">0</strong>
+
+<strong id="average">
+0
+</strong>
+
+<span>
+Average Score
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<strong id="attempts">
+0
+</strong>
+
+<span>
 Attempts
-</div>
+</span>
 
 </div>
 
 </div>
+
+</div>
+
 
 <div class="card">
 
-<h2>Previous Tests</h2>
+<h2>
+📜 Previous Tests
+</h2>
 
 <div id="history"></div>
 
 </div>
 
+
 </div>
 
+
 <script>
+
+"use strict";
+
+
+/* =========================================
+STORAGE
+========================================= */
+
+const HISTORY_KEY =
+"cbtHistory";
+
+
+/* =========================================
+READ HISTORY
+========================================= */
+
+function readHistory(){
+
+try{
+
+const raw =
+localStorage.getItem(
+HISTORY_KEY
+);
+
+if(!raw){
+return [];
+}
+
+const data =
+JSON.parse(raw);
+
+return Array.isArray(data)
+? data
+: [];
+
+}catch(error){
+
+console.error(
+"History error:",
+error
+);
+
+return [];
+
+}
+
+}
+
+
+/* =========================================
+ESCAPE
+========================================= */
+
+function escapeHTML(value){
+
+return String(
+value == null
+? ""
+: value
+)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================
+LOAD HISTORY
+========================================= */
 
 function loadHistory(){
 
 const history =
-JSON.parse(localStorage.getItem("cbtHistory") || "[]");
+readHistory();
 
-document.getElementById("tests").textContent =
+
+document.getElementById(
+"tests"
+).textContent =
 history.length;
 
-document.getElementById("attempts").textContent =
+
+document.getElementById(
+"attempts"
+).textContent =
 history.length;
+
 
 if(history.length===0){
 
-document.getElementById("history").innerHTML =
-'<div class="empty">' +
-'No tests completed yet.<br><br>' +
-'Complete your first CBT to see it here.' +
-'</div>';
+document.getElementById(
+"history"
+).innerHTML = `
+
+<div class="empty">
+
+<div style="font-size:50px">
+📜
+</div>
+
+<h3>
+No tests completed yet
+</h3>
+
+<p>
+Complete your first CBT to see it here.
+</p>
+
+<button
+class="primary"
+type="button"
+onclick="location.href='cbt.html'">
+
+📝 Start CBT
+
+</button>
+
+</div>
+
+`;
 
 return;
+
 }
 
-let best = 0;
-let total = 0;
 
-history.forEach(function(test){
+/* =========================================
+BEST + AVERAGE
+========================================= */
 
-const score = Number(test.score) || 0;
+let best =
+Number.NEGATIVE_INFINITY;
 
-if(score > best) best = score;
+let total=0;
 
-total += score;
+
+history.forEach(
+function(test){
+
+const score =
+Number(test.score)||0;
+
+
+if(score>best){
+best=score;
+}
+
+
+total+=score;
 
 });
 
-document.getElementById("best").textContent = best;
 
-document.getElementById("average").textContent =
-Math.round(total / history.length);
+if(best===Number.NEGATIVE_INFINITY){
+best=0;
+}
+
+
+document.getElementById(
+"best"
+).textContent =
+best;
+
+
+document.getElementById(
+"average"
+).textContent =
+Math.round(
+total/history.length
+);
+
+
+/* =========================================
+RENDER
+========================================= */
 
 const container =
-document.getElementById("history");
+document.getElementById(
+"history"
+);
 
-container.innerHTML = "";
+container.innerHTML="";
 
-history.slice().reverse().forEach(function(test,index){
+
+history
+.slice()
+.reverse()
+.forEach(
+function(test,index){
+
+/*
+Original array index.
+
+Because the display is reversed,
+this converts the displayed item
+back to its actual history index.
+*/
+
+const actualIndex =
+history.length -
+1 -
+index;
+
 
 const item =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
-item.className = "test";
+item.className="test";
+
 
 const date =
-test.date || "Unknown date";
+test.date ||
+"Unknown date";
 
-item.innerHTML =
 
-'<div class="test-title">' +
-'CBT Attempt #' +
-(history.length-index) +
-'</div>' +
+const correct =
+Number(test.correct)||0;
 
-'<div class="details">' +
-'📅 ' + date +
-'</div>' +
 
-'<div class="details">' +
-'🎯 Score: ' + (test.score ?? 0) +
-' &nbsp; | &nbsp; ' +
-'✅ Correct: ' + (test.correct ?? 0) +
-' &nbsp; | &nbsp; ' +
-'❌ Incorrect: ' + (test.incorrect ?? 0) +
-' &nbsp; | &nbsp; ' +
-'⏭️ Skipped: ' + (test.skipped ?? 0) +
-'</div>';
+const incorrect =
+Number(
+test.incorrect ??
+test.wrong
+)||0;
 
-container.appendChild(item);
+
+const skipped =
+Number(test.skipped)||0;
+
+
+let totalQuestions =
+correct+
+incorrect+
+skipped;
+
+
+if(
+Array.isArray(test.questions)
+){
+
+totalQuestions =
+test.questions.length;
+
+}
+
+
+const score =
+Number(test.score)||0;
+
+
+item.innerHTML = `
+
+<div class="test-title">
+
+📝 CBT Attempt #${actualIndex+1}
+
+</div>
+
+
+<div class="details">
+
+📅 ${escapeHTML(date)}
+
+</div>
+
+
+<div class="details">
+
+🎯 Score:
+<strong>
+${score}
+</strong>
+
+&nbsp; | &nbsp;
+
+✅ Correct:
+${correct}
+
+&nbsp; | &nbsp;
+
+❌ Incorrect:
+${incorrect}
+
+&nbsp; | &nbsp;
+
+⏭️ Skipped:
+${skipped}
+
+</div>
+
+
+<div class="details">
+
+📚 Questions:
+${totalQuestions}
+
+</div>
+
+
+<div class="open">
+
+👆 Tap to open full test details →
+
+</div>
+
+`;
+
+
+/* =========================================
+CLICK → HISTORY DETAILS
+========================================= */
+
+item.addEventListener(
+"click",
+function(){
+
+location.href =
+"history.html?test=" +
+actualIndex;
+
+});
+
+
+container.appendChild(
+item
+);
 
 });
 
 }
+
+
+/* =========================================
+START
+========================================= */
 
 loadHistory();
 
