@@ -264,7 +264,6 @@ Dashboard
 </div>
 </header>
 
-
 <div class="container">
 
 <section class="hero">
@@ -281,7 +280,6 @@ class="error-box">
 </div>
 
 </section>
-
 
 <section class="card">
 
@@ -312,7 +310,6 @@ Tap to View →
 
 </button>
 
-
 <button
 class="stat"
 type="button"
@@ -340,7 +337,6 @@ Tap to View →
 
 </section>
 
-
 <section class="card">
 
 <div id="controls"></div>
@@ -360,39 +356,34 @@ class="retry-status">
 
 </div>
 
-
 <script>
 
 "use strict";
 
-
-/* =========================================
+/* ================================
 STORAGE
-========================================= */
+================================ */
 
-const HISTORY_KEY = "cbtHistory";
-const MASTERY_KEY = "cbtMasteryV2";
-const RETRY_QUEUE_KEY = "cbtAnalyzer.retryQueue";
-const RETRY_QUESTION_KEY = "cbtRetryQuestion";
+const HISTORY_KEY="cbtHistory";
+const MASTERY_KEY="cbtMasteryV2";
+const RETRY_QUEUE_KEY="cbtAnalyzer.retryQueue";
+const RETRY_QUESTION_KEY="cbtRetryQuestion";
 
-
-/* =========================================
+/* ================================
 READ JSON
-========================================= */
+================================ */
 
 function readJSON(key){
 
 try{
 
-const raw = localStorage.getItem(key);
+const raw=localStorage.getItem(key);
 
-if(!raw){
-return [];
-}
+if(!raw)return [];
 
-const data = JSON.parse(raw);
+const data=JSON.parse(raw);
 
-return Array.isArray(data) ? data : [];
+return Array.isArray(data)?data:[];
 
 }catch(error){
 
@@ -404,17 +395,16 @@ return [];
 
 }
 
-
-/* =========================================
+/* ================================
 ESCAPE
-========================================= */
+================================ */
 
 function escapeHTML(value){
 
 return String(
-value === undefined || value === null
-? ""
-: value
+value===undefined||value===null
+?""
+:value
 )
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
@@ -424,36 +414,34 @@ value === undefined || value === null
 
 }
 
-
-/* =========================================
+/* ================================
 NORMALIZE
-========================================= */
+================================ */
 
 function normalize(value){
 
-return String(value || "")
+return String(value||"")
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
 
 }
 
-
-/* =========================================
+/* ================================
 MASTERED
-========================================= */
+================================ */
 
 function getMastered(){
 
-const data = readJSON(MASTERY_KEY);
+const data=readJSON(MASTERY_KEY);
 
-const map = {};
+const map={};
 
 data.forEach(function(item){
 
-if(item && item.question){
+if(item&&item.question){
 
-map[normalize(item.question)] = item;
+map[normalize(item.question)]=item;
 
 }
 
@@ -463,52 +451,50 @@ return Object.values(map);
 
 }
 
-
-/* =========================================
+/* ================================
 ACTIVE
-========================================= */
+================================ */
 
 function getActive(){
 
-const history = readJSON(HISTORY_KEY);
-const mastered = getMastered();
+const history=readJSON(HISTORY_KEY);
 
-const masteredSet = new Set(
+const mastered=getMastered();
+
+const masteredSet=new Set(
 mastered.map(function(item){
 return normalize(item.question);
 })
 );
 
-const map = {};
+const map={};
 
 history.forEach(function(test){
 
-if(!test || !Array.isArray(test.questions)){
+if(!test||!Array.isArray(test.questions)){
 return;
 }
 
 test.questions.forEach(function(q){
 
-if(!q || !q.question){
+if(!q||!q.question){
 return;
 }
 
-const wrong =
-q.status === "wrong" ||
-q.correct === false ||
-q.isCorrect === false;
+const wrong=
+q.status==="wrong"||
+q.correct===false||
+q.isCorrect===false;
 
-if(!wrong){
-return;
-}
+if(!wrong)return;
 
-const key = normalize(q.question);
+const key=normalize(q.question);
 
 if(masteredSet.has(key)){
 return;
 }
 
-map[key] = q;
+map[key]=q;
 
 });
 
@@ -518,32 +504,30 @@ return Object.values(map);
 
 }
 
-
-/* =========================================
+/* ================================
 COUNTS
-========================================= */
+================================ */
 
 function updateCounts(){
 
-document.getElementById("activeCount").textContent =
+document.getElementById("activeCount").textContent=
 getActive().length;
 
-document.getElementById("masteredCount").textContent =
+document.getElementById("masteredCount").textContent=
 getMastered().length;
 
 }
 
-
-/* =========================================
+/* ================================
 CORRECT ANSWER
-========================================= */
+================================ */
 
 function getCorrectAnswer(q){
 
 if(
-q.correctAnswer !== undefined &&
-q.correctAnswer !== null &&
-String(q.correctAnswer).trim() !== ""
+q.correctAnswer!==undefined&&
+q.correctAnswer!==null&&
+String(q.correctAnswer).trim()!==""
 ){
 
 return q.correctAnswer;
@@ -551,26 +535,26 @@ return q.correctAnswer;
 }
 
 if(
-Array.isArray(q.options) &&
-q.correctIndex !== undefined
+Array.isArray(q.options)&&
+q.correctIndex!==undefined
 ){
 
-const i = Number(q.correctIndex);
+const i=Number(q.correctIndex);
 
-if(i >= 0 && i < q.options.length){
+if(i>=0&&i<q.options.length){
 return q.options[i];
 }
 
 }
 
 if(
-Array.isArray(q.options) &&
-q.answerIndex !== undefined
+Array.isArray(q.options)&&
+q.answerIndex!==undefined
 ){
 
-const i = Number(q.answerIndex);
+const i=Number(q.answerIndex);
 
-if(i >= 0 && i < q.options.length){
+if(i>=0&&i<q.options.length){
 return q.options[i];
 }
 
@@ -580,39 +564,38 @@ return "";
 
 }
 
-
-/* =========================================
+/* ================================
 PREPARE RETRY
-========================================= */
+================================ */
 
 function prepareRetryQuestion(q){
 
-if(!q || !q.question){
+if(!q||!q.question){
 return null;
 }
 
-let options =
+let options=
 Array.isArray(q.options)
-? q.options.slice()
-: [];
+?q.options.slice()
+:[];
 
 if(
-options.length < 2 &&
+options.length<2&&
 Array.isArray(q.choices)
 ){
 
-options = q.choices.slice();
+options=q.choices.slice();
 
 }
 
-options = options.map(function(option){
+options=options.map(function(option){
 
-if(option && typeof option === "object"){
+if(option&&typeof option==="object"){
 
 return String(
-option.text ??
-option.label ??
-option.value ??
+option.text??
+option.label??
+option.value??
 ""
 );
 
@@ -622,170 +605,161 @@ return String(option);
 
 });
 
-
-let correctIndex = -1;
-
+let correctIndex=-1;
 
 /* correctIndex */
 
-if(q.correctIndex !== undefined){
+if(q.correctIndex!==undefined){
 
-const i = Number(q.correctIndex);
+const i=Number(q.correctIndex);
 
 if(
-Number.isInteger(i) &&
-i >= 0 &&
-i < options.length
+Number.isInteger(i)&&
+i>=0&&
+i<options.length
 ){
 
-correctIndex = i;
+correctIndex=i;
 
 }
 
 }
-
 
 /* answerIndex */
 
 if(
-correctIndex === -1 &&
-q.answerIndex !== undefined
+correctIndex===-1&&
+q.answerIndex!==undefined
 ){
 
-const i = Number(q.answerIndex);
+const i=Number(q.answerIndex);
 
 if(
-Number.isInteger(i) &&
-i >= 0 &&
-i < options.length
+Number.isInteger(i)&&
+i>=0&&
+i<options.length
 ){
 
-correctIndex = i;
+correctIndex=i;
 
 }
 
 }
-
 
 /* correctAnswer */
 
 if(
-correctIndex === -1 &&
-q.correctAnswer !== undefined
+correctIndex===-1&&
+q.correctAnswer!==undefined
 ){
 
-const target = normalize(q.correctAnswer);
+const target=normalize(q.correctAnswer);
 
-correctIndex = options.findIndex(function(option){
+correctIndex=options.findIndex(function(option){
 
-return normalize(option) === target;
+return normalize(option)===target;
 
 });
 
 }
-
 
 /* correctOption */
 
 if(
-correctIndex === -1 &&
-q.correctOption !== undefined
+correctIndex===-1&&
+q.correctOption!==undefined
 ){
 
-const target = normalize(q.correctOption);
+const target=normalize(q.correctOption);
 
-correctIndex = options.findIndex(function(option){
+correctIndex=options.findIndex(function(option){
 
-return normalize(option) === target;
+return normalize(option)===target;
 
 });
 
 }
-
 
 /* answer */
 
 if(
-correctIndex === -1 &&
-q.answer !== undefined
+correctIndex===-1&&
+q.answer!==undefined
 ){
 
-const target = normalize(q.answer);
+const target=normalize(q.answer);
 
-correctIndex = options.findIndex(function(option){
+correctIndex=options.findIndex(function(option){
 
-return normalize(option) === target;
+return normalize(option)===target;
 
 });
 
 }
 
-
-let correctAnswer =
-q.correctAnswer ??
-q.correctOption ??
+let correctAnswer=
+q.correctAnswer??
+q.correctOption??
 "";
 
-
 if(
-!correctAnswer &&
-correctIndex >= 0
+!correctAnswer&&
+correctIndex>=0
 ){
 
-correctAnswer = options[correctIndex];
+correctAnswer=options[correctIndex];
 
 }
 
-
-return {
+return{
 
 id:
-q.id ||
-q.questionId ||
-("retry-" + Date.now()),
+q.id||
+q.questionId||
+("retry-"+Date.now()),
 
 question:String(q.question),
 
 options:options,
 
 subject:
-q.subject ||
-q.subjectName ||
-q.section ||
+q.subject||
+q.subjectName||
+q.section||
 "Unknown",
 
 topic:
-q.topic ||
-q.chapter ||
-q.unit ||
+q.topic||
+q.chapter||
+q.unit||
 "Unknown",
 
 correctIndex:correctIndex,
 
-correctAnswer:String(correctAnswer || ""),
+correctAnswer:String(correctAnswer||""),
 
 solution:
-q.solution ||
-q.explanation ||
-q.reason ||
+q.solution||
+q.explanation||
+q.reason||
 "Solution not available.",
 
 selectedIndex:
-q.selectedIndex ??
-q.selectedOption ??
+q.selectedIndex??
+q.selectedOption??
 null,
 
 selectedAnswer:
-q.selectedAnswer ||
-q.selectedOptionText ||
+q.selectedAnswer||
+q.selectedOptionText||
 "",
 
 mistakeType:
-q.mistakeType ||
+q.mistakeType||
 "Not Classified",
 
 mistakeReason:
-q.mistakeReason ||
+q.mistakeReason||
 "Review the concept and identify why the answer was incorrect.",
 
 source:"Mistake Bank",
@@ -796,41 +770,42 @@ retryStartedAt:Date.now()
 
 }
 
-
-/* =========================================
+/* ================================
 START RETRY
-========================================= */
+FIXED ROUTING
+================================ */
 
 function practiceQuestion(q){
 
 try{
 
-const retryQuestion =
+const retryQuestion=
 prepareRetryQuestion(q);
-
 
 if(!retryQuestion){
 
 alert("Unable to prepare this question.");
+
 return;
 
 }
 
-
 if(
-!Array.isArray(retryQuestion.options) ||
-retryQuestion.options.length < 2
+!Array.isArray(retryQuestion.options)||
+retryQuestion.options.length<2
 ){
 
-alert("This question does not contain valid options.");
+alert(
+"This question does not contain valid options."
+);
+
 return;
 
 }
 
-
 if(
-retryQuestion.correctIndex < 0 ||
-retryQuestion.correctIndex >=
+retryQuestion.correctIndex<0||
+retryQuestion.correctIndex>=
 retryQuestion.options.length
 ){
 
@@ -842,8 +817,9 @@ return;
 
 }
 
-
-/* Save retry data */
+/*
+Save question for retry.html
+*/
 
 localStorage.setItem(
 RETRY_QUESTION_KEY,
@@ -860,10 +836,8 @@ localStorage.setItem(
 String(Date.now())
 );
 
-const retryId =
-"retry_" +
-Date.now() +
-"_" +
+const retryId=
+"retry_"+Date.now()+"_"+
 Math.random()
 .toString(36)
 .substring(2,8);
@@ -873,54 +847,68 @@ localStorage.setItem(
 retryId
 );
 
+/*
+Verify localStorage
+*/
 
-/* Verify */
-
-const saved =
+const saved=
 localStorage.getItem(
 RETRY_QUESTION_KEY
 );
 
 if(!saved){
 
-alert("Retry question could not be saved.");
+alert(
+"Retry question could not be saved."
+);
+
 return;
 
 }
 
+/*
+Show status
+*/
 
-/* Status */
+const status=
+document.getElementById(
+"retryStatus"
+);
 
-const status =
-document.getElementById("retryStatus");
+if(status){
 
-status.style.display = "block";
+status.style.display="block";
 
-status.textContent =
+status.textContent=
 "✅ Retry question loaded. Opening Retry Engine...";
 
+}
 
 /*
-IMPORTANT:
-Use ./retry.html so GitHub Pages resolves
-the page relative to the current directory.
+IMPORTANT FIX:
+
+Do NOT use:
+retry.html?retry=xxxx
+
+Use the actual page directly.
+The question is already stored in localStorage.
 */
 
 setTimeout(function(){
 
-window.location.assign(
-"./retry.html?retry=" +
-encodeURIComponent(retryId)
-);
+window.location.href="retry.html";
 
 },250);
 
 }catch(error){
 
-console.error(error);
+console.error(
+"Retry error:",
+error
+);
 
 alert(
-"Unable to start Retry: " +
+"Unable to start Retry: "+
 error.message
 );
 
@@ -928,34 +916,41 @@ error.message
 
 }
 
-
-/* =========================================
+/* ================================
 ACTIVE VIEW
-========================================= */
+================================ */
 
 function showActive(){
 
-document.getElementById("sectionTitle").textContent =
+document.getElementById(
+"sectionTitle"
+).textContent=
 "❌ Active Mistakes";
 
-document.getElementById("controls").innerHTML = "";
+document.getElementById(
+"controls"
+).innerHTML="";
 
-const list =
+const list=
 document.getElementById("list");
 
-list.innerHTML = "";
+list.innerHTML="";
 
-const data = getActive();
+const data=getActive();
 
-if(data.length === 0){
+if(data.length===0){
 
-list.innerHTML = `
+list.innerHTML=`
 
 <div class="empty">
 
-<div style="font-size:55px">🎉</div>
+<div style="font-size:55px">
+🎉
+</div>
 
-<h2>No Active Mistakes</h2>
+<h2>
+No Active Mistakes
+</h2>
 
 <p>
 Excellent! You have no unresolved mistakes.
@@ -978,29 +973,28 @@ return;
 
 }
 
-
 data.forEach(function(q,index){
 
-const div =
-document.createElement("div");
-
-div.className = "item";
-
-const answer =
+const answer=
 getCorrectAnswer(q);
 
-div.innerHTML = `
+const div=
+document.createElement("div");
+
+div.className="item";
+
+div.innerHTML=`
 
 <span class="badge">
-❌ Mistake ${index + 1}
+❌ Mistake ${index+1}
 </span>
 
 <span class="badge">
-${escapeHTML(q.subject || "Unknown")}
+${escapeHTML(q.subject||"Unknown")}
 </span>
 
 <span class="badge">
-${escapeHTML(q.topic || "Unknown")}
+${escapeHTML(q.topic||"Unknown")}
 </span>
 
 <div class="question">
@@ -1009,33 +1003,31 @@ ${escapeHTML(q.question)}
 
 <div class="info">
 
-<strong>Your Answer</strong>
+<strong>
+Your Answer
+</strong>
 
 <br>
 
 ${escapeHTML(
-q.selectedAnswer || "Not answered"
+q.selectedAnswer||
+"Not answered"
 )}
 
 <br><br>
 
-<strong>Correct Answer</strong>
+<strong>
+Correct Answer
+</strong>
 
 <br>
 
 <span class="correct">
-${escapeHTML(answer || "Not available")}
-</span>
-
-<br><br>
-
-<strong>Solution</strong>
-
-<br>
-
 ${escapeHTML(
-q.solution || "Solution not available."
+answer||
+"Not available"
 )}
+</span>
 
 </div>
 
@@ -1049,12 +1041,16 @@ type="button">
 
 `;
 
-const button =
+const button=
 div.querySelector(".practice");
 
 button.addEventListener(
 "click",
-function(){
+function(event){
+
+event.preventDefault();
+
+event.stopPropagation();
 
 practiceQuestion(q);
 
@@ -1066,17 +1062,20 @@ list.appendChild(div);
 
 }
 
-
-/* =========================================
+/* ================================
 MASTERED VIEW
-========================================= */
+================================ */
 
 function showMastered(){
 
-document.getElementById("sectionTitle").textContent =
+document.getElementById(
+"sectionTitle"
+).textContent=
 "🏆 Mastered Questions";
 
-document.getElementById("controls").innerHTML = `
+document.getElementById(
+"controls"
+).innerHTML=`
 
 <button
 class="back"
@@ -1089,22 +1088,26 @@ onclick="showActive()">
 
 `;
 
-const list =
+const list=
 document.getElementById("list");
 
-list.innerHTML = "";
+list.innerHTML="";
 
-const data = getMastered();
+const data=getMastered();
 
-if(data.length === 0){
+if(data.length===0){
 
-list.innerHTML = `
+list.innerHTML=`
 
 <div class="empty">
 
-<div style="font-size:55px">🔎</div>
+<div style="font-size:55px">
+🔎
+</div>
 
-<h2>No Mastered Questions</h2>
+<h2>
+No Mastered Questions
+</h2>
 
 <p>
 Retry your mistakes to build mastery.
@@ -1127,30 +1130,29 @@ return;
 
 }
 
-
 data.forEach(function(q,index){
 
-const div =
-document.createElement("div");
-
-div.className =
-"item mastered-item";
-
-const answer =
+const answer=
 getCorrectAnswer(q);
 
-div.innerHTML = `
+const div=
+document.createElement("div");
+
+div.className=
+"item mastered-item";
+
+div.innerHTML=`
 
 <span class="badge">
-🏆 Mastered ${index + 1}
+🏆 Mastered ${index+1}
 </span>
 
 <span class="badge">
-${escapeHTML(q.subject || "Unknown")}
+${escapeHTML(q.subject||"Unknown")}
 </span>
 
 <span class="badge">
-${escapeHTML(q.topic || "Unknown")}
+${escapeHTML(q.topic||"Unknown")}
 </span>
 
 <div class="question">
@@ -1159,23 +1161,18 @@ ${escapeHTML(q.question)}
 
 <div class="info">
 
-<strong>✅ Correct Answer</strong>
+<strong>
+✅ Correct Answer
+</strong>
 
 <br><br>
 
 <span class="correct">
-${escapeHTML(answer || "Not available")}
-</span>
-
-<br><br>
-
-<strong>Solution</strong>
-
-<br><br>
-
 ${escapeHTML(
-q.solution || "Solution not available."
+answer||
+"Not available"
 )}
+</span>
 
 </div>
 
@@ -1183,18 +1180,22 @@ q.solution || "Solution not available."
 class="practice"
 type="button">
 
-🔄 Practice Again
+🔄 Practice This Question Again
 
 </button>
 
 `;
 
-const button =
+const button=
 div.querySelector(".practice");
 
 button.addEventListener(
 "click",
-function(){
+function(event){
+
+event.preventDefault();
+
+event.stopPropagation();
 
 practiceQuestion(q);
 
@@ -1206,46 +1207,23 @@ list.appendChild(div);
 
 }
 
-
-/* =========================================
+/* ================================
 DASHBOARD
-========================================= */
+================================ */
 
 function goDashboard(){
 
-window.location.assign("./index.html");
+window.location.href="index.html";
 
 }
 
-
-/* =========================================
-HASH SUPPORT
-========================================= */
-
-function checkHash(){
-
-if(
-window.location.hash === "#mastered"
-){
-
-showMastered();
-
-}else{
-
-showActive();
-
-}
-
-}
-
-
-/* =========================================
+/* ================================
 START
-========================================= */
+================================ */
 
 updateCounts();
 
-checkHash();
+showActive();
 
 </script>
 
