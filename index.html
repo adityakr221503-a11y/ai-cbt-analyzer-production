@@ -3,19 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>CBT Analyzer Pro — Dashboard</title>
 
 <style>
+*{box-sizing:border-box}
 
-*{
-box-sizing:border-box;
-}
-
-html,body{
-margin:0;
-padding:0;
-}
+html,body{margin:0;padding:0}
 
 body{
 font-family:Arial,sans-serif;
@@ -96,6 +89,7 @@ padding:14px;
 font-weight:800;
 font-size:15px;
 cursor:pointer;
+touch-action:manipulation;
 }
 
 .start{
@@ -136,6 +130,7 @@ text-align:center;
 font-family:Arial,sans-serif;
 color:#0f172a;
 cursor:pointer;
+touch-action:manipulation;
 }
 
 .stat:active{
@@ -169,6 +164,7 @@ padding:18px 10px;
 font-weight:800;
 cursor:pointer;
 font-size:14px;
+touch-action:manipulation;
 }
 
 .action:active{
@@ -235,11 +231,35 @@ margin-bottom:6px;
 color:#64748b;
 }
 
+
+/* =========================
+   CLICKABLE TEST HISTORY
+========================= */
+
 .history-item{
+display:block;
+width:100%;
 border:1px solid #e2e8f0;
 border-radius:12px;
 padding:15px;
 margin-top:10px;
+background:#fff;
+font-family:Arial,sans-serif;
+text-align:left;
+color:#0f172a;
+cursor:pointer;
+touch-action:manipulation;
+-webkit-appearance:none;
+appearance:none;
+}
+
+.history-item:hover{
+background:#f8fafc;
+}
+
+.history-item:active{
+transform:scale(.98);
+background:#eef2ff;
 }
 
 .history-top{
@@ -258,6 +278,13 @@ margin-top:8px;
 color:#64748b;
 font-size:14px;
 line-height:1.6;
+}
+
+.history-open{
+margin-top:10px;
+font-size:12px;
+font-weight:800;
+color:#4f46e5;
 }
 
 .empty{
@@ -317,7 +344,6 @@ padding:17px;
 }
 
 }
-
 </style>
 </head>
 
@@ -339,11 +365,15 @@ STUDENT DASHBOARD
 
 </header>
 
+
 <div class="container">
+
 
 <section class="hero">
 
-<h1>🎯 Your CBT Learning Dashboard</h1>
+<h1>
+🎯 Your CBT Learning Dashboard
+</h1>
 
 <p>
 Test → Analyze → Fix Mistakes → Retry → Master.
@@ -354,16 +384,17 @@ Test → Analyze → Fix Mistakes → Retry → Master.
 <button
 class="hero-button start"
 type="button"
-onclick="location.href='cbt.html'">
+onclick="openPage('cbt.html')">
 
 📝 Start CBT Test
 
 </button>
 
+
 <button
 class="hero-button mistakes"
 type="button"
-onclick="location.href='mistake.html'">
+onclick="openPage('mistake.html')">
 
 🧠 Open Mistake Bank
 
@@ -376,13 +407,17 @@ onclick="location.href='mistake.html'">
 
 <section class="card">
 
-<h2>📊 Performance Overview</h2>
+<h2>
+📊 Performance Overview
+</h2>
 
 <div class="stats">
 
 <div class="stat">
 
-<strong id="testsCount">0</strong>
+<strong id="testsCount">
+0
+</strong>
 
 <span>
 Tests Completed
@@ -393,7 +428,9 @@ Tests Completed
 
 <div class="stat">
 
-<strong id="totalQuestions">0</strong>
+<strong id="totalQuestions">
+0
+</strong>
 
 <span>
 Questions Attempted
@@ -404,7 +441,9 @@ Questions Attempted
 
 <div class="stat">
 
-<strong id="accuracy">0%</strong>
+<strong id="accuracy">
+0%
+</strong>
 
 <span>
 Accuracy
@@ -435,16 +474,21 @@ onclick="openMastered()">
 
 <section class="card">
 
-<h2>⚡ Quick Actions</h2>
+<h2>
+⚡ Quick Actions
+</h2>
 
 <div class="actions">
+
 
 <button
 class="action"
 type="button"
-onclick="location.href='cbt.html'">
+onclick="openPage('cbt.html')">
 
-<span class="action-icon">📝</span>
+<span class="action-icon">
+📝
+</span>
 
 New CBT
 
@@ -454,9 +498,11 @@ New CBT
 <button
 class="action"
 type="button"
-onclick="location.href='mistake.html'">
+onclick="openPage('mistake.html')">
 
-<span class="action-icon">❌</span>
+<span class="action-icon">
+❌
+</span>
 
 Mistake Bank
 
@@ -466,9 +512,11 @@ Mistake Bank
 <button
 class="action"
 type="button"
-onclick="location.href='retry.html'">
+onclick="openPage('retry.html')">
 
-<span class="action-icon">🔄</span>
+<span class="action-icon">
+🔄
+</span>
 
 Retry
 
@@ -480,11 +528,14 @@ class="action"
 type="button"
 onclick="scrollToHistory()">
 
-<span class="action-icon">📜</span>
+<span class="action-icon">
+📜
+</span>
 
 History
 
 </button>
+
 
 </div>
 
@@ -493,9 +544,12 @@ History
 
 <section class="card">
 
-<h2>🧠 Mistake Intelligence</h2>
+<h2>
+🧠 Mistake Intelligence
+</h2>
 
 <div class="performance">
+
 
 <div class="performance-box">
 
@@ -519,7 +573,7 @@ Questions that still need revision.
 class="action"
 style="width:100%"
 type="button"
-onclick="location.href='mistake.html'">
+onclick="openPage('mistake.html')">
 
 Review Mistakes
 
@@ -550,7 +604,7 @@ Total retry attempts recorded.
 class="action"
 style="width:100%"
 type="button"
-onclick="location.href='retry.html'">
+onclick="openPage('retry.html')">
 
 Start Retry
 
@@ -565,7 +619,9 @@ Start Retry
 
 <section class="card">
 
-<h2>🎯 Overall Accuracy</h2>
+<h2>
+🎯 Overall Accuracy
+</h2>
 
 <div class="performance-box">
 
@@ -597,13 +653,18 @@ Complete a CBT test to start building your performance profile.
 
 <section class="card">
 
-<h2>📚 Subject Performance</h2>
+<h2>
+📚 Subject Performance
+</h2>
 
 <div class="subject-grid">
 
+
 <div class="subject">
 
-<strong>⚡ Physics</strong>
+<strong>
+⚡ Physics
+</strong>
 
 <div>
 Questions:
@@ -625,7 +686,9 @@ Accuracy:
 
 <div class="subject">
 
-<strong>🧪 Chemistry</strong>
+<strong>
+🧪 Chemistry
+</strong>
 
 <div>
 Questions:
@@ -647,7 +710,9 @@ Accuracy:
 
 <div class="subject">
 
-<strong>🧬 Biology</strong>
+<strong>
+🧬 Biology
+</strong>
 
 <div>
 Questions:
@@ -665,6 +730,7 @@ Accuracy:
 </small>
 
 </div>
+
 
 </div>
 
@@ -695,8 +761,11 @@ CBT Analyzer Pro • Student First Learning System
 
 <script>
 
+"use strict";
+
+
 /* =====================================================
-STORAGE
+   STORAGE
 ===================================================== */
 
 const HISTORY_KEY="cbtHistory";
@@ -707,7 +776,18 @@ const RETRY_KEY="cbtRetryHistory";
 
 
 /* =====================================================
-READ JSON
+   SAFE PAGE NAVIGATION
+===================================================== */
+
+function openPage(page){
+
+window.location.href=page;
+
+}
+
+
+/* =====================================================
+   READ JSON
 ===================================================== */
 
 function readJSON(key,fallback){
@@ -718,7 +798,9 @@ const raw=
 localStorage.getItem(key);
 
 if(!raw){
+
 return fallback;
+
 }
 
 const data=
@@ -746,7 +828,7 @@ return fallback;
 
 
 /* =====================================================
-NORMALIZE
+   NORMALIZE
 ===================================================== */
 
 function normalize(value){
@@ -760,7 +842,7 @@ return String(value||"")
 
 
 /* =====================================================
-MASTERED QUESTIONS
+   MASTERED
 ===================================================== */
 
 function getMasteredQuestions(){
@@ -772,7 +854,9 @@ MASTERY_KEY,
 );
 
 if(!Array.isArray(data)){
+
 return [];
+
 }
 
 return data.filter(
@@ -786,20 +870,17 @@ item.question;
 }
 
 
-/* =====================================================
-OPEN MASTERED
-===================================================== */
-
 function openMastered(){
 
-location.href=
-"mistake.html#mastered";
+openPage(
+"mistake.html#mastered"
+);
 
 }
 
 
 /* =====================================================
-HISTORY
+   HISTORY
 ===================================================== */
 
 const history=
@@ -817,7 +898,7 @@ history
 
 
 /* =====================================================
-GLOBAL STATS
+   GLOBAL STATS
 ===================================================== */
 
 let totalQuestions=0;
@@ -835,8 +916,11 @@ tests.forEach(
 function(test){
 
 if(!test){
+
 return;
+
 }
+
 
 if(
 Array.isArray(test.questions)
@@ -846,13 +930,17 @@ test.questions.forEach(
 function(q){
 
 if(!q){
+
 return;
+
 }
 
 totalQuestions++;
 
 
-if(q.status==="correct"){
+if(
+q.status==="correct"
+){
 
 totalCorrect++;
 
@@ -860,7 +948,9 @@ totalAttempted++;
 
 }
 
-else if(q.status==="wrong"){
+else if(
+q.status==="wrong"
+){
 
 totalWrong++;
 
@@ -868,7 +958,9 @@ totalAttempted++;
 
 }
 
-else if(q.status==="skipped"){
+else if(
+q.status==="skipped"
+){
 
 totalSkipped++;
 
@@ -917,7 +1009,7 @@ Math.round(
 
 
 /* =====================================================
-MASTERED
+   MASTERED
 ===================================================== */
 
 const masteredQuestions=
@@ -928,8 +1020,7 @@ masteredQuestions.length;
 
 
 /* =====================================================
-ACTIVE MISTAKES
-LATEST ATTEMPT WINS
+   ACTIVE MISTAKES
 ===================================================== */
 
 const activeMap=
@@ -974,10 +1065,6 @@ const existing=
 activeMap.get(key);
 
 
-/*
-Latest test attempt wins.
-*/
-
 if(
 existing &&
 (existing._testTime||0)>testTime
@@ -988,11 +1075,9 @@ return;
 }
 
 
-/*
-Wrong = active mistake.
-*/
-
-if(q.status==="wrong"){
+if(
+q.status==="wrong"
+){
 
 activeMap.set(
 key,
@@ -1004,13 +1089,9 @@ _testTime:testTime
 
 }
 
-
-/*
-A later correct attempt clears
-the active mistake.
-*/
-
-else if(q.status==="correct"){
+else if(
+q.status==="correct"
+){
 
 activeMap.delete(key);
 
@@ -1026,7 +1107,7 @@ activeMap.size;
 
 
 /* =====================================================
-RETRY
+   RETRY
 ===================================================== */
 
 const retryHistory=
@@ -1044,7 +1125,7 @@ retryHistory.length
 
 
 /* =====================================================
-UPDATE TOP STATS
+   UPDATE STATS
 ===================================================== */
 
 document.getElementById(
@@ -1096,33 +1177,42 @@ accuracy+"%";
 
 
 /* =====================================================
-ACCURACY MESSAGE
+   ACCURACY MESSAGE
 ===================================================== */
 
 let message;
 
-if(totalAttempted===0){
+
+if(
+totalAttempted===0
+){
 
 message=
 "Complete a CBT test to start building your performance profile.";
 
 }
 
-else if(accuracy>=85){
+else if(
+accuracy>=85
+){
 
 message=
 "🔥 Excellent accuracy. Focus on difficult and recurring mistakes.";
 
 }
 
-else if(accuracy>=70){
+else if(
+accuracy>=70
+){
 
 message=
 "👍 Good progress. Use the Mistake Bank to push your accuracy higher.";
 
 }
 
-else if(accuracy>=50){
+else if(
+accuracy>=50
+){
 
 message=
 "📈 Keep practicing. Review mistakes and retry them regularly.";
@@ -1144,7 +1234,7 @@ message;
 
 
 /* =====================================================
-SUBJECT STATS
+   SUBJECT STATS
 ===================================================== */
 
 const subjects={
@@ -1184,7 +1274,9 @@ test.questions.forEach(
 function(q){
 
 if(!q){
+
 return;
+
 }
 
 
@@ -1291,7 +1383,42 @@ updateSubject(
 
 
 /* =====================================================
-HISTORY
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value){
+
+return String(
+value??""
+)
+
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+   CLICK ONE TEST
+===================================================== */
+
+function openTest(index){
+
+const target=
+"test-details.html?test="+
+encodeURIComponent(index);
+
+window.location.href=
+target;
+
+}
+
+
+/* =====================================================
+   HISTORY
 ===================================================== */
 
 function renderHistory(){
@@ -1304,7 +1431,9 @@ document.getElementById(
 box.innerHTML="";
 
 
-if(tests.length===0){
+if(
+tests.length===0
+){
 
 box.innerHTML=`
 
@@ -1317,7 +1446,7 @@ box.innerHTML=`
 <button
 class="action"
 type="button"
-onclick="location.href='cbt.html'">
+onclick="openPage('cbt.html')">
 
 📝 Start First CBT
 
@@ -1332,31 +1461,88 @@ return;
 }
 
 
+/*
+Newest test is shown first.
+
+index = actual localStorage
+array index.
+
+This is important:
+Test #31 -> history[30]
+Test #30 -> history[29]
+etc.
+*/
+
+
 const recent=
 tests
-.slice()
+.map(
+function(test,index){
+
+return {
+test:test,
+index:index
+};
+
+}
+)
 .reverse()
-.slice(0,8);
+.slice(0,31);
 
 
 recent.forEach(
-function(test,index){
+function(item,displayIndex){
+
+const test=
+item.test;
+
+const actualIndex=
+item.index;
+
+
+/* ================================================
+   BUTTON INSTEAD OF DIV
+   This makes the entire card tappable in Android.
+================================================ */
 
 const div=
-document.createElement("div");
+document.createElement(
+"button"
+);
+
+div.type="button";
 
 div.className=
 "history-item";
 
 
+div.setAttribute(
+"aria-label",
+"Open Test "+
+(actualIndex+1)
+);
+
+
+div.onclick=
+function(){
+
+openTest(
+actualIndex
+);
+
+};
+
+
 const correct=
 Number(test.correct)||0;
+
 
 const wrong=
 Number(
 test.incorrect||
 test.wrong
 )||0;
+
 
 const skipped=
 Number(test.skipped)||0;
@@ -1388,6 +1574,7 @@ test.score
 
 const date=
 test.date||
+test.createdAt||
 "Unknown date";
 
 
@@ -1396,14 +1583,20 @@ div.innerHTML=`
 <div class="history-top">
 
 <span>
-Test #${tests.length-index}
+Test #${actualIndex+1}
 </span>
 
 <span class="history-score">
-${score} / ${total*4}
+${escapeHTML(score)}
+${total>0
+?
+" / "+(total*4)
+:
+""}
 </span>
 
 </div>
+
 
 <div class="history-details">
 
@@ -1423,10 +1616,19 @@ ${score} / ${total*4}
 
 </div>
 
+
+<div class="history-open">
+
+👆 Tap to open full test details
+
+</div>
+
 `;
 
 
-box.appendChild(div);
+box.appendChild(
+div
+);
 
 });
 
@@ -1434,25 +1636,7 @@ box.appendChild(div);
 
 
 /* =====================================================
-ESCAPE
-===================================================== */
-
-function escapeHTML(value){
-
-return String(
-value??""
-)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
-HISTORY SCROLL
+   SCROLL HISTORY
 ===================================================== */
 
 function scrollToHistory(){
@@ -1471,7 +1655,7 @@ block:"start"
 
 
 /* =====================================================
-RENDER
+   RENDER
 ===================================================== */
 
 renderHistory();
