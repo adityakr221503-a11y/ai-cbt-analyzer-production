@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>CBT Analyzer Pro — Mistake Bank</title>
+<title>CBT Analyzer Pro — Mistake Intelligence</title>
 
 <style>
 *{box-sizing:border-box}
@@ -170,32 +170,40 @@ margin-top:12px;
 line-height:1.6;
 }
 
-.correct{
-color:#15803d;
-font-weight:800;
-}
-
 .intelligence{
 margin-top:12px;
-padding:15px;
-border-radius:12px;
+display:grid;
+gap:10px;
+}
+
+.intelligence-box{
+padding:13px;
+border-radius:10px;
+line-height:1.55;
+}
+
+.type-box{
+background:#fff7ed;
+border:1px solid #fed7aa;
+}
+
+.reason-box{
+background:#fefce8;
+border:1px solid #fde68a;
+}
+
+.solution-box{
 background:#eef2ff;
 border:1px solid #c7d2fe;
-line-height:1.6;
 }
 
 .intelligence-title{
-font-size:16px;
 font-weight:800;
-color:#3730a3;
-margin-bottom:10px;
+margin-bottom:5px;
 }
 
-.intelligence-row{
-margin-top:7px;
-}
-
-.intelligence-label{
+.correct{
+color:#15803d;
 font-weight:800;
 }
 
@@ -278,7 +286,6 @@ grid-template-columns:1fr;
 <body>
 
 <header>
-
 <div class="header">
 
 <div class="logo">
@@ -293,18 +300,16 @@ Dashboard
 </button>
 
 </div>
-
 </header>
-
 
 <div class="container">
 
 <section class="hero">
 
-<h1>🧠 Mistake Bank</h1>
+<h1>🧠 Mistake Intelligence</h1>
 
 <p>
-Review mistakes → Understand → Practice → Retry → Master.
+Understand the mistake → Learn the concept → Retry → Master.
 </p>
 
 <div
@@ -313,7 +318,6 @@ class="error-box">
 </div>
 
 </section>
-
 
 <section class="card">
 
@@ -344,7 +348,6 @@ Tap to View →
 
 </button>
 
-
 <button
 class="stat"
 type="button"
@@ -372,7 +375,6 @@ Tap to View →
 
 </section>
 
-
 <section class="card">
 
 <div id="controls"></div>
@@ -392,26 +394,23 @@ class="retry-status">
 
 </div>
 
-
 <script>
 
 "use strict";
 
-
-/* =====================================================
+/* ================================
 STORAGE
-===================================================== */
+================================ */
 
 const HISTORY_KEY="cbtHistory";
 const MASTERY_KEY="cbtMasteryV2";
 const RETRY_QUEUE_KEY="cbtAnalyzer.retryQueue";
 const RETRY_QUESTION_KEY="cbtRetryQuestion";
-const RETRY_HISTORY_KEY="cbtRetryHistory";
 
 
-/* =====================================================
+/* ================================
 READ JSON
-===================================================== */
+================================ */
 
 function readJSON(key){
 
@@ -436,9 +435,9 @@ return [];
 }
 
 
-/* =====================================================
+/* ================================
 ESCAPE
-===================================================== */
+================================ */
 
 function escapeHTML(value){
 
@@ -456,9 +455,9 @@ value===undefined||value===null
 }
 
 
-/* =====================================================
+/* ================================
 NORMALIZE
-===================================================== */
+================================ */
 
 function normalize(value){
 
@@ -470,9 +469,9 @@ return String(value||"")
 }
 
 
-/* =====================================================
+/* ================================
 MASTERED
-===================================================== */
+================================ */
 
 function getMastered(){
 
@@ -495,9 +494,9 @@ return Object.values(map);
 }
 
 
-/* =====================================================
+/* ================================
 ACTIVE
-===================================================== */
+================================ */
 
 function getActive(){
 
@@ -525,18 +524,16 @@ if(!q||!q.question){
 return;
 }
 
-const key=normalize(q.question);
-
-if(masteredSet.has(key)){
-return;
-}
-
 const wrong=
 q.status==="wrong"||
 q.correct===false||
 q.isCorrect===false;
 
-if(!wrong){
+if(!wrong)return;
+
+const key=normalize(q.question);
+
+if(masteredSet.has(key)){
 return;
 }
 
@@ -551,9 +548,9 @@ return Object.values(map);
 }
 
 
-/* =====================================================
+/* ================================
 COUNTS
-===================================================== */
+================================ */
 
 function updateCounts(){
 
@@ -566,15 +563,15 @@ getMastered().length;
 }
 
 
-/* =====================================================
+/* ================================
 CORRECT ANSWER
-===================================================== */
+================================ */
 
 function getCorrectAnswer(q){
 
 if(
-q.correctAnswer!==undefined &&
-q.correctAnswer!==null &&
+q.correctAnswer!==undefined&&
+q.correctAnswer!==null&&
 String(q.correctAnswer).trim()!==""
 ){
 
@@ -583,7 +580,7 @@ return q.correctAnswer;
 }
 
 if(
-Array.isArray(q.options) &&
+Array.isArray(q.options)&&
 q.correctIndex!==undefined
 ){
 
@@ -596,7 +593,7 @@ return q.options[i];
 }
 
 if(
-Array.isArray(q.options) &&
+Array.isArray(q.options)&&
 q.answerIndex!==undefined
 ){
 
@@ -613,218 +610,95 @@ return "";
 }
 
 
-/* =====================================================
-MISTAKE INTELLIGENCE V2
-===================================================== */
+/* ================================
+MISTAKE TYPE
+================================ */
 
-function classifyMistake(q){
-
-if(!q){
-return {
-type:"Concept Gap",
-reason:"Review the underlying concept before attempting the question again."
-};
-}
-
-
-/* Existing classification is preserved */
+function getMistakeType(q){
 
 if(
 q.mistakeType &&
+String(q.mistakeType).trim() &&
 q.mistakeType!=="Not Classified"
 ){
 
-return {
-type:String(q.mistakeType),
-reason:String(
-q.mistakeReason||
-"Review the reason for the incorrect answer and retry the question."
-)
-};
+return q.mistakeType;
 
 }
 
+const question=
+normalize(q.question);
 
-/* Repeated mistake detection */
-
-const history=readJSON(HISTORY_KEY);
-
-const key=normalize(q.question);
-
-let wrongCount=0;
-let correctCount=0;
-
-history.forEach(function(test){
-
-if(!test||!Array.isArray(test.questions)){
-return;
-}
-
-test.questions.forEach(function(item){
-
-if(!item||normalize(item.question)!==key){
-return;
-}
-
-if(item.status==="wrong"){
-wrongCount++;
-}
-
-if(item.status==="correct"){
-correctCount++;
-}
-
-});
-
-});
-
-
-if(wrongCount>=2){
-
-return {
-type:"🔁 Repeated Mistake",
-reason:
-"This question has been answered incorrectly more than once. Revisit the concept and identify the exact step where your reasoning changed."
-};
-
-}
-
-
-/* Selected answer absent */
+const solution=
+normalize(q.solution);
 
 if(
-q.selectedIndex===null||
-q.selectedIndex===undefined
+question.includes("calculate")||
+question.includes("find")||
+question.includes("value")||
+question.includes("velocity")||
+question.includes("force")||
+question.includes("energy")
 ){
 
-return {
-type:"📖 Question Understanding",
-reason:
-"The question was not answered correctly. Read the wording carefully and identify exactly what the question is asking."
-};
+return "🧮 Calculation";
 
 }
-
-
-/* Calculation-related subjects */
-
-const subject=
-normalize(q.subject);
-
-const topic=
-normalize(q.topic);
 
 if(
-subject==="physics" ||
-subject==="chemistry"
+solution.includes("called")||
+solution.includes("known as")||
+solution.includes("symbol")||
+solution.includes("definition")
 ){
+
+return "📚 Factual";
+
+}
+
+return "🧠 Conceptual";
+
+}
+
+
+/* ================================
+MISTAKE REASON
+================================ */
+
+function getMistakeReason(q){
 
 if(
-topic.includes("calculation")||
-topic.includes("numerical")||
-topic.includes("mole")||
-topic.includes("electricity")||
-topic.includes("motion")||
-topic.includes("gravitation")
+q.mistakeReason &&
+String(q.mistakeReason).trim() &&
+q.mistakeReason!=="Review the concept and identify why the answer was incorrect."
 ){
 
-return {
-type:"🔢 Calculation / Application Error",
-reason:
-"Check the formula, units, substitutions, and calculation steps before retrying."
-};
+return q.mistakeReason;
 
 }
 
-}
+const type=getMistakeType(q);
 
+if(type.includes("Calculation")){
 
-/* Default */
-
-return {
-type:"🧠 Concept Gap",
-reason:
-"The selected answer was incorrect. Review the relevant concept, compare it with the correct answer, and retry the question."
-};
+return "The selected answer was incorrect. Recheck the formula, values, units and calculation steps.";
 
 }
 
+if(type.includes("Factual")){
 
-/* =====================================================
-INTELLIGENCE HTML
-===================================================== */
+return "The required fact or NCERT detail was not recalled correctly. Revise the key fact and test it again.";
 
-function intelligenceHTML(q){
+}
 
-const intelligence=
-classifyMistake(q);
-
-const answer=
-getCorrectAnswer(q);
-
-return `
-
-<div class="intelligence">
-
-<div class="intelligence-title">
-🤖 Mistake Intelligence
-</div>
-
-<div class="intelligence-row">
-
-<span class="intelligence-label">
-Mistake Type:
-</span>
-
-${escapeHTML(intelligence.type)}
-
-</div>
-
-<div class="intelligence-row">
-
-<span class="intelligence-label">
-Why:
-</span>
-
-${escapeHTML(intelligence.reason)}
-
-</div>
-
-<div class="intelligence-row">
-
-<span class="intelligence-label">
-Correct Concept:
-</span>
-
-Review the concept connected to
-<strong>${escapeHTML(q.topic||"this question")}</strong>.
-
-</div>
-
-<div class="intelligence-row">
-
-<span class="intelligence-label">
-💡 Solution:
-</span>
-
-${escapeHTML(
-q.solution||
-q.explanation||
-"Solution not available. Review the concept and compare the correct answer with your selected answer."
-)}
-
-</div>
-
-</div>
-
-`;
+return "The selected answer indicates a concept gap. Review the underlying concept and compare it with the correct explanation.";
 
 }
 
 
-/* =====================================================
+/* ================================
 PREPARE RETRY
-===================================================== */
+================================ */
 
 function prepareRetryQuestion(q){
 
@@ -838,7 +712,7 @@ Array.isArray(q.options)
 :[];
 
 if(
-options.length<2 &&
+options.length<2&&
 Array.isArray(q.choices)
 ){
 
@@ -863,11 +737,7 @@ return String(option);
 
 });
 
-
 let correctIndex=-1;
-
-
-/* correctIndex */
 
 if(q.correctIndex!==undefined){
 
@@ -885,11 +755,8 @@ correctIndex=i;
 
 }
 
-
-/* answerIndex */
-
 if(
-correctIndex===-1 &&
+correctIndex===-1&&
 q.answerIndex!==undefined
 ){
 
@@ -907,11 +774,8 @@ correctIndex=i;
 
 }
 
-
-/* correctAnswer */
-
 if(
-correctIndex===-1 &&
+correctIndex===-1&&
 q.correctAnswer!==undefined
 ){
 
@@ -925,62 +789,18 @@ return normalize(option)===target;
 
 }
 
-
-/* correctOption */
-
-if(
-correctIndex===-1 &&
-q.correctOption!==undefined
-){
-
-const target=normalize(q.correctOption);
-
-correctIndex=options.findIndex(function(option){
-
-return normalize(option)===target;
-
-});
-
-}
-
-
-/* answer */
-
-if(
-correctIndex===-1 &&
-q.answer!==undefined
-){
-
-const target=normalize(q.answer);
-
-correctIndex=options.findIndex(function(option){
-
-return normalize(option)===target;
-
-});
-
-}
-
-
 let correctAnswer=
-q.correctAnswer??
-q.correctOption??
+q.correctAnswer||
 "";
 
-
 if(
-!correctAnswer &&
+!correctAnswer&&
 correctIndex>=0
 ){
 
 correctAnswer=options[correctIndex];
 
 }
-
-
-const intelligence=
-classifyMistake(q);
-
 
 return{
 
@@ -1017,19 +837,15 @@ q.reason||
 
 selectedIndex:
 q.selectedIndex??
-q.selectedOption??
 null,
 
 selectedAnswer:
 q.selectedAnswer||
-q.selectedOptionText||
 "",
 
-mistakeType:
-intelligence.type,
+mistakeType:getMistakeType(q),
 
-mistakeReason:
-intelligence.reason,
+mistakeReason:getMistakeReason(q),
 
 source:"Mistake Bank",
 
@@ -1040,9 +856,9 @@ retryStartedAt:Date.now()
 }
 
 
-/* =====================================================
+/* ================================
 START RETRY
-===================================================== */
+================================ */
 
 function practiceQuestion(q){
 
@@ -1059,7 +875,6 @@ return;
 
 }
 
-
 if(
 !Array.isArray(retryQuestion.options)||
 retryQuestion.options.length<2
@@ -1072,7 +887,6 @@ alert(
 return;
 
 }
-
 
 if(
 retryQuestion.correctIndex<0||
@@ -1088,64 +902,34 @@ return;
 
 }
 
-
-/* Save retry question */
-
 localStorage.setItem(
 RETRY_QUESTION_KEY,
 JSON.stringify(retryQuestion)
 );
-
 
 localStorage.setItem(
 RETRY_QUEUE_KEY,
 JSON.stringify([retryQuestion])
 );
 
-
 localStorage.setItem(
 "cbtRetryStartedAt",
 String(Date.now())
 );
 
-
-const retryId=
-"retry_"+Date.now()+"_"+
-Math.random()
-.toString(36)
-.substring(2,8);
-
-
-localStorage.setItem(
-"cbtRetryId",
-retryId
-);
-
-
-/* Verify */
-
 const saved=
-localStorage.getItem(
-RETRY_QUESTION_KEY
-);
+localStorage.getItem(RETRY_QUESTION_KEY);
 
 if(!saved){
 
-alert(
-"Retry question could not be saved."
-);
+alert("Retry question could not be saved.");
 
 return;
 
 }
 
-
-/* Status */
-
 const status=
-document.getElementById(
-"retryStatus"
-);
+document.getElementById("retryStatus");
 
 if(status){
 
@@ -1156,22 +940,15 @@ status.textContent=
 
 }
 
-
-/* Open retry page */
-
 setTimeout(function(){
 
-window.location.assign("retry.html");
+window.location.href="retry.html";
 
 },250);
 
-
 }catch(error){
 
-console.error(
-"Retry error:",
-error
-);
+console.error("Retry error:",error);
 
 alert(
 "Unable to start Retry: "+
@@ -1183,9 +960,9 @@ error.message
 }
 
 
-/* =====================================================
+/* ================================
 ACTIVE VIEW
-===================================================== */
+================================ */
 
 function showActive(){
 
@@ -1194,20 +971,16 @@ document.getElementById(
 ).textContent=
 "❌ Active Mistakes";
 
-
 document.getElementById(
 "controls"
 ).innerHTML="";
-
 
 const list=
 document.getElementById("list");
 
 list.innerHTML="";
 
-
 const data=getActive();
-
 
 if(data.length===0){
 
@@ -1244,19 +1017,23 @@ return;
 
 }
 
-
 data.forEach(function(q,index){
 
-const answer=
-getCorrectAnswer(q);
+const answer=getCorrectAnswer(q);
 
+const type=getMistakeType(q);
+
+const reason=getMistakeReason(q);
+
+const solution=
+q.solution||
+q.explanation||
+"Solution not available.";
 
 const div=
 document.createElement("div");
 
-
 div.className="item";
-
 
 div.innerHTML=`
 
@@ -1272,17 +1049,13 @@ ${escapeHTML(q.subject||"Unknown")}
 ${escapeHTML(q.topic||"Unknown")}
 </span>
 
-
 <div class="question">
 ${escapeHTML(q.question)}
 </div>
 
-
 <div class="info">
 
-<strong>
-Your Answer
-</strong>
+<strong>📝 Your Answer</strong>
 
 <br>
 
@@ -1293,9 +1066,7 @@ q.selectedAnswer||
 
 <br><br>
 
-<strong>
-Correct Answer
-</strong>
+<strong>✅ Correct Answer</strong>
 
 <br>
 
@@ -1308,9 +1079,39 @@ answer||
 
 </div>
 
+<div class="intelligence">
 
-${intelligenceHTML(q)}
+<div class="intelligence-box type-box">
 
+<div class="intelligence-title">
+🧠 Mistake Type
+</div>
+
+${escapeHTML(type)}
+
+</div>
+
+<div class="intelligence-box reason-box">
+
+<div class="intelligence-title">
+💡 Why This Happened
+</div>
+
+${escapeHTML(reason)}
+
+</div>
+
+<div class="intelligence-box solution-box">
+
+<div class="intelligence-title">
+📖 Solution
+</div>
+
+${escapeHTML(solution)}
+
+</div>
+
+</div>
 
 <button
 class="practice"
@@ -1322,22 +1123,20 @@ type="button">
 
 `;
 
-
 const button=
 div.querySelector(".practice");
-
 
 button.addEventListener(
 "click",
 function(event){
 
 event.preventDefault();
+
 event.stopPropagation();
 
 practiceQuestion(q);
 
 });
-
 
 list.appendChild(div);
 
@@ -1346,9 +1145,9 @@ list.appendChild(div);
 }
 
 
-/* =====================================================
+/* ================================
 MASTERED VIEW
-===================================================== */
+================================ */
 
 function showMastered(){
 
@@ -1356,7 +1155,6 @@ document.getElementById(
 "sectionTitle"
 ).textContent=
 "🏆 Mastered Questions";
-
 
 document.getElementById(
 "controls"
@@ -1373,15 +1171,12 @@ onclick="showActive()">
 
 `;
 
-
 const list=
 document.getElementById("list");
 
 list.innerHTML="";
 
-
 const data=getMastered();
-
 
 if(data.length===0){
 
@@ -1418,20 +1213,24 @@ return;
 
 }
 
-
 data.forEach(function(q,index){
 
-const answer=
-getCorrectAnswer(q);
+const answer=getCorrectAnswer(q);
 
+const type=getMistakeType(q);
+
+const reason=getMistakeReason(q);
+
+const solution=
+q.solution||
+q.explanation||
+"Solution not available.";
 
 const div=
 document.createElement("div");
 
-
 div.className=
 "item mastered-item";
-
 
 div.innerHTML=`
 
@@ -1447,11 +1246,9 @@ ${escapeHTML(q.subject||"Unknown")}
 ${escapeHTML(q.topic||"Unknown")}
 </span>
 
-
 <div class="question">
 ${escapeHTML(q.question)}
 </div>
-
 
 <div class="info">
 
@@ -1470,35 +1267,39 @@ answer||
 
 </div>
 
-
 <div class="intelligence">
 
+<div class="intelligence-box type-box">
+
 <div class="intelligence-title">
-🏆 Mastery Status
+🧠 Original Mistake Type
 </div>
 
-<div class="intelligence-row">
-
-<strong>
-Status:
-</strong>
-
-Mastered — answered correctly during retry.
+${escapeHTML(type)}
 
 </div>
 
-<div class="intelligence-row">
+<div class="intelligence-box reason-box">
 
-<strong>
-Next step:
-</strong>
+<div class="intelligence-title">
+💡 Original Mistake Reason
+</div>
 
-Keep revising this concept periodically.
+${escapeHTML(reason)}
+
+</div>
+
+<div class="intelligence-box solution-box">
+
+<div class="intelligence-title">
+📖 Solution
+</div>
+
+${escapeHTML(solution)}
 
 </div>
 
 </div>
-
 
 <button
 class="practice"
@@ -1510,22 +1311,20 @@ type="button">
 
 `;
 
-
 const button=
 div.querySelector(".practice");
-
 
 button.addEventListener(
 "click",
 function(event){
 
 event.preventDefault();
+
 event.stopPropagation();
 
 practiceQuestion(q);
 
 });
-
 
 list.appendChild(div);
 
@@ -1534,45 +1333,24 @@ list.appendChild(div);
 }
 
 
-/* =====================================================
+/* ================================
 DASHBOARD
-===================================================== */
+================================ */
 
 function goDashboard(){
 
-window.location.assign("index.html");
+window.location.href="index.html";
 
 }
 
 
-/* =====================================================
-HASH ROUTING
-===================================================== */
-
-function openInitialView(){
-
-if(
-window.location.hash==="#mastered"
-){
-
-showMastered();
-
-}else{
-
-showActive();
-
-}
-
-}
-
-
-/* =====================================================
+/* ================================
 START
-===================================================== */
+================================ */
 
 updateCounts();
 
-openInitialView();
+showActive();
 
 </script>
 
