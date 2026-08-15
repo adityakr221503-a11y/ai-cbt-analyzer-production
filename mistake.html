@@ -195,6 +195,10 @@ font-weight:800;
 margin-top:14px;
 }
 
+.practice:active{
+background:#3730a3;
+}
+
 .back{
 border:0;
 background:#e2e8f0;
@@ -209,6 +213,17 @@ text-align:center;
 padding:35px 15px;
 color:#64748b;
 line-height:1.6;
+}
+
+.retry-status{
+display:none;
+margin-top:15px;
+padding:13px;
+border-radius:10px;
+background:#dcfce7;
+border:1px solid #86efac;
+color:#166534;
+font-weight:700;
 }
 
 @media(max-width:600px){
@@ -256,12 +271,15 @@ CBT Analyzer <span>Pro</span>
 class="dashboard"
 type="button"
 onclick="goDashboard()">
+
 Dashboard
+
 </button>
 
 </div>
 
 </header>
+
 
 <div class="container">
 
@@ -276,6 +294,7 @@ Review mistakes → Practice → Retry → Master.
 </p>
 
 </section>
+
 
 <section class="card">
 
@@ -308,6 +327,7 @@ Tap to View →
 
 </button>
 
+
 <button
 class="stat"
 type="button"
@@ -335,6 +355,7 @@ Tap to View →
 
 </section>
 
+
 <section class="card">
 
 <div id="controls"></div>
@@ -345,50 +366,66 @@ Tap to View →
 
 <div id="list"></div>
 
+<div
+id="retryStatus"
+class="retry-status">
+</div>
+
 </section>
 
 </div>
+
 
 <script>
 
 "use strict";
 
 
-/* ================================
+/* =========================================
    STORAGE KEYS
-================================ */
+========================================= */
 
-const HISTORY_KEY = "cbtHistory";
-const MASTERY_KEY = "cbtMasteryV2";
-const RETRY_QUEUE_KEY = "cbtAnalyzer.retryQueue";
-const RETRY_QUESTION_KEY = "cbtRetryQuestion";
+const HISTORY_KEY =
+"cbtHistory";
+
+const MASTERY_KEY =
+"cbtMasteryV2";
+
+const RETRY_QUEUE_KEY =
+"cbtAnalyzer.retryQueue";
+
+const RETRY_QUESTION_KEY =
+"cbtRetryQuestion";
 
 
-/* ================================
+/* =========================================
    READ JSON
-================================ */
+========================================= */
 
 function readJSON(key){
 
 try{
 
-const raw = localStorage.getItem(key);
+const raw =
+localStorage.getItem(key);
 
 if(!raw){
 return [];
 }
 
-const data = JSON.parse(raw);
+const data =
+JSON.parse(raw);
 
-if(Array.isArray(data)){
-return data;
-}
-
-return [];
+return Array.isArray(data)
+? data
+: [];
 
 }catch(error){
 
-console.error("Storage error:",error);
+console.error(
+"Storage error:",
+error
+);
 
 return [];
 
@@ -397,14 +434,15 @@ return [];
 }
 
 
-/* ================================
+/* =========================================
    ESCAPE HTML
-================================ */
+========================================= */
 
 function escapeHTML(value){
 
 return String(
-value === undefined || value === null
+value === undefined ||
+value === null
 ? ""
 : value
 )
@@ -417,13 +455,15 @@ value === undefined || value === null
 }
 
 
-/* ================================
+/* =========================================
    NORMALIZE
-================================ */
+========================================= */
 
 function normalize(value){
 
-return String(value || "")
+return String(
+value || ""
+)
 .trim()
 .toLowerCase()
 .replace(/\s+/g," ");
@@ -431,23 +471,32 @@ return String(value || "")
 }
 
 
-/* ================================
+/* =========================================
    GET MASTERED
-================================ */
+========================================= */
 
 function getMastered(){
 
-const data = readJSON(MASTERY_KEY);
+const data =
+readJSON(MASTERY_KEY);
 
 const map = {};
 
-data.forEach(function(item){
+data.forEach(
+function(item){
 
-if(item && item.question){
+if(
+item &&
+item.question
+){
 
-const key = normalize(item.question);
+const key =
+normalize(
+item.question
+);
 
-map[key] = item;
+map[key] =
+item;
 
 }
 
@@ -458,94 +507,136 @@ return Object.values(map);
 }
 
 
-/* ================================
+/* =========================================
    GET ACTIVE MISTAKES
-================================ */
+========================================= */
 
 function getActive(){
 
-const history = readJSON(HISTORY_KEY);
+const history =
+readJSON(HISTORY_KEY);
 
-const mastered = getMastered();
+const mastered =
+getMastered();
 
-const masteredSet = new Set(
-mastered.map(function(item){
+const masteredSet =
+new Set(
+mastered.map(
+function(item){
 
-return normalize(item.question);
+return normalize(
+item.question
+);
 
 })
 );
 
 const map = {};
 
-history.forEach(function(test){
+
+history.forEach(
+function(test){
 
 if(
 !test ||
-!Array.isArray(test.questions)
+!Array.isArray(
+test.questions
+)
 ){
+
 return;
+
 }
 
-test.questions.forEach(function(q){
+
+test.questions.forEach(
+function(q){
 
 if(
 !q ||
 !q.question
 ){
+
 return;
+
 }
+
 
 const isWrong =
 q.status === "wrong" ||
 q.correct === false ||
 q.isCorrect === false;
 
+
 if(!isWrong){
+
 return;
+
 }
 
-const key = normalize(q.question);
 
-if(masteredSet.has(key)){
+const key =
+normalize(
+q.question
+);
+
+
+if(
+masteredSet.has(key)
+){
+
 return;
+
 }
 
-map[key] = q;
+
+/*
+Keep the newest occurrence
+*/
+
+map[key] =
+q;
 
 });
 
 });
+
 
 return Object.values(map);
 
 }
 
 
-/* ================================
+/* =========================================
    UPDATE COUNTS
-================================ */
+========================================= */
 
 function updateCounts(){
 
-const active = getActive();
+const active =
+getActive();
 
-const mastered = getMastered();
+const mastered =
+getMastered();
+
 
 document.getElementById(
 "activeCount"
-).textContent = active.length;
+).textContent =
+active.length;
+
 
 document.getElementById(
 "masteredCount"
-).textContent = mastered.length;
+).textContent =
+mastered.length;
 
 }
 
 
-/* ================================
-   CORRECT ANSWER
-================================ */
+/* =========================================
+   GET CORRECT ANSWER
+========================================= */
 
 function getCorrectAnswer(q){
 
@@ -559,48 +650,544 @@ return q.correctAnswer;
 
 }
 
+
 if(
 Array.isArray(q.options) &&
 q.correctIndex !== undefined
 ){
 
-return q.options[
-Number(q.correctIndex)
-] || "";
+const index =
+Number(q.correctIndex);
+
+if(
+index >= 0 &&
+index < q.options.length
+){
+
+return q.options[index];
 
 }
+
+}
+
+
+if(
+Array.isArray(q.options) &&
+q.answerIndex !== undefined
+){
+
+const index =
+Number(q.answerIndex);
+
+if(
+index >= 0 &&
+index < q.options.length
+){
+
+return q.options[index];
+
+}
+
+}
+
 
 return "";
 
 }
 
 
-/* ================================
-   PRACTICE QUESTION
-================================ */
+/* =========================================
+   PREPARE RETRY QUESTION
+========================================= */
+
+function prepareRetryQuestion(q){
+
+if(
+!q ||
+!q.question
+){
+
+return null;
+
+}
+
+
+let options =
+Array.isArray(q.options)
+? q.options.slice()
+: [];
+
+
+/*
+Some older CBT records may use
+choices instead of options.
+*/
+
+if(
+options.length < 2 &&
+Array.isArray(q.choices)
+){
+
+options =
+q.choices.slice();
+
+}
+
+
+/*
+Some records may store option objects.
+Convert them to text.
+*/
+
+options =
+options.map(
+function(option){
+
+if(
+option &&
+typeof option === "object"
+){
+
+return (
+option.text ??
+option.label ??
+option.value ??
+String(option)
+);
+
+}
+
+return String(option);
+
+});
+
+
+let correctIndex = -1;
+
+
+/*
+1. correctIndex
+*/
+
+if(
+q.correctIndex !== undefined &&
+q.correctIndex !== null
+){
+
+const index =
+Number(q.correctIndex);
+
+if(
+Number.isInteger(index) &&
+index >= 0 &&
+index < options.length
+){
+
+correctIndex =
+index;
+
+}
+
+}
+
+
+/*
+2. answerIndex
+*/
+
+if(
+correctIndex === -1 &&
+q.answerIndex !== undefined &&
+q.answerIndex !== null
+){
+
+const index =
+Number(q.answerIndex);
+
+if(
+Number.isInteger(index) &&
+index >= 0 &&
+index < options.length
+){
+
+correctIndex =
+index;
+
+}
+
+}
+
+
+/*
+3. correctOption
+*/
+
+if(
+correctIndex === -1 &&
+q.correctOption !== undefined
+){
+
+const target =
+normalize(
+q.correctOption
+);
+
+correctIndex =
+options.findIndex(
+function(option){
+
+return normalize(option) === target;
+
+});
+
+}
+
+
+/*
+4. correctAnswer
+*/
+
+if(
+correctIndex === -1 &&
+q.correctAnswer !== undefined
+){
+
+const target =
+normalize(
+q.correctAnswer
+);
+
+correctIndex =
+options.findIndex(
+function(option){
+
+return normalize(option) === target;
+
+});
+
+}
+
+
+/*
+5. answer
+*/
+
+if(
+correctIndex === -1 &&
+q.answer !== undefined
+){
+
+const target =
+normalize(
+q.answer
+);
+
+correctIndex =
+options.findIndex(
+function(option){
+
+return normalize(option) === target;
+
+});
+
+}
+
+
+/*
+Create final answer text.
+*/
+
+let correctAnswer =
+q.correctAnswer ??
+q.correctOption ??
+q.answer ??
+"";
+
+
+if(
+(!correctAnswer ||
+String(correctAnswer).trim() === "") &&
+correctIndex >= 0
+){
+
+correctAnswer =
+options[correctIndex];
+
+}
+
+
+/*
+Return clean retry object.
+*/
+
+return {
+
+id:
+q.id ||
+q.questionId ||
+("retry-" + Date.now()),
+
+question:
+String(q.question),
+
+options:
+options,
+
+subject:
+q.subject ||
+q.subjectName ||
+q.section ||
+"Unknown",
+
+topic:
+q.topic ||
+q.chapter ||
+q.unit ||
+"Unknown",
+
+correctIndex:
+correctIndex,
+
+correctAnswer:
+correctAnswer,
+
+solution:
+q.solution ||
+q.explanation ||
+q.reason ||
+"Solution not available.",
+
+selectedIndex:
+q.selectedIndex ??
+q.selectedOption ??
+null,
+
+selectedAnswer:
+q.selectedAnswer ||
+q.selectedOptionText ||
+"",
+
+mistakeType:
+q.mistakeType ||
+null,
+
+mistakeReason:
+q.mistakeReason ||
+null,
+
+source:
+"Mistake Bank",
+
+retryStartedAt:
+Date.now()
+
+};
+
+}
+
+
+/* =========================================
+   PRACTICE QUESTION — FIXED
+========================================= */
 
 function practiceQuestion(q){
 
 try{
 
-localStorage.setItem(
-RETRY_QUEUE_KEY,
-JSON.stringify([q])
+/*
+Validate question.
+*/
+
+if(
+!q ||
+!q.question
+){
+
+alert(
+"Question data is missing."
 );
+
+return;
+
+}
+
+
+/*
+Convert the stored CBT question
+into a clean retry object.
+*/
+
+const retryQuestion =
+prepareRetryQuestion(q);
+
+
+if(!retryQuestion){
+
+alert(
+"Unable to prepare this question."
+);
+
+return;
+
+}
+
+
+/*
+Question must have options.
+*/
+
+if(
+!Array.isArray(
+retryQuestion.options
+) ||
+retryQuestion.options.length < 2
+){
+
+alert(
+"This question has no valid options."
+);
+
+return;
+
+}
+
+
+/*
+Question must have a correct answer.
+*/
+
+if(
+retryQuestion.correctIndex < 0 ||
+retryQuestion.correctIndex >=
+retryQuestion.options.length
+){
+
+alert(
+"Correct answer could not be identified for this question."
+);
+
+return;
+
+}
+
+
+/*
+Save the selected question.
+*/
 
 localStorage.setItem(
 RETRY_QUESTION_KEY,
-JSON.stringify(q)
+JSON.stringify(
+retryQuestion
+)
 );
+
+
+/*
+Also save one-question retry queue.
+*/
+
+localStorage.setItem(
+RETRY_QUEUE_KEY,
+JSON.stringify(
+[retryQuestion]
+)
+);
+
+
+/*
+Fresh retry timestamp.
+*/
 
 localStorage.setItem(
 "cbtRetryStartedAt",
 String(Date.now())
 );
 
-window.location.href = "retry.html";
+
+/*
+Retry ID.
+*/
+
+const retryId =
+"retry_" +
+Date.now() +
+"_" +
+Math.random()
+.toString(36)
+.slice(2);
+
+
+localStorage.setItem(
+"cbtRetryId",
+retryId
+);
+
+
+/*
+Verify storage before navigating.
+*/
+
+const verify =
+localStorage.getItem(
+RETRY_QUESTION_KEY
+);
+
+
+if(!verify){
+
+alert(
+"Retry question could not be saved."
+);
+
+return;
+
+}
+
+
+/*
+Show small confirmation.
+*/
+
+const status =
+document.getElementById(
+"retryStatus"
+);
+
+if(status){
+
+status.style.display =
+"block";
+
+status.textContent =
+"✅ Retry question loaded. Opening Retry Engine...";
+
+}
+
+
+/*
+Open Retry page.
+*/
+
+setTimeout(
+function(){
+
+window.location.href =
+"retry.html?retry=" +
+encodeURIComponent(
+retryId
+);
+
+},
+150
+);
 
 }catch(error){
+
+console.error(
+"Retry launch error:",
+error
+);
 
 alert(
 "Unable to start practice: " +
@@ -612,9 +1199,9 @@ error.message
 }
 
 
-/* ================================
+/* =========================================
    SHOW ACTIVE
-================================ */
+========================================= */
 
 function showActive(){
 
@@ -623,16 +1210,25 @@ document.getElementById(
 ).textContent =
 "❌ Active Mistakes";
 
+
 document.getElementById(
 "controls"
-).innerHTML = "";
+).innerHTML =
+"";
+
 
 const list =
-document.getElementById("list");
+document.getElementById(
+"list"
+);
 
-list.innerHTML = "";
+list.innerHTML =
+"";
 
-const data = getActive();
+
+const data =
+getActive();
+
 
 if(data.length === 0){
 
@@ -669,15 +1265,22 @@ return;
 
 }
 
-data.forEach(function(q,index){
+
+data.forEach(
+function(q,index){
 
 const answer =
 getCorrectAnswer(q);
 
-const div =
-document.createElement("div");
 
-div.className = "item";
+const div =
+document.createElement(
+"div"
+);
+
+div.className =
+"item";
+
 
 div.innerHTML = `
 
@@ -686,15 +1289,21 @@ div.innerHTML = `
 </span>
 
 <span class="badge">
-${escapeHTML(q.subject || "Unknown")}
+${escapeHTML(
+q.subject || "Unknown"
+)}
 </span>
 
 <span class="badge">
-${escapeHTML(q.topic || "Unknown")}
+${escapeHTML(
+q.topic || "Unknown"
+)}
 </span>
 
 <div class="question">
-${escapeHTML(q.question)}
+${escapeHTML(
+q.question
+)}
 </div>
 
 <div class="info">
@@ -706,7 +1315,8 @@ Your Answer
 <br>
 
 ${escapeHTML(
-q.selectedAnswer || "Not answered"
+q.selectedAnswer ||
+"Not answered"
 )}
 
 <br><br>
@@ -718,7 +1328,10 @@ Correct Answer
 <br>
 
 <span class="correct">
-${escapeHTML(answer)}
+${escapeHTML(
+answer ||
+"Not available"
+)}
 </span>
 
 </div>
@@ -733,27 +1346,38 @@ type="button">
 
 `;
 
+
 const button =
-div.querySelector(".practice");
+div.querySelector(
+".practice"
+);
+
 
 button.addEventListener(
 "click",
-function(){
+function(event){
+
+event.preventDefault();
+
+event.stopPropagation();
 
 practiceQuestion(q);
 
 });
 
-list.appendChild(div);
+
+list.appendChild(
+div
+);
 
 });
 
 }
 
 
-/* ================================
+/* =========================================
    SHOW MASTERED
-================================ */
+========================================= */
 
 function showMastered(){
 
@@ -761,6 +1385,7 @@ document.getElementById(
 "sectionTitle"
 ).textContent =
 "🏆 Mastered Questions";
+
 
 document.getElementById(
 "controls"
@@ -777,12 +1402,19 @@ onclick="showActive()">
 
 `;
 
+
 const list =
-document.getElementById("list");
+document.getElementById(
+"list"
+);
 
-list.innerHTML = "";
+list.innerHTML =
+"";
 
-const data = getMastered();
+
+const data =
+getMastered();
+
 
 if(data.length === 0){
 
@@ -819,16 +1451,22 @@ return;
 
 }
 
-data.forEach(function(q,index){
+
+data.forEach(
+function(q,index){
 
 const answer =
 getCorrectAnswer(q);
 
+
 const div =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 div.className =
 "item mastered-item";
+
 
 div.innerHTML = `
 
@@ -837,15 +1475,21 @@ div.innerHTML = `
 </span>
 
 <span class="badge">
-${escapeHTML(q.subject || "Unknown")}
+${escapeHTML(
+q.subject || "Unknown"
+)}
 </span>
 
 <span class="badge">
-${escapeHTML(q.topic || "Unknown")}
+${escapeHTML(
+q.topic || "Unknown"
+)}
 </span>
 
 <div class="question">
-${escapeHTML(q.question)}
+${escapeHTML(
+q.question
+)}
 </div>
 
 <div class="info">
@@ -857,7 +1501,10 @@ ${escapeHTML(q.question)}
 <br><br>
 
 <span class="correct">
-${escapeHTML(answer)}
+${escapeHTML(
+answer ||
+"Not available"
+)}
 </span>
 
 </div>
@@ -872,38 +1519,50 @@ type="button">
 
 `;
 
+
 const button =
-div.querySelector(".practice");
+div.querySelector(
+".practice"
+);
+
 
 button.addEventListener(
 "click",
-function(){
+function(event){
+
+event.preventDefault();
+
+event.stopPropagation();
 
 practiceQuestion(q);
 
 });
 
-list.appendChild(div);
+
+list.appendChild(
+div
+);
 
 });
 
 }
 
 
-/* ================================
+/* =========================================
    DASHBOARD
-================================ */
+========================================= */
 
 function goDashboard(){
 
-window.location.href = "index.html";
+window.location.href =
+"index.html";
 
 }
 
 
-/* ================================
+/* =========================================
    START
-================================ */
+========================================= */
 
 updateCounts();
 
