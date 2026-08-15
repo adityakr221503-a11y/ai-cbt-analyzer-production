@@ -27,7 +27,6 @@ margin:auto;
 display:flex;
 justify-content:space-between;
 align-items:center;
-gap:10px;
 }
 
 .logo{
@@ -42,15 +41,21 @@ color:#4f46e5;
 button{
 border:0;
 border-radius:10px;
-padding:11px 15px;
+padding:12px 16px;
 font-weight:800;
 font-family:inherit;
 cursor:pointer;
+touch-action:manipulation;
 }
 
 .back{
 background:#e2e8f0;
 color:#0f172a;
+}
+
+.primary{
+background:#4f46e5;
+color:white;
 }
 
 .container{
@@ -191,11 +196,6 @@ color:#64748b;
 line-height:1.6;
 }
 
-.primary{
-background:#4f46e5;
-color:#fff;
-}
-
 @media(max-width:700px){
 
 .stats{
@@ -227,9 +227,9 @@ CBT Analyzer <span>Pro</span>
 <button
 class="back"
 type="button"
-onclick="location.href='history.html'">
+onclick="goDashboard()">
 
-← History
+← Dashboard
 
 </button>
 
@@ -253,33 +253,64 @@ onclick="location.href='history.html'">
 const HISTORY_KEY="cbtHistory";
 
 
+/* =========================
+   DASHBOARD
+========================= */
+
+function goDashboard(){
+
+window.location.href="index.html";
+
+}
+
+
+/* =========================
+   READ HISTORY
+========================= */
+
 function readHistory(){
 
 try{
 
-const data=
-JSON.parse(
-localStorage.getItem(HISTORY_KEY)||"[]"
+const raw=
+localStorage.getItem(
+HISTORY_KEY
 );
+
+if(!raw){
+return [];
+}
+
+const data=
+JSON.parse(raw);
 
 return Array.isArray(data)
 ?data
 :[];
 
-}catch(e){
+}catch(error){
 
-return[];
+console.error(error);
+
+return [];
 
 }
 
 }
 
+
+/* =========================
+   SAFE HTML
+========================= */
 
 function escapeHTML(value){
 
 return String(
-value==null?"":value
+value==null
+?""
+:value
 )
+
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -289,11 +320,15 @@ value==null?"":value
 }
 
 
-function getIndex(){
+/* =========================
+   GET TEST INDEX
+========================= */
+
+function getTestIndex(){
 
 const params=
 new URLSearchParams(
-location.search
+window.location.search
 );
 
 const value=
@@ -301,14 +336,24 @@ Number(
 params.get("test")
 );
 
-return Number.isInteger(value)
-?value
-:-1;
+if(
+Number.isInteger(value)
+){
+
+return value;
+
+}
+
+return -1;
 
 }
 
 
-function getAnswer(q){
+/* =========================
+   GET USER ANSWER
+========================= */
+
+function getUserAnswer(q){
 
 if(
 q.selectedAnswer!==undefined &&
@@ -320,29 +365,45 @@ return q.selectedAnswer;
 
 }
 
+
 if(
 q.selectedIndex!==undefined &&
 Array.isArray(q.options)
 ){
 
-const i=
+const index=
 Number(q.selectedIndex);
 
 if(
-i>=0 &&
-i<q.options.length
+index>=0 &&
+index<q.options.length
 ){
 
-return q.options[i];
+return q.options[index];
 
 }
 
 }
+
+
+if(
+q.userAnswer!==undefined &&
+q.userAnswer!==null
+){
+
+return q.userAnswer;
+
+}
+
 
 return "Not answered";
 
 }
 
+
+/* =========================
+   GET CORRECT ANSWER
+========================= */
 
 function getCorrectAnswer(q){
 
@@ -356,19 +417,14 @@ return q.correctAnswer;
 
 }
 
+
 if(
+q.correctIndex!==undefined &&
 Array.isArray(q.options)
 ){
 
-let index=-1;
-
-if(q.correctIndex!==undefined){
-index=Number(q.correctIndex);
-}
-
-else if(q.answerIndex!==undefined){
-index=Number(q.answerIndex);
-}
+const index=
+Number(q.correctIndex);
 
 if(
 index>=0 &&
@@ -381,10 +437,68 @@ return q.options[index];
 
 }
 
+
+if(
+q.answerIndex!==undefined &&
+Array.isArray(q.options)
+){
+
+const index=
+Number(q.answerIndex);
+
+if(
+index>=0 &&
+index<q.options.length
+){
+
+return q.options[index];
+
+}
+
+}
+
+
 return "Not available";
 
 }
 
+
+/* =========================
+   QUESTION STATUS
+========================= */
+
+function getStatus(q){
+
+if(
+q.status==="correct" ||
+q.correct===true ||
+q.isCorrect===true
+){
+
+return "correct";
+
+}
+
+
+if(
+q.status==="wrong" ||
+q.correct===false ||
+q.isCorrect===false
+){
+
+return "wrong";
+
+}
+
+
+return "skipped";
+
+}
+
+
+/* =========================
+   RENDER
+========================= */
 
 function render(){
 
@@ -392,11 +506,15 @@ const history=
 readHistory();
 
 const index=
-getIndex();
+getTestIndex();
 
 const content=
-document.getElementById("content");
+document.getElementById(
+"content"
+);
 
+
+/* TEST DOES NOT EXIST */
 
 if(
 index<0 ||
@@ -411,17 +529,20 @@ content.innerHTML=`
 🔎
 </div>
 
-<h2>Test Not Found</h2>
+<h2>
+Test Not Found
+</h2>
 
 <p>
-The selected test could not be found in your saved history.
+The selected test could not be found.
 </p>
 
 <button
 class="primary"
-onclick="location.href='history.html'">
+type="button"
+onclick="goDashboard()">
 
-← Back to History
+← Back to Dashboard
 
 </button>
 
@@ -433,6 +554,10 @@ return;
 
 }
 
+
+/* =========================
+   TEST
+========================= */
 
 const test=
 history[index];
@@ -447,44 +572,74 @@ Array.isArray(test.questions)
 let correct=
 Number(test.correct)||0;
 
+
 let wrong=
 Number(
 test.incorrect ??
 test.wrong
 )||0;
 
+
 let skipped=
 Number(test.skipped)||0;
 
 
-if(questions.length){
+/* =========================
+   RECALCULATE
+========================= */
+
+if(
+questions.length>0
+){
 
 correct=0;
 wrong=0;
 skipped=0;
 
-questions.forEach(function(q){
 
-if(q.status==="correct"){
+questions.forEach(
+function(q){
+
+const status=
+getStatus(q);
+
+
+if(
+status==="correct"
+){
+
 correct++;
+
 }
 
-else if(q.status==="wrong"){
+else if(
+status==="wrong"
+){
+
 wrong++;
+
 }
 
-else if(q.status==="skipped"){
+else{
+
 skipped++;
+
 }
 
-});
+}
+
+);
 
 }
 
 
 const total=
 questions.length ||
-(correct+wrong+skipped);
+(
+correct+
+wrong+
+skipped
+);
 
 
 const score=
@@ -501,6 +656,10 @@ total>0
 :0;
 
 
+/* =========================
+   HEADER
+========================= */
+
 let html=`
 
 <div class="hero">
@@ -510,7 +669,13 @@ let html=`
 </h1>
 
 <p>
-📅 ${escapeHTML(test.date||"Unknown date")}
+Test #${index+1}
+&nbsp; • &nbsp;
+📅 ${escapeHTML(
+test.date||
+test.createdAt||
+"Unknown date"
+)}
 </p>
 
 </div>
@@ -522,26 +687,58 @@ let html=`
 📊 Test Summary
 </h2>
 
+
 <div class="stats">
 
 <div class="stat">
-<strong>${score}</strong>
-<span>Score</span>
+
+<strong>
+${escapeHTML(score)}
+</strong>
+
+<span>
+Score
+</span>
+
 </div>
 
-<div class="stat">
-<strong>${correct}</strong>
-<span>Correct</span>
-</div>
 
 <div class="stat">
-<strong>${wrong}</strong>
-<span>Wrong</span>
+
+<strong>
+${correct}
+</strong>
+
+<span>
+Correct
+</span>
+
 </div>
 
+
 <div class="stat">
-<strong>${accuracy}%</strong>
-<span>Accuracy</span>
+
+<strong>
+${wrong}
+</strong>
+
+<span>
+Wrong
+</span>
+
+</div>
+
+
+<div class="stat">
+
+<strong>
+${accuracy}%
+</strong>
+
+<span>
+Accuracy
+</span>
+
 </div>
 
 </div>
@@ -554,80 +751,108 @@ let html=`
 <h2>
 📝 Question-by-Question Review
 </h2>
+
 `;
 
 
-if(!questions.length){
+/* =========================
+   NO QUESTIONS
+========================= */
+
+if(
+questions.length===0
+){
 
 html+=`
 
 <div class="empty">
 
-No individual question data was saved for this test.
+<div style="font-size:50px">
+📭
+</div>
 
-<br><br>
+<h3>
+No question details saved
+</h3>
 
-The score is available, but this older test does not contain
-the question-level details required for review.
+<p>
+This older test contains the score,
+but individual question data was not saved.
+</p>
 
 </div>
 
 `;
 
-}else{
+}
 
-questions.forEach(function(q,i){
+
+/* =========================
+   QUESTIONS
+========================= */
+
+else{
+
+
+questions.forEach(
+function(q,i){
 
 const status=
-q.status||
-(
-q.correct===true
-?"correct"
-:
-q.correct===false
-?"wrong"
-:"skipped"
-);
+getStatus(q);
 
 
 let className=
-"question ";
+"question "+
+status;
+
 
 let badgeClass=
 "badge ";
 
+
 let badgeText="";
 
 
-if(status==="correct"){
+if(
+status==="correct"
+){
 
-className+="correct";
-badgeClass+="correctBadge";
-badgeText="✅ Correct";
+badgeClass+=
+"correctBadge";
+
+badgeText=
+"✅ Correct";
 
 }
 
-else if(status==="wrong"){
+else if(
+status==="wrong"
+){
 
-className+="wrong";
-badgeClass+="wrongBadge";
-badgeText="❌ Wrong";
+badgeClass+=
+"wrongBadge";
+
+badgeText=
+"❌ Wrong";
 
 }
 
 else{
 
-className+="skipped";
-badgeClass+="skippedBadge";
-badgeText="⏭️ Skipped";
+badgeClass+=
+"skippedBadge";
+
+badgeText=
+"⏭️ Skipped";
 
 }
 
 
-const selected=
-getAnswer(q);
+const userAnswer=
+getUserAnswer(q);
 
-const answer=
+
+const correctAnswer=
 getCorrectAnswer(q);
 
 
@@ -635,14 +860,20 @@ html+=`
 
 <div class="${className}">
 
+
 <div class="qtop">
 
 <span class="badge">
+
 Question ${i+1}
+
 </span>
 
+
 <span class="${badgeClass}">
+
 ${badgeText}
+
 </span>
 
 </div>
@@ -650,16 +881,22 @@ ${badgeText}
 
 <div class="qtext">
 
-${escapeHTML(q.question)}
+${escapeHTML(
+q.question
+)}
 
 </div>
 
 
 <div class="info">
 
-<strong>Your Answer:</strong>
+
+<strong>
+Your Answer:
+</strong>
 
 <br>
+
 
 <span class="${
 status==="correct"
@@ -670,51 +907,101 @@ status==="wrong"
 :""
 }">
 
-${escapeHTML(selected)}
+${escapeHTML(
+userAnswer
+)}
 
 </span>
 
+
 <br><br>
 
-<strong>Correct Answer:</strong>
+
+<strong>
+Correct Answer:
+</strong>
 
 <br>
+
 
 <span class="green">
 
-${escapeHTML(answer)}
+${escapeHTML(
+correctAnswer
+)}
 
 </span>
 
-${q.subject?`
+
+${
+q.subject
+?
+
+`
 
 <br><br>
-<strong>Subject:</strong>
-${escapeHTML(q.subject)}
 
-`:``}
+<strong>
+Subject:
+</strong>
 
-${q.topic?`
+${escapeHTML(
+q.subject
+)}
+
+`
+
+:""
+}
+
+
+${
+q.topic
+?
+
+`
 
 <br>
-<strong>Topic:</strong>
-${escapeHTML(q.topic)}
 
-`:``}
+<strong>
+Topic:
+</strong>
 
-${q.solution||q.explanation?`
+${escapeHTML(
+q.topic
+)}
+
+`
+
+:""
+}
+
+
+${
+q.solution ||
+q.explanation
+?
+
+`
 
 <br><br>
 
-<strong>Solution:</strong>
+<strong>
+Solution:
+</strong>
 
 <br>
 
 ${escapeHTML(
-q.solution||q.explanation
+q.solution||
+q.explanation
 )}
 
-`:``}
+`
+
+:""
+}
+
 
 </div>
 
@@ -722,23 +1009,31 @@ q.solution||q.explanation
 
 `;
 
-});
+}
+
+);
 
 }
 
+
+/* =========================
+   BACK
+========================= */
 
 html+=`
 
 </div>
 
+
 <div class="card">
 
 <button
 class="primary"
+type="button"
 style="width:100%"
-onclick="location.href='history.html'">
+onclick="goDashboard()">
 
-← Back to Test History
+← Back to Dashboard
 
 </button>
 
@@ -752,6 +1047,10 @@ html;
 
 }
 
+
+/* =========================
+   START
+========================= */
 
 render();
 
