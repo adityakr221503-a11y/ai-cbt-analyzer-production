@@ -175,6 +175,30 @@ color:#15803d;
 font-weight:800;
 }
 
+.intelligence{
+margin-top:12px;
+padding:15px;
+border-radius:12px;
+background:#eef2ff;
+border:1px solid #c7d2fe;
+line-height:1.6;
+}
+
+.intelligence-title{
+font-size:16px;
+font-weight:800;
+color:#3730a3;
+margin-bottom:10px;
+}
+
+.intelligence-row{
+margin-top:7px;
+}
+
+.intelligence-label{
+font-weight:800;
+}
+
 .practice{
 display:block;
 width:100%;
@@ -226,6 +250,7 @@ margin-top:15px;
 }
 
 @media(max-width:600px){
+
 .container{
 margin:15px auto;
 }
@@ -241,6 +266,11 @@ padding:21px;
 .hero h1{
 font-size:24px;
 }
+
+.stats{
+grid-template-columns:1fr;
+}
+
 }
 </style>
 </head>
@@ -248,6 +278,7 @@ font-size:24px;
 <body>
 
 <header>
+
 <div class="header">
 
 <div class="logo">
@@ -262,7 +293,9 @@ Dashboard
 </button>
 
 </div>
+
 </header>
+
 
 <div class="container">
 
@@ -271,7 +304,7 @@ Dashboard
 <h1>🧠 Mistake Bank</h1>
 
 <p>
-Review mistakes → Practice → Retry → Master.
+Review mistakes → Understand → Practice → Retry → Master.
 </p>
 
 <div
@@ -280,6 +313,7 @@ class="error-box">
 </div>
 
 </section>
+
 
 <section class="card">
 
@@ -310,6 +344,7 @@ Tap to View →
 
 </button>
 
+
 <button
 class="stat"
 type="button"
@@ -337,6 +372,7 @@ Tap to View →
 
 </section>
 
+
 <section class="card">
 
 <div id="controls"></div>
@@ -356,22 +392,26 @@ class="retry-status">
 
 </div>
 
+
 <script>
 
 "use strict";
 
-/* ================================
+
+/* =====================================================
 STORAGE
-================================ */
+===================================================== */
 
 const HISTORY_KEY="cbtHistory";
 const MASTERY_KEY="cbtMasteryV2";
 const RETRY_QUEUE_KEY="cbtAnalyzer.retryQueue";
 const RETRY_QUESTION_KEY="cbtRetryQuestion";
+const RETRY_HISTORY_KEY="cbtRetryHistory";
 
-/* ================================
+
+/* =====================================================
 READ JSON
-================================ */
+===================================================== */
 
 function readJSON(key){
 
@@ -395,9 +435,10 @@ return [];
 
 }
 
-/* ================================
+
+/* =====================================================
 ESCAPE
-================================ */
+===================================================== */
 
 function escapeHTML(value){
 
@@ -414,9 +455,10 @@ value===undefined||value===null
 
 }
 
-/* ================================
+
+/* =====================================================
 NORMALIZE
-================================ */
+===================================================== */
 
 function normalize(value){
 
@@ -427,9 +469,10 @@ return String(value||"")
 
 }
 
-/* ================================
+
+/* =====================================================
 MASTERED
-================================ */
+===================================================== */
 
 function getMastered(){
 
@@ -451,9 +494,10 @@ return Object.values(map);
 
 }
 
-/* ================================
+
+/* =====================================================
 ACTIVE
-================================ */
+===================================================== */
 
 function getActive(){
 
@@ -481,16 +525,18 @@ if(!q||!q.question){
 return;
 }
 
+const key=normalize(q.question);
+
+if(masteredSet.has(key)){
+return;
+}
+
 const wrong=
 q.status==="wrong"||
 q.correct===false||
 q.isCorrect===false;
 
-if(!wrong)return;
-
-const key=normalize(q.question);
-
-if(masteredSet.has(key)){
+if(!wrong){
 return;
 }
 
@@ -504,9 +550,10 @@ return Object.values(map);
 
 }
 
-/* ================================
+
+/* =====================================================
 COUNTS
-================================ */
+===================================================== */
 
 function updateCounts(){
 
@@ -518,15 +565,16 @@ getMastered().length;
 
 }
 
-/* ================================
+
+/* =====================================================
 CORRECT ANSWER
-================================ */
+===================================================== */
 
 function getCorrectAnswer(q){
 
 if(
-q.correctAnswer!==undefined&&
-q.correctAnswer!==null&&
+q.correctAnswer!==undefined &&
+q.correctAnswer!==null &&
 String(q.correctAnswer).trim()!==""
 ){
 
@@ -535,7 +583,7 @@ return q.correctAnswer;
 }
 
 if(
-Array.isArray(q.options)&&
+Array.isArray(q.options) &&
 q.correctIndex!==undefined
 ){
 
@@ -548,7 +596,7 @@ return q.options[i];
 }
 
 if(
-Array.isArray(q.options)&&
+Array.isArray(q.options) &&
 q.answerIndex!==undefined
 ){
 
@@ -564,9 +612,219 @@ return "";
 
 }
 
-/* ================================
+
+/* =====================================================
+MISTAKE INTELLIGENCE V2
+===================================================== */
+
+function classifyMistake(q){
+
+if(!q){
+return {
+type:"Concept Gap",
+reason:"Review the underlying concept before attempting the question again."
+};
+}
+
+
+/* Existing classification is preserved */
+
+if(
+q.mistakeType &&
+q.mistakeType!=="Not Classified"
+){
+
+return {
+type:String(q.mistakeType),
+reason:String(
+q.mistakeReason||
+"Review the reason for the incorrect answer and retry the question."
+)
+};
+
+}
+
+
+/* Repeated mistake detection */
+
+const history=readJSON(HISTORY_KEY);
+
+const key=normalize(q.question);
+
+let wrongCount=0;
+let correctCount=0;
+
+history.forEach(function(test){
+
+if(!test||!Array.isArray(test.questions)){
+return;
+}
+
+test.questions.forEach(function(item){
+
+if(!item||normalize(item.question)!==key){
+return;
+}
+
+if(item.status==="wrong"){
+wrongCount++;
+}
+
+if(item.status==="correct"){
+correctCount++;
+}
+
+});
+
+});
+
+
+if(wrongCount>=2){
+
+return {
+type:"🔁 Repeated Mistake",
+reason:
+"This question has been answered incorrectly more than once. Revisit the concept and identify the exact step where your reasoning changed."
+};
+
+}
+
+
+/* Selected answer absent */
+
+if(
+q.selectedIndex===null||
+q.selectedIndex===undefined
+){
+
+return {
+type:"📖 Question Understanding",
+reason:
+"The question was not answered correctly. Read the wording carefully and identify exactly what the question is asking."
+};
+
+}
+
+
+/* Calculation-related subjects */
+
+const subject=
+normalize(q.subject);
+
+const topic=
+normalize(q.topic);
+
+if(
+subject==="physics" ||
+subject==="chemistry"
+){
+
+if(
+topic.includes("calculation")||
+topic.includes("numerical")||
+topic.includes("mole")||
+topic.includes("electricity")||
+topic.includes("motion")||
+topic.includes("gravitation")
+){
+
+return {
+type:"🔢 Calculation / Application Error",
+reason:
+"Check the formula, units, substitutions, and calculation steps before retrying."
+};
+
+}
+
+}
+
+
+/* Default */
+
+return {
+type:"🧠 Concept Gap",
+reason:
+"The selected answer was incorrect. Review the relevant concept, compare it with the correct answer, and retry the question."
+};
+
+}
+
+
+/* =====================================================
+INTELLIGENCE HTML
+===================================================== */
+
+function intelligenceHTML(q){
+
+const intelligence=
+classifyMistake(q);
+
+const answer=
+getCorrectAnswer(q);
+
+return `
+
+<div class="intelligence">
+
+<div class="intelligence-title">
+🤖 Mistake Intelligence
+</div>
+
+<div class="intelligence-row">
+
+<span class="intelligence-label">
+Mistake Type:
+</span>
+
+${escapeHTML(intelligence.type)}
+
+</div>
+
+<div class="intelligence-row">
+
+<span class="intelligence-label">
+Why:
+</span>
+
+${escapeHTML(intelligence.reason)}
+
+</div>
+
+<div class="intelligence-row">
+
+<span class="intelligence-label">
+Correct Concept:
+</span>
+
+Review the concept connected to
+<strong>${escapeHTML(q.topic||"this question")}</strong>.
+
+</div>
+
+<div class="intelligence-row">
+
+<span class="intelligence-label">
+💡 Solution:
+</span>
+
+${escapeHTML(
+q.solution||
+q.explanation||
+"Solution not available. Review the concept and compare the correct answer with your selected answer."
+)}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* =====================================================
 PREPARE RETRY
-================================ */
+===================================================== */
 
 function prepareRetryQuestion(q){
 
@@ -580,7 +838,7 @@ Array.isArray(q.options)
 :[];
 
 if(
-options.length<2&&
+options.length<2 &&
 Array.isArray(q.choices)
 ){
 
@@ -605,7 +863,9 @@ return String(option);
 
 });
 
+
 let correctIndex=-1;
+
 
 /* correctIndex */
 
@@ -625,10 +885,11 @@ correctIndex=i;
 
 }
 
+
 /* answerIndex */
 
 if(
-correctIndex===-1&&
+correctIndex===-1 &&
 q.answerIndex!==undefined
 ){
 
@@ -646,10 +907,11 @@ correctIndex=i;
 
 }
 
+
 /* correctAnswer */
 
 if(
-correctIndex===-1&&
+correctIndex===-1 &&
 q.correctAnswer!==undefined
 ){
 
@@ -663,10 +925,11 @@ return normalize(option)===target;
 
 }
 
+
 /* correctOption */
 
 if(
-correctIndex===-1&&
+correctIndex===-1 &&
 q.correctOption!==undefined
 ){
 
@@ -680,10 +943,11 @@ return normalize(option)===target;
 
 }
 
+
 /* answer */
 
 if(
-correctIndex===-1&&
+correctIndex===-1 &&
 q.answer!==undefined
 ){
 
@@ -697,19 +961,26 @@ return normalize(option)===target;
 
 }
 
+
 let correctAnswer=
 q.correctAnswer??
 q.correctOption??
 "";
 
+
 if(
-!correctAnswer&&
+!correctAnswer &&
 correctIndex>=0
 ){
 
 correctAnswer=options[correctIndex];
 
 }
+
+
+const intelligence=
+classifyMistake(q);
+
 
 return{
 
@@ -755,12 +1026,10 @@ q.selectedOptionText||
 "",
 
 mistakeType:
-q.mistakeType||
-"Not Classified",
+intelligence.type,
 
 mistakeReason:
-q.mistakeReason||
-"Review the concept and identify why the answer was incorrect.",
+intelligence.reason,
 
 source:"Mistake Bank",
 
@@ -770,10 +1039,10 @@ retryStartedAt:Date.now()
 
 }
 
-/* ================================
+
+/* =====================================================
 START RETRY
-FIXED ROUTING
-================================ */
+===================================================== */
 
 function practiceQuestion(q){
 
@@ -790,6 +1059,7 @@ return;
 
 }
 
+
 if(
 !Array.isArray(retryQuestion.options)||
 retryQuestion.options.length<2
@@ -802,6 +1072,7 @@ alert(
 return;
 
 }
+
 
 if(
 retryQuestion.correctIndex<0||
@@ -817,24 +1088,26 @@ return;
 
 }
 
-/*
-Save question for retry.html
-*/
+
+/* Save retry question */
 
 localStorage.setItem(
 RETRY_QUESTION_KEY,
 JSON.stringify(retryQuestion)
 );
 
+
 localStorage.setItem(
 RETRY_QUEUE_KEY,
 JSON.stringify([retryQuestion])
 );
 
+
 localStorage.setItem(
 "cbtRetryStartedAt",
 String(Date.now())
 );
+
 
 const retryId=
 "retry_"+Date.now()+"_"+
@@ -842,14 +1115,14 @@ Math.random()
 .toString(36)
 .substring(2,8);
 
+
 localStorage.setItem(
 "cbtRetryId",
 retryId
 );
 
-/*
-Verify localStorage
-*/
+
+/* Verify */
 
 const saved=
 localStorage.getItem(
@@ -866,9 +1139,8 @@ return;
 
 }
 
-/*
-Show status
-*/
+
+/* Status */
 
 const status=
 document.getElementById(
@@ -884,21 +1156,15 @@ status.textContent=
 
 }
 
-/*
-IMPORTANT FIX:
 
-Do NOT use:
-retry.html?retry=xxxx
-
-Use the actual page directly.
-The question is already stored in localStorage.
-*/
+/* Open retry page */
 
 setTimeout(function(){
 
-window.location.href="retry.html";
+window.location.assign("retry.html");
 
 },250);
+
 
 }catch(error){
 
@@ -916,9 +1182,10 @@ error.message
 
 }
 
-/* ================================
+
+/* =====================================================
 ACTIVE VIEW
-================================ */
+===================================================== */
 
 function showActive(){
 
@@ -927,16 +1194,20 @@ document.getElementById(
 ).textContent=
 "❌ Active Mistakes";
 
+
 document.getElementById(
 "controls"
 ).innerHTML="";
+
 
 const list=
 document.getElementById("list");
 
 list.innerHTML="";
 
+
 const data=getActive();
+
 
 if(data.length===0){
 
@@ -973,15 +1244,19 @@ return;
 
 }
 
+
 data.forEach(function(q,index){
 
 const answer=
 getCorrectAnswer(q);
 
+
 const div=
 document.createElement("div");
 
+
 div.className="item";
+
 
 div.innerHTML=`
 
@@ -997,9 +1272,11 @@ ${escapeHTML(q.subject||"Unknown")}
 ${escapeHTML(q.topic||"Unknown")}
 </span>
 
+
 <div class="question">
 ${escapeHTML(q.question)}
 </div>
+
 
 <div class="info">
 
@@ -1031,6 +1308,10 @@ answer||
 
 </div>
 
+
+${intelligenceHTML(q)}
+
+
 <button
 class="practice"
 type="button">
@@ -1041,20 +1322,22 @@ type="button">
 
 `;
 
+
 const button=
 div.querySelector(".practice");
+
 
 button.addEventListener(
 "click",
 function(event){
 
 event.preventDefault();
-
 event.stopPropagation();
 
 practiceQuestion(q);
 
 });
+
 
 list.appendChild(div);
 
@@ -1062,9 +1345,10 @@ list.appendChild(div);
 
 }
 
-/* ================================
+
+/* =====================================================
 MASTERED VIEW
-================================ */
+===================================================== */
 
 function showMastered(){
 
@@ -1072,6 +1356,7 @@ document.getElementById(
 "sectionTitle"
 ).textContent=
 "🏆 Mastered Questions";
+
 
 document.getElementById(
 "controls"
@@ -1088,12 +1373,15 @@ onclick="showActive()">
 
 `;
 
+
 const list=
 document.getElementById("list");
 
 list.innerHTML="";
 
+
 const data=getMastered();
+
 
 if(data.length===0){
 
@@ -1130,16 +1418,20 @@ return;
 
 }
 
+
 data.forEach(function(q,index){
 
 const answer=
 getCorrectAnswer(q);
 
+
 const div=
 document.createElement("div");
 
+
 div.className=
 "item mastered-item";
+
 
 div.innerHTML=`
 
@@ -1155,9 +1447,11 @@ ${escapeHTML(q.subject||"Unknown")}
 ${escapeHTML(q.topic||"Unknown")}
 </span>
 
+
 <div class="question">
 ${escapeHTML(q.question)}
 </div>
+
 
 <div class="info">
 
@@ -1176,6 +1470,36 @@ answer||
 
 </div>
 
+
+<div class="intelligence">
+
+<div class="intelligence-title">
+🏆 Mastery Status
+</div>
+
+<div class="intelligence-row">
+
+<strong>
+Status:
+</strong>
+
+Mastered — answered correctly during retry.
+
+</div>
+
+<div class="intelligence-row">
+
+<strong>
+Next step:
+</strong>
+
+Keep revising this concept periodically.
+
+</div>
+
+</div>
+
+
 <button
 class="practice"
 type="button">
@@ -1186,20 +1510,22 @@ type="button">
 
 `;
 
+
 const button=
 div.querySelector(".practice");
+
 
 button.addEventListener(
 "click",
 function(event){
 
 event.preventDefault();
-
 event.stopPropagation();
 
 practiceQuestion(q);
 
 });
+
 
 list.appendChild(div);
 
@@ -1207,23 +1533,46 @@ list.appendChild(div);
 
 }
 
-/* ================================
+
+/* =====================================================
 DASHBOARD
-================================ */
+===================================================== */
 
 function goDashboard(){
 
-window.location.href="index.html";
+window.location.assign("index.html");
 
 }
 
-/* ================================
+
+/* =====================================================
+HASH ROUTING
+===================================================== */
+
+function openInitialView(){
+
+if(
+window.location.hash==="#mastered"
+){
+
+showMastered();
+
+}else{
+
+showActive();
+
+}
+
+}
+
+
+/* =====================================================
 START
-================================ */
+===================================================== */
 
 updateCounts();
 
-showActive();
+openInitialView();
 
 </script>
 
