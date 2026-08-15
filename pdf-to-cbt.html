@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>CBT Analyzer Pro — PDF to CBT</title>
 
 <style>
@@ -12,13 +13,13 @@ body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#f1f5f9;
-color:#0f172a;
+color:#0f172a
 }
 
 header{
 background:#fff;
 border-bottom:1px solid #e2e8f0;
-padding:15px 18px;
+padding:15px 18px
 }
 
 .header{
@@ -27,43 +28,45 @@ margin:auto;
 display:flex;
 align-items:center;
 justify-content:space-between;
-gap:10px;
+gap:10px
 }
 
 .logo{
 font-size:20px;
-font-weight:800;
+font-weight:800
 }
 
-.logo span{color:#4f46e5}
+.logo span{
+color:#4f46e5
+}
 
 button{
 font-family:inherit;
 cursor:pointer;
-touch-action:manipulation;
+touch-action:manipulation
 }
 
 .btn{
 border:0;
 border-radius:10px;
 padding:12px 16px;
-font-weight:800;
+font-weight:800
 }
 
 .primary{
 background:#4f46e5;
-color:#fff;
+color:#fff
 }
 
 .secondary{
 background:#e2e8f0;
-color:#0f172a;
+color:#0f172a
 }
 
 .container{
 max-width:1000px;
 margin:22px auto;
-padding:0 15px;
+padding:0 15px
 }
 
 .hero{
@@ -71,16 +74,16 @@ background:#4f46e5;
 color:#fff;
 border-radius:18px;
 padding:25px;
-margin-bottom:20px;
+margin-bottom:20px
 }
 
 .hero h1{
-margin:0 0 8px;
+margin:0 0 8px
 }
 
 .hero p{
 margin:0;
-line-height:1.6;
+line-height:1.6
 }
 
 .card{
@@ -88,17 +91,19 @@ background:#fff;
 border-radius:16px;
 padding:20px;
 margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
+box-shadow:0 3px 14px rgba(0,0,0,.07)
 }
 
 .upload{
 border:2px dashed #cbd5e1;
 border-radius:14px;
 padding:30px 20px;
-text-align:center;
+text-align:center
 }
 
-.upload input{display:none}
+.upload input{
+display:none
+}
 
 .upload label{
 display:inline-block;
@@ -107,7 +112,7 @@ color:#fff;
 padding:14px 18px;
 border-radius:10px;
 font-weight:800;
-cursor:pointer;
+cursor:pointer
 }
 
 .status{
@@ -117,29 +122,29 @@ border-radius:10px;
 background:#eef2ff;
 color:#3730a3;
 font-weight:700;
-line-height:1.5;
+line-height:1.5
 }
 
 .status.warning{
 background:#fff7ed;
-color:#9a3412;
+color:#9a3412
 }
 
 .status.success{
 background:#ecfdf5;
-color:#166534;
+color:#166534
 }
 
 .question{
 border:1px solid #e2e8f0;
 border-radius:14px;
 padding:17px;
-margin-top:14px;
+margin-top:14px
 }
 
 .question-title{
 font-weight:800;
-margin-bottom:10px;
+margin-bottom:10px
 }
 
 .option{
@@ -147,7 +152,7 @@ margin:7px 0;
 padding:10px;
 background:#f8fafc;
 border-radius:8px;
-line-height:1.5;
+line-height:1.5
 }
 
 .answer-select{
@@ -156,32 +161,14 @@ width:100%;
 padding:10px;
 border:1px solid #cbd5e1;
 border-radius:8px;
-background:#fff;
+background:#fff
 }
 
 .answer-source{
 margin-top:8px;
 font-size:13px;
 font-weight:700;
-color:#64748b;
-}
-
-.answer-detected{
-margin-top:10px;
-padding:10px;
-border-radius:9px;
-background:#ecfdf5;
-color:#166534;
-font-weight:800;
-}
-
-.answer-missing{
-margin-top:10px;
-padding:10px;
-border-radius:9px;
-background:#fff7ed;
-color:#9a3412;
-font-weight:800;
+color:#64748b
 }
 
 .meta{
@@ -191,39 +178,41 @@ background:#f8fafc;
 border-radius:9px;
 font-size:13px;
 color:#475569;
-line-height:1.5;
+line-height:1.5
 }
 
 .actions{
 display:flex;
 gap:10px;
 flex-wrap:wrap;
-margin-top:18px;
+margin-top:18px
 }
 
 .actions button{
 flex:1;
-min-width:160px;
+min-width:160px
 }
 
-.hidden{display:none}
+.hidden{
+display:none
+}
 
 .info{
 background:#f8fafc;
 padding:14px;
 border-radius:10px;
 line-height:1.6;
-margin-bottom:12px;
+margin-bottom:12px
 }
 
 .warning-box{
 background:#fff7ed;
-color:#9a3412;
+color:#9a3412
 }
 
 .success-box{
 background:#ecfdf5;
-color:#166534;
+color:#166534
 }
 
 .badge{
@@ -234,28 +223,34 @@ background:#e0e7ff;
 color:#3730a3;
 font-size:12px;
 font-weight:800;
-margin:3px;
+margin:3px
+}
+
+.verify{
+border:2px solid #f59e0b
+}
+
+.verified{
+border:2px solid #22c55e
 }
 
 @media(max-width:600px){
-
 .container{
-margin:15px auto;
+margin:15px auto
 }
 
 .actions{
 display:grid;
-grid-template-columns:1fr;
+grid-template-columns:1fr
 }
 
 .actions button{
-width:100%;
+width:100%
 }
 
 .header{
-align-items:flex-start;
+align-items:flex-start
 }
-
 }
 </style>
 </head>
@@ -286,9 +281,8 @@ Dashboard
 <h1>📄 PDF → CBT</h1>
 
 <p>
-Import MCQs, automatically detect answer keys,
-verify answers, preserve PDF page information,
-and launch a proper CBT.
+Import MCQs, detect answer keys, preserve PDF pages and chapters,
+verify answers, and launch a proper CBT.
 </p>
 
 </section>
@@ -300,7 +294,8 @@ and launch a proper CBT.
 <div class="upload">
 
 <p>
-Works best with text-based PDFs containing numbered MCQs.
+Works best with text-based PDFs containing numbered MCQs
+and A/B/C/D options.
 </p>
 
 <input
@@ -318,7 +313,6 @@ class="status hidden">
 </div>
 
 </div>
-
 </section>
 
 <section
@@ -367,20 +361,15 @@ Clear
 </div>
 
 <script>
-
 "use strict";
-
 
 /* =====================================================
 STATE
 ===================================================== */
 
 let importedQuestions=[];
-
 let detectedAnswerKey={};
-
 let pdfPages=[];
-
 
 /* =====================================================
 ELEMENTS
@@ -407,20 +396,20 @@ document.getElementById("summaryCard");
 const summary=
 document.getElementById("summary");
 
-
 /* =====================================================
-UPLOAD
+PDF UPLOAD
 ===================================================== */
 
-pdfFile.addEventListener(
-"change",
-async function(){
+pdfFile.addEventListener("change",async function(){
 
 const file=pdfFile.files[0];
 
 if(!file)return;
 
-if(file.type!=="application/pdf"){
+if(
+file.type!=="application/pdf" &&
+!file.name.toLowerCase().endsWith(".pdf")
+){
 
 showStatus(
 "❌ Please select a PDF file.",
@@ -428,7 +417,6 @@ showStatus(
 );
 
 return;
-
 }
 
 showStatus(
@@ -479,9 +467,7 @@ page:pageNumber,
 text:cleanPage
 });
 
-fullText+=
-"\n"+cleanPage;
-
+fullText+="\n"+cleanPage;
 }
 
 if(
@@ -494,43 +480,31 @@ showStatus(
 );
 
 return;
-
 }
 
-
-/* ANSWER KEY FIRST */
+/* Detect answer key first */
 
 detectedAnswerKey=
-detectAnswerKeyFromSections(
-pdfPages
-);
+detectAnswerKeyFromSections(pdfPages);
 
-
-/* QUESTIONS */
+/* Detect questions */
 
 importedQuestions=
-parseMCQsFromPages(
-pdfPages
-);
+parseMCQsFromPages(pdfPages);
 
-
-/* DUPLICATES */
+/* Remove duplicates */
 
 importedQuestions=
-removeDuplicates(
-importedQuestions
-);
+removeDuplicates(importedQuestions);
 
-
-/* APPLY ANSWERS */
+/* Apply answer key */
 
 applyAnswerKey();
-
 
 if(importedQuestions.length===0){
 
 showStatus(
-"⚠️ PDF loaded, but no clear MCQs were detected.",
+"⚠️ PDF loaded, but no clear MCQs were detected. Try a numbered MCQ PDF with A/B/C/D options.",
 "warning"
 );
 
@@ -538,31 +512,19 @@ previewCard.classList.add("hidden");
 summaryCard.classList.add("hidden");
 
 return;
-
 }
-
-
-const detectedCount=
-importedQuestions.filter(function(q){
-return q.answer!==null;
-}).length;
-
 
 showStatus(
 "✅ "+
 importedQuestions.length+
-" question(s) detected • "+
-detectedCount+
-" correct answer(s) detected.",
+" question(s) detected. Answers detected automatically where possible.",
 "success"
 );
 
 renderSummary();
-
 renderQuestions();
 
-}
-catch(error){
+}catch(error){
 
 console.error(error);
 
@@ -574,7 +536,6 @@ showStatus(
 }
 
 });
-
 
 /* =====================================================
 STATUS
@@ -596,9 +557,8 @@ statusBox.classList.add(type);
 
 }
 
-
 /* =====================================================
-PDF.JS
+LOAD PDF.JS
 ===================================================== */
 
 function loadPDFLibrary(){
@@ -607,8 +567,7 @@ if(window.pdfjsLib){
 return Promise.resolve();
 }
 
-return new Promise(
-function(resolve,reject){
+return new Promise(function(resolve,reject){
 
 const script=
 document.createElement("script");
@@ -627,9 +586,7 @@ resolve();
 
 }else{
 
-reject(
-new Error("PDF library unavailable")
-);
+reject(new Error("PDF library unavailable"));
 
 }
 
@@ -637,9 +594,7 @@ new Error("PDF library unavailable")
 
 script.onerror=function(){
 
-reject(
-new Error("Could not load PDF library")
-);
+reject(new Error("Could not load PDF library"));
 
 };
 
@@ -648,7 +603,6 @@ document.head.appendChild(script);
 });
 
 }
-
 
 /* =====================================================
 NORMALIZE
@@ -664,7 +618,6 @@ return String(text||"")
 .trim();
 
 }
-
 
 /* =====================================================
 QUESTION PARSER
@@ -692,10 +645,13 @@ while(
 ){
 
 matches.push({
+
 number:Number(match[1]),
+
 start:
 match.index+
 match[0].length
+
 });
 
 }
@@ -734,25 +690,34 @@ questions.push({
 
 number:current.number,
 
-question:cleanQuestion(questionText),
+question:
+cleanQuestion(questionText),
 
-options:optionResult.options,
+options:
+optionResult.options,
 
 answer:null,
 
-answerSource:"Not detected",
+answerSource:
+"Not detected — verification required",
 
-sourceType:"PDF",
+sourceType:
+"PDF",
 
-pdfPage:page.page,
+pdfPage:
+page.page,
 
-pdfPageEnd:page.page,
+pdfPageEnd:
+page.page,
 
-chapter:detectChapter(clean),
+chapter:
+detectChapter(clean),
 
-section:detectSection(clean),
+section:
+detectSection(clean),
 
-subject:"Imported",
+subject:
+"Imported",
 
 topic:
 detectSection(clean)||
@@ -772,9 +737,8 @@ return questions;
 
 }
 
-
 /* =====================================================
-OPTIONS
+OPTION PARSER
 ===================================================== */
 
 function parseOptions(block){
@@ -782,7 +746,7 @@ function parseOptions(block){
 const optionRegex=
 /(?:^|\s)(?:\(?([A-D])\)?\s*[.)\-:])\s*/gi;
 
-let matches=[];
+const matches=[];
 
 let match;
 
@@ -792,13 +756,15 @@ while(
 
 matches.push({
 
-letter:match[1].toUpperCase(),
+letter:
+match[1].toUpperCase(),
 
 start:
 match.index+
 match[0].length,
 
-markerStart:match.index
+markerStart:
+match.index
 
 });
 
@@ -823,8 +789,11 @@ block.slice(start,end).trim();
 if(value){
 
 options.push({
+
 letter:matches[i].letter,
+
 text:cleanOption(value)
+
 });
 
 }
@@ -843,15 +812,15 @@ if(
 !letters.includes("A")||
 !letters.includes("B")
 ){
+
 return null;
 }
 
-return{
+return {
 
 start:matches[0].markerStart,
 
-options:
-finalOptions.map(function(x){
+options:finalOptions.map(function(x){
 return x.text;
 })
 
@@ -859,161 +828,25 @@ return x.text;
 
 }
 
-
 /* =====================================================
-ANSWER KEY DETECTION
+CLEAN
 ===================================================== */
 
-function detectAnswerKeyFromSections(pages){
+function cleanQuestion(text){
 
-const result={};
-
-for(const page of pages){
-
-const text=String(page.text||"");
-
-const keyPage=
-/answer\s*key|answer\s*keys|correct\s*answers?|solutions?\s*key/i
-.test(text);
-
-if(!keyPage)continue;
-
-
-/*
-Supports:
-
-1-A 2-B
-1. A 2. B
-1) A 2) B
-Q1 A
-Q2 B
-1:A
-1 A
-*/
-const regex=
-/(?:Q(?:uestion)?\s*)?(\d{1,4})\s*(?:[\.\)\:\-=\|]\s*|\s+)([A-D])\b/gi;
-
-let match;
-
-while(
-(match=regex.exec(text))!==null
-){
-
-const number=Number(match[1]);
-
-const letter=match[2].toUpperCase();
-
-if(
-number>0 &&
-number<10000 &&
-["A","B","C","D"].includes(letter)
-){
-
-result[number]={
-letter:letter,
-page:page.page,
-source:
-"Detected from answer-key section"
-};
+return String(text||"")
+.replace(/\s+/g," ")
+.trim();
 
 }
 
-}
+function cleanOption(text){
+
+return String(text||"")
+.replace(/\s+/g," ")
+.trim();
 
 }
-
-
-/*
-Second compact pass.
-*/
-
-for(const page of pages){
-
-const text=String(page.text||"");
-
-if(
-!/answer\s*key|correct\s*answers?|solutions?/i
-.test(text)
-){
-continue;
-}
-
-const compact=
-/(\d{1,4})\s*[-.:)]\s*([A-D])/gi;
-
-let match;
-
-while(
-(match=compact.exec(text))!==null
-){
-
-const number=Number(match[1]);
-
-const letter=match[2].toUpperCase();
-
-if(
-number>0 &&
-number<10000 &&
-!result[number]
-){
-
-result[number]={
-letter:letter,
-page:page.page,
-source:
-"Detected from answer-key section"
-};
-
-}
-
-}
-
-}
-
-console.log(
-"Detected answer key:",
-result
-);
-
-return result;
-
-}
-
-
-/* =====================================================
-APPLY ANSWER KEY
-===================================================== */
-
-function applyAnswerKey(){
-
-importedQuestions.forEach(function(q){
-
-const key=
-detectedAnswerKey[q.number];
-
-if(!key)return;
-
-const index=
-["A","B","C","D"]
-.indexOf(key.letter);
-
-if(
-index>=0 &&
-index<q.options.length
-){
-
-q.answer=index;
-
-q.answerSource=
-"✅ Detected from answer key • PDF page "+
-key.page;
-
-}
-
-});
-
-}
-
 
 /* =====================================================
 CHAPTER
@@ -1050,7 +883,6 @@ return "";
 
 }
 
-
 /* =====================================================
 SECTION
 ===================================================== */
@@ -1058,16 +890,19 @@ SECTION
 function detectSection(pageText){
 
 const patterns=[
+
 /(?:topic|section)\s*[:\-]\s*([^|]{3,100})/i
+
 ];
 
 for(const pattern of patterns){
 
-const match=
-pageText.match(pattern);
+const match=pageText.match(pattern);
 
 if(match){
+
 return match[1].trim();
+
 }
 
 }
@@ -1076,6 +911,116 @@ return "";
 
 }
 
+/* =====================================================
+ANSWER KEY DETECTION
+===================================================== */
+
+function detectAnswerKeyFromSections(pages){
+
+const result={};
+
+for(const page of pages){
+
+const text=page.text;
+
+const isKeyPage=
+/answer\s*key|answers?\s*(?:key|:)|correct\s*answers?/i
+.test(text);
+
+if(!isKeyPage)continue;
+
+/*
+Format examples handled:
+
+1 A
+2 B
+3 C
+
+1-A
+2-B
+3-C
+
+1. A
+2. B
+
+Q1 A
+Q2 B
+
+Answer 1: A
+*/
+
+const regex=
+/(?:Q(?:uestion)?\s*)?(\d{1,4})\s*(?:[\.\):=\-]|is)?\s*([A-D])(?=\s|$)/gi;
+
+let match;
+
+while(
+(match=regex.exec(text))!==null
+){
+
+const number=Number(match[1]);
+
+const letter=match[2].toUpperCase();
+
+if(
+number>0 &&
+number<10000
+){
+
+result[number]={
+
+letter:letter,
+
+page:page.page,
+
+source:
+"Detected from answer-key section"
+
+};
+
+}
+
+}
+
+}
+
+return result;
+
+}
+
+/* =====================================================
+APPLY ANSWER KEY
+===================================================== */
+
+function applyAnswerKey(){
+
+importedQuestions.forEach(function(q){
+
+const key=
+detectedAnswerKey[q.number];
+
+if(!key)return;
+
+const index=
+["A","B","C","D"]
+.indexOf(key.letter);
+
+if(
+index>=0 &&
+index<q.options.length
+){
+
+q.answer=index;
+
+q.answerSource=
+"Automatically detected from answer key • PDF page "+
+key.page;
+
+}
+
+});
+
+}
 
 /* =====================================================
 DUPLICATES
@@ -1105,7 +1050,6 @@ return true;
 
 }
 
-
 /* =====================================================
 SUMMARY
 ===================================================== */
@@ -1114,8 +1058,8 @@ function renderSummary(){
 
 summaryCard.classList.remove("hidden");
 
-let detected=0;
-let missing=0;
+let answerDetected=0;
+let answerNotDetected=0;
 
 const pages=new Set();
 
@@ -1124,9 +1068,9 @@ importedQuestions.forEach(function(q){
 pages.add(q.pdfPage);
 
 if(q.answer!==null){
-detected++;
+answerDetected++;
 }else{
-missing++;
+answerNotDetected++;
 }
 
 });
@@ -1147,37 +1091,39 @@ pages.size+
 "</span>"+
 
 "<span class='badge'>Answers detected: "+
-detected+
+answerDetected+
 "</span>"+
 
 "<span class='badge'>Need verification: "+
-missing+
+answerNotDetected+
 "</span>"+
 
 "</div>"+
 
 "<div class='info "+
-(keyDetected
-?"success-box"
-:"warning-box")+
+(keyDetected?"success-box":"warning-box")+
 "'>"+
 
 (
 keyDetected
+
 ?
-"🔑 Answer-key section detected. Detected answers are attached to the questions and will be used by the CBT."
+
+"🔑 Answer-key section detected. Detected answers are already accepted by the CBT. You can change any answer before starting."
+
 :
-"⚠️ No answer-key section was confidently detected. Select the correct answer manually for unanswered questions."
+
+"⚠️ No answer-key section was confidently detected. Questions without an answer must be verified before starting."
+
 )+
 
 "</div>"+
 
 "<div class='info'>"+
-"📄 PDF page numbers are preserved for post-test source analysis."
+"📄 PDF page, chapter and section information is preserved for CBT analysis."
 +"</div>";
 
 }
-
 
 /* =====================================================
 RENDER QUESTIONS
@@ -1189,24 +1135,20 @@ preview.innerHTML="";
 
 previewCard.classList.remove("hidden");
 
-const detected=
-importedQuestions.filter(function(q){
-return q.answer!==null;
-}).length;
-
 const missing=
-importedQuestions.length-detected;
+importedQuestions.filter(function(q){
+return q.answer===null;
+}).length;
 
 questionCount.innerHTML=
 "Detected "+
 importedQuestions.length+
 " question(s). "+
-"<strong>"+
-detected+
-" correct answer(s) detected automatically.</strong> "+
-(missing>0
-?missing+" question(s) still need verification."
-:"All correct answers are ready. You can start the CBT.");
+(
+missing===0
+?"✅ All answers are ready. You can start CBT."
+:"⚠️ "+missing+" question(s) need answer verification."
+);
 
 importedQuestions.forEach(function(q,index){
 
@@ -1215,6 +1157,12 @@ document.createElement("div");
 
 card.className="question";
 
+if(q.answer===null){
+card.classList.add("verify");
+}else{
+card.classList.add("verified");
+}
+
 let html=
 
 "<div class='question-title'>"+
@@ -1222,7 +1170,9 @@ let html=
 (index+1)+
 " — PDF #"+
 q.number+
-"</div>"+
+"</div>";
+
+html+=
 
 "<div style='line-height:1.6;font-weight:700'>"+
 escapeHTML(q.question)+
@@ -1241,36 +1191,15 @@ escapeHTML(option)+
 
 });
 
-
-if(q.answer!==null){
-
-html+=
-
-"<div class='answer-detected'>"+
-"✅ Correct answer detected: "+
-String.fromCharCode(65+q.answer)+
-" — "+
-escapeHTML(q.options[q.answer])+
-"</div>";
-
-}else{
-
-html+=
-"<div class='answer-missing'>"+
-"⚠️ Correct answer not detected — please select it below."
-+"</div>";
-
-}
-
-
 html+=
 
 "<select class='answer-select' data-index='"+index+"'>"+
-
 "<option value=''>"+
-(q.answer===null
-?"Select correct answer"
-:"Keep detected answer")+
+(
+q.answer===null
+?"⚠️ Select correct answer"
+:"✅ Answer "+String.fromCharCode(65+q.answer)+" already detected"
+)+
 "</option>";
 
 q.options.forEach(function(option,optionIndex){
@@ -1284,7 +1213,7 @@ html+=
 
 "<option value='"+optionIndex+"'"+
 selected+
-">"+
+">Correct: "+
 String.fromCharCode(65+optionIndex)+
 " — "+
 escapeHTML(option)+
@@ -1324,26 +1253,25 @@ preview.appendChild(card);
 
 }
 
-
 /* =====================================================
-START CBT
+FINAL START CBT
 ===================================================== */
 
 function startCBT(){
 
-if(importedQuestions.length===0){
+if(
+!importedQuestions||
+importedQuestions.length===0
+){
 
 alert("No questions are available.");
 
 return;
-
 }
 
-
 /*
-Read manual changes.
-Detected answers are
-already preserved.
+Read any manual changes.
+Detected answers remain valid.
 */
 
 const selects=
@@ -1366,46 +1294,37 @@ importedQuestions[index].answerSource=
 
 });
 
-
 /*
-Check only questions that
-still have no answer.
+Check only genuinely missing answers.
 */
 
-const missing=
+const missingQuestions=
 importedQuestions.filter(function(q){
 
 return(
-q.answer===null ||
-q.answer===undefined ||
-typeof q.answer!=="number" ||
-q.answer<0 ||
+q.answer===null||
+q.answer===undefined||
+typeof q.answer!=="number"||
+q.answer<0||
 q.answer>=q.options.length
 );
 
 });
 
-
-if(missing.length>0){
+if(missingQuestions.length>0){
 
 alert(
 "⚠️ "+
-missing.length+
-" question(s) still have no correct answer.\n\n"+
-"Please select the correct answer for those questions before starting CBT."
+missingQuestions.length+
+" question(s) still need a correct answer. Please verify those questions."
 );
 
 return;
-
 }
-
 
 /*
 Create final CBT questions.
 */
-
-const importId=
-Date.now();
 
 const finalQuestions=
 importedQuestions.map(function(q,index){
@@ -1413,7 +1332,10 @@ importedQuestions.map(function(q,index){
 return{
 
 id:
-"pdf-"+importId+"-"+index,
+"pdf-"+
+Date.now()+
+"-"+
+index,
 
 question:q.question,
 
@@ -1431,19 +1353,21 @@ explanation:q.explanation||"",
 
 source:"PDF Import",
 
-sourceType:"PDF",
+sourceType:q.sourceType||"PDF",
 
-pdfPage:q.pdfPage,
+pdfPage:q.pdfPage||"",
 
-pdfPageEnd:q.pdfPageEnd,
+pdfPageEnd:
+q.pdfPageEnd||
+q.pdfPage||
+"",
 
 chapter:q.chapter||"",
 
 section:q.section||"",
 
 answerSource:
-q.answerSource||
-"Verified by user",
+q.answerSource||"Verified",
 
 bookmarked:false
 
@@ -1451,9 +1375,8 @@ bookmarked:false
 
 });
 
-
 /*
-Primary CBT storage.
+MAIN CBT STORAGE
 */
 
 localStorage.setItem(
@@ -1461,9 +1384,8 @@ localStorage.setItem(
 JSON.stringify(finalQuestions)
 );
 
-
 /*
-Compatibility storage.
+Compatibility storage
 */
 
 localStorage.setItem(
@@ -1471,9 +1393,8 @@ localStorage.setItem(
 JSON.stringify(finalQuestions)
 );
 
-
 /*
-Metadata.
+Metadata
 */
 
 localStorage.setItem(
@@ -1506,23 +1427,18 @@ finalQuestions.length,
 answerKeyDetected:
 Object.keys(detectedAnswerKey).length>0,
 
-answersReady:true,
-
 importedAt:Date.now()
 
 })
 );
 
-
 /*
-IMPORTANT:
-Open the existing CBT engine.
+Open CBT.
 */
 
 window.location.href="cbt.html";
 
 }
-
 
 /* =====================================================
 CLEAR
@@ -1552,10 +1468,9 @@ summary.innerHTML="";
 
 }
 
-/*
-======================================================
+/* =====================================================
 ESCAPE HTML
-====================================================== */
+===================================================== */
 
 function escapeHTML(value){
 
