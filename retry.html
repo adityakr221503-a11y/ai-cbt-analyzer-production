@@ -7,6 +7,7 @@
 <title>CBT Analyzer Pro — Retry</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -50,6 +51,11 @@ button{
   font-family:inherit;
   cursor:pointer;
   touch-action:manipulation;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
 }
 
 .back{
@@ -236,6 +242,77 @@ button{
   color:#991b1b;
 }
 
+/* =====================================================
+MISTAKE INTELLIGENCE
+===================================================== */
+
+.intelligence{
+  margin-top:18px;
+  padding:18px;
+  background:#eef2ff;
+  border:1px solid #c7d2fe;
+  border-radius:14px;
+  text-align:left;
+}
+
+.intelligence h3{
+  margin:0 0 7px;
+}
+
+.intelligence p{
+  margin:0 0 14px;
+  color:#475569;
+  line-height:1.5;
+}
+
+.reasonGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.reasonButton{
+  border:2px solid #e2e8f0;
+  background:#fff;
+  color:#0f172a;
+  border-radius:10px;
+  padding:12px;
+  text-align:left;
+  font-weight:700;
+  line-height:1.3;
+}
+
+.reasonButton:hover{
+  border-color:#818cf8;
+}
+
+.reasonButton.selected{
+  border-color:#4f46e5;
+  background:#e0e7ff;
+  color:#3730a3;
+}
+
+.reasonSaved{
+  display:none;
+  margin-top:14px;
+  padding:13px;
+  background:#dcfce7;
+  border:1px solid #86efac;
+  border-radius:10px;
+  color:#166534;
+  font-weight:700;
+  text-align:left;
+}
+
+.savedReason{
+  margin-top:14px;
+  padding:13px;
+  background:#f8fafc;
+  border-radius:10px;
+  text-align:left;
+  line-height:1.5;
+}
+
 @media(max-width:600px){
 
   .container{
@@ -250,7 +327,12 @@ button{
     font-size:19px;
   }
 
+  .reasonGrid{
+    grid-template-columns:1fr;
+  }
+
 }
+
 </style>
 </head>
 
@@ -321,7 +403,7 @@ Correct → 🏆 Mastery confirmed
 
 <br>
 
-Wrong → 🔁 Review and practice again
+Wrong → 🧠 Identify the mistake and practice again
 
 </div>
 
@@ -395,6 +477,47 @@ class="resultMessage">
 </div>
 
 <div id="resultDetails"></div>
+
+
+<!-- =====================================================
+MISTAKE INTELLIGENCE PANEL
+===================================================== -->
+
+<div
+id="intelligencePanel"
+class="intelligence"
+style="display:none">
+
+<h3>🧠 Why did you miss it?</h3>
+
+<p>
+Identifying the reason helps CBT Analyzer Pro understand
+your mistake pattern and improve future revision.
+</p>
+
+<div
+id="reasonGrid"
+class="reasonGrid">
+</div>
+
+<button
+id="saveReasonButton"
+class="action primary"
+type="button">
+
+🧠 Save Mistake Reason
+
+</button>
+
+<div
+id="reasonSaved"
+class="reasonSaved">
+
+✅ Mistake reason saved successfully.
+
+</div>
+
+</div>
 
 
 <button
@@ -503,6 +626,50 @@ const RETRY_HISTORY_KEY =
 
 
 /* =====================================================
+MISTAKE INTELLIGENCE REASONS
+===================================================== */
+
+const MISTAKE_REASONS = [
+
+{
+id:"concept",
+label:"🧠 Concept not understood"
+},
+
+{
+id:"memory",
+label:"📖 Forgot fact / formula"
+},
+
+{
+id:"misread",
+label:"⚠️ Misread the question"
+},
+
+{
+id:"calculation",
+label:"🔢 Calculation mistake"
+},
+
+{
+id:"confusion",
+label:"🔀 Confused between options"
+},
+
+{
+id:"guess",
+label:"🎯 Guess / intuition"
+},
+
+{
+id:"time",
+label:"⏱️ Time pressure"
+}
+
+];
+
+
+/* =====================================================
 STATE
 ===================================================== */
 
@@ -511,6 +678,10 @@ let questionData = null;
 let selectedAnswer = null;
 
 let answered = false;
+
+let selectedMistakeReason = null;
+
+let mistakeReasonSaved = false;
 
 
 /* =====================================================
@@ -581,8 +752,34 @@ return fallback;
 }
 
 
+function writeJSON(key,value){
+
+try{
+
+localStorage.setItem(
+key,
+JSON.stringify(value)
+);
+
+return true;
+
+}catch(error){
+
+console.error(
+"Storage write error:",
+key,
+error
+);
+
+return false;
+
+}
+
+}
+
+
 /* =====================================================
-NORMALIZE QUESTION OBJECT
+NORMALIZE QUESTION
 ===================================================== */
 
 function normalizeQuestion(q){
@@ -704,7 +901,11 @@ q.solution ||
 
 mistakeType:
 q.mistakeType ||
-"Not Classified"
+"Not Classified",
+
+mistakeReason:
+q.mistakeReason ||
+null
 
 };
 
@@ -712,7 +913,7 @@ q.mistakeType ||
 
 
 /* =====================================================
-GET DIRECT RETRY QUESTION
+GET DIRECT QUESTION
 ===================================================== */
 
 function getDirectQuestion(){
@@ -734,7 +935,7 @@ return normalized;
 
 
 /* =====================================================
-TRY RETRY QUEUE
+RETRY QUEUE
 ===================================================== */
 
 const queue =
@@ -773,8 +974,7 @@ return null;
 
 
 /* =====================================================
-FALLBACK:
-GET FIRST MASTERED QUESTION
+MASTERED FALLBACK
 ===================================================== */
 
 function getMasteredFallback(){
@@ -811,34 +1011,22 @@ return q;
 
 }
 
-
 return null;
 
 }
 
 
 /* =====================================================
-LOAD QUESTION
+LOAD
 ===================================================== */
 
 function loadQuestion(){
 
 try{
 
-/*
-Priority 1:
-Practice Again selected question.
-*/
-
 questionData =
 getDirectQuestion();
 
-
-/*
-Priority 2:
-If direct question is missing,
-use a mastered question.
-*/
 
 if(!questionData){
 
@@ -847,10 +1035,6 @@ getMasteredFallback();
 
 }
 
-
-/*
-Nothing found.
-*/
 
 if(!questionData){
 
@@ -1001,6 +1185,10 @@ selectedAnswer = null;
 
 answered = false;
 
+selectedMistakeReason = null;
+
+mistakeReasonSaved = false;
+
 showRetry();
 
 
@@ -1138,10 +1326,6 @@ selectedAnswer ===
 questionData.correctIndex;
 
 
-/*
-Highlight choices.
-*/
-
 const buttons =
 document.querySelectorAll(
 ".option"
@@ -1222,6 +1406,9 @@ history = [];
 
 history.push({
 
+id:
+questionData.id,
+
 question:
 questionData.question,
 
@@ -1248,6 +1435,20 @@ questionData.correctAnswer,
 correct:
 correct,
 
+mistakeReason:
+correct
+?
+null
+:
+null,
+
+mistakeType:
+correct
+?
+null
+:
+"Not Classified",
+
 date:
 new Date().toISOString(),
 
@@ -1257,108 +1458,156 @@ source:
 });
 
 
-localStorage.setItem(
+writeJSON(
 RETRY_HISTORY_KEY,
-JSON.stringify(history)
+history
 );
 
 }
 
 
 /* =====================================================
-MARK MASTERED
+BUILD REASON BUTTONS
 ===================================================== */
 
-function markMastered(){
+function renderReasonButtons(){
 
-const key =
-normalize(
-questionData.question
+const grid =
+document.getElementById(
+"reasonGrid"
 );
 
+grid.innerHTML =
+"";
 
-let mastery =
-readJSON(
-MASTERY_KEY,
-[]
+
+MISTAKE_REASONS.forEach(
+function(reason){
+
+const button =
+document.createElement(
+"button"
 );
 
-if(!Array.isArray(mastery)){
+button.type =
+"button";
 
-mastery = [];
+button.className =
+"reasonButton";
+
+button.textContent =
+reason.label;
+
+
+button.addEventListener(
+"click",
+function(){
+
+if(mistakeReasonSaved){
+
+return;
 
 }
 
 
-const already =
-mastery.some(
-function(item){
+selectedMistakeReason =
+reason;
 
-return (
-item &&
-item.question &&
-normalize(
-item.question
-) === key
+
+document.querySelectorAll(
+".reasonButton"
+).forEach(
+function(btn){
+
+btn.classList.remove(
+"selected"
 );
 
 });
 
 
-if(!already){
+button.classList.add(
+"selected"
+);
 
-mastery.push({
+});
 
-type:
-"mastery",
 
-id:
-questionData.id,
-
-question:
-questionData.question,
-
-options:
-questionData.options,
-
-subject:
-questionData.subject,
-
-topic:
-questionData.topic,
-
-correctIndex:
-questionData.correctIndex,
-
-correctAnswer:
-questionData.correctAnswer,
-
-solution:
-questionData.solution,
-
-mistakeType:
-questionData.mistakeType,
-
-masteredAt:
-new Date().toISOString(),
-
-source:
-"Retry Engine"
+grid.appendChild(
+button
+);
 
 });
 
 }
 
 
-localStorage.setItem(
-MASTERY_KEY,
-JSON.stringify(mastery)
+/* =====================================================
+SHOW MISTAKE INTELLIGENCE
+===================================================== */
+
+function showMistakeIntelligence(){
+
+const panel =
+document.getElementById(
+"intelligencePanel"
 );
 
+panel.style.display =
+"block";
 
-/*
-Update CBT history.
-*/
+
+selectedMistakeReason =
+null;
+
+mistakeReasonSaved =
+false;
+
+
+document.getElementById(
+"reasonSaved"
+).style.display =
+"none";
+
+
+document.getElementById(
+"saveReasonButton"
+).style.display =
+"block";
+
+
+renderReasonButtons();
+
+}
+
+
+/* =====================================================
+SAVE MISTAKE REASON
+===================================================== */
+
+function saveMistakeReason(){
+
+if(!selectedMistakeReason){
+
+alert(
+"Please select the reason that best describes your mistake."
+);
+
+return;
+
+}
+
+
+const reason =
+selectedMistakeReason.label;
+
+const reasonId =
+selectedMistakeReason.id;
+
+
+/* =====================================================
+UPDATE CBT HISTORY
+===================================================== */
 
 const tests =
 readJSON(
@@ -1391,309 +1640,158 @@ q &&
 q.question &&
 normalize(
 q.question
-) === key
+) ===
+normalize(
+questionData.question
+)
 ){
 
-q.mastered = true;
+q.mistakeType =
+reasonId;
 
-q.masteryStatus =
-"Mastered";
+q.mistakeReason =
+reason;
 
-q.masteredAt =
+q.mistakeReasonId =
+reasonId;
+
+q.mistakeReasonSavedAt =
 new Date().toISOString();
 
-q.retryCorrect =
+}
+
+});
+
+});
+
+writeJSON(
+HISTORY_KEY,
+tests
+);
+
+}
+
+
+/* =====================================================
+UPDATE RETRY HISTORY
+===================================================== */
+
+const retryHistory =
+readJSON(
+RETRY_HISTORY_KEY,
+[]
+);
+
+if(Array.isArray(retryHistory)){
+
+for(
+let i = retryHistory.length - 1;
+i >= 0;
+i--
+){
+
+const item =
+retryHistory[i];
+
+if(
+item &&
+normalize(item.question) ===
+normalize(questionData.question)
+){
+
+item.mistakeType =
+reasonId;
+
+item.mistakeReason =
+reason;
+
+item.mistakeReasonId =
+reasonId;
+
+item.mistakeReasonSavedAt =
+new Date().toISOString();
+
+break;
+
+}
+
+}
+
+writeJSON(
+RETRY_HISTORY_KEY,
+retryHistory
+);
+
+}
+
+
+/* =====================================================
+UPDATE RETRY QUESTION
+===================================================== */
+
+questionData.mistakeType =
+reasonId;
+
+questionData.mistakeReason =
+reason;
+
+
+/*
+Keep the current retry question
+available for practice again.
+*/
+
+writeJSON(
+RETRY_QUESTION_KEY,
+questionData
+);
+
+
+mistakeReasonSaved =
 true;
 
-}
-
-});
-
-});
-
-localStorage.setItem(
-HISTORY_KEY,
-JSON.stringify(tests)
-);
-
-}
-
-
-/*
-Remove only the temporary
-practice selection.
-*/
-
-localStorage.removeItem(
-RETRY_QUESTION_KEY
-);
-
-localStorage.removeItem(
-"cbtRetryStartedAt"
-);
-
-
-/*
-Do NOT delete cbtMasteryV2.
-The question must remain mastered.
-*/
-
-}
-
-
-/* =====================================================
-SUCCESS
-===================================================== */
-
-function showSuccess(){
 
 document.getElementById(
-"retryCard"
+"saveReasonButton"
 ).style.display =
 "none";
 
+
 document.getElementById(
-"resultCard"
+"reasonSaved"
 ).style.display =
 "block";
 
 
 document.getElementById(
-"resultIcon"
-).textContent =
-"🏆";
-
-
-document.getElementById(
-"resultTitle"
-).textContent =
-"Mastery Confirmed!";
-
-
-document.getElementById(
-"resultMessage"
-).textContent =
-"Excellent! You answered the mastered question correctly again.";
-
-
-document.getElementById(
-"resultDetails"
+"reasonSaved"
 ).innerHTML =
 
-"<div class='solution'>" +
-
-"<strong>🏆 Mastered</strong>" +
-
-"<br><br>" +
-
-"The question remains safely stored " +
-"in your Mastered section." +
-
-"<br><br>" +
-
-"<strong>Correct Answer:</strong>" +
-
-"<br><br>" +
-
-escapeHTML(
-questionData.correctAnswer
-) +
-
-"<br><br>" +
-
-"<strong>Solution:</strong>" +
-
-"<br><br>" +
-
-escapeHTML(
-questionData.solution
-) +
-
-"</div>";
-
-}
-
-
-/* =====================================================
-FAILURE
-===================================================== */
-
-function showFailure(){
-
-document.getElementById(
-"retryCard"
-).style.display =
-"none";
-
-document.getElementById(
-"resultCard"
-).style.display =
-"block";
-
-
-document.getElementById(
-"resultIcon"
-).textContent =
-"🔁";
-
-
-document.getElementById(
-"resultTitle"
-).textContent =
-"Keep Practicing";
-
-
-document.getElementById(
-"resultMessage"
-).textContent =
-"Review this question and practice it again later.";
-
-
-document.getElementById(
-"resultDetails"
-).innerHTML =
-
-"<div class='solution failure'>" +
-
-"<strong>Correct Answer:</strong>" +
-
-"<br><br>" +
-
-escapeHTML(
-questionData.correctAnswer
-) +
-
-"<br><br>" +
-
-"<strong>Solution:</strong>" +
-
-"<br><br>" +
-
-escapeHTML(
-questionData.solution
-) +
-
-"</div>";
-
-}
-
-
-/* =====================================================
-PRACTICE AGAIN
-===================================================== */
-
-function practiceAgain(){
-
-/*
-Save the same question again.
-*/
-
-localStorage.setItem(
-RETRY_QUESTION_KEY,
-JSON.stringify(
-questionData
-)
-);
+"✅ Mistake reason saved: <strong>" +
+escapeHTML(reason) +
+"</strong>";
 
 
 /*
-Reload the retry engine.
+Show saved reason in result details.
 */
 
-window.location.href =
-"retry.html?v=" +
-Date.now();
+const existing =
+document.getElementById(
+"savedReason"
+);
+
+if(existing){
+
+existing.remove();
 
 }
 
 
-/* =====================================================
-NAVIGATION
-===================================================== */
-
-function goMistake(){
-
-window.location.href =
-"mistake.html";
-
-}
-
-
-function goDashboard(){
-
-window.location.href =
-"index.html";
-
-}
-
-
-/* =====================================================
-BUTTONS
-===================================================== */
-
-document.getElementById(
-"checkButton"
-).addEventListener(
-"click",
-checkAnswer
+const saved =
+document.createElement(
+"div"
 );
 
-
-document.getElementById(
-"againButton"
-).addEventListener(
-"click",
-practiceAgain
-);
-
-
-document.getElementById(
-"mistakeButton"
-).addEventListener(
-"click",
-goMistake
-);
-
-
-document.getElementById(
-"dashboardButton"
-).addEventListener(
-"click",
-goDashboard
-);
-
-
-document.getElementById(
-"backButton"
-).addEventListener(
-"click",
-goMistake
-);
-
-
-document.getElementById(
-"emptyMistakeButton"
-).addEventListener(
-"click",
-goMistake
-);
-
-
-document.getElementById(
-"errorBackButton"
-).addEventListener(
-"click",
-goMistake
-);
-
-
-/* =====================================================
-START
-===================================================== */
-
-loadQuestion();
-
-</script>
-
-</body>
-</html>
+saved.id =
+"savedReason
