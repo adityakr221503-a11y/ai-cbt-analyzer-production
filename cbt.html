@@ -362,10 +362,10 @@ Submit Test
 <script>
 
 /* =====================================================
-QUESTIONS
+DEFAULT QUESTIONS
 ===================================================== */
 
-const questions=[
+let questions=[
 
 {
 subject:"Physics",
@@ -511,6 +511,126 @@ solution:"The heart contracts rhythmically to pump blood through the circulatory
 
 
 /* =====================================================
+PDF IMPORT OVERRIDE
+===================================================== */
+
+(function loadImportedPDFQuestions(){
+
+try{
+
+const saved=
+localStorage.getItem("pdfCbtQuestions");
+
+if(!saved){
+
+console.log("No PDF CBT import found. Using default questions.");
+
+return;
+
+}
+
+const imported=
+JSON.parse(saved);
+
+if(
+!Array.isArray(imported) ||
+imported.length===0
+){
+
+console.warn(
+"PDF CBT data exists but is empty."
+);
+
+return;
+
+}
+
+
+/*
+Validate imported questions.
+*/
+
+const valid=
+imported.filter(function(q){
+
+return q &&
+typeof q.question==="string" &&
+q.question.trim()!=="" &&
+Array.isArray(q.options) &&
+q.options.length>=2 &&
+typeof q.answer==="number" &&
+q.answer>=0 &&
+q.answer<q.options.length;
+
+});
+
+
+if(valid.length===0){
+
+console.warn(
+"No valid imported PDF questions found."
+);
+
+return;
+
+}
+
+
+/*
+Use PDF questions.
+*/
+
+questions=valid.map(function(q){
+
+return {
+
+subject:q.subject||"Imported",
+
+topic:q.topic||"PDF Import",
+
+question:q.question,
+
+options:q.options,
+
+answer:q.answer,
+
+solution:q.solution||
+q.explanation||
+"Review the original PDF solution."
+
+};
+
+});
+
+
+console.log(
+"PDF CBT loaded successfully:",
+questions.length,
+"questions"
+);
+
+
+/*
+Remove import flag after successful consumption.
+*/
+
+localStorage.removeItem(
+"pdfCbtQuestions"
+);
+
+}catch(error){
+
+console.error(
+"PDF CBT loading failed:",
+error
+);
+
+}
+
+})();
+
+
+/* =====================================================
 STATE
 ===================================================== */
 
@@ -533,9 +653,11 @@ TIMER
 
 function updateTimer(){
 
-const minutes=Math.floor(timeLeft/60);
+const minutes=
+Math.floor(timeLeft/60);
 
-const seconds=timeLeft%60;
+const seconds=
+timeLeft%60;
 
 document.getElementById("timer").textContent=
 String(minutes).padStart(2,"0")+
@@ -546,7 +668,8 @@ String(seconds).padStart(2,"0");
 
 updateTimer();
 
-const timerInterval=setInterval(function(){
+const timerInterval=
+setInterval(function(){
 
 if(submitted)return;
 
@@ -577,21 +700,36 @@ function renderQuestion(){
 
 const q=questions[current];
 
+if(!q){
+
+document.getElementById("questionNumber").textContent=
+"No question available";
+
+document.getElementById("question").textContent=
+"Could not load the questions.";
+
+return;
+
+}
+
 document.getElementById("questionNumber").textContent=
 "Question "+
 (current+1)+
 " of "+
 questions.length+
 " • "+
-q.subject;
+(q.subject||"Imported");
+
 
 document.getElementById("question").textContent=
 q.question;
+
 
 const box=
 document.getElementById("options");
 
 box.innerHTML="";
+
 
 q.options.forEach(function(option,index){
 
@@ -613,7 +751,9 @@ String.fromCharCode(65+index)+
 ". "+
 option;
 
-button.addEventListener("click",function(){
+button.addEventListener(
+"click",
+function(){
 
 if(submitted)return;
 
@@ -627,10 +767,12 @@ box.appendChild(button);
 
 });
 
+
 document.getElementById("nextButton").textContent=
 current===questions.length-1
 ?"Finish"
 :"Next";
+
 
 renderPalette();
 
@@ -648,6 +790,7 @@ document.getElementById("palette");
 
 palette.innerHTML="";
 
+
 questions.forEach(function(q,index){
 
 const button=
@@ -656,6 +799,7 @@ document.createElement("button");
 button.type="button";
 
 button.textContent=index+1;
+
 
 if(answers[index]!==null){
 
@@ -675,7 +819,10 @@ button.classList.add("current");
 
 }
 
-button.addEventListener("click",function(){
+
+button.addEventListener(
+"click",
+function(){
 
 if(submitted)return;
 
@@ -684,6 +831,7 @@ current=index;
 renderQuestion();
 
 });
+
 
 palette.appendChild(button);
 
@@ -768,13 +916,15 @@ const selected=
 selectedIndex===null||
 selectedIndex===undefined
 ?""
-:String(q.options[selectedIndex]||"").toLowerCase();
+:String(
+q.options[selectedIndex]||""
+).toLowerCase();
 
 const correct=
-String(q.options[q.answer]||"").toLowerCase();
+String(
+q.options[q.answer]||""
+).toLowerCase();
 
-
-/* Calculation */
 
 const calculationWords=[
 "calculate",
@@ -795,6 +945,7 @@ const calculationWords=[
 "momentum"
 ];
 
+
 if(
 calculationWords.some(function(word){
 return question.includes(word);
@@ -810,8 +961,6 @@ reason:
 }
 
 
-/* Memory */
-
 const memoryWords=[
 "what is",
 "which is",
@@ -824,6 +973,7 @@ const memoryWords=[
 "organ",
 "organelle"
 ];
+
 
 if(
 memoryWords.some(function(word){
@@ -840,8 +990,6 @@ reason:
 }
 
 
-/* Concept */
-
 const conceptWords=[
 "why",
 "principle",
@@ -852,6 +1000,7 @@ const conceptWords=[
 "reason",
 "concept"
 ];
+
 
 if(
 conceptWords.some(function(word){
@@ -868,8 +1017,6 @@ reason:
 
 }
 
-
-/* Confusion */
 
 if(
 selected &&
@@ -903,8 +1050,6 @@ reason:
 
 }
 
-
-/* Default */
 
 return{
 type:"⚠️ Concept Gap",
@@ -943,7 +1088,8 @@ mastery=[];
 }
 
 
-const wrongQuestions=new Set();
+const wrongQuestions=
+new Set();
 
 
 questions.forEach(function(q,index){
@@ -1039,6 +1185,7 @@ questions:questions.map(function(q,index){
 
 let status;
 
+
 if(answers[index]===null){
 
 status="skipped";
@@ -1057,6 +1204,7 @@ status="wrong";
 
 
 let intelligence=null;
+
 
 if(status==="wrong"){
 
@@ -1122,6 +1270,7 @@ markedForReview:marked[index]
 
 history.push(record);
 
+
 localStorage.setItem(
 "cbtHistory",
 JSON.stringify(history)
@@ -1152,6 +1301,7 @@ function openRetry(){
 
 const wrong=[];
 
+
 questions.forEach(function(q,index){
 
 if(
@@ -1165,9 +1315,11 @@ q,
 answers[index]
 );
 
+
 wrong.push({
 
-id:"retry-"+Date.now()+"-"+index,
+id:
+"retry-"+Date.now()+"-"+index,
 
 question:q.question,
 
@@ -1185,7 +1337,8 @@ solution:q.solution,
 
 selectedIndex:answers[index],
 
-selectedAnswer:q.options[answers[index]],
+selectedAnswer:
+q.options[answers[index]],
 
 mistakeType:intelligence.type,
 
@@ -1202,7 +1355,9 @@ source:"CBT"
 
 if(wrong.length===0){
 
-alert("There are no mistakes to retry.");
+alert(
+"There are no mistakes to retry."
+);
 
 return;
 
@@ -1224,7 +1379,8 @@ localStorage.setItem(
 String(Date.now())
 );
 
-window.location.href="retry.html";
+window.location.href=
+"retry.html";
 
 }
 
@@ -1237,6 +1393,7 @@ function updateRetryButton(incorrect){
 
 const button=
 document.getElementById("retryButton");
+
 
 if(incorrect>0){
 
@@ -1264,6 +1421,7 @@ SUBMIT
 function submitTest(){
 
 if(submitted)return;
+
 
 let correct=0;
 
@@ -1365,7 +1523,9 @@ questions.forEach(function(q,index){
 const item=
 document.createElement("div");
 
+
 let status;
+
 
 if(answers[index]===null){
 
@@ -1461,7 +1621,6 @@ ${escapeHTML(q.solution)}
 
 }
 
-
 if(status==="correct"){
 
 item.innerHTML+=`
@@ -1479,7 +1638,6 @@ ${escapeHTML(q.solution)}
 `;
 
 }
-
 
 box.appendChild(item);
 
