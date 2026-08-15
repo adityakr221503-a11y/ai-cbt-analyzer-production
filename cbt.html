@@ -7,7 +7,9 @@
 <title>CBT Analyzer Pro — CBT Test</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
@@ -159,11 +161,25 @@ outline:3px solid #4f46e5;
 display:none;
 }
 
+#result h2{
+margin-top:0;
+}
+
 .score{
 font-size:38px;
 font-weight:800;
 text-align:center;
-margin:20px;
+margin:10px 0;
+}
+
+.result-actions{
+margin-top:10px;
+}
+
+.result-actions button{
+width:100%;
+margin-top:8px;
+padding:14px;
 }
 
 .review-item{
@@ -193,40 +209,27 @@ border-radius:10px;
 line-height:1.5;
 }
 
-.result-actions button{
-width:100%;
-margin-top:10px;
-}
-#result h2{
-  margin-top:0;
-}
-
-#result .result-actions{
-  margin-top:15px;
-}
-
-@media(max-width:800px){
-  #result{
-    padding-top:0;
-  }
-
-  #result .score{
-    margin:10px 0;
-  }
-
-  #result .result-actions{
-    margin-top:10px;
-  }
-
-  #result .result-actions button{
-    margin-top:8px;
-    padding:14px;
-  }
-}
 @media(max-width:800px){
 
 .container{
 grid-template-columns:1fr;
+}
+
+#result{
+padding-top:0;
+}
+
+#result .score{
+margin:10px 0;
+}
+
+#result .result-actions{
+margin-top:10px;
+}
+
+#result .result-actions button{
+margin-top:8px;
+padding:14px;
 }
 
 }
@@ -311,7 +314,8 @@ class="score">
 
 <p id="summary"></p>
 
-<div id="review"></div>
+
+<!-- ACTIONS MOVED ABOVE QUESTION ANALYSIS -->
 
 <div class="result-actions">
 
@@ -336,6 +340,11 @@ onclick="location.href='index.html'">
 </button>
 
 </div>
+
+
+<!-- QUESTION ANALYSIS NOW COMES AFTER THE BUTTONS -->
+
+<div id="review"></div>
 
 </section>
 
