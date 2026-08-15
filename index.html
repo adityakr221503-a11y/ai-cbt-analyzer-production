@@ -98,6 +98,7 @@ font-weight:800;
 font-size:15px;
 cursor:pointer;
 touch-action:manipulation;
+-webkit-tap-highlight-color:transparent;
 }
 
 .start{
@@ -128,6 +129,7 @@ grid-template-columns:repeat(4,1fr);
 gap:12px;
 }
 
+/* TESTS COMPLETED IS NOW DIRECTLY CLICKABLE */
 .stat{
 width:100%;
 border:0;
@@ -138,6 +140,10 @@ text-align:center;
 color:#0f172a;
 cursor:pointer;
 touch-action:manipulation;
+-webkit-tap-highlight-color:transparent;
+position:relative;
+z-index:5;
+pointer-events:auto;
 }
 
 .stat:active{
@@ -172,6 +178,7 @@ font-weight:800;
 cursor:pointer;
 font-size:14px;
 touch-action:manipulation;
+-webkit-tap-highlight-color:transparent;
 }
 
 .action:active{
@@ -239,25 +246,46 @@ color:#64748b;
 }
 
 
-/* CLICKABLE HISTORY */
+/* =====================================================
+   CLICKABLE HISTORY — FULL TOUCH AREA
+===================================================== */
 
 .history-item{
 display:block;
+position:relative;
+z-index:100;
+isolation:isolate;
+
 width:100%;
+min-height:100px;
+
 border:1px solid #e2e8f0;
 border-radius:12px;
+
 padding:15px;
 margin-top:10px;
+
 background:#fff;
 color:#0f172a;
+
 font-family:Arial,sans-serif;
 font-size:15px;
 font-weight:400;
 text-align:left;
+
 cursor:pointer;
+
 touch-action:manipulation;
+-webkit-tap-highlight-color:transparent;
 -webkit-appearance:none;
 appearance:none;
+
+pointer-events:auto;
+user-select:none;
+}
+
+.history-item *{
+pointer-events:none;
 }
 
 .history-item:hover{
@@ -417,20 +445,48 @@ onclick="go('mistake.html')">
 
 <div class="stats">
 
-<div class="stat">
+<!-- TESTS COMPLETED IS NOW A BUTTON -->
+<button
+class="stat"
+type="button"
+onclick="scrollToHistory()">
+
 <strong id="testsCount">0</strong>
-<span>Tests Completed</span>
-</div>
 
-<div class="stat">
+<span>
+Tests Completed — Tap to Open
+</span>
+
+</button>
+
+
+<button
+class="stat"
+type="button"
+onclick="scrollToHistory()">
+
 <strong id="totalQuestions">0</strong>
-<span>Questions Attempted</span>
-</div>
 
-<div class="stat">
+<span>
+Questions Attempted
+</span>
+
+</button>
+
+
+<button
+class="stat"
+type="button"
+onclick="scrollToHistory()">
+
 <strong id="accuracy">0%</strong>
-<span>Accuracy</span>
-</div>
+
+<span>
+Accuracy
+</span>
+
+</button>
+
 
 <button
 class="stat"
@@ -1185,12 +1241,6 @@ updateSubject(
 
 function openTest(index){
 
-/*
-Direct relative URL.
-This is deliberately simple so it
-works with GitHub Pages and WebViews.
-*/
-
 const url=
 "./test-details.html?test="+
 encodeURIComponent(index);
@@ -1265,33 +1315,24 @@ const test=item.test;
 const actualIndex=item.index;
 
 
-/*
-REAL BUTTON.
-
-The entire Test card is clickable.
-*/
-
 const button=
 document.createElement("button");
 
 button.type="button";
-
-button.className=
-"history-item";
+button.className="history-item";
 
 
-button.addEventListener(
-"click",
-function(event){
+/*
+FULL CARD CLICK.
+The click listener is attached directly
+to the entire history button.
+*/
 
-event.preventDefault();
-event.stopPropagation();
+button.onclick=function(){
 
 openTest(actualIndex);
 
-},
-false
-);
+};
 
 
 const correct=
@@ -1373,7 +1414,7 @@ ${total>0
 
 <div class="history-open">
 
-👆 TAP TO OPEN TEST DETAILS
+👆 TAP ANYWHERE TO OPEN TEST DETAILS
 
 </div>
 
@@ -1393,9 +1434,10 @@ box.appendChild(button);
 
 function scrollToHistory(){
 
-document.getElementById(
-"historySection"
-).scrollIntoView({
+const section=
+document.getElementById("historySection");
+
+section.scrollIntoView({
 behavior:"smooth",
 block:"start"
 });
