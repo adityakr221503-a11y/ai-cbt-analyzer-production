@@ -4,253 +4,239 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>CBT Analyzer Pro — PDF to CBT</title>
+<title>CBT Analyzer Pro — CBT Test</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+box-sizing:border-box;
+}
 
 body{
 margin:0;
 font-family:Arial,sans-serif;
 background:#f1f5f9;
-color:#0f172a
+color:#0f172a;
 }
 
 header{
 background:#fff;
 border-bottom:1px solid #e2e8f0;
-padding:15px 18px
+padding:16px 20px;
 }
 
 .header{
-max-width:1000px;
+max-width:1100px;
 margin:auto;
 display:flex;
 align-items:center;
 justify-content:space-between;
-gap:10px
+gap:15px;
 }
 
 .logo{
 font-size:20px;
-font-weight:800
+font-weight:800;
 }
 
 .logo span{
-color:#4f46e5
+color:#4f46e5;
 }
 
-button{
-font-family:inherit;
-cursor:pointer;
-touch-action:manipulation
-}
-
-.btn{
-border:0;
-border-radius:10px;
-padding:12px 16px;
-font-weight:800
-}
-
-.primary{
-background:#4f46e5;
-color:#fff
-}
-
-.secondary{
-background:#e2e8f0;
-color:#0f172a
+.timer{
+background:#eef2ff;
+color:#3730a3;
+padding:9px 14px;
+border-radius:9px;
+font-weight:800;
 }
 
 .container{
-max-width:1000px;
-margin:22px auto;
-padding:0 15px
-}
-
-.hero{
-background:#4f46e5;
-color:#fff;
-border-radius:18px;
-padding:25px;
-margin-bottom:20px
-}
-
-.hero h1{
-margin:0 0 8px
-}
-
-.hero p{
-margin:0;
-line-height:1.6
+max-width:1100px;
+margin:20px auto;
+padding:0 15px;
+display:grid;
+grid-template-columns:1fr 280px;
+gap:20px;
 }
 
 .card{
 background:#fff;
 border-radius:16px;
-padding:20px;
-margin-bottom:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07)
+padding:22px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
-.upload{
-border:2px dashed #cbd5e1;
-border-radius:14px;
-padding:30px 20px;
-text-align:center
-}
-
-.upload input{
-display:none
-}
-
-.upload label{
-display:inline-block;
-background:#4f46e5;
-color:#fff;
-padding:14px 18px;
-border-radius:10px;
-font-weight:800;
-cursor:pointer
-}
-
-.status{
-margin-top:15px;
-padding:13px;
-border-radius:10px;
-background:#eef2ff;
-color:#3730a3;
+.question-number{
+color:#64748b;
 font-weight:700;
-line-height:1.5
-}
-
-.status.warning{
-background:#fff7ed;
-color:#9a3412
-}
-
-.status.success{
-background:#ecfdf5;
-color:#166534
+margin-bottom:12px;
 }
 
 .question{
-border:1px solid #e2e8f0;
-border-radius:14px;
-padding:17px;
-margin-top:14px
-}
-
-.question-title{
+font-size:21px;
 font-weight:800;
-margin-bottom:10px
+line-height:1.55;
+margin-bottom:20px;
 }
 
 .option{
-margin:7px 0;
-padding:10px;
-background:#f8fafc;
-border-radius:8px;
-line-height:1.5
-}
-
-.answer-select{
-margin-top:12px;
+display:block;
 width:100%;
-padding:10px;
-border:1px solid #cbd5e1;
-border-radius:8px;
-background:#fff
+padding:15px;
+margin:10px 0;
+background:#fff;
+border:2px solid #e2e8f0;
+border-radius:11px;
+text-align:left;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+touch-action:manipulation;
 }
 
-.answer-source{
-margin-top:8px;
-font-size:13px;
-font-weight:700;
-color:#64748b
+.option.selected{
+border-color:#4f46e5;
+background:#eef2ff;
 }
 
-.meta{
-margin-top:10px;
-padding:10px;
-background:#f8fafc;
-border-radius:9px;
-font-size:13px;
-color:#475569;
-line-height:1.5
-}
-
-.actions{
-display:flex;
+.buttons{
+display:grid;
+grid-template-columns:1fr 1fr;
 gap:10px;
-flex-wrap:wrap;
-margin-top:18px
+margin-top:20px;
 }
 
-.actions button{
-flex:1;
-min-width:160px
+button{
+font-family:inherit;
+border:0;
+border-radius:10px;
+padding:13px;
+font-weight:700;
+cursor:pointer;
+touch-action:manipulation;
 }
 
-.hidden{
-display:none
+.primary{
+background:#4f46e5;
+color:#fff;
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.warning{
+background:#f59e0b;
+color:#fff;
+}
+
+.danger{
+background:#dc2626;
+color:#fff;
+}
+
+.palette{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:8px;
+margin-top:15px;
+}
+
+.palette button{
+background:#e2e8f0;
+padding:10px 5px;
+}
+
+.palette .answered{
+background:#bbf7d0;
+}
+
+.palette .review{
+background:#fde68a;
+}
+
+.palette .current{
+outline:3px solid #4f46e5;
+}
+
+#result{
+display:none;
+position:relative;
+z-index:10;
+}
+
+.score{
+font-size:38px;
+font-weight:800;
+text-align:center;
+margin:10px 0;
+}
+
+.result-actions{
+margin-top:10px;
+}
+
+.result-actions button{
+width:100%;
+margin-top:8px;
+padding:14px;
+}
+
+.review-item{
+margin-top:15px;
+padding:15px;
+background:#f8fafc;
+border-radius:10px;
+}
+
+.review-item.incorrect{
+border-left:5px solid #dc2626;
+}
+
+.review-item.correct{
+border-left:5px solid #16a34a;
+}
+
+.review-item.skipped{
+border-left:5px solid #f59e0b;
+}
+
+.analysis{
+margin-top:10px;
+padding:14px;
+background:#eef2ff;
+border-radius:10px;
+line-height:1.6;
+}
+
+.analysis-type{
+font-weight:800;
+color:#3730a3;
 }
 
 .info{
+padding:12px;
 background:#f8fafc;
-padding:14px;
 border-radius:10px;
-line-height:1.6;
-margin-bottom:12px
+margin-bottom:12px;
+line-height:1.5;
 }
 
-.warning-box{
-background:#fff7ed;
-color:#9a3412
-}
+@media(max-width:800px){
 
-.success-box{
-background:#ecfdf5;
-color:#166534
-}
-
-.badge{
-display:inline-block;
-padding:5px 9px;
-border-radius:999px;
-background:#e0e7ff;
-color:#3730a3;
-font-size:12px;
-font-weight:800;
-margin:3px
-}
-
-.verify{
-border:2px solid #f59e0b
-}
-
-.verified{
-border:2px solid #22c55e
-}
-
-@media(max-width:600px){
 .container{
-margin:15px auto
-}
-
-.actions{
-display:grid;
-grid-template-columns:1fr
-}
-
-.actions button{
-width:100%
+grid-template-columns:1fr;
 }
 
 .header{
-align-items:flex-start
+align-items:flex-start;
 }
+
+.question{
+font-size:19px;
+}
+
 }
 </style>
 </head>
@@ -258,1215 +244,1439 @@ align-items:flex-start
 <body>
 
 <header>
+
 <div class="header">
 
 <div class="logo">
 CBT Analyzer <span>Pro</span>
 </div>
 
-<button
-class="btn secondary"
-type="button"
-onclick="location.href='index.html'">
-Dashboard
-</button>
+<div id="timer" class="timer">
+30:00
+</div>
 
 </div>
+
 </header>
 
 <div class="container">
 
-<section class="hero">
+<main class="card">
 
-<h1>📄 PDF → CBT</h1>
+<section id="testScreen">
 
-<p>
-Import MCQs, detect answer keys, preserve PDF pages and chapters,
-verify answers, and launch a proper CBT.
-</p>
-
-</section>
-
-<section class="card">
-
-<h2>📤 Upload Question PDF</h2>
-
-<div class="upload">
-
-<p>
-Works best with text-based PDFs containing numbered MCQs
-and A/B/C/D options.
-</p>
-
-<input
-id="pdfFile"
-type="file"
-accept="application/pdf">
-
-<label for="pdfFile">
-Choose PDF
-</label>
-
-<div
-id="status"
-class="status hidden">
+<div id="questionNumber" class="question-number">
+Loading...
 </div>
 
-</div>
-</section>
-
-<section
-id="summaryCard"
-class="card hidden">
-
-<h2>📊 Import Summary</h2>
-
-<div id="summary"></div>
-
-</section>
-
-<section
-id="previewCard"
-class="card hidden">
-
-<h2>📝 Imported Questions</h2>
-
-<div
-id="questionCount"
-class="info">
+<div id="question" class="question">
+Loading question...
 </div>
 
-<div id="preview"></div>
+<div id="options"></div>
 
-<div class="actions">
+<div class="buttons">
 
 <button
-class="btn primary"
+class="secondary"
 type="button"
-onclick="startCBT()">
-🚀 Start CBT
+onclick="previousQuestion()">
+Previous
 </button>
 
 <button
-class="btn secondary"
+class="warning"
 type="button"
-onclick="clearImport()">
+onclick="markReview()">
+Mark Review
+</button>
+
+<button
+class="secondary"
+type="button"
+onclick="clearAnswer()">
 Clear
 </button>
 
+<button
+id="nextButton"
+class="primary"
+type="button"
+onclick="nextQuestion()">
+Next
+</button>
+
 </div>
 
 </section>
+
+<section id="result">
+
+<h2>🎯 Test Completed</h2>
+
+<div id="score" class="score"></div>
+
+<p id="summary"></p>
+
+<div class="result-actions">
+
+<button
+id="retryButton"
+class="primary"
+type="button"
+style="display:none"
+onclick="openRetry()">
+🔄 Retry Mistakes
+</button>
+
+<button
+class="secondary"
+type="button"
+onclick="location.href='mistake.html'">
+🧠 Mistake Bank
+</button>
+
+<button
+class="secondary"
+type="button"
+onclick="location.href='index.html'">
+🏠 Dashboard
+</button>
+
+</div>
+
+<div id="review"></div>
+
+</section>
+
+</main>
+
+<aside class="card">
+
+<h3>Question Palette</h3>
+
+<div id="palette" class="palette"></div>
+
+<button
+class="danger"
+type="button"
+style="width:100%;margin-top:20px"
+onclick="submitTest()">
+Submit Test
+</button>
+
+</aside>
 
 </div>
 
 <script>
+
 "use strict";
 
 /* =====================================================
-STATE
+QUESTIONS
 ===================================================== */
 
-let importedQuestions=[];
-let detectedAnswerKey={};
-let pdfPages=[];
+let questions=[
 
-/* =====================================================
-ELEMENTS
-===================================================== */
+{
+subject:"Physics",
+topic:"Basic Physics",
+question:"Which planet is known as the Red Planet?",
+options:[
+"Earth",
+"Mars",
+"Jupiter",
+"Venus"
+],
+answer:1,
+solution:
+"Mars is called the Red Planet because iron-bearing minerals on its surface give it a reddish appearance."
+},
 
-const pdfFile=
-document.getElementById("pdfFile");
+{
+subject:"Physics",
+topic:"Units",
+question:"What is the SI unit of force?",
+options:[
+"Joule",
+"Newton",
+"Watt",
+"Pascal"
+],
+answer:1,
+solution:
+"The SI unit of force is the newton (N)."
+},
 
-const statusBox=
-document.getElementById("status");
+{
+subject:"Biology",
+topic:"Cell Biology",
+question:"Which organelle is known as the powerhouse of the cell?",
+options:[
+"Nucleus",
+"Ribosome",
+"Mitochondria",
+"Golgi apparatus"
+],
+answer:2,
+solution:
+"Mitochondria are major sites of ATP production during cellular respiration."
+},
 
-const previewCard=
-document.getElementById("previewCard");
+{
+subject:"Chemistry",
+topic:"Periodic Table",
+question:"What is the chemical symbol of sodium?",
+options:[
+"So",
+"Na",
+"S",
+"Sd"
+],
+answer:1,
+solution:
+"The symbol Na comes from the Latin name natrium."
+},
 
-const preview=
-document.getElementById("preview");
+{
+subject:"Biology",
+topic:"Environment",
+question:"Which gas is most abundant in Earth's atmosphere?",
+options:[
+"Oxygen",
+"Carbon dioxide",
+"Nitrogen",
+"Hydrogen"
+],
+answer:2,
+solution:
+"Nitrogen makes up approximately 78% of Earth's atmosphere."
+},
 
-const questionCount=
-document.getElementById("questionCount");
+{
+subject:"Physics",
+topic:"Gravitation",
+question:"What is the approximate acceleration due to gravity near Earth's surface?",
+options:[
+"4.9 m/s²",
+"9.8 m/s²",
+"19.6 m/s²",
+"98 m/s²"
+],
+answer:1,
+solution:
+"The approximate acceleration due to gravity near Earth's surface is 9.8 m/s²."
+},
 
-const summaryCard=
-document.getElementById("summaryCard");
+{
+subject:"Biology",
+topic:"Genetics",
+question:"Which molecule carries genetic information?",
+options:[
+"Protein",
+"Lipid",
+"DNA",
+"Glucose"
+],
+answer:2,
+solution:
+"DNA stores hereditary genetic information in most organisms."
+},
 
-const summary=
-document.getElementById("summary");
+{
+subject:"Physics",
+topic:"Electricity",
+question:"Which particle has a negative electric charge?",
+options:[
+"Proton",
+"Neutron",
+"Electron",
+"Photon"
+],
+answer:2,
+solution:
+"An electron carries a negative elementary charge."
+},
 
-/* =====================================================
-PDF UPLOAD
-===================================================== */
+{
+subject:"Chemistry",
+topic:"Atomic Structure",
+question:"Which particle has no electric charge?",
+options:[
+"Proton",
+"Electron",
+"Neutron",
+"Positron"
+],
+answer:2,
+solution:
+"A neutron is electrically neutral."
+},
 
-pdfFile.addEventListener("change",async function(){
-
-const file=pdfFile.files[0];
-
-if(!file)return;
-
-if(
-file.type!=="application/pdf" &&
-!file.name.toLowerCase().endsWith(".pdf")
-){
-
-showStatus(
-"❌ Please select a PDF file.",
-"warning"
-);
-
-return;
+{
+subject:"Biology",
+topic:"Human Physiology",
+question:"Which organ pumps blood throughout the human body?",
+options:[
+"Liver",
+"Kidney",
+"Heart",
+"Lung"
+],
+answer:2,
+solution:
+"The heart contracts rhythmically to pump blood through the circulatory system."
 }
 
-showStatus(
-"📖 Reading PDF page-by-page...",
-""
-);
+];
+
+
+/* =====================================================
+LOAD PDF CBT
+===================================================== */
+
+function loadPDFQuestions(){
 
 try{
 
-await loadPDFLibrary();
+const saved=
+localStorage.getItem("pdfCbtQuestions");
 
-const buffer=
-await file.arrayBuffer();
+if(!saved){
 
-const pdf=
-await pdfjsLib.getDocument({
-data:buffer
-}).promise;
+return false;
 
-pdfPages=[];
-
-let fullText="";
-
-for(
-let pageNumber=1;
-pageNumber<=pdf.numPages;
-pageNumber++
-){
-
-const page=
-await pdf.getPage(pageNumber);
-
-const content=
-await page.getTextContent();
-
-const pageText=
-content.items
-.map(function(item){
-return item.str||"";
-})
-.join(" ");
-
-const cleanPage=
-normalizeText(pageText);
-
-pdfPages.push({
-page:pageNumber,
-text:cleanPage
-});
-
-fullText+="\n"+cleanPage;
 }
+
+const imported=
+JSON.parse(saved);
 
 if(
-fullText.replace(/\s/g,"").length<100
+!Array.isArray(imported) ||
+imported.length===0
 ){
 
-showStatus(
-"⚠️ This PDF appears to be scanned/image-only. Text extraction found too little text.",
-"warning"
-);
-
-return;
-}
-
-/* Detect answer key first */
-
-detectedAnswerKey=
-detectAnswerKeyFromSections(pdfPages);
-
-/* Detect questions */
-
-importedQuestions=
-parseMCQsFromPages(pdfPages);
-
-/* Remove duplicates */
-
-importedQuestions=
-removeDuplicates(importedQuestions);
-
-/* Apply answer key */
-
-applyAnswerKey();
-
-if(importedQuestions.length===0){
-
-showStatus(
-"⚠️ PDF loaded, but no clear MCQs were detected. Try a numbered MCQ PDF with A/B/C/D options.",
-"warning"
-);
-
-previewCard.classList.add("hidden");
-summaryCard.classList.add("hidden");
-
-return;
-}
-
-showStatus(
-"✅ "+
-importedQuestions.length+
-" question(s) detected. Answers detected automatically where possible.",
-"success"
-);
-
-renderSummary();
-renderQuestions();
-
-}catch(error){
-
-console.error(error);
-
-showStatus(
-"❌ Could not read this PDF. Please try another PDF.",
-"warning"
-);
+return false;
 
 }
+
+const valid=
+imported.filter(function(q){
+
+return q &&
+typeof q.question==="string" &&
+q.question.trim()!=="" &&
+Array.isArray(q.options) &&
+q.options.length>=2 &&
+typeof q.answer==="number" &&
+q.answer>=0 &&
+q.answer<q.options.length;
 
 });
 
-/* =====================================================
-STATUS
-===================================================== */
+if(valid.length===0){
 
-function showStatus(message,type){
-
-statusBox.classList.remove(
-"hidden",
-"warning",
-"success"
-);
-
-statusBox.textContent=message;
-
-if(type){
-statusBox.classList.add(type);
-}
+return false;
 
 }
 
-/* =====================================================
-LOAD PDF.JS
-===================================================== */
-
-function loadPDFLibrary(){
-
-if(window.pdfjsLib){
-return Promise.resolve();
-}
-
-return new Promise(function(resolve,reject){
-
-const script=
-document.createElement("script");
-
-script.src=
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-
-script.onload=function(){
-
-if(window.pdfjsLib){
-
-pdfjsLib.GlobalWorkerOptions.workerSrc=
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-resolve();
-
-}else{
-
-reject(new Error("PDF library unavailable"));
-
-}
-
-};
-
-script.onerror=function(){
-
-reject(new Error("Could not load PDF library"));
-
-};
-
-document.head.appendChild(script);
-
-});
-
-}
-
-/* =====================================================
-NORMALIZE
-===================================================== */
-
-function normalizeText(text){
-
-return String(text||"")
-.replace(/\u00a0/g," ")
-.replace(/\r/g," ")
-.replace(/[ \t]+/g," ")
-.replace(/\n+/g," ")
-.trim();
-
-}
-
-/* =====================================================
-QUESTION PARSER
-===================================================== */
-
-function parseMCQsFromPages(pages){
-
-const questions=[];
-
-for(let p=0;p<pages.length;p++){
-
-const page=pages[p];
-
-const clean=page.text;
-
-const matches=[];
-
-const questionRegex=
-/(?:^|\s)(?:Question\s*)?Q?\.?\s*(\d{1,4})\s*[.)\-:]\s*/gi;
-
-let match;
-
-while(
-(match=questionRegex.exec(clean))!==null
-){
-
-matches.push({
-
-number:Number(match[1]),
-
-start:
-match.index+
-match[0].length
-
-});
-
-}
-
-for(let i=0;i<matches.length;i++){
-
-const current=matches[i];
-
-const next=matches[i+1];
-
-const blockEnd=
-next
-?next.start
-:clean.length;
-
-const block=
-clean.slice(
-current.start,
-blockEnd
-).trim();
-
-const optionResult=
-parseOptions(block);
-
-if(!optionResult)continue;
-
-const questionText=
-block.slice(
-0,
-optionResult.start
-).trim();
-
-if(!questionText)continue;
-
-questions.push({
-
-number:current.number,
-
-question:
-cleanQuestion(questionText),
-
-options:
-optionResult.options,
-
-answer:null,
-
-answerSource:
-"Not detected — verification required",
-
-sourceType:
-"PDF",
-
-pdfPage:
-page.page,
-
-pdfPageEnd:
-page.page,
-
-chapter:
-detectChapter(clean),
-
-section:
-detectSection(clean),
-
-subject:
-"Imported",
-
-topic:
-detectSection(clean)||
-detectChapter(clean)||
-"PDF Import",
-
-solution:"",
-explanation:""
-
-});
-
-}
-
-}
-
-return questions;
-
-}
-
-/* =====================================================
-OPTION PARSER
-===================================================== */
-
-function parseOptions(block){
-
-const optionRegex=
-/(?:^|\s)(?:\(?([A-D])\)?\s*[.)\-:])\s*/gi;
-
-const matches=[];
-
-let match;
-
-while(
-(match=optionRegex.exec(block))!==null
-){
-
-matches.push({
-
-letter:
-match[1].toUpperCase(),
-
-start:
-match.index+
-match[0].length,
-
-markerStart:
-match.index
-
-});
-
-}
-
-if(matches.length<2)return null;
-
-const options=[];
-
-for(let i=0;i<matches.length;i++){
-
-const start=matches[i].start;
-
-const end=
-matches[i+1]
-?matches[i+1].markerStart
-:block.length;
-
-const value=
-block.slice(start,end).trim();
-
-if(value){
-
-options.push({
-
-letter:matches[i].letter,
-
-text:cleanOption(value)
-
-});
-
-}
-
-}
-
-const finalOptions=
-options.slice(0,4);
-
-const letters=
-finalOptions.map(function(x){
-return x.letter;
-});
-
-if(
-!letters.includes("A")||
-!letters.includes("B")
-){
-
-return null;
-}
+questions=
+valid.map(function(q){
 
 return {
 
-start:matches[0].markerStart,
+id:q.id || ("pdf-"+Date.now()),
 
-options:finalOptions.map(function(x){
-return x.text;
-})
+subject:q.subject || "Imported",
 
-};
-
-}
-
-/* =====================================================
-CLEAN
-===================================================== */
-
-function cleanQuestion(text){
-
-return String(text||"")
-.replace(/\s+/g," ")
-.trim();
-
-}
-
-function cleanOption(text){
-
-return String(text||"")
-.replace(/\s+/g," ")
-.trim();
-
-}
-
-/* =====================================================
-CHAPTER
-===================================================== */
-
-function detectChapter(pageText){
-
-const patterns=[
-
-/(?:chapter|chap\.?)\s*[:\-]?\s*(?:no\.?\s*)?(\d{1,3})\s*[:\-–]\s*([^|]{3,100})/i,
-
-/(?:chapter)\s+(\d{1,3})\s+([^|]{3,100})/i
-
-];
-
-for(const pattern of patterns){
-
-const match=pageText.match(pattern);
-
-if(match){
-
-return(
-"Chapter "+
-match[1]+
-": "+
-match[2]
-).trim();
-
-}
-
-}
-
-return "";
-
-}
-
-/* =====================================================
-SECTION
-===================================================== */
-
-function detectSection(pageText){
-
-const patterns=[
-
-/(?:topic|section)\s*[:\-]\s*([^|]{3,100})/i
-
-];
-
-for(const pattern of patterns){
-
-const match=pageText.match(pattern);
-
-if(match){
-
-return match[1].trim();
-
-}
-
-}
-
-return "";
-
-}
-
-/* =====================================================
-ANSWER KEY DETECTION
-===================================================== */
-
-function detectAnswerKeyFromSections(pages){
-
-const result={};
-
-for(const page of pages){
-
-const text=page.text;
-
-const isKeyPage=
-/answer\s*key|answers?\s*(?:key|:)|correct\s*answers?/i
-.test(text);
-
-if(!isKeyPage)continue;
-
-/*
-Format examples handled:
-
-1 A
-2 B
-3 C
-
-1-A
-2-B
-3-C
-
-1. A
-2. B
-
-Q1 A
-Q2 B
-
-Answer 1: A
-*/
-
-const regex=
-/(?:Q(?:uestion)?\s*)?(\d{1,4})\s*(?:[\.\):=\-]|is)?\s*([A-D])(?=\s|$)/gi;
-
-let match;
-
-while(
-(match=regex.exec(text))!==null
-){
-
-const number=Number(match[1]);
-
-const letter=match[2].toUpperCase();
-
-if(
-number>0 &&
-number<10000
-){
-
-result[number]={
-
-letter:letter,
-
-page:page.page,
-
-source:
-"Detected from answer-key section"
-
-};
-
-}
-
-}
-
-}
-
-return result;
-
-}
-
-/* =====================================================
-APPLY ANSWER KEY
-===================================================== */
-
-function applyAnswerKey(){
-
-importedQuestions.forEach(function(q){
-
-const key=
-detectedAnswerKey[q.number];
-
-if(!key)return;
-
-const index=
-["A","B","C","D"]
-.indexOf(key.letter);
-
-if(
-index>=0 &&
-index<q.options.length
-){
-
-q.answer=index;
-
-q.answerSource=
-"Automatically detected from answer key • PDF page "+
-key.page;
-
-}
-
-});
-
-}
-
-/* =====================================================
-DUPLICATES
-===================================================== */
-
-function removeDuplicates(list){
-
-const seen=new Set();
-
-return list.filter(function(q){
-
-const key=
-q.question
-.toLowerCase()
-.replace(/\s+/g," ")
-.trim();
-
-if(seen.has(key)){
-return false;
-}
-
-seen.add(key);
-
-return true;
-
-});
-
-}
-
-/* =====================================================
-SUMMARY
-===================================================== */
-
-function renderSummary(){
-
-summaryCard.classList.remove("hidden");
-
-let answerDetected=0;
-let answerNotDetected=0;
-
-const pages=new Set();
-
-importedQuestions.forEach(function(q){
-
-pages.add(q.pdfPage);
-
-if(q.answer!==null){
-answerDetected++;
-}else{
-answerNotDetected++;
-}
-
-});
-
-const keyDetected=
-Object.keys(detectedAnswerKey).length>0;
-
-summary.innerHTML=
-
-"<div class='info'>"+
-
-"<span class='badge'>Questions: "+
-importedQuestions.length+
-"</span>"+
-
-"<span class='badge'>PDF pages: "+
-pages.size+
-"</span>"+
-
-"<span class='badge'>Answers detected: "+
-answerDetected+
-"</span>"+
-
-"<span class='badge'>Need verification: "+
-answerNotDetected+
-"</span>"+
-
-"</div>"+
-
-"<div class='info "+
-(keyDetected?"success-box":"warning-box")+
-"'>"+
-
-(
-keyDetected
-
-?
-
-"🔑 Answer-key section detected. Detected answers are already accepted by the CBT. You can change any answer before starting."
-
-:
-
-"⚠️ No answer-key section was confidently detected. Questions without an answer must be verified before starting."
-
-)+
-
-"</div>"+
-
-"<div class='info'>"+
-"📄 PDF page, chapter and section information is preserved for CBT analysis."
-+"</div>";
-
-}
-
-/* =====================================================
-RENDER QUESTIONS
-===================================================== */
-
-function renderQuestions(){
-
-preview.innerHTML="";
-
-previewCard.classList.remove("hidden");
-
-const missing=
-importedQuestions.filter(function(q){
-return q.answer===null;
-}).length;
-
-questionCount.innerHTML=
-"Detected "+
-importedQuestions.length+
-" question(s). "+
-(
-missing===0
-?"✅ All answers are ready. You can start CBT."
-:"⚠️ "+missing+" question(s) need answer verification."
-);
-
-importedQuestions.forEach(function(q,index){
-
-const card=
-document.createElement("div");
-
-card.className="question";
-
-if(q.answer===null){
-card.classList.add("verify");
-}else{
-card.classList.add("verified");
-}
-
-let html=
-
-"<div class='question-title'>"+
-"Question "+
-(index+1)+
-" — PDF #"+
-q.number+
-"</div>";
-
-html+=
-
-"<div style='line-height:1.6;font-weight:700'>"+
-escapeHTML(q.question)+
-"</div>";
-
-q.options.forEach(function(option,optionIndex){
-
-html+=
-
-"<div class='option'>"+
-"<strong>"+
-String.fromCharCode(65+optionIndex)+
-".</strong> "+
-escapeHTML(option)+
-"</div>";
-
-});
-
-html+=
-
-"<select class='answer-select' data-index='"+index+"'>"+
-"<option value=''>"+
-(
-q.answer===null
-?"⚠️ Select correct answer"
-:"✅ Answer "+String.fromCharCode(65+q.answer)+" already detected"
-)+
-"</option>";
-
-q.options.forEach(function(option,optionIndex){
-
-const selected=
-q.answer===optionIndex
-?" selected"
-:"";
-
-html+=
-
-"<option value='"+optionIndex+"'"+
-selected+
-">Correct: "+
-String.fromCharCode(65+optionIndex)+
-" — "+
-escapeHTML(option)+
-"</option>";
-
-});
-
-html+="</select>";
-
-html+=
-
-"<div class='answer-source'>"+
-"Answer source: "+
-escapeHTML(q.answerSource)+
-"</div>";
-
-html+=
-
-"<div class='meta'>"+
-"📄 PDF page: "+
-escapeHTML(q.pdfPage)+
-(q.chapter
-?"<br>📚 Chapter: "+
-escapeHTML(q.chapter)
-:"")+
-(q.section
-?"<br>📌 Section: "+
-escapeHTML(q.section)
-:"")+
-"</div>";
-
-card.innerHTML=html;
-
-preview.appendChild(card);
-
-});
-
-}
-
-/* =====================================================
-FINAL START CBT
-===================================================== */
-
-function startCBT(){
-
-if(
-!importedQuestions||
-importedQuestions.length===0
-){
-
-alert("No questions are available.");
-
-return;
-}
-
-/*
-Read any manual changes.
-Detected answers remain valid.
-*/
-
-const selects=
-document.querySelectorAll(".answer-select");
-
-selects.forEach(function(select){
-
-const index=
-Number(select.dataset.index);
-
-if(select.value!==""){
-
-importedQuestions[index].answer=
-Number(select.value);
-
-importedQuestions[index].answerSource=
-"Verified by user";
-
-}
-
-});
-
-/*
-Check only genuinely missing answers.
-*/
-
-const missingQuestions=
-importedQuestions.filter(function(q){
-
-return(
-q.answer===null||
-q.answer===undefined||
-typeof q.answer!=="number"||
-q.answer<0||
-q.answer>=q.options.length
-);
-
-});
-
-if(missingQuestions.length>0){
-
-alert(
-"⚠️ "+
-missingQuestions.length+
-" question(s) still need a correct answer. Please verify those questions."
-);
-
-return;
-}
-
-/*
-Create final CBT questions.
-*/
-
-const finalQuestions=
-importedQuestions.map(function(q,index){
-
-return{
-
-id:
-"pdf-"+
-Date.now()+
-"-"+
-index,
+topic:q.topic || q.section || "PDF Import",
 
 question:q.question,
 
 options:q.options,
 
-answer:q.answer,
+answer:Number(q.answer),
 
-subject:q.subject||"Imported",
+solution:
+q.solution ||
+q.explanation ||
+"Review the original PDF solution.",
 
-topic:q.topic||"PDF Import",
+explanation:q.explanation || "",
 
-solution:q.solution||"",
+pdfPage:q.pdfPage || "",
 
-explanation:q.explanation||"",
+pdfPageEnd:q.pdfPageEnd || q.pdfPage || "",
 
-source:"PDF Import",
+chapter:q.chapter || "",
 
-sourceType:q.sourceType||"PDF",
+section:q.section || "",
 
-pdfPage:q.pdfPage||"",
+answerSource:q.answerSource || "Verified",
 
-pdfPageEnd:
-q.pdfPageEnd||
-q.pdfPage||
-"",
+source:q.source || "PDF Import",
 
-chapter:q.chapter||"",
+sourceType:q.sourceType || "PDF",
 
-section:q.section||"",
-
-answerSource:
-q.answerSource||"Verified",
-
-bookmarked:false
+bookmarked:Boolean(q.bookmarked)
 
 };
 
 });
 
 /*
-MAIN CBT STORAGE
+Do NOT remove the PDF data yet.
+This prevents accidental loss if the page
+reloads before initialization.
 */
 
-localStorage.setItem(
-"pdfCbtQuestions",
-JSON.stringify(finalQuestions)
+return true;
+
+}catch(error){
+
+console.error(
+"PDF question loading failed:",
+error
 );
 
-/*
-Compatibility storage
-*/
+return false;
 
-localStorage.setItem(
-"importedQuestions",
-JSON.stringify(finalQuestions)
+}
+
+}
+
+
+/* =====================================================
+VALIDATE QUESTIONS
+===================================================== */
+
+function validateQuestions(){
+
+questions=
+questions.filter(function(q){
+
+return q &&
+typeof q.question==="string" &&
+q.question.trim()!=="" &&
+Array.isArray(q.options) &&
+q.options.length>=2 &&
+typeof q.answer==="number" &&
+q.answer>=0 &&
+q.answer<q.options.length;
+
+});
+
+}
+
+
+/* =====================================================
+STATE
+===================================================== */
+
+let current=0;
+
+let answers=[];
+
+let marked=[];
+
+let submitted=false;
+
+let timeLeft=1800;
+
+
+/* =====================================================
+INITIALIZE STATE
+===================================================== */
+
+function initializeState(){
+
+answers=
+new Array(questions.length).fill(null);
+
+marked=
+new Array(questions.length).fill(false);
+
+current=0;
+
+submitted=false;
+
+}
+
+
+/* =====================================================
+TIMER
+===================================================== */
+
+function updateTimer(){
+
+const minutes=
+Math.floor(timeLeft/60);
+
+const seconds=
+timeLeft%60;
+
+document.getElementById("timer").textContent=
+String(minutes).padStart(2,"0")+
+":"+
+String(seconds).padStart(2,"0");
+
+}
+
+
+/* =====================================================
+PART 1 COMPLETE
+===================================================== */
+  /* =====================================================
+RENDER QUESTION
+===================================================== */
+
+function renderQuestion(){
+
+const q=questions[current];
+
+if(!q){
+
+document.getElementById("questionNumber").textContent=
+"No question available";
+
+document.getElementById("question").textContent=
+"Could not load questions.";
+
+document.getElementById("options").innerHTML="";
+
+return;
+
+}
+
+document.getElementById("questionNumber").textContent=
+"Question "+
+(current+1)+
+" of "+
+questions.length+
+" • "+
+(q.subject || "Imported");
+
+document.getElementById("question").textContent=
+q.question;
+
+const box=
+document.getElementById("options");
+
+box.innerHTML="";
+
+q.options.forEach(function(option,index){
+
+const button=
+document.createElement("button");
+
+button.type="button";
+
+button.className="option";
+
+if(answers[current]===index){
+
+button.classList.add("selected");
+
+}
+
+button.textContent=
+String.fromCharCode(65+index)+
+". "+
+option;
+
+button.onclick=function(){
+
+if(submitted)return;
+
+answers[current]=index;
+
+renderQuestion();
+
+};
+
+box.appendChild(button);
+
+});
+
+document.getElementById("nextButton").textContent=
+current===questions.length-1
+?"Finish"
+:"Next";
+
+renderPalette();
+
+}
+
+
+/* =====================================================
+QUESTION PALETTE
+===================================================== */
+
+function renderPalette(){
+
+const palette=
+document.getElementById("palette");
+
+palette.innerHTML="";
+
+questions.forEach(function(q,index){
+
+const button=
+document.createElement("button");
+
+button.type="button";
+
+button.textContent=index+1;
+
+if(answers[index]!==null){
+
+button.classList.add("answered");
+
+}
+
+if(marked[index]){
+
+button.classList.add("review");
+
+}
+
+if(index===current){
+
+button.classList.add("current");
+
+}
+
+button.onclick=function(){
+
+if(submitted)return;
+
+current=index;
+
+renderQuestion();
+
+};
+
+palette.appendChild(button);
+
+});
+
+}
+
+
+/* =====================================================
+NAVIGATION
+===================================================== */
+
+function nextQuestion(){
+
+if(submitted)return;
+
+if(current<questions.length-1){
+
+current++;
+
+renderQuestion();
+
+}else{
+
+submitTest();
+
+}
+
+}
+
+
+function previousQuestion(){
+
+if(submitted)return;
+
+if(current>0){
+
+current--;
+
+renderQuestion();
+
+}
+
+}
+
+
+function clearAnswer(){
+
+if(submitted)return;
+
+answers[current]=null;
+
+renderQuestion();
+
+}
+
+
+function markReview(){
+
+if(submitted)return;
+
+marked[current]=!marked[current];
+
+renderPalette();
+
+}
+
+
+/* =====================================================
+MISTAKE INTELLIGENCE
+===================================================== */
+
+function classifyMistake(q,selectedIndex){
+
+const question=
+String(q.question||"").toLowerCase();
+
+const topic=
+String(q.topic||"").toLowerCase();
+
+const selected=
+selectedIndex===null ||
+selectedIndex===undefined
+?""
+:String(q.options[selectedIndex]||"").toLowerCase();
+
+const correct=
+String(q.options[q.answer]||"").toLowerCase();
+
+
+const calculationWords=[
+"calculate",
+"calculation",
+"numerical",
+"value of",
+"find the",
+"velocity",
+"acceleration",
+"force",
+"work",
+"energy",
+"power",
+"current",
+"voltage",
+"resistance",
+"mass",
+"momentum"
+];
+
+
+if(calculationWords.some(function(word){
+
+return question.includes(word);
+
+})){
+
+return{
+
+type:"🔢 Calculation Error",
+
+reason:
+"Recheck the formula, units and calculation steps."
+
+};
+
+}
+
+
+const memoryWords=[
+"what is",
+"which is",
+"who",
+"symbol",
+"unit",
+"known as",
+"called",
+"most abundant",
+"organ",
+"organelle"
+];
+
+
+if(memoryWords.some(function(word){
+
+return question.includes(word);
+
+})){
+
+return{
+
+type:"📚 Memory / Recall Gap",
+
+reason:
+"This is mainly a factual or definition-based question. Revise the key fact and test recall again."
+
+};
+
+}
+
+
+const conceptWords=[
+"why",
+"principle",
+"mechanism",
+"process",
+"function",
+"relationship",
+"reason",
+"concept"
+];
+
+
+if(
+conceptWords.some(function(word){
+
+return question.includes(word);
+
+}) ||
+topic.includes("concept")
+){
+
+return{
+
+type:"🧠 Concept Gap",
+
+reason:
+"Review the underlying concept instead of memorising only the answer."
+
+};
+
+}
+
+
+if(selected && correct && selected!==correct){
+
+const selectedWords=
+selected.split(/\s+/);
+
+const correctWords=
+correct.split(/\s+/);
+
+const overlap=
+selectedWords.filter(function(word){
+
+return word.length>3 &&
+correctWords.includes(word);
+
+}).length;
+
+if(overlap>0){
+
+return{
+
+type:"🧩 Confused Concepts",
+
+reason:
+"Your selected answer is related to the correct answer. Review the distinction between the two concepts."
+
+};
+
+}
+
+}
+
+
+return{
+
+type:"⚠️ Concept Gap",
+
+reason:
+"The answer was incorrect. Review the explanation and retry the question."
+
+};
+
+}
+
+
+/* =====================================================
+NORMALIZE
+===================================================== */
+
+function normalize(value){
+
+return String(value||"")
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ");
+
+}
+
+
+/* =====================================================
+REACTIVATE MISTAKES
+===================================================== */
+
+function reactivateMistakes(){
+
+let mastery=[];
+
+try{
+
+mastery=
+JSON.parse(
+localStorage.getItem("cbtMasteryV2")||"[]"
 );
 
-/*
-Metadata
-*/
+if(!Array.isArray(mastery)){
+
+mastery=[];
+
+}
+
+}catch(error){
+
+mastery=[];
+
+}
+
+const wrongQuestions=new Set();
+
+questions.forEach(function(q,index){
+
+if(
+answers[index]!==null &&
+answers[index]!==q.answer
+){
+
+wrongQuestions.add(
+normalize(q.question)
+);
+
+}
+
+});
+
+
+mastery=
+mastery.filter(function(item){
+
+if(!item || !item.question){
+
+return true;
+
+}
+
+return !wrongQuestions.has(
+normalize(item.question)
+);
+
+});
+
 
 localStorage.setItem(
-"pdfCbtImportedAt",
+"cbtMasteryV2",
+JSON.stringify(mastery)
+);
+
+}
+
+
+/* =====================================================
+SAVE TEST HISTORY
+===================================================== */
+
+function saveHistory(
+correct,
+incorrect,
+skipped,
+score
+){
+
+let history=[];
+
+try{
+
+history=
+JSON.parse(
+localStorage.getItem("cbtHistory")||"[]"
+);
+
+if(!Array.isArray(history)){
+
+history=[];
+
+}
+
+}catch(error){
+
+history=[];
+
+}
+
+
+const record={
+
+date:new Date().toLocaleString(),
+
+timestamp:Date.now(),
+
+score:score,
+
+correct:correct,
+
+incorrect:incorrect,
+
+wrong:incorrect,
+
+skipped:skipped,
+
+questions:questions.map(function(q,index){
+
+let status;
+
+if(answers[index]===null){
+
+status="skipped";
+
+}else if(answers[index]===q.answer){
+
+status="correct";
+
+}else{
+
+status="wrong";
+
+}
+
+
+let intelligence=null;
+
+if(status==="wrong"){
+
+intelligence=
+classifyMistake(
+q,
+answers[index]
+);
+
+}
+
+
+return{
+
+question:q.question,
+
+options:q.options,
+
+subject:q.subject,
+
+topic:q.topic,
+
+status:status,
+
+selectedIndex:answers[index],
+
+selectedAnswer:
+answers[index]===null
+?"Not answered"
+:q.options[answers[index]],
+
+correctIndex:q.answer,
+
+correctAnswer:q.options[q.answer],
+
+mistakeType:
+intelligence
+?intelligence.type
+:null,
+
+mistakeReason:
+intelligence
+?intelligence.reason
+:null,
+
+mistakeConfidence:
+intelligence
+?"Auto Classified"
+:null,
+
+solution:q.solution||"",
+
+bookmarked:Boolean(marked[index]),
+
+markedForReview:Boolean(marked[index]),
+
+pdfPage:q.pdfPage||"",
+
+chapter:q.chapter||"",
+
+section:q.section||""
+
+};
+
+})
+
+};
+
+
+history.push(record);
+
+localStorage.setItem(
+"cbtHistory",
+JSON.stringify(history)
+);
+
+}
+
+
+/* =====================================================
+CREATE RETRY QUEUE
+===================================================== */
+
+function openRetry(){
+
+const wrong=[];
+
+questions.forEach(function(q,index){
+
+if(
+answers[index]!==null &&
+answers[index]!==q.answer
+){
+
+const intelligence=
+classifyMistake(
+q,
+answers[index]
+);
+
+wrong.push({
+
+id:
+"retry-"+Date.now()+"-"+index,
+
+question:q.question,
+
+options:q.options,
+
+subject:q.subject||"Imported",
+
+topic:q.topic||"PDF Import",
+
+correctIndex:q.answer,
+
+correctAnswer:q.options[q.answer],
+
+solution:q.solution||"",
+
+selectedIndex:answers[index],
+
+selectedAnswer:q.options[answers[index]],
+
+mistakeType:intelligence.type,
+
+mistakeReason:intelligence.reason,
+
+source:"CBT",
+
+pdfPage:q.pdfPage||"",
+
+chapter:q.chapter||"",
+
+section:q.section||""
+
+});
+
+}
+
+});
+
+
+if(wrong.length===0){
+
+alert("There are no mistakes to retry.");
+
+return;
+
+}
+
+
+localStorage.setItem(
+"cbtAnalyzer.retryQueue",
+JSON.stringify(wrong)
+);
+
+localStorage.setItem(
+"cbtRetryQuestion",
+JSON.stringify(wrong[0])
+);
+
+localStorage.setItem(
+"cbtRetryStartedAt",
 String(Date.now())
 );
 
-localStorage.setItem(
-"pdfCbtQuestionCount",
-String(finalQuestions.length)
-);
-
-localStorage.setItem(
-"pdfCbtAnswerKeyDetected",
-JSON.stringify(detectedAnswerKey)
-);
-
-localStorage.setItem(
-"pdfCbtSourceMetadata",
-JSON.stringify({
-
-fileName:
-pdfFile.files[0]
-?pdfFile.files[0].name
-:"",
-
-questionCount:
-finalQuestions.length,
-
-answerKeyDetected:
-Object.keys(detectedAnswerKey).length>0,
-
-importedAt:Date.now()
-
-})
-);
-
-/*
-Open CBT.
-*/
-
-window.location.href="cbt.html";
+window.location.href="retry.html";
 
 }
+
 
 /* =====================================================
-CLEAR
+RETRY BUTTON
 ===================================================== */
 
-function clearImport(){
+function updateRetryButton(incorrect){
 
-importedQuestions=[];
+const button=
+document.getElementById("retryButton");
 
-detectedAnswerKey={};
+if(incorrect>0){
 
-pdfPages=[];
+button.style.display="block";
 
-pdfFile.value="";
+button.textContent=
+"🔄 Retry "+
+incorrect+
+" Mistake"+
+(incorrect===1?"":"s");
 
-preview.innerHTML="";
+}else{
 
-previewCard.classList.add("hidden");
-
-summaryCard.classList.add("hidden");
-
-statusBox.classList.add("hidden");
-
-questionCount.textContent="";
-
-summary.innerHTML="";
+button.style.display="none";
 
 }
+
+}
+
+
+/* =====================================================
+SUBMIT TEST
+===================================================== */
+
+function submitTest(){
+
+if(submitted)return;
+
+if(!questions.length){
+
+alert(
+"No questions are available."
+);
+
+return;
+
+}
+
+
+let correct=0;
+
+let incorrect=0;
+
+let skipped=0;
+
+
+questions.forEach(function(q,index){
+
+if(answers[index]===null){
+
+skipped++;
+
+}else if(answers[index]===q.answer){
+
+correct++;
+
+}else{
+
+incorrect++;
+
+}
+
+});
+
+
+const score=
+(correct*4)-incorrect;
+
+
+reactivateMistakes();
+
+saveHistory(
+correct,
+incorrect,
+skipped,
+score
+);
+
+submitted=true;
+
+clearInterval(timerInterval);
+
+
+document.getElementById("testScreen")
+.style.display="none";
+
+document.querySelector("aside")
+.style.display="none";
+
+document.getElementById("result")
+.style.display="block";
+
+
+document.getElementById("score")
+.textContent=
+score+
+" / "+
+(questions.length*4);
+
+
+document.getElementById("summary").textContent=
+"Correct: "+
+correct+
+" | Incorrect: "+
+incorrect+
+" | Skipped: "+
+skipped;
+
+
+updateRetryButton(incorrect);
+
+generateReview();
+
+}
+
+
+/* =====================================================
+GENERATE REVIEW
+===================================================== */
+
+function generateReview(){
+
+const box=
+document.getElementById("review");
+
+box.innerHTML=
+"<h3>🧠 Question Analysis</h3>";
+
+
+questions.forEach(function(q,index){
+
+const item=
+document.createElement("div");
+
+let status;
+
+if(answers[index]===null){
+
+status="skipped";
+
+}else if(answers[index]===q.answer){
+
+status="correct";
+
+}else{
+
+status="incorrect";
+
+}
+
+
+item.className=
+"review-item "+
+status;
+
+
+const yourAnswer=
+answers[index]===null
+?"Not answered"
+:q.options[answers[index]];
+
+
+let html=
+"<strong>Question "+
+(index+1)+
+"</strong>"+
+
+"<p>"+
+escapeHTML(q.question)+
+"</p>"+
+
+"<p><strong>Your answer:</strong> "+
+escapeHTML(yourAnswer)+
+"</p>"+
+
+"<p><strong>Correct answer:</strong> "+
+escapeHTML(q.options[q.answer])+
+"</p>";
+
+
+if(status==="incorrect"){
+
+const intelligence=
+classifyMistake(
+q,
+answers[index]
+);
+
+html+=
+"<div class='analysis'>"+
+
+"<strong>🧠 Mistake Intelligence</strong>"+
+
+"<br><br>"+
+
+"<strong>Mistake Type:</strong>"+
+
+"<div class='analysis-type'>"+
+escapeHTML(intelligence.type)+
+"</div>"+
+
+"<br>"+
+
+"<strong>Why:</strong><br>"+
+
+escapeHTML(intelligence.reason)+
+
+"<br><br>"+
+
+"<strong>💡 Solution</strong><br>"+
+
+escapeHTML(
+q.solution ||
+"Review this concept and retry the question."
+)+
+
+"</div>";
+
+}
+
+
+if(status==="correct"){
+
+html+=
+"<div class='analysis'>"+
+"✅ Correct. "+
+escapeHTML(
+q.solution ||
+"Good work. Keep revising this concept."
+)+
+"</div>";
+
+}
+
+
+if(status==="skipped"){
+
+html+=
+"<div class='analysis'>"+
+"⚠️ Skipped. Review this question before your next attempt."+
+"</div>";
+
+}
+
+
+item.innerHTML=html;
+
+box.appendChild(item);
+
+});
+
+}
+
 
 /* =====================================================
 ESCAPE HTML
@@ -1474,7 +1684,7 @@ ESCAPE HTML
 
 function escapeHTML(value){
 
-return String(value??"")
+return String(value ?? "")
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;")
@@ -1482,6 +1692,69 @@ return String(value??"")
 .replace(/'/g,"&#039;");
 
 }
+
+
+/* =====================================================
+TIMER START
+===================================================== */
+
+updateTimer();
+
+const timerInterval=
+setInterval(function(){
+
+if(submitted)return;
+
+timeLeft--;
+
+if(timeLeft<=0){
+
+timeLeft=0;
+
+updateTimer();
+
+clearInterval(timerInterval);
+
+submitTest();
+
+return;
+
+}
+
+updateTimer();
+
+},1000);
+
+
+/* =====================================================
+INITIALIZE
+===================================================== */
+
+loadPDFQuestions();
+
+validateQuestions();
+
+initializeState();
+
+
+if(questions.length===0){
+
+document.getElementById("questionNumber").textContent=
+"No questions available";
+
+document.getElementById("question").textContent=
+"Please import a PDF containing MCQs first.";
+
+}else{
+
+renderQuestion();
+
+}
+
+
+/* =====================================================
+END
+===================================================== */
 
 </script>
 
