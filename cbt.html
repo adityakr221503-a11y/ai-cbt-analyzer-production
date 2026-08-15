@@ -193,31 +193,6 @@ border-radius:10px;
 line-height:1.5;
 }
 
-.reason-options{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin-top:10px;
-}
-
-.reason-button{
-background:#fff;
-border:2px solid #e2e8f0;
-text-align:left;
-}
-
-.reason-button.selected{
-border-color:#4f46e5;
-background:#eef2ff;
-}
-
-.bookmark{
-margin-top:10px;
-padding:10px;
-background:#fef3c7;
-border-radius:8px;
-}
-
 .result-actions button{
 width:100%;
 margin-top:10px;
@@ -229,10 +204,6 @@ margin-top:10px;
 grid-template-columns:1fr;
 }
 
-.reason-options{
-grid-template-columns:1fr;
-}
-
 }
 </style>
 </head>
@@ -240,19 +211,19 @@ grid-template-columns:1fr;
 <body>
 
 <header>
+
 <div class="header">
 
 <div class="logo">
 CBT Analyzer <span>Pro</span>
 </div>
 
-<div
-id="timer"
-class="timer">
+<div id="timer" class="timer">
 30:00
 </div>
 
 </div>
+
 </header>
 
 
@@ -262,14 +233,12 @@ class="timer">
 
 <section id="testScreen">
 
-<div
-id="questionNumber"
+<div id="questionNumber"
 class="question-number">
 Loading...
 </div>
 
-<div
-id="question"
+<div id="question"
 class="question">
 </div>
 
@@ -311,15 +280,13 @@ Next
 
 <h2>🎯 Test Completed</h2>
 
-<div
-id="score"
+<div id="score"
 class="score">
 </div>
 
 <p id="summary"></p>
 
 <div id="review"></div>
-
 
 <div class="result-actions">
 
@@ -354,8 +321,7 @@ onclick="location.href='index.html'">
 
 <h3>Question Palette</h3>
 
-<div
-id="palette"
+<div id="palette"
 class="palette">
 </div>
 
@@ -373,9 +339,9 @@ Submit Test
 
 <script>
 
-/* ================================
+/* =====================================================
 QUESTIONS
-================================ */
+===================================================== */
 
 const questions=[
 
@@ -522,9 +488,9 @@ solution:"The heart contracts rhythmically to pump blood through the circulatory
 ];
 
 
-/* ================================
+/* =====================================================
 STATE
-================================ */
+===================================================== */
 
 let current=0;
 
@@ -539,9 +505,9 @@ let submitted=false;
 let timeLeft=1800;
 
 
-/* ================================
+/* =====================================================
 TIMER
-================================ */
+===================================================== */
 
 function updateTimer(){
 
@@ -583,9 +549,9 @@ updateTimer();
 },1000);
 
 
-/* ================================
+/* =====================================================
 RENDER QUESTION
-================================ */
+===================================================== */
 
 function renderQuestion(){
 
@@ -651,9 +617,9 @@ renderPalette();
 }
 
 
-/* ================================
+/* =====================================================
 PALETTE
-================================ */
+===================================================== */
 
 function renderPalette(){
 
@@ -702,9 +668,9 @@ palette.appendChild(button);
 }
 
 
-/* ================================
+/* =====================================================
 NAVIGATION
-================================ */
+===================================================== */
 
 function nextQuestion(){
 
@@ -751,9 +717,93 @@ renderPalette();
 }
 
 
-/* ================================
+/* =====================================================
+REACTIVATE MISTAKES
+===================================================== */
+
+function reactivateMistakes(){
+
+let mastery=[];
+
+try{
+
+mastery=
+JSON.parse(
+localStorage.getItem("cbtMasteryV2")||"[]"
+);
+
+if(!Array.isArray(mastery)){
+
+mastery=[];
+
+}
+
+}catch(error){
+
+mastery=[];
+
+}
+
+
+const wrongQuestions=
+new Set();
+
+
+questions.forEach(function(q,index){
+
+if(
+answers[index]!==null &&
+answers[index]!==q.answer
+){
+
+wrongQuestions.add(
+String(q.question||"")
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ")
+);
+
+}
+
+});
+
+
+mastery=
+mastery.filter(function(item){
+
+if(
+!item ||
+!item.question
+){
+
+return true;
+
+}
+
+
+const key=
+String(item.question)
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ");
+
+
+return !wrongQuestions.has(key);
+
+});
+
+
+localStorage.setItem(
+"cbtMasteryV2",
+JSON.stringify(mastery)
+);
+
+}
+
+
+/* =====================================================
 SAVE HISTORY
-================================ */
+===================================================== */
 
 function saveHistory(
 correct,
@@ -877,9 +927,9 @@ JSON.stringify(history)
 }
 
 
-/* ================================
+/* =====================================================
 RETRY BUTTON
-================================ */
+===================================================== */
 
 function updateRetryButton(incorrect){
 
@@ -905,9 +955,9 @@ button.style.display="none";
 }
 
 
-/* ================================
+/* =====================================================
 SUBMIT
-================================ */
+===================================================== */
 
 function submitTest(){
 
@@ -943,6 +993,15 @@ incorrect++;
 
 const score=
 (correct*4)-incorrect;
+
+
+/*
+Important:
+Remove any previously-mastered questions
+that were answered incorrectly again.
+*/
+
+reactivateMistakes();
 
 
 saveHistory(
@@ -992,9 +1051,9 @@ generateReview();
 }
 
 
-/* ================================
+/* =====================================================
 REVIEW
-================================ */
+===================================================== */
 
 function generateReview(){
 
@@ -1088,9 +1147,9 @@ box.appendChild(item);
 }
 
 
-/* ================================
+/* =====================================================
 ESCAPE
-================================ */
+===================================================== */
 
 function escapeHTML(value){
 
@@ -1104,9 +1163,9 @@ return String(value||"")
 }
 
 
-/* ================================
+/* =====================================================
 START
-================================ */
+===================================================== */
 
 updateTimer();
 
@@ -1115,4 +1174,4 @@ renderQuestion();
 </script>
 
 </body>
-</html
+</html>
