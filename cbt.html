@@ -7,9 +7,7 @@
 <title>CBT Analyzer Pro — CBT Test</title>
 
 <style>
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
@@ -159,10 +157,15 @@ outline:3px solid #4f46e5;
 
 #result{
 display:none;
+position:relative;
+z-index:10;
 }
 
 #result h2{
 margin-top:0;
+position:relative;
+z-index:20;
+pointer-events:auto;
 }
 
 .score{
@@ -170,16 +173,31 @@ font-size:38px;
 font-weight:800;
 text-align:center;
 margin:10px 0;
+position:relative;
+z-index:20;
+pointer-events:auto;
+}
+
+#summary{
+position:relative;
+z-index:20;
+pointer-events:auto;
 }
 
 .result-actions{
 margin-top:10px;
+position:relative;
+z-index:30;
+pointer-events:auto;
 }
 
 .result-actions button{
 width:100%;
 margin-top:8px;
 padding:14px;
+position:relative;
+z-index:40;
+pointer-events:auto;
 }
 
 .review-item{
@@ -207,6 +225,11 @@ padding:13px;
 background:#eef2ff;
 border-radius:10px;
 line-height:1.5;
+}
+
+/* Hidden test screen must never block result clicks */
+#testScreen[style*="display: none"]{
+pointer-events:none !important;
 }
 
 @media(max-width:800px){
@@ -315,8 +338,6 @@ class="score">
 <p id="summary"></p>
 
 
-<!-- ACTIONS MOVED ABOVE QUESTION ANALYSIS -->
-
 <div class="result-actions">
 
 <button
@@ -341,8 +362,6 @@ onclick="location.href='index.html'">
 
 </div>
 
-
-<!-- QUESTION ANALYSIS NOW COMES AFTER THE BUTTONS -->
 
 <div id="review"></div>
 
@@ -1028,12 +1047,6 @@ incorrect++;
 const score=
 (correct*4)-incorrect;
 
-
-/*
-Important:
-Remove any previously-mastered questions
-that were answered incorrectly again.
-*/
 
 reactivateMistakes();
 
