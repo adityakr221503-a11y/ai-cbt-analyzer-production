@@ -7,24 +7,21 @@
 <title>CBT Analyzer Pro — Dashboard</title>
 
 <style>
-*{box-sizing:border-box}
-
-html,body{
-margin:0;
-padding:0;
+*{
+box-sizing:border-box;
 }
 
 body{
+margin:0;
 font-family:Arial,sans-serif;
 background:#f1f5f9;
 color:#0f172a;
--webkit-tap-highlight-color:transparent;
 }
 
 header{
 background:#fff;
 border-bottom:1px solid #e2e8f0;
-padding:16px 20px;
+padding:16px 18px;
 }
 
 .header{
@@ -38,33 +35,24 @@ gap:15px;
 
 .logo{
 font-size:21px;
-font-weight:800;
+font-weight:900;
 }
 
 .logo span{
 color:#4f46e5;
 }
 
-.header-badge{
-background:#eef2ff;
-color:#3730a3;
-padding:8px 11px;
-border-radius:9px;
-font-size:12px;
-font-weight:800;
-}
-
 .container{
 max-width:1100px;
-margin:25px auto;
+margin:22px auto;
 padding:0 15px;
 }
 
 .hero{
 background:#4f46e5;
 color:#fff;
-border-radius:20px;
-padding:28px;
+border-radius:18px;
+padding:25px;
 margin-bottom:20px;
 }
 
@@ -75,307 +63,119 @@ font-size:28px;
 
 .hero p{
 margin:0;
-opacity:.92;
 line-height:1.6;
+opacity:.95;
 }
 
-.hero-actions{
+.grid{
 display:grid;
 grid-template-columns:repeat(2,1fr);
-gap:10px;
-margin-top:22px;
-}
-
-button{
-font-family:Arial,sans-serif;
-}
-
-.hero-button{
-border:0;
-border-radius:11px;
-padding:14px;
-font-weight:800;
-font-size:15px;
-cursor:pointer;
-touch-action:manipulation;
--webkit-tap-highlight-color:transparent;
-}
-
-.start{
-background:#fff;
-color:#3730a3;
-}
-
-.mistakes{
-background:#312e81;
-color:#fff;
+gap:16px;
 }
 
 .card{
 background:#fff;
 border-radius:16px;
 padding:20px;
-margin-bottom:20px;
 box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .card h2{
-margin-top:0;
+margin:0 0 8px;
+}
+
+.card p{
+color:#64748b;
+line-height:1.5;
+}
+
+.btn{
+display:block;
+width:100%;
+border:0;
+border-radius:11px;
+padding:14px 16px;
+font-family:inherit;
+font-size:15px;
+font-weight:800;
+text-align:center;
+text-decoration:none;
+cursor:pointer;
+margin-top:12px;
+}
+
+.primary{
+background:#4f46e5;
+color:#fff;
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.green{
+background:#16a34a;
+color:#fff;
+}
+
+.orange{
+background:#f59e0b;
+color:#fff;
+}
+
+.red{
+background:#dc2626;
+color:#fff;
 }
 
 .stats{
 display:grid;
 grid-template-columns:repeat(4,1fr);
 gap:12px;
+margin-bottom:20px;
 }
 
-/* TESTS COMPLETED IS NOW DIRECTLY CLICKABLE */
 .stat{
-width:100%;
-border:0;
-background:#f8fafc;
-border-radius:13px;
-padding:17px;
-text-align:center;
-color:#0f172a;
-cursor:pointer;
-touch-action:manipulation;
--webkit-tap-highlight-color:transparent;
-position:relative;
-z-index:5;
-pointer-events:auto;
-}
-
-.stat:active{
-transform:scale(.97);
-background:#eef2ff;
-}
-
-.stat strong{
-display:block;
-font-size:29px;
-margin-bottom:5px;
-}
-
-.stat span{
-font-size:13px;
-color:#64748b;
-font-weight:600;
-}
-
-.actions{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:12px;
-}
-
-.action{
-border:0;
-background:#f8fafc;
-border-radius:13px;
-padding:18px 10px;
-font-weight:800;
-cursor:pointer;
-font-size:14px;
-touch-action:manipulation;
--webkit-tap-highlight-color:transparent;
-}
-
-.action:active{
-transform:scale(.97);
-background:#eef2ff;
-}
-
-.action-icon{
-display:block;
-font-size:27px;
-margin-bottom:8px;
-}
-
-.performance{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-}
-
-.performance-box{
-background:#f8fafc;
-border-radius:13px;
-padding:18px;
-}
-
-.performance-box h3{
-margin-top:0;
-}
-
-.progress{
-height:10px;
-background:#e2e8f0;
-border-radius:20px;
-overflow:hidden;
-margin:12px 0;
-}
-
-.progress-bar{
-height:100%;
-width:0%;
-background:#4f46e5;
-transition:.4s;
-}
-
-.subject-grid{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:12px;
-}
-
-.subject{
-background:#f8fafc;
-border-radius:13px;
-padding:17px;
-}
-
-.subject strong{
-display:block;
-font-size:20px;
-margin-bottom:6px;
-}
-
-.subject small{
-color:#64748b;
-}
-
-
-/* =====================================================
-   CLICKABLE HISTORY — FULL TOUCH AREA
-===================================================== */
-
-.history-item{
-display:block;
-position:relative;
-z-index:100;
-isolation:isolate;
-
-width:100%;
-min-height:100px;
-
-border:1px solid #e2e8f0;
-border-radius:12px;
-
-padding:15px;
-margin-top:10px;
-
 background:#fff;
-color:#0f172a;
-
-font-family:Arial,sans-serif;
-font-size:15px;
-font-weight:400;
-text-align:left;
-
-cursor:pointer;
-
-touch-action:manipulation;
--webkit-tap-highlight-color:transparent;
--webkit-appearance:none;
-appearance:none;
-
-pointer-events:auto;
-user-select:none;
+border-radius:14px;
+padding:17px;
+box-shadow:0 3px 12px rgba(0,0,0,.06);
 }
 
-.history-item *{
-pointer-events:none;
+.stat-value{
+font-size:25px;
+font-weight:900;
 }
 
-.history-item:hover{
-background:#f8fafc;
-}
-
-.history-item:active{
-transform:scale(.98);
-background:#eef2ff;
-}
-
-.history-top{
-display:flex;
-justify-content:space-between;
-gap:10px;
-font-weight:800;
-}
-
-.history-score{
-color:#4f46e5;
-}
-
-.history-details{
-margin-top:8px;
+.stat-label{
 color:#64748b;
-font-size:14px;
-line-height:1.6;
+font-size:13px;
+margin-top:5px;
 }
 
-.history-open{
-margin-top:10px;
-font-size:12px;
-font-weight:800;
-color:#4f46e5;
+.section-title{
+margin:25px 0 12px;
 }
 
 .empty{
 text-align:center;
-padding:30px;
+padding:20px;
 color:#64748b;
-line-height:1.6;
 }
 
-.footer{
-text-align:center;
-padding:15px;
-color:#94a3b8;
-font-size:13px;
-}
+@media(max-width:750px){
 
-@media(max-width:800px){
+.grid{
+grid-template-columns:1fr;
+}
 
 .stats{
-grid-template-columns:1fr 1fr;
-}
-
-.actions{
-grid-template-columns:1fr 1fr;
-}
-
-.subject-grid{
-grid-template-columns:1fr;
-}
-
-.performance{
-grid-template-columns:1fr;
-}
-
-}
-
-@media(max-width:600px){
-
-.container{
-margin:15px auto;
-}
-
-.hero{
-padding:21px;
+grid-template-columns:repeat(2,1fr);
 }
 
 .hero h1{
 font-size:24px;
-}
-
-.hero-actions{
-grid-template-columns:1fr;
-}
-
-.card{
-padding:17px;
 }
 
 }
@@ -392,10 +192,6 @@ padding:17px;
 CBT Analyzer <span>Pro</span>
 </div>
 
-<div class="header-badge">
-STUDENT DASHBOARD
-</div>
-
 </div>
 
 </header>
@@ -406,347 +202,248 @@ STUDENT DASHBOARD
 
 <section class="hero">
 
-<h1>
-🎯 Your CBT Learning Dashboard
-</h1>
+<h1>🎯 CBT Analyzer Pro</h1>
 
 <p>
-Test → Analyze → Fix Mistakes → Retry → Master.
+Practice tests, import question PDFs, analyze mistakes,
+retry weak questions and track your performance.
 </p>
-
-<div class="hero-actions">
-
-<button
-class="hero-button start"
-type="button"
-onclick="go('cbt.html')">
-
-📝 Start CBT Test
-
-</button>
-
-<button
-class="hero-button mistakes"
-type="button"
-onclick="go('mistake.html')">
-
-🧠 Open Mistake Bank
-
-</button>
-
-</div>
 
 </section>
 
 
-<section class="card">
-
-<h2>📊 Performance Overview</h2>
+<!-- ================================
+STATS
+================================ -->
 
 <div class="stats">
 
-<!-- TESTS COMPLETED IS NOW A BUTTON -->
-<button
-class="stat"
-type="button"
-onclick="scrollToHistory()">
-
-<strong id="testsCount">0</strong>
-
-<span>
-Tests Completed — Tap to Open
-</span>
-
-</button>
-
-
-<button
-class="stat"
-type="button"
-onclick="scrollToHistory()">
-
-<strong id="totalQuestions">0</strong>
-
-<span>
-Questions Attempted
-</span>
-
-</button>
-
-
-<button
-class="stat"
-type="button"
-onclick="scrollToHistory()">
-
-<strong id="accuracy">0%</strong>
-
-<span>
-Accuracy
-</span>
-
-</button>
-
-
-<button
-class="stat"
-type="button"
-onclick="openMastered()">
-
-<strong id="mastered">0</strong>
-
-<span>
-🏆 Mastered — Tap to Open
-</span>
-
-</button>
-
-</div>
-
-</section>
-
-
-<section class="card">
-
-<h2>⚡ Quick Actions</h2>
-
-<div class="actions">
-
-<button
-class="action"
-type="button"
-onclick="go('cbt.html')">
-
-<span class="action-icon">📝</span>
-New CBT
-
-</button>
-
-<button
-class="action"
-type="button"
-onclick="go('mistake.html')">
-
-<span class="action-icon">❌</span>
-Mistake Bank
-
-</button>
-
-<button
-class="action"
-type="button"
-onclick="go('retry.html')">
-
-<span class="action-icon">🔄</span>
-Retry
-
-</button>
-
-<button
-class="action"
-type="button"
-onclick="scrollToHistory()">
-
-<span class="action-icon">📜</span>
-History
-
-</button>
-
-</div>
-
-</section>
-
-
-<section class="card">
-
-<h2>🧠 Mistake Intelligence</h2>
-
-<div class="performance">
-
-<div class="performance-box">
-
-<h3>❌ Active Mistakes</h3>
-
-<strong
-id="activeMistakes"
-style="font-size:30px">
-
-0
-
-</strong>
-
-<p>
-Questions that still need revision.
-</p>
-
-<button
-class="action"
-style="width:100%"
-type="button"
-onclick="go('mistake.html')">
-
-Review Mistakes
-
-</button>
-
-</div>
-
-
-<div class="performance-box">
-
-<h3>🔄 Retry Attempts</h3>
-
-<strong
-id="retryAttempts"
-style="font-size:30px">
-
-0
-
-</strong>
-
-<p>
-Total retry attempts recorded.
-</p>
-
-<button
-class="action"
-style="width:100%"
-type="button"
-onclick="go('retry.html')">
-
-Start Retry
-
-</button>
-
-</div>
-
-</div>
-
-</section>
-
-
-<section class="card">
-
-<h2>🎯 Overall Accuracy</h2>
-
-<div class="performance-box">
-
-<strong
-id="accuracyLarge"
-style="font-size:34px">
-
-0%
-
-</strong>
-
-<div class="progress">
+<div class="stat">
 
 <div
-class="progress-bar"
-id="accuracyBar">
+id="testCount"
+class="stat-value">
+0
+</div>
+
+<div class="stat-label">
+Tests Completed
 </div>
 
 </div>
 
-<p id="accuracyMessage">
-Complete a CBT test to start building your performance profile.
+
+<div class="stat">
+
+<div
+id="mistakeCount"
+class="stat-value">
+0
+</div>
+
+<div class="stat-label">
+Mistakes
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div
+id="retryCount"
+class="stat-value">
+0
+</div>
+
+<div class="stat-label">
+Retry Questions
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div
+id="lastScore"
+class="stat-value">
+—
+</div>
+
+<div class="stat-label">
+Last Score
+</div>
+
+</div>
+
+</div>
+
+
+<h2 class="section-title">
+🚀 Start Learning
+</h2>
+
+
+<div class="grid">
+
+
+<!-- PDF TO CBT -->
+
+<div class="card">
+
+<h2>📄 PDF → CBT</h2>
+
+<p>
+Upload a question PDF, detect MCQs, verify answers,
+and convert the questions into a CBT.
 </p>
 
+<a
+class="btn primary"
+href="pdf-to-cbt.html">
+
+📄 Import PDF & Create CBT
+
+</a>
+
 </div>
 
-</section>
 
+<!-- NORMAL CBT -->
+
+<div class="card">
+
+<h2>📝 CBT Test</h2>
+
+<p>
+Take a standard computer-based test using the built-in
+question bank.
+</p>
+
+<a
+class="btn secondary"
+href="cbt.html">
+
+🚀 Start CBT
+
+</a>
+
+</div>
+
+
+<!-- MISTAKE BANK -->
+
+<div class="card">
+
+<h2>🧠 Mistake Bank</h2>
+
+<p>
+Review questions you answered incorrectly and understand
+your mistake patterns.
+</p>
+
+<a
+class="btn orange"
+href="mistake.html">
+
+🧠 Open Mistake Bank
+
+</a>
+
+</div>
+
+
+<!-- RETRY -->
+
+<div class="card">
+
+<h2>🔄 Retry Mistakes</h2>
+
+<p>
+Practice your previously incorrect questions again and
+build mastery.
+</p>
+
+<a
+class="btn green"
+href="retry.html">
+
+🔄 Retry Mistakes
+
+</a>
+
+</div>
+
+
+<!-- HISTORY -->
+
+<div class="card">
+
+<h2>📊 Test History</h2>
+
+<p>
+View your previous CBT attempts, scores, correct answers,
+wrong answers and skipped questions.
+</p>
+
+<a
+class="btn secondary"
+href="history.html">
+
+📊 Test History
+
+</a>
+
+</div>
+
+
+<!-- MASTERED -->
+
+<div class="card">
+
+<h2>🏆 Mastery</h2>
+
+<p>
+Questions you have successfully improved on are tracked
+through the CBT learning system.
+</p>
+
+<button
+class="btn primary"
+type="button"
+onclick="showMastery()">
+
+🏆 View Mastery
+
+</button>
+
+</div>
+
+
+</div>
+
+
+<!-- ================================
+RECENT ACTIVITY
+================================ -->
+
+<h2 class="section-title">
+📈 Recent Test
+</h2>
 
 <section class="card">
 
-<h2>📚 Subject Performance</h2>
+<div
+id="recentTest"
+class="empty">
 
-<div class="subject-grid">
-
-<div class="subject">
-
-<strong>⚡ Physics</strong>
-
-<div>
-Questions:
-<span id="physicsQuestions">0</span>
-</div>
-
-<div>
-Correct:
-<span id="physicsCorrect">0</span>
-</div>
-
-<small>
-Accuracy:
-<span id="physicsAccuracy">0%</span>
-</small>
-
-</div>
-
-
-<div class="subject">
-
-<strong>🧪 Chemistry</strong>
-
-<div>
-Questions:
-<span id="chemistryQuestions">0</span>
-</div>
-
-<div>
-Correct:
-<span id="chemistryCorrect">0</span>
-</div>
-
-<small>
-Accuracy:
-<span id="chemistryAccuracy">0%</span>
-</small>
-
-</div>
-
-
-<div class="subject">
-
-<strong>🧬 Biology</strong>
-
-<div>
-Questions:
-<span id="biologyQuestions">0</span>
-</div>
-
-<div>
-Correct:
-<span id="biologyCorrect">0</span>
-</div>
-
-<small>
-Accuracy:
-<span id="biologyAccuracy">0%</span>
-</small>
-
-</div>
+No test history yet.
 
 </div>
 
 </section>
 
-
-<section
-class="card"
-id="historySection">
-
-<h2>📜 Recent Test History</h2>
-
-<div id="historyList"></div>
-
-</section>
-
-
-<div class="footer">
-CBT Analyzer Pro • Student First Learning System
-</div>
 
 </div>
 
@@ -756,73 +453,217 @@ CBT Analyzer Pro • Student First Learning System
 "use strict";
 
 
-/* ================================
-   STORAGE
-================================ */
+/* =====================================
+LOAD HISTORY
+===================================== */
 
-const HISTORY_KEY="cbtHistory";
-const MASTERY_KEY="cbtMasteryV2";
-const RETRY_KEY="cbtRetryHistory";
-
-
-/* ================================
-   NAVIGATION
-================================ */
-
-function go(page){
-
-window.location.assign(page);
-
-}
-
-
-/* ================================
-   READ STORAGE
-================================ */
-
-function readJSON(key,fallback){
+function getHistory(){
 
 try{
 
-const raw=localStorage.getItem(key);
+const history=
+JSON.parse(
+localStorage.getItem("cbtHistory")||"[]"
+);
 
-if(!raw){
-return fallback;
-}
+return Array.isArray(history)
+?history
+:[];
 
-const data=JSON.parse(raw);
+}catch(error){
 
-return data===null
-?fallback
-:data;
-
-}catch(e){
-
-console.error(e);
-return fallback;
+return [];
 
 }
 
 }
 
 
-/* ================================
-   NORMALIZE
-================================ */
+/* =====================================
+UPDATE DASHBOARD
+===================================== */
 
-function normalize(value){
+function updateDashboard(){
 
-return String(value||"")
-.trim()
-.toLowerCase()
-.replace(/\s+/g," ");
+const history=
+getHistory();
+
+
+/*
+Tests
+*/
+
+document.getElementById(
+"testCount"
+).textContent=
+history.length;
+
+
+/*
+Mistakes
+*/
+
+let mistakes=0;
+
+history.forEach(function(test){
+
+mistakes+=
+Number(test.incorrect||0);
+
+});
+
+document.getElementById(
+"mistakeCount"
+).textContent=
+mistakes;
+
+
+/*
+Retry queue
+*/
+
+let retryCount=0;
+
+try{
+
+const retry=
+JSON.parse(
+localStorage.getItem(
+"cbtAnalyzer.retryQueue"
+)||"[]"
+);
+
+if(Array.isArray(retry)){
+
+retryCount=retry.length;
+
+}
+
+}catch(error){
+
+retryCount=0;
+
+}
+
+document.getElementById(
+"retryCount"
+).textContent=
+retryCount;
+
+
+/*
+Last score
+*/
+
+if(history.length>0){
+
+const latest=
+history[history.length-1];
+
+document.getElementById(
+"lastScore"
+).textContent=
+latest.score??"—";
+
+renderRecent(latest);
+
+}
 
 }
 
 
-/* ================================
-   ESCAPE
-================================ */
+/* =====================================
+RECENT TEST
+===================================== */
+
+function renderRecent(test){
+
+const box=
+document.getElementById(
+"recentTest"
+);
+
+if(!test){
+
+box.textContent=
+"No test history yet.";
+
+return;
+
+}
+
+box.innerHTML=
+"<strong>Latest Test</strong>"+
+"<br><br>"+
+"📅 "+
+escapeHTML(test.date||"")+
+"<br>"+
+"🎯 Score: "+
+escapeHTML(test.score)+
+"<br>"+
+"✅ Correct: "+
+escapeHTML(test.correct)+
+" | ❌ Incorrect: "+
+escapeHTML(test.incorrect)+
+" | ⏭ Skipped: "+
+escapeHTML(test.skipped);
+
+}
+
+
+/* =====================================
+MASTERY
+===================================== */
+
+function showMastery(){
+
+let mastery=[];
+
+try{
+
+mastery=
+JSON.parse(
+localStorage.getItem(
+"cbtMasteryV2"
+)||"[]"
+);
+
+if(!Array.isArray(mastery)){
+
+mastery=[];
+
+}
+
+}catch(error){
+
+mastery=[];
+
+}
+
+
+if(mastery.length===0){
+
+alert(
+"No mastered questions yet. Keep practicing your mistakes!"
+);
+
+return;
+
+}
+
+
+alert(
+"🏆 Mastery contains "+
+mastery.length+
+" tracked question(s)."
+);
+
+}
+
+
+/* =====================================
+ESCAPE
+===================================== */
 
 function escapeHTML(value){
 
@@ -836,620 +677,11 @@ return String(value??"")
 }
 
 
-/* ================================
-   MASTERED
-================================ */
-
-function getMasteredQuestions(){
-
-const data=
-readJSON(MASTERY_KEY,[]);
-
-if(!Array.isArray(data)){
-return [];
-}
-
-return data.filter(function(item){
-
-return item && item.question;
-
-});
-
-}
-
-
-function openMastered(){
-
-window.location.assign(
-"mistake.html#mastered"
-);
-
-}
-
-
-/* ================================
-   HISTORY
-================================ */
-
-const history=
-readJSON(HISTORY_KEY,[]);
-
-const tests=
-Array.isArray(history)
-?history
-:[];
-
-
-/* ================================
-   GLOBAL STATS
-================================ */
-
-let totalQuestions=0;
-let totalAttempted=0;
-let totalCorrect=0;
-let totalWrong=0;
-let totalSkipped=0;
-
-
-tests.forEach(function(test){
-
-if(!test){
-return;
-}
-
-
-if(Array.isArray(test.questions)){
-
-test.questions.forEach(function(q){
-
-if(!q){
-return;
-}
-
-totalQuestions++;
-
-
-if(q.status==="correct"){
-
-totalCorrect++;
-totalAttempted++;
-
-}
-
-else if(q.status==="wrong"){
-
-totalWrong++;
-totalAttempted++;
-
-}
-
-else if(q.status==="skipped"){
-
-totalSkipped++;
-
-}
-
-else if(
-q.selectedIndex!==null &&
-q.selectedIndex!==undefined
-){
-
-totalAttempted++;
-
-}
-
-});
-
-}else{
-
-totalCorrect+=Number(test.correct)||0;
-
-totalWrong+=
-Number(test.incorrect||test.wrong)||0;
-
-totalSkipped+=
-Number(test.skipped)||0;
-
-}
-
-});
-
-
-const accuracy=
-totalAttempted>0
-?Math.round(
-(totalCorrect/totalAttempted)*100
-)
-:0;
-
-
-/* ================================
-   MASTERED
-================================ */
-
-const masteredCount=
-getMasteredQuestions().length;
-
-
-/* ================================
-   ACTIVE MISTAKES
-================================ */
-
-const activeMap=new Map();
-
-
-tests.forEach(function(test){
-
-if(
-!test ||
-!Array.isArray(test.questions)
-){
-return;
-}
-
-
-const testTime=
-Number(test.timestamp)||0;
-
-
-test.questions.forEach(function(q){
-
-if(!q || !q.question){
-return;
-}
-
-
-const key=normalize(q.question);
-
-const existing=activeMap.get(key);
-
-
-if(
-existing &&
-(existing._testTime||0)>testTime
-){
-return;
-}
-
-
-if(q.status==="wrong"){
-
-activeMap.set(
-key,
-{
-...q,
-_testTime:testTime
-}
-);
-
-}
-
-else if(q.status==="correct"){
-
-activeMap.delete(key);
-
-}
-
-});
-
-});
-
-
-const activeMistakes=
-activeMap.size;
-
-
-/* ================================
-   RETRY
-================================ */
-
-const retryHistory=
-readJSON(RETRY_KEY,[]);
-
-const retryAttempts=
-Array.isArray(retryHistory)
-?retryHistory.length
-:0;
-
-
-/* ================================
-   UPDATE DASHBOARD
-================================ */
-
-document.getElementById("testsCount").textContent=
-tests.length;
-
-document.getElementById("totalQuestions").textContent=
-totalQuestions;
-
-document.getElementById("accuracy").textContent=
-accuracy+"%";
-
-document.getElementById("mastered").textContent=
-masteredCount;
-
-document.getElementById("activeMistakes").textContent=
-activeMistakes;
-
-document.getElementById("retryAttempts").textContent=
-retryAttempts;
-
-document.getElementById("accuracyLarge").textContent=
-accuracy+"%";
-
-document.getElementById("accuracyBar").style.width=
-accuracy+"%";
-
-
-/* ================================
-   ACCURACY MESSAGE
-================================ */
-
-let message;
-
-if(totalAttempted===0){
-
-message=
-"Complete a CBT test to start building your performance profile.";
-
-}
-else if(accuracy>=85){
-
-message=
-"🔥 Excellent accuracy. Focus on difficult and recurring mistakes.";
-
-}
-else if(accuracy>=70){
-
-message=
-"👍 Good progress. Use the Mistake Bank to push your accuracy higher.";
-
-}
-else if(accuracy>=50){
-
-message=
-"📈 Keep practicing. Review mistakes and retry them regularly.";
-
-}
-else{
-
-message=
-"🎯 Start with concept revision, then use Retry → Mastery.";
-
-}
-
-
-document.getElementById("accuracyMessage")
-.textContent=message;
-
-
-/* ================================
-   SUBJECTS
-================================ */
-
-const subjects={
-
-Physics:{questions:0,correct:0},
-Chemistry:{questions:0,correct:0},
-Biology:{questions:0,correct:0}
-
-};
-
-
-tests.forEach(function(test){
-
-if(
-!test ||
-!Array.isArray(test.questions)
-){
-return;
-}
-
-
-test.questions.forEach(function(q){
-
-if(!q){
-return;
-}
-
-
-const subject=
-String(q.subject||"").trim();
-
-
-if(!subjects[subject]){
-return;
-}
-
-
-if(
-q.status==="correct" ||
-q.status==="wrong"
-){
-
-subjects[subject].questions++;
-
-}
-
-
-if(q.status==="correct"){
-
-subjects[subject].correct++;
-
-}
-
-});
-
-});
-
-
-function updateSubject(
-subject,
-questionId,
-correctId,
-accuracyId
-){
-
-const data=subjects[subject];
-
-document.getElementById(questionId)
-.textContent=data.questions;
-
-document.getElementById(correctId)
-.textContent=data.correct;
-
-
-const acc=
-data.questions>0
-?Math.round(
-(data.correct/data.questions)*100
-)
-:0;
-
-
-document.getElementById(accuracyId)
-.textContent=acc+"%";
-
-}
-
-
-updateSubject(
-"Physics",
-"physicsQuestions",
-"physicsCorrect",
-"physicsAccuracy"
-);
-
-updateSubject(
-"Chemistry",
-"chemistryQuestions",
-"chemistryCorrect",
-"chemistryAccuracy"
-);
-
-updateSubject(
-"Biology",
-"biologyQuestions",
-"biologyCorrect",
-"biologyAccuracy"
-);
-
-
-/* ================================
-   OPEN TEST
-================================ */
-
-function openTest(index){
-
-const url=
-"./test-details.html?test="+
-encodeURIComponent(index);
-
-window.location.assign(url);
-
-}
-
-
-/* ================================
-   HISTORY
-================================ */
-
-function renderHistory(){
-
-const box=
-document.getElementById("historyList");
-
-box.innerHTML="";
-
-
-if(tests.length===0){
-
-box.innerHTML=`
-
-<div class="empty">
-
-📜 No test history yet.
-
-<br><br>
-
-<button
-class="action"
-type="button"
-onclick="go('cbt.html')">
-
-📝 Start First CBT
-
-</button>
-
-</div>
-
-`;
-
-return;
-
-}
-
-
-/*
-Show newest tests first.
-The actual array index is preserved.
-*/
-
-const recent=
-tests
-.map(function(test,index){
-
-return {
-test:test,
-index:index
-};
-
-})
-.reverse()
-.slice(0,31);
-
-
-recent.forEach(function(item){
-
-const test=item.test;
-const actualIndex=item.index;
-
-
-const button=
-document.createElement("button");
-
-button.type="button";
-button.className="history-item";
-
-
-/*
-FULL CARD CLICK.
-The click listener is attached directly
-to the entire history button.
-*/
-
-button.onclick=function(){
-
-openTest(actualIndex);
-
-};
-
-
-const correct=
-Number(test.correct)||0;
-
-const wrong=
-Number(
-test.incorrect||test.wrong
-)||0;
-
-const skipped=
-Number(test.skipped)||0;
-
-
-let total=
-correct+
-wrong+
-skipped;
-
-
-if(Array.isArray(test.questions)){
-
-total=test.questions.length;
-
-}
-
-
-const score=
-test.score!==undefined
-?test.score
-:(correct*4)-wrong;
-
-
-const date=
-test.date||
-test.createdAt||
-"Unknown date";
-
-
-button.innerHTML=`
-
-<div class="history-top">
-
-<span>
-Test #${actualIndex+1}
-</span>
-
-<span class="history-score">
-
-${escapeHTML(score)}
-
-${total>0
-?" / "+(total*4)
-:""}
-
-</span>
-
-</div>
-
-
-<div class="history-details">
-
-📅 ${escapeHTML(date)}
-
-<br>
-
-✅ Correct: ${correct}
-
-&nbsp; • &nbsp;
-
-❌ Wrong: ${wrong}
-
-&nbsp; • &nbsp;
-
-⏭️ Skipped: ${skipped}
-
-</div>
-
-
-<div class="history-open">
-
-👆 TAP ANYWHERE TO OPEN TEST DETAILS
-
-</div>
-
-`;
-
-
-box.appendChild(button);
-
-});
-
-}
-
-
-/* ================================
-   SCROLL
-================================ */
-
-function scrollToHistory(){
-
-const section=
-document.getElementById("historySection");
-
-section.scrollIntoView({
-behavior:"smooth",
-block:"start"
-});
-
-}
-
-
-/* ================================
-   START
-================================ */
-
-renderHistory();
+/* =====================================
+START
+===================================== */
+
+updateDashboard();
 
 </script>
 
