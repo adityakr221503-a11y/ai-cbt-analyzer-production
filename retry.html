@@ -7,859 +7,1241 @@
 
 <style>
 *{box-sizing:border-box}
+
 body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f1f5f9;
-  color:#0f172a;
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
 }
+
 header{
-  background:#fff;
-  border-bottom:1px solid #e2e8f0;
-  padding:15px 18px;
+background:#fff;
+border-bottom:1px solid #e2e8f0;
+padding:15px 18px;
 }
+
 .header{
-  max-width:900px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+max-width:900px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:space-between;
 }
+
 .logo{
-  font-size:20px;
-  font-weight:800;
+font-size:20px;
+font-weight:800;
 }
-.logo span{color:#4f46e5}
+
+.logo span{
+color:#4f46e5;
+}
+
 button{
-  font-family:inherit;
-  cursor:pointer;
-  touch-action:manipulation;
+font-family:inherit;
+cursor:pointer;
+touch-action:manipulation;
 }
+
 .back{
-  border:0;
-  background:#e2e8f0;
-  padding:11px 15px;
-  border-radius:10px;
-  font-weight:800;
+border:0;
+background:#e2e8f0;
+padding:11px 15px;
+border-radius:10px;
+font-weight:800;
 }
+
 .container{
-  max-width:900px;
-  margin:20px auto;
-  padding:0 15px;
+max-width:900px;
+margin:20px auto;
+padding:0 15px;
 }
+
 .hero{
-  background:#4f46e5;
-  color:#fff;
-  padding:25px;
-  border-radius:18px;
-  margin-bottom:20px;
+background:#4f46e5;
+color:#fff;
+padding:25px;
+border-radius:18px;
+margin-bottom:20px;
 }
-.hero h1{margin:0 0 8px}
-.hero p{margin:0;line-height:1.5}
+
+.hero h1{
+margin:0 0 8px;
+}
+
+.hero p{
+margin:0;
+line-height:1.5;
+}
+
 .card{
-  background:#fff;
-  padding:20px;
-  border-radius:17px;
-  box-shadow:0 3px 14px rgba(0,0,0,.07);
+background:#fff;
+padding:20px;
+border-radius:17px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
+
 .meta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:18px;
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-bottom:18px;
 }
+
 .badge{
-  background:#eef2ff;
-  color:#3730a3;
-  padding:7px 10px;
-  border-radius:8px;
-  font-size:12px;
-  font-weight:800;
+background:#eef2ff;
+color:#3730a3;
+padding:7px 10px;
+border-radius:8px;
+font-size:12px;
+font-weight:800;
 }
+
 .question{
-  font-size:21px;
-  font-weight:800;
-  line-height:1.6;
-  margin:20px 0;
+font-size:21px;
+font-weight:800;
+line-height:1.6;
+margin:20px 0;
 }
+
 .option{
-  width:100%;
-  display:block;
-  text-align:left;
-  background:#fff;
-  border:2px solid #e2e8f0;
-  padding:15px;
-  border-radius:11px;
-  margin:10px 0;
-  font-size:16px;
-  font-weight:600;
+width:100%;
+display:block;
+text-align:left;
+background:#fff;
+border:2px solid #e2e8f0;
+padding:15px;
+border-radius:11px;
+margin:10px 0;
+font-size:16px;
+font-weight:600;
 }
+
 .option.selected{
-  border-color:#4f46e5;
-  background:#eef2ff;
+border-color:#4f46e5;
+background:#eef2ff;
 }
+
 .option.correct{
-  border-color:#16a34a;
-  background:#dcfce7;
+border-color:#16a34a;
+background:#dcfce7;
 }
+
 .option.wrong{
-  border-color:#dc2626;
-  background:#fee2e2;
+border-color:#dc2626;
+background:#fee2e2;
 }
+
 .action{
-  width:100%;
-  border:0;
-  padding:15px;
-  border-radius:11px;
-  margin-top:14px;
-  font-size:16px;
-  font-weight:800;
+width:100%;
+border:0;
+padding:15px;
+border-radius:11px;
+margin-top:14px;
+font-size:16px;
+font-weight:800;
 }
+
 .primary{
-  background:#4f46e5;
-  color:#fff;
+background:#4f46e5;
+color:#fff;
 }
+
 .secondary{
-  background:#e2e8f0;
-  color:#0f172a;
+background:#e2e8f0;
+color:#0f172a;
 }
+
 .result{
-  display:none;
+display:none;
 }
+
 .resultIcon{
-  font-size:60px;
-  text-align:center;
+font-size:60px;
+text-align:center;
 }
-.result h2{text-align:center}
+
+.result h2{
+text-align:center;
+}
+
 .solution{
-  margin-top:18px;
-  padding:16px;
-  border-radius:12px;
-  background:#f0fdf4;
-  border:1px solid #bbf7d0;
-  line-height:1.7;
+margin-top:18px;
+padding:16px;
+border-radius:12px;
+background:#f0fdf4;
+border:1px solid #bbf7d0;
+line-height:1.7;
 }
+
 .error{
-  text-align:center;
-  padding:30px 15px;
+text-align:center;
+padding:30px 15px;
 }
-.hidden{display:none}
+
+.hidden{
+display:none;
+}
+
+@media(max-width:600px){
+
+.container{
+margin:15px auto;
+}
+
+.question{
+font-size:18px;
+}
+
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="header">
-<div class="logo">CBT Analyzer <span>Pro</span></div>
 
-<button class="back" onclick="goBank()">
-← Mistake Bank
-</button>
+<div class="header">
+
+<div class="logo">
+CBT Analyzer <span>Pro</span>
 </div>
+
+<button
+class="back"
+type="button"
+onclick="goBank()">
+
+← Mistake Bank
+
+</button>
+
+</div>
+
 </header>
+
 
 <div class="container">
 
 <div class="hero">
-<h1>🔄 Retry → Mastery</h1>
-<p>Answer the question again and strengthen your mastery.</p>
+
+<h1>
+🔄 Retry → Mastery
+</h1>
+
+<p>
+Answer the question again and strengthen your mastery.
+</p>
+
 </div>
 
-<section id="questionCard" class="card">
+
+<section
+id="questionCard"
+class="card">
 
 <div class="meta">
-<span id="subject" class="badge">Subject</span>
-<span id="topic" class="badge">Topic</span>
-<span class="badge">🔄 Retry</span>
+
+<span
+id="subject"
+class="badge">
+Subject
+</span>
+
+<span
+id="topic"
+class="badge">
+Topic
+</span>
+
+<span class="badge">
+🔄 Retry
+</span>
+
 </div>
 
-<div id="question" class="question">
+
+<div
+id="question"
+class="question">
+
 Loading question...
+
 </div>
+
 
 <div id="options"></div>
+
 
 <button
 id="checkButton"
 class="action primary"
+type="button"
 onclick="checkAnswer()">
+
 Check Answer
+
 </button>
 
 </section>
 
-<section id="resultCard" class="card result">
 
-<div id="resultIcon" class="resultIcon"></div>
+<section
+id="resultCard"
+class="card result">
 
-<h2 id="resultTitle"></h2>
+<div
+id="resultIcon"
+class="resultIcon">
+</div>
 
-<p id="resultMessage" style="text-align:center;line-height:1.6"></p>
+<h2
+id="resultTitle">
+</h2>
 
-<div id="solution" class="solution"></div>
+<p
+id="resultMessage"
+style="text-align:center;line-height:1.6">
+</p>
+
+<div
+id="solution"
+class="solution">
+</div>
+
 
 <button
 class="action primary"
+type="button"
 onclick="retryAgain()">
+
 🔄 Try Again
+
 </button>
+
 
 <button
 class="action secondary"
+type="button"
 onclick="goBank()">
+
 🧠 Mistake Bank
+
 </button>
+
 
 <button
 class="action secondary"
+type="button"
 onclick="goDashboard()">
+
 🏠 Dashboard
+
 </button>
 
 </section>
 
-<section id="errorCard" class="card error hidden">
 
-<div style="font-size:55px">🔎</div>
+<section
+id="errorCard"
+class="card error hidden">
 
-<h2>No Retry Question Found</h2>
+<div style="font-size:55px">
+🔎
+</div>
+
+<h2>
+No Retry Question Found
+</h2>
 
 <p>
-The retry page opened correctly, but no question was found.
-</p>
-
-<p>
-Go back to Mistake Bank and tap
-<strong>Retry This Question</strong>.
+The Retry page opened, but no valid retry question was found.
 </p>
 
 <button
 class="action primary"
+type="button"
 onclick="goBank()">
+
 Open Mistake Bank
+
 </button>
 
 </section>
 
 </div>
 
+
 <script>
+
 "use strict";
 
-/* =========================
-   STORAGE
-========================= */
 
-const RETRY_QUESTION_KEY = "cbtRetryQuestion";
-const RETRY_QUEUE_KEY = "cbtAnalyzer.retryQueue";
-const MASTERY_KEY = "cbtMasteryV2";
-const HISTORY_KEY = "cbtHistory";
+/* =====================================
+STORAGE
+===================================== */
+
+const RETRY_QUESTION_KEY =
+"cbtRetryQuestion";
+
+const RETRY_QUEUE_KEY =
+"cbtAnalyzer.retryQueue";
+
+const MASTERY_KEY =
+"cbtMasteryV2";
+
+const HISTORY_KEY =
+"cbtHistory";
 
 
-let questionData = null;
-let selectedIndex = null;
-let answered = false;
+let questionData=null;
+
+let selectedIndex=null;
+
+let answered=false;
 
 
-/* =========================
-   JSON
-========================= */
+/* =====================================
+READ JSON
+===================================== */
 
 function readJSON(key){
 
-  try{
-    const raw = localStorage.getItem(key);
+try{
 
-    if(!raw) return null;
+const raw=
+localStorage.getItem(key);
 
-    return JSON.parse(raw);
+if(!raw){
 
-  }catch(e){
-    console.error(e);
-    return null;
-  }
+return null;
+
 }
 
+return JSON.parse(raw);
+
+}catch(error){
+
+console.error(error);
+
+return null;
+
+}
+
+}
+
+
+/* =====================================
+SAVE JSON
+===================================== */
 
 function saveJSON(key,value){
 
-  try{
-    localStorage.setItem(
-      key,
-      JSON.stringify(value)
-    );
-  }catch(e){
-    console.error(e);
-  }
+try{
+
+localStorage.setItem(
+key,
+JSON.stringify(value)
+);
+
+}catch(error){
+
+console.error(error);
+
+}
 
 }
 
 
-/* =========================
-   NORMALIZE
-========================= */
+/* =====================================
+NORMALIZE
+===================================== */
 
 function normalize(value){
 
-  return String(
-    value == null ? "" : value
-  )
-  .trim()
-  .toLowerCase()
-  .replace(/\s+/g," ");
+return String(
+value==null
+?""
+:value
+)
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ");
 
 }
 
 
-/* =========================
-   GET CORRECT INDEX
-========================= */
+/* =====================================
+CORRECT INDEX
+===================================== */
 
 function getCorrectIndex(q){
 
-  let index = Number(q.correctIndex);
+if(
+q.correctIndex!==undefined &&
+q.correctIndex!==null
+){
 
-  if(
-    Number.isInteger(index) &&
-    index >= 0 &&
-    Array.isArray(q.options) &&
-    index < q.options.length
-  ){
-    return index;
-  }
+const index=
+Number(q.correctIndex);
 
-  if(q.answerIndex !== undefined){
+if(
+Number.isInteger(index) &&
+index>=0 &&
+Array.isArray(q.options) &&
+index<q.options.length
+){
 
-    index = Number(q.answerIndex);
+return index;
 
-    if(
-      Number.isInteger(index) &&
-      index >= 0 &&
-      index < q.options.length
-    ){
-      return index;
-    }
-
-  }
-
-  if(
-    q.correctAnswer !== undefined &&
-    Array.isArray(q.options)
-  ){
-
-    const answer =
-      normalize(q.correctAnswer);
-
-    const found =
-      q.options.findIndex(function(option){
-        return normalize(option) === answer;
-      });
-
-    if(found >= 0){
-      return found;
-    }
-
-  }
-
-  return -1;
+}
 
 }
 
 
-/* =========================
-   NORMALIZE QUESTION
-========================= */
+if(
+q.answerIndex!==undefined &&
+q.answerIndex!==null
+){
+
+const index=
+Number(q.answerIndex);
+
+if(
+Number.isInteger(index) &&
+index>=0 &&
+index<q.options.length
+){
+
+return index;
+
+}
+
+}
+
+
+if(
+q.correctAnswer!==undefined &&
+Array.isArray(q.options)
+){
+
+const target=
+normalize(q.correctAnswer);
+
+const found=
+q.options.findIndex(
+function(option){
+
+return normalize(option)===target;
+
+});
+
+if(found>=0){
+
+return found;
+
+}
+
+}
+
+
+return -1;
+
+}
+
+
+/* =====================================
+NORMALIZE QUESTION
+===================================== */
 
 function normalizeQuestion(q){
 
-  if(!q || !q.question){
-    return null;
-  }
+if(
+!q ||
+!q.question
+){
 
-  if(
-    !Array.isArray(q.options) ||
-    q.options.length < 2
-  ){
-    return null;
-  }
-
-  const correctIndex =
-    getCorrectIndex(q);
-
-  if(correctIndex < 0){
-    return null;
-  }
-
-  return {
-    id:q.id || ("retry-" + Date.now()),
-
-    question:String(q.question),
-
-    options:q.options.slice(),
-
-    subject:
-      q.subject ||
-      q.subjectName ||
-      "Unknown",
-
-    topic:
-      q.topic ||
-      q.chapter ||
-      "Unknown",
-
-    correctIndex:correctIndex,
-
-    correctAnswer:
-      q.correctAnswer != null
-      ? q.correctAnswer
-      : q.options[correctIndex],
-
-    solution:
-      q.solution ||
-      q.explanation ||
-      "Review the concept and compare each option with the correct answer."
-  };
+return null;
 
 }
 
 
-/* =========================
-   LOAD QUESTION
-========================= */
+let options=
+Array.isArray(q.options)
+?q.options.slice()
+:[];
+
+
+if(
+options.length<2 &&
+Array.isArray(q.choices)
+){
+
+options=
+q.choices.slice();
+
+}
+
+
+options=
+options.map(
+function(option){
+
+if(
+option &&
+typeof option==="object"
+){
+
+return String(
+option.text ??
+option.label ??
+option.value ??
+""
+);
+
+}
+
+return String(option);
+
+});
+
+
+if(options.length<2){
+
+return null;
+
+}
+
+
+q={
+...q,
+options:options
+};
+
+
+const correctIndex=
+getCorrectIndex(q);
+
+
+if(
+correctIndex<0 ||
+correctIndex>=options.length
+){
+
+return null;
+
+}
+
+
+return{
+
+id:
+q.id ||
+q.questionId ||
+("retry-"+Date.now()),
+
+question:
+String(q.question),
+
+options:options,
+
+subject:
+q.subject ||
+q.subjectName ||
+q.section ||
+"Unknown",
+
+topic:
+q.topic ||
+q.chapter ||
+q.unit ||
+"Unknown",
+
+correctIndex:
+correctIndex,
+
+correctAnswer:
+q.correctAnswer ??
+q.correctOption ??
+options[correctIndex],
+
+solution:
+q.solution ||
+q.explanation ||
+q.reason ||
+"Review the concept and compare the options."
+
+};
+
+}
+
+
+/* =====================================
+LOAD RETRY QUESTION
+===================================== */
 
 function loadQuestion(){
 
-  /* 1. Direct retry question */
-  let raw =
-    localStorage.getItem(
-      RETRY_QUESTION_KEY
-    );
+/* 1 — Direct retry question */
 
-  if(raw){
+const raw=
+localStorage.getItem(
+RETRY_QUESTION_KEY
+);
 
-    try{
+if(raw){
 
-      const q =
-        normalizeQuestion(
-          JSON.parse(raw)
-        );
+try{
 
-      if(q){
-        return q;
-      }
+const q=
+normalizeQuestion(
+JSON.parse(raw)
+);
 
-    }catch(e){
-      console.error(e);
-    }
+if(q){
 
-  }
+return q;
 
+}
 
-  /* 2. Retry queue */
-  const queue =
-    readJSON(RETRY_QUEUE_KEY);
+}catch(error){
 
-  if(
-    Array.isArray(queue) &&
-    queue.length
-  ){
+console.error(error);
 
-    for(let i=0;i<queue.length;i++){
-
-      const q =
-        normalizeQuestion(queue[i]);
-
-      if(q){
-        return q;
-      }
-
-    }
-
-  }
-
-
-  /* 3. Last wrong question from history */
-  const history =
-    readJSON(HISTORY_KEY);
-
-  if(Array.isArray(history)){
-
-    for(
-      let t=history.length-1;
-      t>=0;
-      t--
-    ){
-
-      const test=history[t];
-
-      if(
-        !test ||
-        !Array.isArray(test.questions)
-      ){
-        continue;
-      }
-
-      for(
-        let i=test.questions.length-1;
-        i>=0;
-        i--
-      ){
-
-        const q=test.questions[i];
-
-        if(!q || !q.question){
-          continue;
-        }
-
-        const wrong =
-          q.status === "wrong" ||
-          q.correct === false ||
-          q.isCorrect === false;
-
-        if(!wrong){
-          continue;
-        }
-
-        const normalized =
-          normalizeQuestion(q);
-
-        if(normalized){
-          return normalized;
-        }
-
-      }
-
-    }
-
-  }
-
-  return null;
+}
 
 }
 
 
-/* =========================
-   RENDER
-========================= */
+/* 2 — Retry queue */
+
+const queue=
+readJSON(
+RETRY_QUEUE_KEY
+);
+
+if(
+Array.isArray(queue) &&
+queue.length>0
+){
+
+for(
+let i=0;
+i<queue.length;
+i++
+){
+
+const q=
+normalizeQuestion(queue[i]);
+
+if(q){
+
+return q;
+
+}
+
+}
+
+}
+
+
+/* 3 — Last wrong question */
+
+const history=
+readJSON(
+HISTORY_KEY
+);
+
+if(Array.isArray(history)){
+
+for(
+let t=history.length-1;
+t>=0;
+t--
+){
+
+const test=
+history[t];
+
+if(
+!test ||
+!Array.isArray(test.questions)
+){
+
+continue;
+
+}
+
+for(
+let i=test.questions.length-1;
+i>=0;
+i--
+){
+
+const q=
+test.questions[i];
+
+if(
+!q ||
+!q.question
+){
+
+continue;
+
+}
+
+const wrong=
+q.status==="wrong" ||
+q.correct===false ||
+q.isCorrect===false;
+
+if(!wrong){
+
+continue;
+
+}
+
+const normalized=
+normalizeQuestion(q);
+
+if(normalized){
+
+return normalized;
+
+}
+
+}
+
+}
+
+}
+
+
+return null;
+
+}
+
+
+/* =====================================
+RENDER
+===================================== */
 
 function render(){
 
-  if(!questionData){
+if(!questionData){
 
-    document.getElementById(
-      "questionCard"
-    ).style.display="none";
+document.getElementById(
+"questionCard"
+).style.display="none";
 
-    document.getElementById(
-      "errorCard"
-    ).classList.remove("hidden");
+document.getElementById(
+"errorCard"
+).classList.remove("hidden");
 
-    return;
-
-  }
-
-  document.getElementById(
-    "subject"
-  ).textContent =
-    questionData.subject;
-
-  document.getElementById(
-    "topic"
-  ).textContent =
-    questionData.topic;
-
-  document.getElementById(
-    "question"
-  ).textContent =
-    questionData.question;
-
-  const options =
-    document.getElementById(
-      "options"
-    );
-
-  options.innerHTML="";
-
-  questionData.options.forEach(
-    function(option,index){
-
-      const button =
-        document.createElement(
-          "button"
-        );
-
-      button.type="button";
-      button.className="option";
-
-      button.textContent =
-        String.fromCharCode(65+index) +
-        ". " +
-        String(option);
-
-      button.onclick =
-        function(){
-
-          if(answered) return;
-
-          selectedIndex=index;
-
-          document
-            .querySelectorAll(".option")
-            .forEach(
-              function(btn,i){
-                btn.classList.toggle(
-                  "selected",
-                  i===index
-                );
-              }
-            );
-
-        };
-
-      options.appendChild(button);
-
-    }
-  );
+return;
 
 }
 
 
-/* =========================
-   CHECK
-========================= */
+document.getElementById(
+"subject"
+).textContent=
+questionData.subject;
+
+
+document.getElementById(
+"topic"
+).textContent=
+questionData.topic;
+
+
+document.getElementById(
+"question"
+).textContent=
+questionData.question;
+
+
+const box=
+document.getElementById(
+"options"
+);
+
+box.innerHTML="";
+
+
+questionData.options.forEach(
+function(option,index){
+
+const button=
+document.createElement("button");
+
+button.type="button";
+
+button.className="option";
+
+button.textContent=
+String.fromCharCode(65+index)+
+". "+
+String(option);
+
+
+button.onclick=
+function(){
+
+if(answered){
+
+return;
+
+}
+
+selectedIndex=index;
+
+
+document
+.querySelectorAll(".option")
+.forEach(
+function(btn,i){
+
+btn.classList.toggle(
+"selected",
+i===index
+);
+
+});
+
+};
+
+
+box.appendChild(button);
+
+});
+
+}
+
+
+/* =====================================
+CHECK ANSWER
+===================================== */
 
 function checkAnswer(){
 
-  if(answered) return;
+if(answered){
 
-  if(selectedIndex === null){
-
-    alert("Please select an answer first.");
-    return;
-
-  }
-
-  answered=true;
-
-  const correct =
-    selectedIndex ===
-    questionData.correctIndex;
-
-  document
-    .querySelectorAll(".option")
-    .forEach(
-      function(button,index){
-
-        button.disabled=true;
-
-        if(
-          index ===
-          questionData.correctIndex
-        ){
-          button.classList.add("correct");
-        }
-
-        if(
-          index === selectedIndex &&
-          !correct
-        ){
-          button.classList.add("wrong");
-        }
-
-      }
-    );
-
-  if(correct){
-
-    markMastered();
-
-    showResult(true);
-
-  }else{
-
-    showResult(false);
-
-  }
+return;
 
 }
 
 
-/* =========================
-   MASTERED
-========================= */
+if(selectedIndex===null){
+
+alert(
+"Please select an answer first."
+);
+
+return;
+
+}
+
+
+answered=true;
+
+
+const correct=
+selectedIndex===
+questionData.correctIndex;
+
+
+document
+.querySelectorAll(".option")
+.forEach(
+function(button,index){
+
+button.disabled=true;
+
+
+if(
+index===
+questionData.correctIndex
+){
+
+button.classList.add(
+"correct"
+);
+
+}
+
+
+if(
+index===selectedIndex &&
+!correct
+){
+
+button.classList.add(
+"wrong"
+);
+
+}
+
+});
+
+
+if(correct){
+
+markMastered();
+
+showResult(true);
+
+}else{
+
+showResult(false);
+
+}
+
+}
+
+
+/* =====================================
+MARK MASTERED
+===================================== */
 
 function markMastered(){
 
-  let mastery =
-    readJSON(MASTERY_KEY);
+let mastery=
+readJSON(
+MASTERY_KEY
+);
 
-  if(!Array.isArray(mastery)){
-    mastery=[];
-  }
+if(!Array.isArray(mastery)){
 
-  const key =
-    normalize(
-      questionData.question
-    );
-
-  let found=false;
-
-  mastery =
-    mastery.map(
-      function(item){
-
-        if(
-          item &&
-          normalize(item.question)===key
-        ){
-
-          found=true;
-
-          return {
-            ...item,
-            ...questionData,
-            mastered:true,
-            masteryStatus:"Mastered",
-            masteredAt:
-              new Date().toISOString()
-          };
-
-        }
-
-        return item;
-
-      }
-    );
-
-  if(!found){
-
-    mastery.push({
-      ...questionData,
-      mastered:true,
-      masteryStatus:"Mastered",
-      masteredAt:
-        new Date().toISOString()
-    });
-
-  }
-
-  saveJSON(
-    MASTERY_KEY,
-    mastery
-  );
+mastery=[];
 
 }
 
 
-/* =========================
-   RESULT
-========================= */
+const key=
+normalize(
+questionData.question
+);
+
+
+let found=false;
+
+
+mastery=
+mastery.map(
+function(item){
+
+if(
+item &&
+normalize(item.question)===key
+){
+
+found=true;
+
+return{
+
+...item,
+...questionData,
+
+mastered:true,
+
+masteryStatus:
+"Mastered",
+
+masteredAt:
+new Date().toISOString()
+
+};
+
+}
+
+return item;
+
+});
+
+
+if(!found){
+
+mastery.push({
+
+...questionData,
+
+mastered:true,
+
+masteryStatus:
+"Mastered",
+
+masteredAt:
+new Date().toISOString()
+
+});
+
+}
+
+
+saveJSON(
+MASTERY_KEY,
+mastery
+);
+
+}
+
+
+/* =====================================
+RESULT
+===================================== */
 
 function showResult(correct){
 
-  document.getElementById(
-    "questionCard"
-  ).style.display="none";
+document.getElementById(
+"questionCard"
+).style.display="none";
 
-  document.getElementById(
-    "resultCard"
-  ).style.display="block";
 
-  if(correct){
+document.getElementById(
+"resultCard"
+).style.display="block";
 
-    document.getElementById(
-      "resultIcon"
-    ).textContent="🏆";
 
-    document.getElementById(
-      "resultTitle"
-    ).textContent=
-      "Mastery Confirmed!";
+if(correct){
 
-    document.getElementById(
-      "resultMessage"
-    ).textContent=
-      "Excellent! You answered correctly.";
+document.getElementById(
+"resultIcon"
+).textContent="🏆";
 
-  }else{
 
-    document.getElementById(
-      "resultIcon"
-    ).textContent="🔁";
+document.getElementById(
+"resultTitle"
+).textContent=
+"Mastery Confirmed!";
 
-    document.getElementById(
-      "resultTitle"
-    ).textContent=
-      "Keep Practicing";
 
-    document.getElementById(
-      "resultMessage"
-    ).textContent=
-      "Review the correct answer and try again.";
+document.getElementById(
+"resultMessage"
+).textContent=
+"Excellent! You answered correctly.";
 
-  }
+}else{
 
-  document.getElementById(
-    "solution"
-  ).innerHTML =
-    "<strong>Correct Answer:</strong><br><br>" +
-    String(questionData.correctAnswer) +
-    "<br><br>" +
-    "<strong>Solution:</strong><br><br>" +
-    String(questionData.solution);
+document.getElementById(
+"resultIcon"
+).textContent="🔁";
+
+
+document.getElementById(
+"resultTitle"
+).textContent=
+"Keep Practicing";
+
+
+document.getElementById(
+"resultMessage"
+).textContent=
+"Review the correct answer and try again.";
 
 }
 
 
-/* =========================
-   TRY AGAIN
-========================= */
+document.getElementById(
+"solution"
+).innerHTML=
+
+"<strong>Correct Answer:</strong><br><br>"+
+escapeHTML(
+String(questionData.correctAnswer)
+)+
+"<br><br>"+
+"<strong>Solution:</strong><br><br>"+
+escapeHTML(
+String(questionData.solution)
+);
+
+}
+
+
+/* =====================================
+TRY AGAIN
+===================================== */
 
 function retryAgain(){
 
-  answered=false;
-  selectedIndex=null;
+answered=false;
 
-  document.getElementById(
-    "resultCard"
-  ).style.display="none";
+selectedIndex=null;
 
-  document.getElementById(
-    "questionCard"
-  ).style.display="block";
 
-  render();
+document.getElementById(
+"resultCard"
+).style.display="none";
+
+
+document.getElementById(
+"questionCard"
+).style.display="block";
+
+
+render();
 
 }
 
 
-/* =========================
-   NAVIGATION
-========================= */
+/* =====================================
+NAVIGATION
+===================================== */
+
+/*
+IMPORTANT:
+
+Your actual file is:
+
+mistake.html
+
+NOT:
+
+mistake-bank.html
+*/
 
 function goBank(){
 
-  window.location.href =
-    "mistake-bank.html";
+window.location.href=
+"mistake.html";
 
 }
 
 
 function goDashboard(){
 
-  window.location.href =
-    "index.html";
+window.location.href=
+"index.html";
 
 }
 
 
-/* =========================
-   START
-========================= */
+/* =====================================
+ESCAPE
+===================================== */
 
-questionData =
-  loadQuestion();
+function escapeHTML(value){
+
+return String(
+value??""
+)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================
+START
+===================================== */
+
+questionData=
+loadQuestion();
 
 render();
 
