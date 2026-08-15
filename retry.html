@@ -7,6 +7,7 @@
 <title>CBT Analyzer Pro — Retry</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -96,6 +97,12 @@ button:disabled{
   box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
+.loading{
+  text-align:center;
+  padding:40px;
+  color:#64748b;
+}
+
 .info{
   background:#f8fafc;
   padding:15px;
@@ -130,7 +137,7 @@ button:disabled{
 
 .progressBar{
   height:100%;
-  width:0%;
+  width:100%;
   background:#4f46e5;
 }
 
@@ -229,12 +236,6 @@ button:disabled{
   line-height:1.6;
 }
 
-.loading{
-  text-align:center;
-  padding:40px;
-  color:#64748b;
-}
-
 .error{
   display:none;
   background:#fef2f2;
@@ -243,6 +244,7 @@ button:disabled{
 }
 
 .intelligence{
+  display:none;
   margin-top:18px;
   padding:18px;
   background:#eef2ff;
@@ -275,7 +277,6 @@ button:disabled{
   padding:12px;
   text-align:left;
   font-weight:700;
-  line-height:1.3;
 }
 
 .reasonButton.selected{
@@ -293,15 +294,6 @@ button:disabled{
   border-radius:10px;
   color:#166534;
   font-weight:700;
-}
-
-.savedReason{
-  margin-top:14px;
-  padding:13px;
-  background:#f8fafc;
-  border-radius:10px;
-  text-align:left;
-  line-height:1.5;
 }
 
 @media(max-width:600px){
@@ -323,12 +315,16 @@ button:disabled{
   }
 
 }
+
 </style>
 </head>
 
+
 <body>
 
+
 <header>
+
 <div class="header">
 
 <div class="logo">
@@ -337,16 +333,20 @@ CBT Analyzer <span>Pro</span>
 
 <button
 class="back"
-type="button"
-id="backButton">
+id="backButton"
+type="button">
+
 ← Mistake Bank
+
 </button>
 
 </div>
+
 </header>
 
 
 <div class="container">
+
 
 <div class="hero">
 
@@ -359,6 +359,8 @@ Practice the question again and strengthen your mastery.
 </div>
 
 
+<!-- LOADING -->
+
 <section
 id="loading"
 class="card loading">
@@ -367,6 +369,8 @@ Loading Retry Engine...
 
 </section>
 
+
+<!-- RETRY QUESTION -->
 
 <section
 id="retryCard"
@@ -383,10 +387,176 @@ Answer the question without looking at your previous answer.
 
 <br><br>
 
-<strong>Correct → 🏆 Mastery confirmed</strong>
+<strong>
+Correct → 🏆 Mastery confirmed
+</strong>
 
 <br>
 
-<strong>Wrong → 🧠 Identify the mistake</strong>
+<strong>
+Wrong → 🧠 Identify the mistake
+</strong>
 
-</
+</div>
+
+
+<div class="meta">
+
+<span
+class="badge"
+id="subject">
+Subject
+</span>
+
+<span
+class="badge"
+id="topic">
+Topic
+</span>
+
+<span class="badge">
+🔄 Retry
+</span>
+
+</div>
+
+
+<div class="progress">
+
+<div
+id="progressBar"
+class="progressBar">
+</div>
+
+</div>
+
+
+<div
+id="question"
+class="question">
+</div>
+
+
+<div id="options"></div>
+
+
+<button
+id="checkButton"
+class="action primary"
+type="button">
+
+Check Answer
+
+</button>
+
+</section>
+
+
+<!-- RESULT -->
+
+<section
+id="resultCard"
+class="card result">
+
+<div
+id="resultIcon"
+class="resultIcon">
+</div>
+
+
+<h2 id="resultTitle"></h2>
+
+
+<div
+id="resultMessage"
+class="resultMessage">
+</div>
+
+
+<div id="resultDetails"></div>
+
+
+<!-- MISTAKE INTELLIGENCE -->
+
+<div
+id="intelligencePanel"
+class="intelligence">
+
+<h3>
+🧠 Why did you miss it?
+</h3>
+
+<p>
+Identify the reason so CBT Analyzer Pro can understand
+your mistake pattern.
+</p>
+
+
+<div
+id="reasonGrid"
+class="reasonGrid">
+</div>
+
+
+<button
+id="saveReasonButton"
+class="action primary"
+type="button">
+
+🧠 Save Mistake Reason
+
+</button>
+
+
+<div
+id="reasonSaved"
+class="reasonSaved">
+</div>
+
+</div>
+
+
+<button
+id="againButton"
+class="action primary"
+type="button">
+
+🔄 Practice Again
+
+</button>
+
+
+<button
+id="mistakeButton"
+class="action secondary"
+type="button">
+
+🧠 Mistake Bank
+
+</button>
+
+
+<button
+id="dashboardButton"
+class="action secondary"
+type="button">
+
+🏠 Dashboard
+
+</button>
+
+</section>
+
+
+<!-- EMPTY -->
+
+<section
+id="empty"
+class="card empty">
+
+<div style="font-size:55px">
+🔎
+</div>
+
+<h2>
+No Retry Question Found
