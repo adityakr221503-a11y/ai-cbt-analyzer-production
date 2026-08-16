@@ -1227,14 +1227,12 @@ function saveMistakes(wrongQueue){
     );
 }
 
-
 /* =====================================================
    SAVE RETRY QUEUE
 ===================================================== */
 
 function saveRetryQueue(wrongQueue){
 
-    /* No mistakes: clear old retry data */
     if(
         !Array.isArray(wrongQueue) ||
         wrongQueue.length === 0
@@ -1257,26 +1255,31 @@ function saveRetryQueue(wrongQueue){
 
 
     /* Save complete retry queue */
+
     localStorage.setItem(
         "cbtAnalyzer.retryQueue",
         JSON.stringify(wrongQueue)
     );
 
 
-    /* Save first mistake for retry.html */
+    /* Save first mistake */
+
     localStorage.setItem(
         "cbtRetryQuestion",
         JSON.stringify(wrongQueue[0])
     );
 
 
-    /* Save retry session start time */
+    /* Save retry start time */
+
     localStorage.setItem(
         "cbtRetryStartedAt",
         String(Date.now())
     );
 }
-   /* =====================================================
+
+
+/* =====================================================
    OPEN RETRY
 ===================================================== */
 
@@ -1285,10 +1288,8 @@ function openRetry(){
     const wrongQueue =
         buildRetryQueue();
 
-    if(
-        !Array.isArray(wrongQueue) ||
-        wrongQueue.length === 0
-    ){
+
+    if(wrongQueue.length === 0){
 
         alert(
             "There are no mistakes to retry."
@@ -1297,508 +1298,19 @@ function openRetry(){
         return;
     }
 
-    saveRetryQueue(
-        wrongQueue
-    );
-
-    window.location.href =
-        "retry.html";
-}
-
-
-/* =====================================================
-   RETRY BUTTON
-===================================================== */
-
-function updateRetryButton(incorrect){
-
-    const button =
-        document.getElementById(
-            "retryButton"
-        );
-
-    if(!button){
-        return;
-    }
-
-    if(incorrect > 0){
-
-        button.style.display =
-            "block";
-
-        button.textContent =
-            "🔄 Retry " +
-            incorrect +
-            " Mistake" +
-            (
-                incorrect === 1
-                ? ""
-                : "s"
-            );
-
-    }
-    else{
-
-        button.style.display =
-            "none";
-    }
-}
-
-
-/* =====================================================
-   SAVE TEST HISTORY
-===================================================== */
-
-function saveTestHistory(
-    correct,
-    incorrect,
-    skipped,
-    percentage
-){
-
-    let history = [];
-
-    try{
-
-        history =
-            JSON.parse(
-                localStorage.getItem(
-                    "cbtTestHistory"
-                )
-            ) || [];
-
-        if(!Array.isArray(history)){
-            history = [];
-        }
-
-    }
-    catch(error){
-
-        history = [];
-    }
-
-
-    const record = {
-
-        id:
-            "test-" +
-            Date.now(),
-
-        date:
-            new Date().toISOString(),
-
-        total:
-            questions.length,
-
-        correct:
-            correct,
-
-        incorrect:
-            incorrect,
-
-        skipped:
-            skipped,
-
-        percentage:
-            percentage,
-
-        source:
-            "PDF CBT",
-
-        subject:
-            questions.length > 0
-            ? (
-                questions[0].subject ||
-                "Imported"
-              )
-            : "Imported",
-
-        duration:
-            1800 - timeLeft
-    };
-
-
-    history.push(record);
-
-
-    localStorage.setItem(
-        "cbtTestHistory",
-                JSON.stringify(wrongQueue[0])
-    );
-
-
-    /* Save retry start timestamp */
-    localStorage.setItem(
-        "cbtRetryStartedAt",
-        String(Date.now())
-    );
-
-}
-
-
-/* =====================================================
-   SUBMIT TEST
-===================================================== */
-
-function submitTest(autoSubmit){
-
-    if(submitted){
-        return;
-    }
-
-
-    if(questions.length === 0){
-
-        alert(
-            "No questions are available."
-        );
-
-        return;
-    }
-
-
-    /* Manual submit confirmation */
-    if(!autoSubmit){
-
-        const unanswered =
-            answers.filter(
-                function(answer){
-                    return answer === null;
-                }
-            ).length;
-
-
-        if(unanswered > 0){
-
-            const confirmed =
-                confirm(
-                    "You still have " +
-                    unanswered +
-                    " unanswered question(s).\n\n" +
-                    "Do you want to submit the test?"
-                );
-
-
-            if(!confirmed){
-                return;
-            }
-
-        }
-
-    }
-
-
-    submitted = true;
-
-
-    clearInterval(
-        timerInterval
-    );
-
-
-    let correct = 0;
-
-    let incorrect = 0;
-
-    let skipped = 0;
-
-
-    const wrongQueue =
-        buildRetryQueue();
-
-
-    const reviewBox =
-        document.getElementById(
-            "review"
-        );
-
-
-    reviewBox.innerHTML = "";
-
-
-    /* =================================================
-       BUILD COMPLETE REVIEW
-    ================================================= */
-
-    questions.forEach(
-        function(q,index){
-
-            const selected =
-                answers[index];
-
-
-            let status = "";
-
-            let statusClass = "";
-
-            let itemClass = "";
-
-
-            if(selected === null){
-
-                skipped++;
-
-                status =
-                    "Skipped";
-
-                statusClass =
-                    "status-skipped";
-
-                itemClass =
-                    "skipped";
-
-            }
-            else if(
-                selected === q.answer
-            ){
-
-                correct++;
-
-                status =
-                    "Correct";
-
-                statusClass =
-                    "status-correct";
-
-                itemClass =
-                    "correct";
-
-            }
-            else{
-
-                incorrect++;
-
-                status =
-                    "Incorrect";
-
-                statusClass =
-                    "status-incorrect";
-
-                itemClass =
-                    "incorrect";
-
-            }
-
-
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-
-            item.className =
-                "review-item " +
-                itemClass;
-
-
-            let html = "";
-
-
-            html +=
-                "<strong>Question " +
-                (index + 1) +
-                "</strong>";
-
-
-            html +=
-                "<div style='margin-top:8px'>" +
-                escapeHTML(
-                    q.question
-                ) +
-                "</div>";
-
-
-            html +=
-                "<p class='" +
-                statusClass +
-                "'>" +
-                status +
-                "</p>";
-
-
-            if(selected !== null){
-
-                html +=
-                    "<div>" +
-                    "<strong>Your answer:</strong> " +
-                    escapeHTML(
-                        q.options[selected]
-                    ) +
-                    "</div>";
-
-            }
-            else{
-
-                html +=
-                    "<div>" +
-                    "<strong>Your answer:</strong> " +
-                    "Not answered" +
-                    "</div>";
-
-            }
-
-
-            if(selected !== q.answer){
-
-                html +=
-                    "<div style='margin-top:6px'>" +
-                    "<strong>Correct answer:</strong> " +
-                    escapeHTML(
-                        q.options[q.answer]
-                    ) +
-                    "</div>";
-
-            }
-
-
-            if(q.solution){
-
-                html +=
-                    "<div class='analysis'>" +
-                    "<div class='analysis-type'>" +
-                    "Solution" +
-                    "</div>" +
-                    "<div style='margin-top:6px'>" +
-                    escapeHTML(
-                        q.solution
-                    ) +
-                    "</div>" +
-                    "</div>";
-
-            }
-
-
-            if(
-                selected !== null &&
-                selected !== q.answer
-            ){
-
-                const mistake =
-                    classifyMistake(q);
-
-
-                html +=
-                    "<div class='analysis'>" +
-                    "<div class='analysis-type'>" +
-                    mistake.type +
-                    "</div>" +
-                    "<div style='margin-top:6px'>" +
-                    mistake.reason +
-                    "</div>" +
-                    "</div>";
-
-            }
-
-
-            item.innerHTML =
-                html;
-
-
-            reviewBox.appendChild(
-                item
-            );
-
-        }
-    );
-
-
-    /* =================================================
-       SCORE
-    ================================================= */
-
-    const total =
-        questions.length;
-
-
-    const percentage =
-        total > 0
-        ? Math.round(
-            (
-                correct /
-                total
-            ) * 100
-          )
-        : 0;
-
-
-    document.getElementById(
-        "score"
-    ).textContent =
-        correct +
-        " / " +
-        total;
-
-
-    document.getElementById(
-        "summary"
-    ).textContent =
-        "Correct: " +
-        correct +
-        " • Incorrect: " +
-        incorrect +
-        " • Skipped: " +
-        skipped +
-        " • Accuracy: " +
-        percentage +
-        "%";
-
-
-    /* =================================================
-       SAVE RETRY
-    ================================================= */
-
-    saveRetryQueue(
-        wrongQueue
-    );
-
-
-    /* =================================================
-       SAVE MISTAKE BANK
-    ================================================= */
 
     saveMistakes(
         wrongQueue
     );
 
 
-    /* =================================================
-       SAVE TEST HISTORY
-    ================================================= */
-
-    saveTestHistory(
-        correct,
-        incorrect,
-        skipped,
-        percentage
+    saveRetryQueue(
+        wrongQueue
     );
 
 
-    /* =================================================
-       SHOW RESULT
-    ================================================= */
-
-    document.getElementById(
-        "testScreen"
-    ).style.display =
-        "none";
-
-
-    document.getElementById(
-        "result"
-    ).style.display =
-        "block";
-
-
-    updateRetryButton(
-        incorrect
-    );
-
-
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
-    });
-
+    window.location.href =
+        "retry.html";
 }
 
 
@@ -1816,6 +1328,11 @@ function updateRetryButton(
         );
 
 
+    if(!button){
+        return;
+    }
+
+
     if(incorrect > 0){
 
         button.style.display =
@@ -1839,12 +1356,11 @@ function updateRetryButton(
             "none";
 
     }
-
 }
 
 
 /* =====================================================
-   TEST HISTORY
+   SAVE TEST HISTORY
 ===================================================== */
 
 function saveTestHistory(
@@ -1879,13 +1395,6 @@ function saveTestHistory(
         history = [];
 
     }
-
-
-    const duration =
-        Math.max(
-            0,
-            1800 - timeLeft
-        );
 
 
     const record = {
@@ -1921,7 +1430,17 @@ function saveTestHistory(
             "Imported",
 
         duration:
-            duration
+            testStartedAt
+            ? Math.max(
+                0,
+                Math.round(
+                    (
+                        Date.now() -
+                        testStartedAt
+                    ) / 1000
+                )
+            )
+            : 1800 - timeLeft
 
     };
 
@@ -1941,38 +1460,504 @@ function saveTestHistory(
         "cbtLastResult",
         JSON.stringify(record)
     );
-
 }
 
 
 /* =====================================================
-   SAFE HTML ESCAPE
+   SUBMIT TEST
 ===================================================== */
 
-function escapeHTML(value){
+function submitTest(
+    autoSubmit
+){
 
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
+    if(submitted){
+        return;
+    }
+
+
+    if(questions.length === 0){
+
+        alert(
+            "No questions are available."
         );
 
+        return;
+    }
+
+
+    if(!autoSubmit){
+
+        const unanswered =
+            answers.filter(
+                function(answer){
+                    return answer === null;
+                }
+            ).length;
+
+
+        if(unanswered > 0){
+
+            const proceed =
+                confirm(
+                    "You have " +
+                    unanswered +
+                    " unanswered question" +
+                    (
+                        unanswered === 1
+                        ? ""
+                        : "s"
+                    ) +
+                    ".\n\nSubmit the test anyway?"
+                );
+
+
+            if(!proceed){
+                return;
+            }
+
+        }
+
+    }
+
+
+    submitted = true;
+
+
+    clearInterval(
+        timerInterval
+    );
+
+
+    let correct = 0;
+
+    let incorrect = 0;
+
+    let skipped = 0;
+
+
+    questions.forEach(
+        function(q,index){
+
+            const selected =
+                answers[index];
+
+
+            if(selected === null){
+
+                skipped++;
+
+            }
+            else if(
+                selected === q.answer
+            ){
+
+                correct++;
+
+            }
+            else{
+
+                incorrect++;
+
+            }
+
+        }
+    );
+
+
+    const percentage =
+        Math.round(
+            (
+                correct /
+                questions.length
+            ) *
+            100
+        );
+
+
+    const wrongQueue =
+        buildRetryQueue();
+
+
+    saveMistakes(
+        wrongQueue
+    );
+
+
+    saveRetryQueue(
+        wrongQueue
+    );
+
+
+    saveTestHistory(
+        correct,
+        incorrect,
+        skipped,
+        percentage
+    );
+
+
+    showResult(
+        correct,
+        incorrect,
+        skipped,
+        percentage,
+        wrongQueue
+    );
+}
+
+
+/* =====================================================
+   SHOW RESULT
+===================================================== */
+
+function showResult(
+    correct,
+    incorrect,
+    skipped,
+    percentage,
+    wrongQueue
+){
+
+    document.getElementById(
+        "testScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "score"
+    ).textContent =
+        percentage +
+        "%";
+
+
+    document.getElementById(
+        "summary"
+    ).textContent =
+        "Correct: " +
+        correct +
+        " • Incorrect: " +
+        incorrect +
+        " • Skipped: " +
+        skipped +
+        " • Total: " +
+        questions.length;
+
+
+    updateRetryButton(
+        incorrect
+    );
+
+
+    renderReview();
+}
+
+
+/* =====================================================
+   REVIEW ANSWERS
+===================================================== */
+
+function renderReview(){
+
+    const box =
+        document.getElementById(
+            "review"
+        );
+
+
+    box.innerHTML =
+        "<h3>Question Review</h3>";
+
+
+    questions.forEach(
+        function(q,index){
+
+            const selected =
+                answers[index];
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            let statusClass;
+
+            let statusText;
+
+
+            if(selected === null){
+
+                statusClass =
+                    "skipped";
+
+                statusText =
+                    "⏭ Skipped";
+
+            }
+            else if(
+                selected === q.answer
+            ){
+
+                statusClass =
+                    "correct";
+
+                statusText =
+                    "✓ Correct";
+
+            }
+            else{
+
+                statusClass =
+                    "incorrect";
+
+                statusText =
+                    "✗ Incorrect";
+
+            }
+
+
+            item.className =
+                "review-item " +
+                statusClass;
+
+
+            item.innerHTML = "";
+
+
+            const title =
+                document.createElement(
+                    "strong"
+                );
+
+
+            title.textContent =
+                "Q" +
+                (index + 1) +
+                ". " +
+                q.question;
+
+
+            item.appendChild(
+                title
+            );
+
+
+            const status =
+                document.createElement(
+                    "div"
+                );
+
+
+            status.style.marginTop =
+                "8px";
+
+
+            status.textContent =
+                statusText;
+
+
+            if(statusClass === "correct"){
+
+                status.className =
+                    "status-correct";
+
+            }
+            else if(
+                statusClass === "incorrect"
+            ){
+
+                status.className =
+                    "status-incorrect";
+
+            }
+            else{
+
+                status.className =
+                    "status-skipped";
+
+            }
+
+
+            item.appendChild(
+                status
+            );
+
+
+            const answerText =
+                document.createElement(
+                    "div"
+                );
+
+
+            answerText.style.marginTop =
+                "8px";
+
+
+            if(selected === null){
+
+                answerText.textContent =
+                    "Your answer: Not answered";
+
+            }
+            else{
+
+                answerText.textContent =
+                    "Your answer: " +
+                    q.options[selected];
+
+            }
+
+
+            item.appendChild(
+                answerText
+            );
+
+
+            const correctText =
+                document.createElement(
+                    "div"
+                );
+
+
+            correctText.style.marginTop =
+                "6px";
+
+
+            correctText.textContent =
+                "Correct answer: " +
+                q.options[q.answer];
+
+
+            item.appendChild(
+                correctText
+            );
+
+
+            if(
+                selected !== null &&
+                selected !== q.answer
+            ){
+
+                const mistake =
+                    classifyMistake(q);
+
+
+                const analysis =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                analysis.className =
+                    "analysis";
+
+
+                analysis.innerHTML =
+                    "<div class='analysis-type'>" +
+                    mistake.type +
+                    "</div>" +
+                    "<div>" +
+                    mistake.reason +
+                    "</div>";
+
+
+                if(q.solution){
+
+                    const solution =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    solution.style.marginTop =
+                        "8px";
+
+
+                    solution.innerHTML =
+                        "<strong>Solution:</strong> " +
+                        escapeHtml(
+                            q.solution
+                        );
+
+
+                    analysis.appendChild(
+                        solution
+                    );
+
+                }
+
+
+                item.appendChild(
+                    analysis
+                );
+
+            }
+            else if(
+                selected === null &&
+                q.solution
+            ){
+
+                const solution =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                solution.className =
+                    "analysis";
+
+
+                solution.innerHTML =
+                    "<strong>Solution:</strong> " +
+                    escapeHtml(
+                        q.solution
+                    );
+
+
+                item.appendChild(
+                    solution
+                );
+
+            }
+
+
+            box.appendChild(
+                item
+            );
+
+        }
+    );
+}
+
+
+/* =====================================================
+   SAFE TEXT
+===================================================== */
+
+function escapeHtml(
+    value
+){
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        String(value || "");
+
+
+    return div.innerHTML;
 }
 
 
@@ -1991,47 +1976,44 @@ function startCBT(){
         document.getElementById(
             "questionNumber"
         ).textContent =
-            "No questions available";
+            "No PDF CBT questions";
 
 
         document.getElementById(
             "question"
         ).textContent =
-            "No PDF CBT questions were found.";
+            "Please import a PDF and create the CBT first.";
 
 
         document.getElementById(
             "options"
         ).innerHTML =
             "<div class='info'>" +
-            "Import a PDF from the PDF → CBT page, then open CBT Test again." +
+            "No valid questions were found in " +
+            "localStorage key: pdfCbtQuestions" +
             "</div>";
 
 
         document.getElementById(
-            "timer"
-        ).textContent =
-            "00:00";
+            "palette"
+        ).innerHTML =
+            "";
 
 
         return;
-
     }
 
 
     initialize();
 
-
     renderQuestion();
 
-
     startTimer();
-
 }
 
 
 /* =====================================================
-   PAGE START
+   START
 ===================================================== */
 
 document.addEventListener(
@@ -2043,4 +2025,4 @@ document.addEventListener(
 
 </body>
 </html>
-           
+   
