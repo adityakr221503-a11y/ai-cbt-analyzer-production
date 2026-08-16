@@ -1621,7 +1621,110 @@ function escapeHTML(value){
 START CBT
 ============================== */
 
-function startCBT(){
+ function startCBT(){
+
+    if(!detectedQuestions.length){
+
+        try{
+
+            const saved =
+                localStorage.getItem(
+                    "pdfCbtQuestions"
+                );
+
+            if(saved){
+
+                const parsed =
+                    JSON.parse(saved);
+
+                if(Array.isArray(parsed)){
+
+                    detectedQuestions =
+                        parsed;
+
+                }
+
+            }
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    if(!detectedQuestions.length){
+
+        alert(
+            "Please choose and read a PDF first."
+        );
+
+        return;
+
+    }
+
+
+    const usable =
+        detectedQuestions.filter(
+            function(q){
+
+                return q &&
+                    typeof q.question === "string" &&
+                    q.question.trim() !== "" &&
+                    Array.isArray(q.options) &&
+                    q.options.length >= 2 &&
+                    Number.isInteger(
+                        Number(q.answer)
+                    ) &&
+                    Number(q.answer) >= 0 &&
+                    Number(q.answer) < q.options.length;
+
+            }
+        );
+
+
+    if(!usable.length){
+
+        alert(
+            "No verified questions were found."
+        );
+
+        return;
+
+    }
+
+
+    /* IMPORTANT:
+       Replace old CBT data with
+       the questions just generated.
+    */
+
+    localStorage.removeItem(
+        "pdfCbtQuestions"
+    );
+
+
+    localStorage.setItem(
+        "pdfCbtQuestions",
+        JSON.stringify(usable)
+    );
+
+
+    /* Verification */
+
+    console.log(
+        "PDF CBT QUESTIONS:",
+        usable.length,
+        usable[0]
+    );
+
+
+    window.location.href =
+        "cbt.html";
+
+ }
 
     const loaded =
         loadQuestions();
