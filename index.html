@@ -7,6 +7,7 @@
 <title>CBT Analyzer Pro — Dashboard</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -51,8 +52,8 @@ header{
   background:#fff;
   border-radius:18px;
   padding:25px;
-  box-shadow:0 3px 14px rgba(0,0,0,.07);
   margin-bottom:20px;
+  box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .hero h1{
@@ -107,8 +108,8 @@ header{
 }
 
 .primary{
-  border-color:#c7d2fe;
   background:#eef2ff;
+  border-color:#c7d2fe;
 }
 
 .stats{
@@ -139,17 +140,17 @@ header{
 
 @media(max-width:700px){
 
-.grid{
-  grid-template-columns:1fr;
-}
+  .grid{
+    grid-template-columns:1fr;
+  }
 
-.stats{
-  grid-template-columns:repeat(2,1fr);
-}
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
 
-.hero h1{
-  font-size:24px;
-}
+  .hero h1{
+    font-size:24px;
+  }
 
 }
 
@@ -160,13 +161,13 @@ header{
 
 <header>
 
-<div class="header">
+  <div class="header">
 
-<div class="logo">
-CBT Analyzer <span>Pro</span>
-</div>
+    <div class="logo">
+      CBT Analyzer <span>Pro</span>
+    </div>
 
-</div>
+  </div>
 
 </header>
 
@@ -174,21 +175,25 @@ CBT Analyzer <span>Pro</span>
 <div class="container">
 
 
-<!-- HERO -->
+<!-- =====================================================
+HERO
+===================================================== -->
 
 <section class="hero">
 
-<h1>🎯 CBT Analyzer Pro</h1>
+  <h1>🎯 CBT Analyzer Pro</h1>
 
-<p>
-Practice tests, analyze mistakes, retry weak questions,
-and convert PDF question papers into CBT tests.
-</p>
+  <p>
+    Practice CBT tests, analyze mistakes, retry weak
+    questions, and convert PDF question papers into CBT.
+  </p>
 
 </section>
 
 
-<!-- MAIN FEATURES -->
+<!-- =====================================================
+FEATURES
+===================================================== -->
 
 <div class="grid">
 
@@ -196,17 +201,18 @@ and convert PDF question papers into CBT tests.
 <!-- CBT TEST -->
 
 <a
-href="cbt.html"
-class="card primary">
+  href="cbt.html"
+  class="card primary"
+>
 
-<div class="icon">📝</div>
+  <div class="icon">📝</div>
 
-<h2>CBT Test</h2>
+  <h2>CBT Test</h2>
 
-<p>
-Start a computer-based test and answer questions
-with the question palette.
-</p>
+  <p>
+    Start a computer-based test with questions,
+    options, timer and question palette.
+  </p>
 
 </a>
 
@@ -214,17 +220,18 @@ with the question palette.
 <!-- PDF TO CBT -->
 
 <a
-href="pdf.html"
-class="card primary">
+  href="pdf-to-cbt.html"
+  class="card primary"
+>
 
-<div class="icon">📄</div>
+  <div class="icon">📄</div>
 
-<h2>PDF → CBT</h2>
+  <h2>PDF → CBT</h2>
 
-<p>
-Upload a PDF question paper and convert detected
-MCQs into a CBT test.
-</p>
+  <p>
+    Upload your actual PDF question paper and
+    convert it into a CBT test.
+  </p>
 
 </a>
 
@@ -232,17 +239,18 @@ MCQs into a CBT test.
 <!-- MISTAKE BANK -->
 
 <a
-href="mistake.html"
-class="card">
+  href="mistake.html"
+  class="card"
+>
 
-<div class="icon">🧠</div>
+  <div class="icon">🧠</div>
 
-<h2>Mistake Bank</h2>
+  <h2>Mistake Bank</h2>
 
-<p>
-Review incorrect questions, mistake types,
-solutions and weak areas.
-</p>
+  <p>
+    Review incorrect questions, mistake types,
+    reasons and solutions.
+  </p>
 
 </a>
 
@@ -250,53 +258,93 @@ solutions and weak areas.
 <!-- RETRY -->
 
 <a
-href="retry.html"
-class="card">
+  href="retry.html"
+  class="card"
+>
 
-<div class="icon">🔄</div>
+  <div class="icon">🔄</div>
 
-<h2>Retry Mistakes</h2>
+  <h2>Retry Mistakes</h2>
 
-<p>
-Practice questions you previously answered
-incorrectly.
-</p>
-
-</a>
-
-
-<!-- TEST HISTORY -->
-
-<a
-href="history.html"
-class="card">
-
-<div class="icon">📊</div>
-
-<h2>Test History</h2>
-
-<p>
-View previous CBT attempts, scores,
-correct answers and mistakes.
-</p>
+  <p>
+    Practice questions that you previously
+    answered incorrectly.
+  </p>
 
 </a>
 
 
-<!-- REVIEW -->
+<!-- HISTORY -->
 
 <a
-href="review.html"
-class="card">
+  href="history.html"
+  class="card"
+>
 
-<div class="icon">🔍</div>
+  <div class="icon">📊</div>
 
-<h2>Review</h2>
+  <h2>Test History</h2>
 
-<p>
-Review completed tests and analyze your
-question-by-question performance.
-</p>
+  <p>
+    View previous tests, scores, correct answers,
+    incorrect answers and skipped questions.
+  </p>
+
+</a>
+
+
+<!-- MASTERED -->
+
+<a
+  href="mastered.html"
+  class="card"
+>
+
+  <div class="icon">🏆</div>
+
+  <h2>Mastered</h2>
+
+  <p>
+    View questions that have been successfully
+    mastered.
+  </p>
+
+</a>
+
+
+<!-- ATTEMPT -->
+
+<a
+  href="attempt.html"
+  class="card"
+>
+
+  <div class="icon">🎯</div>
+
+  <h2>Attempt</h2>
+
+  <p>
+    Continue and review your test attempts.
+  </p>
+
+</a>
+
+
+<!-- PDF READER -->
+
+<a
+  href="pdf.html"
+  class="card"
+>
+
+  <div class="icon">📖</div>
+
+  <h2>PDF Reader</h2>
+
+  <p>
+    Open the PDF reader and inspect imported
+    question-paper content.
+  </p>
 
 </a>
 
@@ -304,68 +352,72 @@ question-by-question performance.
 </div>
 
 
-<!-- STATS -->
+<!-- =====================================================
+STATISTICS
+===================================================== -->
 
 <div class="stats">
 
-<div class="stat">
-
-<div
-id="tests"
-class="stat-value">
-0
-</div>
-
-<div class="stat-label">
-Tests Completed
-</div>
-
-</div>
-
 
 <div class="stat">
 
-<div
-id="mistakes"
-class="stat-value">
-0
-</div>
+  <div
+    id="tests"
+    class="stat-value">
+    0
+  </div>
 
-<div class="stat-label">
-Mistakes
-</div>
+  <div class="stat-label">
+    Tests Completed
+  </div>
 
 </div>
 
 
 <div class="stat">
 
-<div
-id="mastered"
-class="stat-value">
-0
-</div>
+  <div
+    id="mistakes"
+    class="stat-value">
+    0
+  </div>
 
-<div class="stat-label">
-Mastered
-</div>
+  <div class="stat-label">
+    Mistakes
+  </div>
 
 </div>
 
 
 <div class="stat">
 
-<div
-id="questions"
-class="stat-value">
-0
+  <div
+    id="mastered"
+    class="stat-value">
+    0
+  </div>
+
+  <div class="stat-label">
+    Mastered
+  </div>
+
 </div>
 
-<div class="stat-label">
-Questions Attempted
-</div>
+
+<div class="stat">
+
+  <div
+    id="questions"
+    class="stat-value">
+    0
+  </div>
+
+  <div class="stat-label">
+    Questions Attempted
+  </div>
 
 </div>
+
 
 </div>
 
@@ -379,102 +431,113 @@ Questions Attempted
 
 
 /* =====================================================
-LOAD DASHBOARD STATISTICS
+LOAD HISTORY
 ===================================================== */
 
-function loadStats(){
+function getHistory(){
 
-let history=[];
+  try{
 
-try{
+    const data =
+      JSON.parse(
+        localStorage.getItem("cbtHistory") || "[]"
+      );
 
-history=
-JSON.parse(
-localStorage.getItem("cbtHistory")||"[]"
-);
+    return Array.isArray(data) ? data : [];
 
-if(!Array.isArray(history)){
-history=[];
-}
+  }catch(error){
 
-}catch(error){
+    return [];
 
-history=[];
+  }
 
 }
 
 
-/* Tests */
+/* =====================================================
+LOAD MASTERY
+===================================================== */
 
-document.getElementById("tests")
-.textContent=
-history.length;
+function getMastery(){
 
+  try{
 
-/* Mistakes */
+    const data =
+      JSON.parse(
+        localStorage.getItem("cbtMasteryV2") || "[]"
+      );
 
-let mistakes=0;
+    return Array.isArray(data) ? data : [];
 
-let attempted=0;
+  }catch(error){
 
-history.forEach(function(test){
+    return [];
 
-mistakes+=
-Number(test.incorrect||test.wrong||0);
-
-if(Array.isArray(test.questions)){
-
-test.questions.forEach(function(q){
-
-if(q.status!=="skipped"){
-
-attempted++;
+  }
 
 }
 
-});
 
-}
+/* =====================================================
+DASHBOARD STATISTICS
+===================================================== */
 
-});
+function loadDashboardStats(){
 
+  const history = getHistory();
 
-document.getElementById("mistakes")
-.textContent=
-mistakes;
-
-
-/* Questions */
-
-document.getElementById("questions")
-.textContent=
-attempted;
+  const mastery = getMastery();
 
 
-/* Mastered */
+  let mistakes = 0;
 
-let mastery=[];
+  let attempted = 0;
 
-try{
 
-mastery=
-JSON.parse(
-localStorage.getItem("cbtMasteryV2")||"[]"
-);
+  history.forEach(function(test){
 
-if(!Array.isArray(mastery)){
-mastery=[];
-}
+    mistakes += Number(
+      test.incorrect ||
+      test.wrong ||
+      0
+    );
 
-}catch(error){
 
-mastery=[];
+    if(
+      Array.isArray(test.questions)
+    ){
 
-}
+      test.questions.forEach(function(question){
 
-document.getElementById("mastered")
-.textContent=
-mastery.length;
+        if(
+          question.status !== "skipped"
+        ){
+
+          attempted++;
+
+        }
+
+      });
+
+    }
+
+  });
+
+
+  document.getElementById("tests")
+    .textContent = history.length;
+
+
+  document.getElementById("mistakes")
+    .textContent = mistakes;
+
+
+  document.getElementById("mastered")
+    .textContent = mastery.length;
+
+
+  document.getElementById("questions")
+    .textContent = attempted;
 
 }
 
@@ -483,9 +546,9 @@ mastery.length;
 START
 ===================================================== */
 
-loadStats();
+loadDashboardStats();
 
 </script>
 
 </body>
-  </html>
+</html>
