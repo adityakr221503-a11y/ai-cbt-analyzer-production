@@ -423,4 +423,465 @@ Question 4:
 */
 
 const questionPattern=
-/(?:^|\
+/(?:^|\s)(?:Q(?:uestion)?\s*)?(\d{1,3})\s*[\.\):]\s*/gi;
+
+
+const matches=[];
+
+let match;
+
+
+while(
+(match=questionPattern.exec(text))!==null
+){
+
+matches.push({
+
+number:Number(match[1]),
+
+start:match.index+
+match[0].length
+
+});
+
+}
+
+
+for(
+let i=0;
+i<matches.length;
+i++
+){
+
+const currentMatch=
+matches[i];
+
+
+const nextMatch=
+matches[i+1];
+
+
+const end=
+nextMatch
+?nextMatch.start
+:text.length;
+
+
+const block=
+text.substring(
+currentMatch.start,
+end
+).trim();
+
+
+const parsed=
+parseQuestionBlock(block);
+
+
+if(parsed){
+
+parsed.id=
+"pdf-"+currentMatch.number+"-"+Date.now();
+
+questions.push(parsed);
+
+}
+
+}
+
+
+return questions;
+
+}
+
+
+/* =====================================================
+PARSE ONE QUESTION
+===================================================== */
+
+function parseQuestionBlock(block){
+
+/*
+Look for A/B/C/D options.
+*/
+
+const optionPattern=
+/(?:^|\s)([A-D])\s*[\.\):]\s*/gi;
+
+
+const optionMatches=[];
+
+let match;
+
+
+while(
+(match=optionPattern.exec(block))!==null
+){
+
+optionMatches.push({
+
+letter:
+match[1].toUpperCase(),
+
+start:
+match.index+
+match[0].length
+
+});
+
+}
+
+
+if(optionMatches.length<2){
+
+return null;
+
+}
+
+
+const questionText=
+block.substring(
+0,
+optionMatches[0].start-
+optionMatches[0].letter.length-
+2
+).trim();
+
+
+if(!questionText){
+
+return null;
+
+}
+
+
+const options=[];
+
+
+for(
+let i=0;
+i<optionMatches.length;
+i++
+){
+
+const start=
+optionMatches[i].start;
+
+
+const end=
+optionMatches[i+1]
+?optionMatches[i+1].start-
+(optionMatches[i+1].letter.length+2)
+:block.length;
+
+
+const optionText=
+block.substring(
+start,
+end
+).trim();
+
+
+if(optionText){
+
+options.push(optionText);
+
+}
+
+}
+
+
+if(options.length<2){
+
+return null;
+
+}
+
+
+/*
+Default answer is 0 because
+the PDF parser cannot safely
+invent an answer.
+
+The student can verify the
+answer key later.
+*/
+
+return{
+
+subject:"Imported",
+
+topic:"PDF Import",
+
+question:questionText,
+
+options:options,
+
+answer:0,
+
+solution:
+"Imported from PDF. Verify the answer using the original answer key.",
+
+source:"PDF",
+
+sourceType:"PDF",
+
+answerSource:"Needs Verification"
+
+};
+
+}
+
+</script>
+/* =====================================================
+COMPLETE REVIEW
+===================================================== */
+
+function generateReview(){
+
+    const box = document.getElementById("review");
+
+    box.innerHTML = "<h3>🧠 Question Analysis</h3>";
+
+    questions.forEach(function(q,index){
+
+        const item = document.createElement("div");
+
+        let status;
+
+        if(answers[index] === null){
+            status = "skipped";
+        }
+        else if(answers[index] === q.answer){
+            status = "correct";
+        }
+        else{
+            status = "incorrect";
+        }
+
+        item.className = "review-item " + status;
+
+        const yourAnswer =
+            answers[index] === null
+            ? "Not answered"
+            : q.options[answers[index]];
+
+        let html = "";
+
+        html += "<strong>Question " + (index+1) + "</strong>";
+
+        html += "<p>" +
+            escapeHTML(q.question) +
+            "</p>";
+
+        html += "<p><strong>Your answer:</strong> " +
+            escapeHTML(yourAnswer) +
+            "</p>";
+
+        html += "<p><strong>Correct answer:</strong> " +
+            escapeHTML(q.options[q.answer]) +
+            "</p>";
+
+        if(status === "correct"){
+
+            html +=
+            "<div class='analysis'>" +
+            "✅ <strong>Correct</strong><br>" +
+            "Good work. You selected the correct answer.";
+
+            if(q.solution){
+
+                html +=
+                "<br><br><strong>💡 Solution:</strong><br>" +
+                escapeHTML(q.solution);
+
+            }
+
+            html += "</div>";
+        }
+
+        if(status === "skipped"){
+
+            html +=
+            "<div class='analysis'>" +
+            "🟡 <strong>Skipped</strong><br>" +
+            "This question was not answered.";
+
+            if(q.solution){
+
+                html +=
+                "<br><br><strong>💡 Solution:</strong><br>" +
+                escapeHTML(q.solution);
+
+            }
+
+            html += "</div>";
+        }
+
+        if(status === "incorrect"){
+
+            const intelligence =
+                classifyMistake(q,answers[index]);
+
+            html +=
+            "<div class='analysis'>" +
+
+            "<strong>🧠 Mistake Intelligence</strong>" +
+
+            "<br><br>" +
+
+            "<strong>Mistake Type:</strong>" +
+
+            "<div class='analysis-type'>" +
+            escapeHTML(intelligence.type) +
+            "</div>" +
+
+            "<br>" +
+
+            "<strong>Why:</strong><br>" +
+            escapeHTML(intelligence.reason) +
+
+            "<br><br>" +
+
+            "<strong>💡 Solution:</strong><br>" +
+            escapeHTML(
+                q.solution ||
+                "Review the underlying concept and retry this question."
+            ) +
+
+            "</div>";
+        }
+
+        if(q.pdfPage || q.chapter || q.section){
+
+            html += "<div class='info'>";
+
+            if(q.pdfPage){
+                html +=
+                "📄 PDF Page: " +
+                escapeHTML(q.pdfPage);
+            }
+
+            if(q.chapter){
+                html +=
+                "<br>📚 Chapter: " +
+                escapeHTML(q.chapter);
+            }
+
+            if(q.section){
+                html +=
+                "<br>📌 Section: " +
+                escapeHTML(q.section);
+            }
+
+            html += "</div>";
+        }
+
+        item.innerHTML = html;
+
+        box.appendChild(item);
+
+    });
+}
+
+
+/* =====================================================
+ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+START CBT
+===================================================== */
+
+function startCBT(){
+
+    validateQuestions();
+
+    initializeState();
+
+    renderQuestion();
+
+    renderPalette();
+
+    updateTimer();
+
+}
+
+
+/* =====================================================
+INITIAL LOAD
+===================================================== */
+
+loadPDFQuestions();
+
+validateQuestions();
+
+initializeState();
+
+startCBT();
+
+
+/* =====================================================
+PDF IMPORT CLEANUP
+===================================================== */
+
+/*
+Only remove the temporary PDF queue after
+the CBT has successfully loaded.
+*/
+
+if(
+    questions.length > 0 &&
+    localStorage.getItem("pdfCbtQuestions")
+){
+
+    localStorage.removeItem("pdfCbtQuestions");
+
+}
+
+
+/* =====================================================
+PROTECT AGAINST EMPTY TEST
+===================================================== */
+
+if(!questions.length){
+
+    document.getElementById("questionNumber")
+        .textContent = "No questions loaded";
+
+    document.getElementById("question")
+        .textContent =
+        "Please import a PDF or load a question set.";
+
+    document.getElementById("options")
+        .innerHTML = "";
+
+}
+
+
+/* =====================================================
+FINISH
+===================================================== */
+
+console.log(
+    "CBT Analyzer Pro loaded:",
+    questions.length,
+    "questions"
+);
+
+</script>
+
+</body>
+</html>
