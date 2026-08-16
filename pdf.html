@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>CBT Analyzer Pro — PDF to CBT</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f1f5f9;
+  color:#0f172a;
+}
+
+header{
+  background:#fff;
+  border-bottom:1px solid #e2e8f0;
+  padding:16px 20px;
+}
+
+.header{
+  max-width:900px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:800;
+}
+
+.logo span{
+  color:#4f46e5;
+}
+
+.container{
+  max-width:900px;
+  margin:25px auto;
+  padding:0 15px;
+}
+
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 3px 14px rgba(0,0,0,.08);
+}
+
+h1{
+  margin-top:0;
+}
+
+.upload{
+  border:2px dashed #94a3b8;
+  border-radius:14px;
+  padding:30px 20px;
+  text-align:center;
+  margin-top:20px;
+}
+
+input[type="file"]{
+  width:100%;
+  margin:15px 0;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:14px 18px;
+  background:#4f46e5;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.5;
+}
+
+.status{
+  margin-top:20px;
+  padding:14px;
+  background:#f8fafc;
+  border-radius:10px;
+  line-height:1.6;
+}
+
+.back{
+  display:block;
+  margin-top:20px;
+  text-align:center;
+  color:#4f46e5;
+  font-weight:700;
+  text-decoration:none;
+}
+
+.progress{
+  width:100%;
+  height:10px;
+  background:#e2e8f0;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:15px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:#4f46e5;
+  transition:width .2s;
+}
+
+@media(max-width:600px){
+
+.card{
+  padding:18px;
+}
+
+h1{
+  font-size:24px;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="header">
+
+<div class="logo">
+CBT Analyzer <span>Pro</span>
+</div>
+
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h1>📄 PDF → CBT</h1>
+
+<p>
+Upload your question PDF and convert it into a CBT test.
+</p>
+
+<div class="upload">
+
+<input
+id="pdfFile"
+type="file"
+accept="application/pdf">
+
+<br>
+
+<button
+id="convertButton"
+type="button"
+onclick="convertPDF()">
+
+Convert PDF to CBT
+
+</button>
+
+<div class="progress">
+<div
+id="progressBar"
+class="progress-bar">
+</div>
+</div>
+
+</div>
+
+<div
+id="status"
+class="status">
+
+Waiting for PDF…
+
+</div>
+
+<a
+class="back"
+href="cbt.html">
+
+← Open CBT Test
+
+</a>
+
+</div>
+
+</div>
+<script type="module">
+
+import * as pdfjsLib from
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+
+
+window.pdfjsLib = pdfjsLib;
+
+
+window.convertPDF = async function(){
+
+const fileInput =
+document.getElementById("pdfFile");
+
+const status =
+document.getElementById("status");
+
+const button =
+document.getElementById("convertButton");
+
+const progress =
+document.getElementById("progressBar");
+
+
+if(!fileInput.files.length){
+
+status.textContent =
+"Please select a PDF first.";
+
+return;
+
+}
+
+
+const file =
+fileInput.files[0];
+
+
+if(file.type !== "application/pdf"){
+
+status.textContent =
+"Please select a valid PDF file.";
+
+return;
+
+}
+
+
+try{
+
+button.disabled=true;
+
+status.textContent =
+"📖 Reading PDF...";
+
+progress.style.width="10%";
+
+
+const arrayBuffer =
+await file.arrayBuffer();
+
+
+progress.style.width="25%";
+
+
+const pdf =
+await pdfjsLib.getDocument({
+data:arrayBuffer
+}).promise;
+
+
+let fullText="";
+
+
+for(
+let pageNumber=1;
+pageNumber<=pdf.numPages;
+pageNumber++
+){
+
+status.textContent =
+"📖 Reading page "+
+pageNumber+
+" of "+
+pdf.numPages+"...";
+
+
+const page =
+await pdf.getPage(pageNumber);
+
+
+const textContent =
+await page.getTextContent();
+
+
+const pageText =
+textContent.items
+.map(function(item){
+return item.str;
+})
+.join(" ");
+
+
+fullText +=
+"\n"+
+pageText+
+"\n";
+
+
+progress.style.width =
+(25+
+(pageNumber/pdf.numPages)*50)+
+"%";
+
+}
+
+
+status.textContent =
+"🧠 Detecting questions...";
+
+
+const questions =
+parseQuestions(fullText);
+
+
+progress.style.width="90%";
+
+
+if(!questions.length){
+
+status.textContent =
+"❌ PDF was read, but no MCQ questions were detected. Make sure the PDF contains numbered questions with options A, B, C and D.";
+
+button.disabled=false;
+
+return;
+
+}
+
+
+localStorage.setItem(
+"pdfCbtQuestions",
+JSON.stringify(questions)
+);
+
+
+localStorage.setItem(
+"cbtActiveQuestions",
+JSON.stringify(questions)
+);
+
+
+progress.style.width="100%";
+
+
+status.textContent =
+"✅ "+
+questions.length+
+" questions detected. Opening CBT...";
+
+
+setTimeout(function(){
+
+window.location.href="cbt.html";
+
+},800);
+
+
+}catch(error){
+
+console.error(error);
+
+status.textContent =
+"❌ PDF reader error: "+
+error.message;
+
+button.disabled=false;
+
+progress.style.width="0%";
+
+}
+
+};
+
+
+/* =====================================================
+QUESTION PARSER
+===================================================== */
+
+function parseQuestions(text){
+
+const questions=[];
+
+
+/*
+Clean extracted PDF text.
+*/
+
+text=
+String(text||"")
+.replace(/\r/g," ")
+.replace(/\n+/g," ")
+.replace(/\s+/g," ")
+.trim();
+
+
+/*
+Find numbered questions.
+
+Examples:
+
+1. Question
+2) Question
+Q3. Question
+Question 4:
+*/
+
+const questionPattern=
+/(?:^|\
