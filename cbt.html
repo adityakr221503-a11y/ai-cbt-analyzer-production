@@ -1769,7 +1769,461 @@ window.addEventListener(
     }
 );
 
-</script>
+<script>
+"use strict";
+
+/* =========================================
+   PDF QUESTIONS
+========================================= */
+
+let questions = [];
+
+function loadQuestions(){
+
+    const saved =
+        localStorage.getItem("pdfCbtQuestions");
+
+    if(!saved){
+        return false;
+    }
+
+    try{
+
+        const data = JSON.parse(saved);
+
+        if(!Array.isArray(data)){
+            return false;
+        }
+
+        questions = data
+            .filter(function(q){
+
+                return q &&
+                    q.question &&
+                    Array.isArray(q.options) &&
+                    q.options.length >= 2 &&
+                    Number.isInteger(Number(q.answer));
+
+            })
+            .map(function(q){
+
+                return {
+
+                    id:
+                        q.id ||
+                        "pdf-" + Date.now(),
+
+                    subject:
+                        q.subject || "Imported",
+
+                    topic:
+                        q.topic ||
+                        q.section ||
+                        "PDF Import",
+
+                    question:
+                        String(q.question),
+
+                    options:
+                        q.options.map(String),
+
+                    answer:
+                        Number(q.answer),
+
+                    solution:
+                        q.solution ||
+                        q.explanation ||
+                        "Review this question.",
+
+                    explanation:
+                        q.explanation || "",
+
+                    pdfPage:
+                        q.pdfPage || "",
+
+                    source:
+                        q.source ||
+                        "PDF Import"
+
+                };
+
+            });
+
+        return questions.length > 0;
+
+    }
+    catch(error){
+
+        console.error(
+            "Question loading error:",
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================
+   TEST STATE
+========================================= */
+
+let current = 0;
+
+let answers = [];
+
+let marked = [];
+
+let submitted = false;
+
+let timeLeft = 1800;
+
+let timerInterval = null;
+
+
+/* =========================================
+   INITIALIZE
+========================================= */
+
+function initialize(){
+
+    answers =
+        new Array(
+            questions.length
+        ).fill(null);
+
+    marked =
+        new Array(
+            questions.length
+        ).fill(false);
+
+    current = 0;
+
+    submitted = false;
+
+    timeLeft = 1800;
+
+}
+
+
+/* =========================================
+   TIMER
+========================================= */
+
+function updateTimer(){
+
+    const min =
+        Math.floor(timeLeft / 60);
+
+    const sec =
+        timeLeft % 60;
+
+    document.getElementById(
+        "timer"
+    ).textContent =
+        String(min).padStart(2,"0") +
+        ":" +
+        String(sec).padStart(2,"0");
+
+}
+
+
+function startTimer(){
+
+    clearInterval(timerInterval);
+
+    updateTimer();
+
+    timerInterval =
+        setInterval(function(){
+
+            if(submitted){
+
+                clearInterval(
+                    timerInterval
+                );
+
+                return;
+
+            }
+
+            timeLeft--;
+
+            if(timeLeft <= 0){
+
+                timeLeft = 0;
+
+                updateTimer();
+
+                clearInterval(
+                    timerInterval
+                );
+
+                submitTest();
+
+                return;
+
+            }
+
+            updateTimer();
+
+        },1000);
+
+}
+
+
+/* =========================================
+   RENDER QUESTION
+========================================= */
+
+function renderQuestion(){
+
+    const q =
+        questions[current];
+
+    if(!q){
+
+        document.getElementById(
+            "questionNumber"
+        ).textContent =
+            "No question available";
+
+        document.getElementById(
+            "question"
+        ).textContent =
+            "No imported questions found.";
+
+        document.getElementById(
+            "options"
+        ).innerHTML = "";
+
+        return;
+
+    }
+
+    document.getElementById(
+        "questionNumber"
+    ).textContent =
+        "Question " +
+        (current + 1) +
+        " of " +
+        questions.length;
+
+    document.getElementById(
+        "question"
+    ).textContent =
+        q.question;
+
+    const box =
+        document.getElementById(
+            "options"
+        );
+
+    box.innerHTML = "";
+
+    q.options.forEach(
+        function(option,index){
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "option";
+
+            if(
+                answers[current] === index
+            ){
+
+                button.classList.add(
+                    "selected"
+                );
+
+            }
+
+            button.textContent =
+                String.fromCharCode(
+                    65 + index
+                ) +
+                ". " +
+                option;
+
+            button.onclick =
+                function(){
+
+                    if(submitted){
+                        return;
+                    }
+
+                    answers[current] =
+                        index;
+
+                    renderQuestion();
+
+                };
+
+            box.appendChild(button);
+
+        }
+    );
+
+    document.getElementById(
+        "nextButton"
+    ).textContent =
+        current === questions.length - 1
+        ? "Finish"
+        : "Next";
+
+    renderPalette();
+
+}
+
+
+/* =========================================
+   PALETTE
+========================================= */
+
+function renderPalette(){
+
+    const palette =
+        document.getElementById(
+            "palette"
+        );
+
+    palette.innerHTML = "";
+
+    questions.forEach(
+        function(q,index){
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.textContent =
+                index + 1;
+
+            if(
+                answers[index] !== null
+            ){
+
+                button.classList.add(
+                    "answered"
+                );
+
+            }
+
+            if(marked[index]){
+
+                button.classList.add(
+                    "review"
+                );
+
+            }
+
+            if(index === current){
+
+                button.classList.add(
+                    "current"
+                );
+
+            }
+
+            button.onclick =
+                function(){
+
+                    if(submitted){
+                        return;
+                    }
+
+                    current = index;
+
+                    renderQuestion();
+
+                };
+
+            palette.appendChild(button);
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+function nextQuestion(){
+
+    if(submitted){
+        return;
+    }
+
+    if(
+        current <
+        questions.length - 1
+    ){
+
+        current++;
+
+        renderQuestion();
+
+    }
+    else{
+
+        submitTest();
+
+    }
+
+}
+
+
+function previousQuestion(){
+
+    if(submitted){
+        return;
+    }
+
+    if(current > 0){
+
+        current--;
+
+        renderQuestion();
+
+    }
+
+}
+
+
+function clearAnswer(){
+
+    if(submitted){
+        return;
+    }
+
+    answers[current] = null;
+
+    renderQuestion();
+
+}
+
+
+function markReview(){
+
+    if(submitted){
+        return;
+    }
+
+    marked[current] =
+        !marked[current];
+
+    renderPalette();
+
+                        }
 
 </body>
 </html>
