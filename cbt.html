@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>CBT Analyzer Pro — CBT Test</title>
 
 <style>
-
 *{
 box-sizing:border-box;
 }
@@ -167,8 +163,6 @@ outline:3px solid #4f46e5;
 
 #result{
 display:none;
-position:relative;
-z-index:10;
 }
 
 .score{
@@ -248,6 +242,14 @@ font-size:14px;
 color:#64748b;
 }
 
+.empty{
+padding:20px;
+background:#fef2f2;
+border-radius:12px;
+color:#991b1b;
+font-weight:700;
+}
+
 @media(max-width:800px){
 
 .container{
@@ -259,7 +261,6 @@ font-size:19px;
 }
 
 }
-
 </style>
 
 </head>
@@ -274,8 +275,7 @@ font-size:19px;
 CBT Analyzer <span>Pro</span>
 </div>
 
-<div id="timer"
-class="timer">
+<div id="timer" class="timer">
 30:00
 </div>
 
@@ -291,12 +291,12 @@ class="timer">
 
 <div id="questionNumber"
 class="question-number">
-Loading...
+Loading imported questions...
 </div>
 
 <div id="question"
 class="question">
-Loading question...
+Loading...
 </div>
 
 <div id="options"></div>
@@ -340,9 +340,7 @@ Next
 
 <h2>🎯 Test Completed</h2>
 
-<div id="score"
-class="score">
-</div>
+<div id="score" class="score"></div>
 
 <p id="summary"></p>
 
@@ -383,9 +381,7 @@ onclick="location.href='index.html'">
 
 <h3>Question Palette</h3>
 
-<div id="palette"
-class="palette">
-</div>
+<div id="palette" class="palette"></div>
 
 <button
 class="danger"
@@ -402,163 +398,22 @@ Submit Test
 <script>
 
 "use strict";
-    /* =====================================================
-QUESTIONS
+
+/* =====================================================
+IMPORTANT:
+THIS CBT USES PDF QUESTIONS ONLY.
+NO OLD HARD-CODED QUESTIONS.
 ===================================================== */
 
-let questions = [
+let questions=[];
 
-{
-subject:"Physics",
-topic:"Basic Physics",
-question:"Which planet is known as the Red Planet?",
-options:[
-"Earth",
-"Mars",
-"Jupiter",
-"Venus"
-],
-answer:1,
-solution:
-"Mars is called the Red Planet because iron-bearing minerals on its surface give it a reddish appearance."
-},
+let current=0;
+let answers=[];
+let marked=[];
+let submitted=false;
 
-{
-subject:"Physics",
-topic:"Units",
-question:"What is the SI unit of force?",
-options:[
-"Joule",
-"Newton",
-"Watt",
-"Pascal"
-],
-answer:1,
-solution:
-"The SI unit of force is the newton (N)."
-},
-
-{
-subject:"Biology",
-topic:"Cell Biology",
-question:"Which organelle is known as the powerhouse of the cell?",
-options:[
-"Nucleus",
-"Ribosome",
-"Mitochondria",
-"Golgi apparatus"
-],
-answer:2,
-solution:
-"Mitochondria are major sites of ATP production during cellular respiration."
-},
-
-{
-subject:"Chemistry",
-topic:"Periodic Table",
-question:"What is the chemical symbol of sodium?",
-options:[
-"So",
-"Na",
-"S",
-"Sd"
-],
-answer:1,
-solution:
-"The symbol Na comes from the Latin name natrium."
-},
-
-{
-subject:"Biology",
-topic:"Environment",
-question:"Which gas is most abundant in Earth's atmosphere?",
-options:[
-"Oxygen",
-"Carbon dioxide",
-"Nitrogen",
-"Hydrogen"
-],
-answer:2,
-solution:
-"Nitrogen makes up approximately 78% of Earth's atmosphere."
-},
-
-{
-subject:"Physics",
-topic:"Gravitation",
-question:"What is the approximate acceleration due to gravity near Earth's surface?",
-options:[
-"4.9 m/s²",
-"9.8 m/s²",
-"19.6 m/s²",
-"98 m/s²"
-],
-answer:1,
-solution:
-"The approximate acceleration due to gravity near Earth's surface is 9.8 m/s²."
-},
-
-{
-subject:"Biology",
-topic:"Genetics",
-question:"Which molecule carries genetic information?",
-options:[
-"Protein",
-"Lipid",
-"DNA",
-"Glucose"
-],
-answer:2,
-solution:
-"DNA stores hereditary genetic information in most organisms."
-},
-
-{
-subject:"Physics",
-topic:"Electricity",
-question:"Which particle has a negative electric charge?",
-options:[
-"Proton",
-"Neutron",
-"Electron",
-"Photon"
-],
-answer:2,
-solution:
-"An electron carries a negative elementary charge."
-},
-
-{
-subject:"Chemistry",
-topic:"Atomic Structure",
-question:"Which particle has no electric charge?",
-options:[
-"Proton",
-"Electron",
-"Neutron",
-"Positron"
-],
-answer:2,
-solution:
-"A neutron is electrically neutral."
-},
-
-{
-subject:"Biology",
-topic:"Human Physiology",
-question:"Which organ pumps blood throughout the human body?",
-options:[
-"Liver",
-"Kidney",
-"Heart",
-"Lung"
-],
-answer:2,
-solution:
-"The heart contracts rhythmically to pump blood through the circulatory system."
-}
-
-];
+let timeLeft=1800;
+let timerInterval=null;
 
 
 /* =====================================================
@@ -567,180 +422,207 @@ LOAD PDF QUESTIONS
 
 function loadPDFQuestions(){
 
-    try{
+const saved=
+localStorage.getItem("pdfCbtQuestions");
 
-        const saved =
-            localStorage.getItem("pdfCbtQuestions");
+console.log(
+"pdfCbtQuestions:",
+saved
+);
 
-        if(!saved){
-            return false;
-        }
+if(!saved){
 
-        const imported =
-            JSON.parse(saved);
+return false;
 
-        if(
-            !Array.isArray(imported) ||
-            imported.length === 0
-        ){
-            return false;
-        }
+}
 
-        const valid =
-            imported.filter(function(q){
+try{
 
-                return q &&
-                    typeof q.question === "string" &&
-                    q.question.trim() !== "" &&
-                    Array.isArray(q.options) &&
-                    q.options.length >= 2 &&
-                    Number.isInteger(q.answer) &&
-                    q.answer >= 0 &&
-                    q.answer < q.options.length;
+const imported=
+JSON.parse(saved);
 
-            });
+if(
+!Array.isArray(imported) ||
+imported.length===0
+){
+
+return false;
+
+}
 
 
-        if(valid.length === 0){
-            return false;
-        }
+/*
+Only accept properly scored questions.
+*/
+
+const valid=
+imported.filter(function(q){
+
+return q &&
+typeof q.question==="string" &&
+q.question.trim()!=="" &&
+Array.isArray(q.options) &&
+q.options.length>=2 &&
+Number.isInteger(Number(q.answer)) &&
+Number(q.answer)>=0 &&
+Number(q.answer)<q.options.length;
+
+});
 
 
-        questions =
-            valid.map(function(q){
+if(valid.length===0){
 
-                return {
+return false;
 
-                    id:
-                        q.id ||
-                        ("pdf-" + Date.now()),
-
-                    subject:
-                        q.subject ||
-                        "Imported",
-
-                    topic:
-                        q.topic ||
-                        q.section ||
-                        "PDF Import",
-
-                    question:
-                        q.question,
-
-                    options:
-                        q.options,
-
-                    answer:
-                        Number(q.answer),
-
-                    solution:
-                        q.solution ||
-                        q.explanation ||
-                        "Review the original PDF solution.",
-
-                    explanation:
-                        q.explanation || "",
-
-                    pdfPage:
-                        q.pdfPage || "",
-
-                    pdfPageEnd:
-                        q.pdfPageEnd ||
-                        q.pdfPage ||
-                        "",
-
-                    chapter:
-                        q.chapter || "",
-
-                    section:
-                        q.section || "",
-
-                    answerSource:
-                        q.answerSource ||
-                        "Verified",
-
-                    source:
-                        q.source ||
-                        "PDF Import",
-
-                    sourceType:
-                        q.sourceType ||
-                        "PDF",
-
-                    bookmarked:
-                        Boolean(q.bookmarked)
-
-                };
-
-            });
+}
 
 
-        return true;
+/*
+Replace questions completely.
+*/
 
-    }
+questions=
+valid.map(function(q,index){
 
-    catch(error){
+return {
 
-        console.error(
-            "PDF question loading failed:",
-            error
-        );
+id:
+q.id ||
+("pdf-"+Date.now()+"-"+index),
 
-        return false;
+subject:
+q.subject ||
+"Imported",
 
-    }
+topic:
+q.topic ||
+"PDF Import",
+
+question:
+q.question,
+
+options:
+q.options,
+
+answer:
+Number(q.answer),
+
+solution:
+q.solution ||
+q.explanation ||
+"Review the solution from the source PDF.",
+
+explanation:
+q.explanation || "",
+
+pdfPage:
+q.pdfPage || "",
+
+chapter:
+q.chapter || "",
+
+section:
+q.section || "",
+
+answerSource:
+q.answerSource ||
+"PDF",
+
+source:
+q.source ||
+"PDF Import",
+
+sourceType:
+q.sourceType ||
+"PDF"
+
+};
+
+});
+
+
+return true;
+
+}
+catch(error){
+
+console.error(
+"PDF loading error:",
+error
+);
+
+return false;
+
+}
 
 }
 
 
 /* =====================================================
-VALIDATE QUESTIONS
+INITIALIZE
 ===================================================== */
 
-function validateQuestions(){
+function initialize(){
 
-    questions =
-        questions.filter(function(q){
+/*
+CRITICAL:
+Try PDF data first.
+*/
 
-            return q &&
-                typeof q.question === "string" &&
-                q.question.trim() !== "" &&
-                Array.isArray(q.options) &&
-                q.options.length >= 2 &&
-                Number.isInteger(q.answer) &&
-                q.answer >= 0 &&
-                q.answer < q.options.length;
-
-        });
-
-                      }
-    /* =====================================================
-STATE
-===================================================== */
-
-let current = 0;
-let answers = [];
-let marked = [];
-let submitted = false;
-let timeLeft = 1800;
-let timerInterval = null;
+const loaded=
+loadPDFQuestions();
 
 
-/* =====================================================
-INITIALIZE STATE
-===================================================== */
+if(!loaded){
 
-function initializeState(){
+document.getElementById(
+"questionNumber"
+).textContent=
+"No imported CBT available";
 
-    answers = new Array(questions.length).fill(null);
 
-    marked = new Array(questions.length).fill(false);
+document.getElementById(
+"question"
+).innerHTML=
+'<div class="empty">'+
+'No valid PDF questions were found.<br><br>'+
+'Go back to <b>PDF → CBT</b>, read the PDF, and then tap Start CBT.'+
+'</div>';
 
-    current = 0;
 
-    submitted = false;
+document.getElementById(
+"options"
+).innerHTML="";
 
-    timeLeft = 1800;
+
+return;
+
+}
+
+
+answers=
+new Array(
+questions.length
+).fill(null);
+
+
+marked=
+new Array(
+questions.length
+).fill(false);
+
+
+current=0;
+
+submitted=false;
+
+timeLeft=1800;
+
+
+renderQuestion();
+
+startTimer();
+
 }
 
 
@@ -750,47 +632,63 @@ TIMER
 
 function updateTimer(){
 
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
+const minutes=
+Math.floor(timeLeft/60);
 
-    document.getElementById("timer").textContent =
-        String(minutes).padStart(2,"0") +
-        ":" +
-        String(seconds).padStart(2,"0");
+const seconds=
+timeLeft%60;
+
+
+document.getElementById(
+"timer"
+).textContent=
+String(minutes).padStart(2,"0")+
+":"+
+String(seconds).padStart(2,"0");
+
 }
 
 
 function startTimer(){
 
-    clearInterval(timerInterval);
+clearInterval(timerInterval);
 
-    updateTimer();
+updateTimer();
 
-    timerInterval = setInterval(function(){
 
-        if(submitted){
-            clearInterval(timerInterval);
-            return;
-        }
+timerInterval=
+setInterval(function(){
 
-        timeLeft--;
+if(submitted){
 
-        if(timeLeft <= 0){
+clearInterval(timerInterval);
+return;
 
-            timeLeft = 0;
+}
 
-            updateTimer();
 
-            clearInterval(timerInterval);
+timeLeft--;
 
-            submitTest();
 
-            return;
-        }
+if(timeLeft<=0){
 
-        updateTimer();
+timeLeft=0;
 
-    },1000);
+updateTimer();
+
+clearInterval(timerInterval);
+
+submitTest();
+
+return;
+
+}
+
+
+updateTimer();
+
+},1000);
+
 }
 
 
@@ -800,152 +698,181 @@ RENDER QUESTION
 
 function renderQuestion(){
 
-    const q = questions[current];
+if(!questions.length){
 
-    if(!q){
+return;
 
-        document.getElementById("questionNumber").textContent =
-            "No question available";
-
-        document.getElementById("question").textContent =
-            "Could not load questions.";
-
-        document.getElementById("options").innerHTML = "";
-
-        return;
-    }
+}
 
 
-    document.getElementById("questionNumber").textContent =
-        "Question " +
-        (current + 1) +
-        " of " +
-        questions.length +
-        " • " +
-        (q.subject || "Imported");
+const q=
+questions[current];
 
 
-    document.getElementById("question").textContent =
-        q.question;
+document.getElementById(
+"questionNumber"
+).textContent=
+"Question "+
+(current+1)+
+" of "+
+questions.length+
+" • "+
+(q.subject||"Imported");
 
 
-    const box =
-        document.getElementById("options");
-
-    box.innerHTML = "";
-
-
-    q.options.forEach(function(option,index){
-
-        const button =
-            document.createElement("button");
-
-        button.type = "button";
-
-        button.className = "option";
+document.getElementById(
+"question"
+).textContent=
+q.question;
 
 
-        if(answers[current] === index){
+const box=
+document.getElementById(
+"options"
+);
 
-            button.classList.add("selected");
-
-        }
-
-
-        button.textContent =
-            String.fromCharCode(65 + index) +
-            ". " +
-            option;
+box.innerHTML="";
 
 
-        button.onclick = function(){
+q.options.forEach(
+function(option,index){
 
-            if(submitted) return;
+const button=
+document.createElement(
+"button"
+);
 
-            answers[current] = index;
+button.type="button";
 
-            renderQuestion();
-
-        };
-
-
-        box.appendChild(button);
-
-    });
+button.className=
+"option";
 
 
-    const nextButton =
-        document.getElementById("nextButton");
+if(
+answers[current]===index
+){
+
+button.classList.add(
+"selected"
+);
+
+}
 
 
-    nextButton.textContent =
-        current === questions.length - 1
-        ? "Finish"
-        : "Next";
+button.textContent=
+String.fromCharCode(65+index)+
+". "+
+option;
 
 
-    renderPalette();
+button.onclick=
+function(){
+
+if(submitted){
+return;
+}
+
+answers[current]=index;
+
+renderQuestion();
+
+};
+
+
+box.appendChild(button);
+
+});
+
+
+document.getElementById(
+"nextButton"
+).textContent=
+current===questions.length-1
+?"Finish"
+:"Next";
+
+
+renderPalette();
 
 }
 
 
 /* =====================================================
-QUESTION PALETTE
+PALETTE
 ===================================================== */
 
 function renderPalette(){
 
-    const palette =
-        document.getElementById("palette");
+const palette=
+document.getElementById(
+"palette"
+);
 
-    palette.innerHTML = "";
-
-
-    questions.forEach(function(q,index){
-
-        const button =
-            document.createElement("button");
-
-        button.type = "button";
-
-        button.textContent = index + 1;
+palette.innerHTML="";
 
 
-        if(answers[index] !== null){
+questions.forEach(
+function(q,index){
 
-            button.classList.add("answered");
+const button=
+document.createElement(
+"button"
+);
 
-        }
+button.type="button";
 
-
-        if(marked[index]){
-
-            button.classList.add("review");
-
-        }
-
-
-        if(index === current){
-
-            button.classList.add("current");
-
-        }
+button.textContent=
+index+1;
 
 
-        button.onclick = function(){
+if(
+answers[index]!==null
+){
 
-            if(submitted) return;
+button.classList.add(
+"answered"
+);
 
-            current = index;
-
-            renderQuestion();
-
-        };
+}
 
 
-        palette.appendChild(button);
+if(marked[index]){
 
-    });
+button.classList.add(
+"review"
+);
+
+}
+
+
+if(index===current){
+
+button.classList.add(
+"current"
+);
+
+}
+
+
+button.onclick=
+function(){
+
+if(submitted){
+return;
+}
+
+current=index;
+
+renderQuestion();
+
+};
+
+
+palette.appendChild(
+button
+);
+
+});
 
 }
 
@@ -956,267 +883,278 @@ NAVIGATION
 
 function nextQuestion(){
 
-    if(submitted) return;
+if(submitted){
+return;
+}
 
 
-    if(current < questions.length - 1){
+if(
+current<
+questions.length-1
+){
 
-        current++;
+current++;
 
-        renderQuestion();
+renderQuestion();
 
-    }else{
+}
+else{
 
-        submitTest();
+submitTest();
 
-    }
+}
 
 }
 
 
 function previousQuestion(){
 
-    if(submitted) return;
+if(submitted){
+return;
+}
 
 
-    if(current > 0){
+if(current>0){
 
-        current--;
+current--;
 
-        renderQuestion();
+renderQuestion();
 
-    }
+}
 
 }
 
 
 function clearAnswer(){
 
-    if(submitted) return;
+if(submitted){
+return;
+}
 
-    answers[current] = null;
 
-    renderQuestion();
+answers[current]=null;
+
+renderQuestion();
 
 }
 
 
 function markReview(){
 
-    if(submitted) return;
+if(submitted){
+return;
+}
 
-    marked[current] = !marked[current];
 
-    renderPalette();
+marked[current]=
+!marked[current];
+
+renderPalette();
 
 }
     /* =====================================================
 MISTAKE INTELLIGENCE
 ===================================================== */
 
-function classifyMistake(q, selectedIndex){
+function classifyMistake(q,selectedIndex){
 
-    const question =
-        String(q.question || "").toLowerCase();
+const question=
+String(q.question||"")
+.toLowerCase();
 
-    const topic =
-        String(q.topic || "").toLowerCase();
+const topic=
+String(q.topic||"")
+.toLowerCase();
 
-    const selected =
-        selectedIndex === null ||
-        selectedIndex === undefined
-        ? ""
-        : String(
-            q.options[selectedIndex] || ""
-          ).toLowerCase();
+const selected=
+selectedIndex===null ||
+selectedIndex===undefined
+?""
+:String(
+q.options[selectedIndex]||""
+).toLowerCase();
 
-    const correct =
-        String(
-            q.options[q.answer] || ""
-        ).toLowerCase();
+const correct=
+String(
+q.options[q.answer]||""
+).toLowerCase();
 
 
-    /* =========================
-       CALCULATION ERROR
-    ========================= */
+/* CALCULATION */
 
-    const calculationWords = [
+const calculationWords=[
 
-        "calculate",
-        "calculation",
-        "numerical",
-        "value of",
-        "find the",
-        "velocity",
-        "acceleration",
-        "force",
-        "work",
-        "energy",
-        "power",
-        "current",
-        "voltage",
-        "resistance",
-        "mass",
-        "momentum"
+"calculate",
+"calculation",
+"numerical",
+"value of",
+"find the",
+"velocity",
+"acceleration",
+"force",
+"work",
+"energy",
+"power",
+"current",
+"voltage",
+"resistance",
+"mass",
+"momentum"
 
-    ];
+];
 
 
-    if(
-        calculationWords.some(function(word){
+if(
+calculationWords.some(
+function(word){
 
-            return question.includes(word);
+return question.includes(word);
 
-        })
-    ){
+})
+){
 
-        return {
+return{
 
-            type: "🔢 Calculation Error",
+type:"🔢 Calculation Error",
 
-            reason:
-                "Recheck the formula, units and calculation steps."
+reason:
+"Recheck the formula, units and calculation steps."
 
-        };
+};
 
-    }
+}
 
 
-    /* =========================
-       MEMORY / RECALL
-    ========================= */
+/* MEMORY */
 
-    const memoryWords = [
+const memoryWords=[
 
-        "what is",
-        "which is",
-        "who",
-        "symbol",
-        "unit",
-        "known as",
-        "called",
-        "most abundant",
-        "organ",
-        "organelle"
+"what is",
+"which is",
+"who",
+"symbol",
+"unit",
+"known as",
+"called",
+"most abundant",
+"organ",
+"organelle"
 
-    ];
+];
 
 
-    if(
-        memoryWords.some(function(word){
+if(
+memoryWords.some(
+function(word){
 
-            return question.includes(word);
+return question.includes(word);
 
-        })
-    ){
+})
+){
 
-        return {
+return{
 
-            type: "📚 Memory / Recall Gap",
+type:"📚 Memory / Recall Gap",
 
-            reason:
-                "This is mainly a factual or definition-based question. Revise the key fact and test recall again."
+reason:
+"This is mainly a factual or definition-based question. Revise the key fact and test recall again."
 
-        };
+};
 
-    }
+}
 
 
-    /* =========================
-       CONCEPT GAP
-    ========================= */
+/* CONCEPT */
 
-    const conceptWords = [
+const conceptWords=[
 
-        "why",
-        "principle",
-        "mechanism",
-        "process",
-        "function",
-        "relationship",
-        "reason",
-        "concept"
+"why",
+"principle",
+"mechanism",
+"process",
+"function",
+"relationship",
+"reason",
+"concept"
 
-    ];
+];
 
 
-    if(
-        conceptWords.some(function(word){
+if(
+conceptWords.some(
+function(word){
 
-            return question.includes(word);
+return question.includes(word);
 
-        }) ||
-        topic.includes("concept")
-    ){
+}) ||
+topic.includes("concept")
+){
 
-        return {
+return{
 
-            type: "🧠 Concept Gap",
+type:"🧠 Concept Gap",
 
-            reason:
-                "Review the underlying concept instead of memorising only the answer."
+reason:
+"Review the underlying concept instead of memorising only the answer."
 
-        };
+};
 
-    }
+}
 
 
-    /* =========================
-       CONFUSED CONCEPTS
-    ========================= */
+/* CONFUSION */
 
-    if(
-        selected &&
-        correct &&
-        selected !== correct
-    ){
+if(
+selected &&
+correct &&
+selected!==correct
+){
 
-        const selectedWords =
-            selected.split(/\s+/);
+const selectedWords=
+selected.split(/\s+/);
 
-        const correctWords =
-            correct.split(/\s+/);
+const correctWords=
+correct.split(/\s+/);
 
 
-        const overlap =
-            selectedWords.filter(function(word){
+const overlap=
+selectedWords.filter(
+function(word){
 
-                return (
-                    word.length > 3 &&
-                    correctWords.includes(word)
-                );
+return(
+word.length>3 &&
+correctWords.includes(word)
+);
 
-            }).length;
+}).length;
 
 
-        if(overlap > 0){
+if(overlap>0){
 
-            return {
+return{
 
-                type: "🧩 Confused Concepts",
+type:"🧩 Confused Concepts",
 
-                reason:
-                    "Your selected answer is related to the correct answer. Review the distinction between the two concepts."
+reason:
+"Your selected answer is related to the correct answer. Review the distinction between the two concepts."
 
-            };
+};
 
-        }
+}
 
-    }
+}
 
 
-    /* =========================
-       DEFAULT
-    ========================= */
+/* DEFAULT */
 
-    return {
+return{
 
-        type: "⚠️ Concept Gap",
+type:"⚠️ Concept Gap",
 
-        reason:
-            "The answer was incorrect. Review the explanation and retry the question."
+reason:
+"The answer was incorrect. Review the explanation and retry the question."
 
-    };
+};
 
 }
 
@@ -1227,10 +1165,10 @@ NORMALIZE
 
 function normalize(value){
 
-    return String(value || "")
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g," ");
+return String(value||"")
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ");
 
 }
 
@@ -1241,448 +1179,446 @@ REACTIVATE MISTAKES
 
 function reactivateMistakes(){
 
-    let mastery = [];
+let mastery=[];
 
 
-    try{
+try{
 
-        mastery =
-            JSON.parse(
-                localStorage.getItem(
-                    "cbtMasteryV2"
-                ) || "[]"
-            );
-
-
-        if(!Array.isArray(mastery)){
-
-            mastery = [];
-
-        }
-
-    }catch(error){
-
-        mastery = [];
-
-    }
+mastery=
+JSON.parse(
+localStorage.getItem(
+"cbtMasteryV2"
+)||"[]"
+);
 
 
-    const wrongQuestions =
-        new Set();
+if(!Array.isArray(mastery)){
 
-
-    questions.forEach(function(q,index){
-
-        if(
-            answers[index] !== null &&
-            answers[index] !== q.answer
-        ){
-
-            wrongQuestions.add(
-                normalize(q.question)
-            );
-
-        }
-
-    });
-
-
-    mastery =
-        mastery.filter(function(item){
-
-            if(
-                !item ||
-                !item.question
-            ){
-
-                return true;
-
-            }
-
-
-            return !wrongQuestions.has(
-                normalize(item.question)
-            );
-
-        });
-
-
-    localStorage.setItem(
-        "cbtMasteryV2",
-        JSON.stringify(mastery)
-    );
+mastery=[];
 
 }
-    /* =====================================================
+
+}
+catch(error){
+
+mastery=[];
+
+}
+
+
+const wrongQuestions=
+new Set();
+
+
+questions.forEach(
+function(q,index){
+
+if(
+answers[index]!==null &&
+answers[index]!==q.answer
+){
+
+wrongQuestions.add(
+normalize(q.question)
+);
+
+}
+
+});
+
+
+mastery=
+mastery.filter(
+function(item){
+
+if(
+!item ||
+!item.question
+){
+
+return true;
+
+}
+
+
+return !wrongQuestions.has(
+normalize(item.question)
+);
+
+});
+
+
+localStorage.setItem(
+"cbtMasteryV2",
+JSON.stringify(mastery)
+);
+
+}
+
+
+/* =====================================================
 SAVE TEST HISTORY
 ===================================================== */
 
 function saveHistory(
-    correct,
-    incorrect,
-    skipped,
-    score
+correct,
+incorrect,
+skipped,
+score
 ){
 
-    let history = [];
+let history=[];
 
 
-    try{
+try{
 
-        history =
-            JSON.parse(
-                localStorage.getItem(
-                    "cbtHistory"
-                ) || "[]"
-            );
+history=
+JSON.parse(
+localStorage.getItem(
+"cbtHistory"
+)||"[]"
+);
 
 
-        if(!Array.isArray(history)){
+if(!Array.isArray(history)){
 
-            history = [];
-
-        }
-
-    }catch(error){
-
-        history = [];
-
-    }
-
-
-    const record = {
-
-        date:
-            new Date().toLocaleString(),
-
-        timestamp:
-            Date.now(),
-
-        score:
-            score,
-
-        correct:
-            correct,
-
-        incorrect:
-            incorrect,
-
-        wrong:
-            incorrect,
-
-        skipped:
-            skipped,
-
-        total:
-            questions.length,
-
-        questions:
-            questions.map(function(q,index){
-
-                let status;
-
-
-                if(
-                    answers[index] === null
-                ){
-
-                    status = "skipped";
-
-                }
-                else if(
-                    answers[index] === q.answer
-                ){
-
-                    status = "correct";
-
-                }
-                else{
-
-                    status = "incorrect";
-
-                }
-
-
-                let intelligence = null;
-
-
-                if(status === "incorrect"){
-
-                    intelligence =
-                        classifyMistake(
-                            q,
-                            answers[index]
-                        );
-
-                }
-
-
-                return {
-
-                    id:
-                        q.id ||
-                        (
-                            "history-" +
-                            Date.now() +
-                            "-" +
-                            index
-                        ),
-
-                    question:
-                        q.question,
-
-                    options:
-                        q.options,
-
-                    subject:
-                        q.subject || "Imported",
-
-                    topic:
-                        q.topic || "PDF Import",
-
-                    status:
-                        status,
-
-                    selectedIndex:
-                        answers[index],
-
-                    selectedAnswer:
-                        answers[index] === null
-                        ? "Not answered"
-                        : q.options[
-                            answers[index]
-                          ],
-
-                    correctIndex:
-                        q.answer,
-
-                    correctAnswer:
-                        q.options[q.answer],
-
-                    mistakeType:
-                        intelligence
-                        ? intelligence.type
-                        : null,
-
-                    mistakeReason:
-                        intelligence
-                        ? intelligence.reason
-                        : null,
-
-                    mistakeConfidence:
-                        intelligence
-                        ? "Auto Classified"
-                        : null,
-
-                    solution:
-                        q.solution || "",
-
-                    explanation:
-                        q.explanation || "",
-
-                    bookmarked:
-                        Boolean(
-                            marked[index]
-                        ),
-
-                    markedForReview:
-                        Boolean(
-                            marked[index]
-                        ),
-
-                    pdfPage:
-                        q.pdfPage || "",
-
-                    chapter:
-                        q.chapter || "",
-
-                    section:
-                        q.section || "",
-
-                    source:
-                        q.source || "CBT"
-
-                };
-
-            })
-
-    };
-
-
-    history.push(record);
-
-
-    /* Keep history available to Dashboard */
-
-    localStorage.setItem(
-        "cbtHistory",
-        JSON.stringify(history)
-    );
-
-
-    /* Also save latest test separately */
-
-    localStorage.setItem(
-        "cbtLastTest",
-        JSON.stringify(record)
-    );
+history=[];
 
 }
+
+}
+catch(error){
+
+history=[];
+
+}
+
+
+const record={
+
+date:
+new Date().toLocaleString(),
+
+timestamp:
+Date.now(),
+
+score:score,
+
+correct:correct,
+
+incorrect:incorrect,
+
+wrong:incorrect,
+
+skipped:skipped,
+
+total:questions.length,
+
+source:
+"PDF / CBT",
+
+
+questions:
+questions.map(
+function(q,index){
+
+let status;
+
+if(
+answers[index]===null
+){
+
+status="skipped";
+
+}
+else if(
+answers[index]===q.answer
+){
+
+status="correct";
+
+}
+else{
+
+status="incorrect";
+
+}
+
+
+let intelligence=null;
+
+
+if(status==="incorrect"){
+
+intelligence=
+classifyMistake(
+q,
+answers[index]
+);
+
+}
+
+
+return{
+
+id:
+q.id ||
+(
+"history-"+
+Date.now()+
+"-"+
+index
+),
+
+question:
+q.question,
+
+options:
+q.options,
+
+subject:
+q.subject||"Imported",
+
+topic:
+q.topic||"PDF Import",
+
+status:status,
+
+selectedIndex:
+answers[index],
+
+selectedAnswer:
+answers[index]===null
+?"Not answered"
+:q.options[answers[index]],
+
+correctIndex:
+q.answer,
+
+correctAnswer:
+q.options[q.answer],
+
+mistakeType:
+intelligence
+?intelligence.type
+:null,
+
+mistakeReason:
+intelligence
+?intelligence.reason
+:null,
+
+mistakeConfidence:
+intelligence
+?"Auto Classified"
+:null,
+
+solution:
+q.solution||"",
+
+explanation:
+q.explanation||"",
+
+bookmarked:
+Boolean(
+marked[index]
+),
+
+markedForReview:
+Boolean(
+marked[index]
+),
+
+pdfPage:
+q.pdfPage||"",
+
+chapter:
+q.chapter||"",
+
+section:
+q.section||"",
+
+source:
+q.source||"PDF Import"
+
+};
+
+})
+
+};
+
+
+history.push(record);
+
+
+localStorage.setItem(
+"cbtHistory",
+JSON.stringify(history)
+);
+
+}
+
 
 /* =====================================================
 CREATE RETRY QUEUE
 ===================================================== */
 
+function createRetryQueue(){
+
+const wrong=[];
+
+
+questions.forEach(
+function(q,index){
+
+if(
+answers[index]!==null &&
+answers[index]!==q.answer
+){
+
+const intelligence=
+classifyMistake(
+q,
+answers[index]
+);
+
+
+wrong.push({
+
+id:
+"retry-"+
+Date.now()+
+"-"+
+index,
+
+question:
+q.question,
+
+options:
+q.options,
+
+subject:
+q.subject||"Imported",
+
+topic:
+q.topic||"PDF Import",
+
+correctIndex:
+q.answer,
+
+correctAnswer:
+q.options[q.answer],
+
+solution:
+q.solution||"",
+
+explanation:
+q.explanation||"",
+
+selectedIndex:
+answers[index],
+
+selectedAnswer:
+q.options[answers[index]],
+
+mistakeType:
+intelligence.type,
+
+mistakeReason:
+intelligence.reason,
+
+mistakeConfidence:
+"Auto Classified",
+
+source:
+"PDF / CBT",
+
+pdfPage:
+q.pdfPage||"",
+
+chapter:
+q.chapter||"",
+
+section:
+q.section||""
+
+});
+
+}
+
+});
+
+
+return wrong;
+
+}
+
+
+/* =====================================================
+OPEN RETRY
+===================================================== */
+
 function openRetry(){
 
-    const wrong = [];
-
-    questions.forEach(function(q,index){
-
-        if(
-            answers[index] !== null &&
-            answers[index] !== q.answer
-        ){
-
-            const intelligence =
-                classifyMistake(
-                    q,
-                    answers[index]
-                );
-
-            wrong.push({
-
-                id:
-                    "retry-" +
-                    Date.now() +
-                    "-" +
-                    index,
-
-                question:
-                    q.question,
-
-                options:
-                    q.options,
-
-                subject:
-                    q.subject || "Imported",
-
-                topic:
-                    q.topic || "PDF Import",
-
-                correctIndex:
-                    q.answer,
-
-                correctAnswer:
-                    q.options[q.answer],
-
-                selectedIndex:
-                    answers[index],
-
-                selectedAnswer:
-                    q.options[answers[index]],
-
-                solution:
-                    q.solution || "",
-
-                explanation:
-                    q.explanation || "",
-
-                mistakeType:
-                    intelligence.type,
-
-                mistakeReason:
-                    intelligence.reason,
-
-                mistakeConfidence:
-                    "Auto Classified",
-
-                source:
-                    q.source || "PDF Import",
-
-                sourceType:
-                    q.sourceType || "PDF",
-
-                pdfPage:
-                    q.pdfPage || "",
-
-                chapter:
-                    q.chapter || "",
-
-                section:
-                    q.section || "",
-
-                bookmarked:
-                    Boolean(marked[index]),
-
-                markedForReview:
-                    Boolean(marked[index])
-
-            });
-
-        }
-
-    });
+const wrong=
+createRetryQueue();
 
 
-    if(wrong.length === 0){
+if(!wrong.length){
 
-        alert(
-            "There are no mistakes to retry."
-        );
+alert(
+"There are no mistakes to retry."
+);
 
-        return;
+return;
 
-    }
-
-
-    /* ==========================================
-       SAVE COMPLETE RETRY QUEUE
-    ========================================== */
-
-    localStorage.setItem(
-        "cbtAnalyzer.retryQueue",
-        JSON.stringify(wrong)
-    );
+}
 
 
-    /* ==========================================
-       SAVE FIRST RETRY QUESTION
-    ========================================== */
+/*
+Save complete retry queue.
+*/
 
-    localStorage.setItem(
-        "cbtRetryQuestion",
-        JSON.stringify(wrong[0])
-    );
-
-
-    /* ==========================================
-       SAVE COMPATIBILITY DATA
-    ========================================== */
-
-    localStorage.setItem(
-        "retryQuestions",
-        JSON.stringify(wrong)
-    );
-
-    localStorage.setItem(
-        "mistakeQuestions",
-        JSON.stringify(wrong)
-    );
+localStorage.setItem(
+"cbtAnalyzer.retryQueue",
+JSON.stringify(wrong)
+);
 
 
-    localStorage.setItem(
-        "cbtRetryStartedAt",
-        String(Date.now())
-    );
+/*
+Save first retry question.
+*/
+
+localStorage.setItem(
+"cbtRetryQuestion",
+JSON.stringify(wrong[0])
+);
 
 
-    /* ==========================================
-       OPEN RETRY PAGE
-    ========================================== */
+/*
+Save retry timestamp.
+*/
 
-    window.location.href =
-        "retry.html";
+localStorage.setItem(
+"cbtRetryStartedAt",
+String(Date.now())
+);
+
+
+/*
+Important:
+Tell retry.html exactly where
+its questions are coming from.
+*/
+
+localStorage.setItem(
+"retrySource",
+"cbtAnalyzer.retryQueue"
+);
+
+
+window.location.href=
+"retry.html";
 
 }
 
@@ -1691,41 +1627,39 @@ function openRetry(){
 RETRY BUTTON
 ===================================================== */
 
-function updateRetryButton(incorrect){
+function updateRetryButton(
+incorrect
+){
 
-    const button =
-        document.getElementById(
-            "retryButton"
-        );
-
-
-    if(!button){
-        return;
-    }
+const button=
+document.getElementById(
+"retryButton"
+);
 
 
-    if(incorrect > 0){
+if(incorrect>0){
 
-        button.style.display =
-            "block";
+button.style.display=
+"block";
 
-        button.textContent =
-            "🔄 Retry " +
-            incorrect +
-            " Mistake" +
-            (
-                incorrect === 1
-                ? ""
-                : "s"
-            );
 
-    }
-    else{
+button.textContent=
+"🔄 Retry "+
+incorrect+
+" Mistake"+
+(
+incorrect===1
+?""
+:"s"
+);
 
-        button.style.display =
-            "none";
+}
+else{
 
-    }
+button.style.display=
+"none";
+
+}
 
 }
 
@@ -1736,318 +1670,372 @@ GENERATE REVIEW
 
 function generateReview(){
 
-    const review =
-        document.getElementById(
-            "review"
-        );
+const review=
+document.getElementById(
+"review"
+);
 
-    if(!review){
-        return;
-    }
 
+review.innerHTML="";
 
-    review.innerHTML = "";
 
+if(!questions.length){
 
-    questions.forEach(function(q,index){
+review.innerHTML=
+'<div class="empty">'+
+"No questions available for review."+
+"</div>";
 
-        const selected =
-            answers[index];
-
-
-        const item =
-            document.createElement(
-                "div"
-            );
-
-
-        let statusHTML = "";
-
-
-        if(selected === null){
-
-            item.className =
-                "review-item skipped";
-
-            statusHTML =
-                '<span class="status-skipped">' +
-                "⚠️ Skipped" +
-                "</span>";
-
-        }
-        else if(selected === q.answer){
-
-            item.className =
-                "review-item correct";
-
-            statusHTML =
-                '<span class="status-correct">' +
-                "✅ Correct" +
-                "</span>";
-
-        }
-        else{
-
-            item.className =
-                "review-item incorrect";
-
-            statusHTML =
-                '<span class="status-incorrect">' +
-                "❌ Incorrect" +
-                "</span>";
-
-        }
-
-
-        let html = "";
-
-
-        html +=
-            "<div>" +
-            "<b>Q" +
-            (index + 1) +
-            ".</b> " +
-            escapeHTML(q.question) +
-            "</div>";
-
-
-        html +=
-            "<div style='margin-top:8px'>" +
-            statusHTML +
-            "</div>";
-
-
-        if(selected === null){
-
-            html +=
-                "<div style='margin-top:8px'>" +
-                "<b>Your answer:</b> Not answered" +
-                "</div>";
-
-        }
-        else{
-
-            html +=
-                "<div style='margin-top:8px'>" +
-                "<b>Your answer:</b> " +
-                escapeHTML(
-                    q.options[selected]
-                ) +
-                "</div>";
-
-        }
-
-
-        html +=
-            "<div style='margin-top:8px'>" +
-            "<b>Correct answer:</b> " +
-            escapeHTML(
-                q.options[q.answer]
-            ) +
-            "</div>";
-
-
-        /* ======================================
-           INCORRECT ANALYSIS
-        ====================================== */
-
-        if(
-            selected !== null &&
-            selected !== q.answer
-        ){
-
-            const intelligence =
-                classifyMistake(
-                    q,
-                    selected
-                );
-
-
-            html +=
-                "<div class='analysis'>" +
-
-                "<div class='analysis-type'>" +
-                intelligence.type +
-                "</div>" +
-
-                "<div style='margin-top:6px'>" +
-                "<b>Why:</b> " +
-                escapeHTML(
-                    intelligence.reason
-                ) +
-                "</div>" +
-
-                "</div>";
-
-        }
-
-
-        /* ======================================
-           SOLUTION
-        ====================================== */
-
-        if(q.solution){
-
-            html +=
-                "<div class='info'>" +
-
-                "<b>💡 Solution:</b>" +
-
-                "<br>" +
-
-                escapeHTML(
-                    q.solution
-                ) +
-
-                "</div>";
-
-        }
-
-
-        /* ======================================
-           RETRY THIS QUESTION
-        ====================================== */
-
-        if(
-            selected !== null &&
-            selected !== q.answer
-        ){
-
-            html +=
-                "<button " +
-                "type='button' " +
-                "class='primary' " +
-                "style='margin-top:8px;width:100%' " +
-                "onclick='retrySingleQuestion(" +
-                index +
-                ")'>" +
-                "🔄 Retry This Question" +
-                "</button>";
-
-        }
-
-
-        item.innerHTML =
-            html;
-
-
-        review.appendChild(
-            item
-        );
-
-    });
+return;
 
 }
 
 
-/* =====================================================
-RETRY SINGLE QUESTION
-===================================================== */
+/*
+Heading
+*/
 
-function retrySingleQuestion(index){
+const heading=
+document.createElement("h3");
 
-    const q =
-        questions[index];
+heading.textContent=
+"📝 Detailed Test Review";
 
-    if(!q){
-        return;
-    }
-
-
-    const intelligence =
-        classifyMistake(
-            q,
-            answers[index]
-        );
+review.appendChild(
+heading
+);
 
 
-    const retryQuestion = {
+/*
+Create one review item
+for every question.
+*/
 
-        id:
-            "retry-single-" +
-            Date.now(),
+questions.forEach(
+function(q,index){
 
-        question:
-            q.question,
+const selected=
+answers[index];
 
-        options:
-            q.options,
-
-        subject:
-            q.subject || "Imported",
-
-        topic:
-            q.topic || "PDF Import",
-
-        correctIndex:
-            q.answer,
-
-        correctAnswer:
-            q.options[q.answer],
-
-        selectedIndex:
-            answers[index],
-
-        selectedAnswer:
-            answers[index] === null
-            ? "Not answered"
-            : q.options[
-                answers[index]
-              ],
-
-        solution:
-            q.solution || "",
-
-        explanation:
-            q.explanation || "",
-
-        mistakeType:
-            intelligence.type,
-
-        mistakeReason:
-            intelligence.reason,
-
-        source:
-            q.source || "PDF Import",
-
-        pdfPage:
-            q.pdfPage || "",
-
-        chapter:
-            q.chapter || "",
-
-        section:
-            q.section || ""
-
-    };
+const item=
+document.createElement("div");
 
 
-    localStorage.setItem(
-        "cbtRetryQuestion",
-        JSON.stringify(
-            retryQuestion
-        )
-    );
+let status="skipped";
 
 
-    localStorage.setItem(
-        "cbtAnalyzer.retryQueue",
-        JSON.stringify(
-            [retryQuestion]
-        )
-    );
+if(selected!==null){
+
+if(selected===q.answer){
+
+status="correct";
+
+}
+else{
+
+status="incorrect";
+
+}
+
+}
 
 
-    localStorage.setItem(
-        "retryQuestions",
-        JSON.stringify(
-            [retryQuestion]
-        )
-    );
+item.className=
+"review-item "+
+status;
 
 
-    window.location.href =
-        "retry.html";
+const title=
+document.createElement("div");
+
+
+title.innerHTML=
+"<b>Q"+
+(index+1)+
+". "+
+escapeHTML(
+q.question
+)+
+"</b>";
+
+
+item.appendChild(
+title
+);
+
+
+/*
+STATUS
+*/
+
+const statusDiv=
+document.createElement("div");
+
+statusDiv.style.marginTop=
+"8px";
+
+
+if(status==="correct"){
+
+statusDiv.className=
+"status-correct";
+
+statusDiv.textContent=
+"✅ Correct";
+
+}
+else if(status==="incorrect"){
+
+statusDiv.className=
+"status-incorrect";
+
+statusDiv.textContent=
+"❌ Incorrect";
+
+}
+else{
+
+statusDiv.className=
+"status-skipped";
+
+statusDiv.textContent=
+"⏭️ Skipped";
+
+}
+
+
+item.appendChild(
+statusDiv
+);
+
+
+/*
+Selected answer
+*/
+
+if(selected!==null){
+
+const selectedDiv=
+document.createElement("div");
+
+selectedDiv.style.marginTop=
+"8px";
+
+selectedDiv.innerHTML=
+"<b>Your answer:</b> "+
+escapeHTML(
+q.options[selected]
+);
+
+item.appendChild(
+selectedDiv
+);
+
+}
+
+
+/*
+Correct answer
+*/
+
+const correctDiv=
+document.createElement("div");
+
+correctDiv.style.marginTop=
+"6px";
+
+correctDiv.innerHTML=
+"<b>Correct answer:</b> "+
+escapeHTML(
+q.options[q.answer]
+);
+
+item.appendChild(
+correctDiv
+);
+
+
+/*
+Solution
+*/
+
+if(q.solution){
+
+const solutionDiv=
+document.createElement("div");
+
+solutionDiv.className=
+"analysis";
+
+solutionDiv.innerHTML=
+"<b>💡 Solution</b><br>"+
+escapeHTML(
+q.solution
+);
+
+item.appendChild(
+solutionDiv
+);
+
+}
+
+
+/*
+Mistake intelligence
+*/
+
+if(status==="incorrect"){
+
+const intelligence=
+classifyMistake(
+q,
+selected
+);
+
+
+const analysis=
+document.createElement("div");
+
+analysis.className=
+"analysis";
+
+analysis.innerHTML=
+'<div class="analysis-type">'+
+escapeHTML(
+intelligence.type
+)+
+"</div>"+
+"<div>"+
+escapeHTML(
+intelligence.reason
+)+
+"</div>";
+
+item.appendChild(
+analysis
+);
+
+}
+
+
+/*
+Retry question button
+*/
+
+if(status==="incorrect"){
+
+const retryBtn=
+document.createElement("button");
+
+retryBtn.type="button";
+
+retryBtn.className=
+"primary";
+
+retryBtn.style.marginTop=
+"10px";
+
+retryBtn.textContent=
+"🔄 Retry This Question";
+
+
+retryBtn.onclick=
+function(){
+
+const retryQuestion={
+
+id:
+"single-retry-"+
+Date.now(),
+
+question:
+q.question,
+
+options:
+q.options,
+
+subject:
+q.subject||"Imported",
+
+topic:
+q.topic||"PDF Import",
+
+correctIndex:
+q.answer,
+
+correctAnswer:
+q.options[q.answer],
+
+solution:
+q.solution||"",
+
+explanation:
+q.explanation||"",
+
+selectedIndex:
+selected,
+
+selectedAnswer:
+q.options[selected],
+
+mistakeType:
+classifyMistake(
+q,
+selected
+).type,
+
+mistakeReason:
+classifyMistake(
+q,
+selected
+).reason,
+
+source:
+"PDF / CBT"
+
+};
+
+
+localStorage.setItem(
+"cbtAnalyzer.retryQueue",
+JSON.stringify(
+[retryQuestion]
+)
+);
+
+
+localStorage.setItem(
+"cbtRetryQuestion",
+JSON.stringify(
+retryQuestion
+)
+);
+
+
+localStorage.setItem(
+"retrySource",
+"cbtAnalyzer.retryQueue"
+);
+
+
+window.location.href=
+"retry.html";
+
+};
+
+
+item.appendChild(
+retryBtn
+);
+
+}
+
+
+review.appendChild(
+item
+);
+
+});
 
 }
 
@@ -2058,58 +2046,227 @@ ESCAPE HTML
 
 function escapeHTML(value){
 
-    return String(
-        value == null
-        ? ""
-        : value
-    )
+return String(
+value==null
+?""
+:value
+)
 
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+    }
+    /* =====================================================
+SUBMIT TEST
+===================================================== */
+
+function submitTest(){
+
+if(submitted){
+return;
+}
+
+
+if(!questions.length){
+
+alert(
+"No imported questions are available."
+);
+
+return;
 
 }
-   /* =====================================================
-START CBT
+
+
+let correct=0;
+let incorrect=0;
+let skipped=0;
+
+
+questions.forEach(
+function(q,index){
+
+if(
+answers[index]===null
+){
+
+skipped++;
+
+}
+else if(
+answers[index]===q.answer
+){
+
+correct++;
+
+}
+else{
+
+incorrect++;
+
+}
+
+});
+
+
+/*
+NEET-style scoring:
++4 correct
+-1 incorrect
+0 skipped
+*/
+
+const score=
+(correct*4)-incorrect;
+
+
+/*
+Save history BEFORE showing result.
+*/
+
+reactivateMistakes();
+
+
+saveHistory(
+correct,
+incorrect,
+skipped,
+score
+);
+
+
+submitted=true;
+
+
+clearInterval(
+timerInterval
+);
+
+
+/*
+Hide test interface.
+*/
+
+document.getElementById(
+"testScreen"
+).style.display="none";
+
+
+document.querySelector(
+"aside"
+).style.display="none";
+
+
+/*
+Show result.
+*/
+
+document.getElementById(
+"result"
+).style.display="block";
+
+
+document.getElementById(
+"score"
+).textContent=
+score+
+" / "+
+(questions.length*4);
+
+
+document.getElementById(
+"summary"
+).textContent=
+"Correct: "+
+correct+
+" | Incorrect: "+
+incorrect+
+" | Skipped: "+
+skipped;
+
+
+/*
+Retry button appears
+when mistakes exist.
+*/
+
+updateRetryButton(
+incorrect
+);
+
+
+/*
+Generate complete review.
+*/
+
+generateReview();
+
+}
+
+
+/* =====================================================
+PAGE SAFETY
+===================================================== */
+
+window.addEventListener(
+"beforeunload",
+function(event){
+
+if(
+!submitted &&
+questions.length>0
+){
+
+/*
+Do not block navigation,
+but save current progress.
+*/
+
+try{
+
+localStorage.setItem(
+"cbtCurrentAnswers",
+JSON.stringify(
+answers
+)
+);
+
+localStorage.setItem(
+"cbtCurrentQuestion",
+String(
+current
+)
+);
+
+}catch(error){
+
+console.log(
+"Progress save skipped."
+);
+
+}
+
+}
+
+});
+
+
+/* =====================================================
+START APPLICATION
 ===================================================== */
 
 document.addEventListener(
-    "DOMContentLoaded",
-    function(){
+"DOMContentLoaded",
+function(){
 
-        const loaded =
-            loadPDFQuestions();
+initialize();
 
-        validateQuestions();
-
-        if(!questions.length){
-
-            document.getElementById(
-                "questionNumber"
-            ).textContent =
-                "No questions available";
-
-            document.getElementById(
-                "question"
-            ).textContent =
-                "Please import a PDF first.";
-
-            return;
-
-        }
-
-        initializeState();
-
-        renderQuestion();
-
-        startTimer();
-
-    }
-);
+});
 
 </script>
 
 </body>
-</html> 
+</html>
