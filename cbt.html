@@ -1034,19 +1034,28 @@ function openRetry(){
 RETRY BUTTON
 ============================== */
 
-function updateRetryButton(
-    incorrect
-){
+function updateRetryButton(incorrect){
 
     const button =
-        document.getElementById(
-            "retryButton"
-        );
+        document.getElementById("retryButton");
 
     if(incorrect > 0){
 
-    button.style.display =
-            "none";
+        button.style.display = "block";
+
+        button.textContent =
+            "🔄 Retry " +
+            incorrect +
+            " Mistake" +
+            (incorrect === 1 ? "" : "s");
+
+    }else{
+
+        button.style.display = "none";
+
+    }
+
+}
 
     }
 
