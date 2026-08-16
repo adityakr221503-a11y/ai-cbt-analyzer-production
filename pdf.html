@@ -6,126 +6,165 @@
 
 <title>CBT Analyzer Pro — PDF to CBT</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f1f5f9;
-  color:#0f172a;
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
 }
 
 header{
-  background:#fff;
-  border-bottom:1px solid #e2e8f0;
-  padding:16px 20px;
+background:#fff;
+border-bottom:1px solid #e2e8f0;
+padding:16px 20px;
 }
 
 .header{
-  max-width:900px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+max-width:900px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:space-between;
 }
 
 .logo{
-  font-size:20px;
-  font-weight:800;
+font-size:20px;
+font-weight:800;
 }
 
 .logo span{
-  color:#4f46e5;
+color:#4f46e5;
 }
 
 .container{
-  max-width:900px;
-  margin:25px auto;
-  padding:0 15px;
+max-width:900px;
+margin:25px auto;
+padding:0 15px;
 }
 
 .card{
-  background:#fff;
-  border-radius:16px;
-  padding:24px;
-  box-shadow:0 3px 14px rgba(0,0,0,.08);
+background:#fff;
+border-radius:16px;
+padding:24px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
+margin-bottom:20px;
 }
 
 h1{
-  margin-top:0;
+margin-top:0;
 }
 
 .upload{
-  border:2px dashed #94a3b8;
-  border-radius:14px;
-  padding:30px 20px;
-  text-align:center;
-  margin-top:20px;
+border:2px dashed #94a3b8;
+border-radius:14px;
+padding:35px 20px;
+text-align:center;
+background:#f8fafc;
 }
 
-input[type="file"]{
-  width:100%;
-  margin:15px 0;
+.upload input{
+display:none;
+}
+
+.upload label{
+display:inline-block;
+background:#4f46e5;
+color:white;
+padding:14px 22px;
+border-radius:10px;
+font-weight:800;
+cursor:pointer;
+}
+
+.file-name{
+margin-top:15px;
+font-weight:700;
+color:#475569;
 }
 
 button{
-  border:0;
-  border-radius:10px;
-  padding:14px 18px;
-  background:#4f46e5;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
+border:0;
+border-radius:10px;
+padding:14px 18px;
+font-weight:800;
+cursor:pointer;
+font-family:inherit;
 }
 
-button:disabled{
-  opacity:.5;
+.primary{
+background:#4f46e5;
+color:white;
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.success{
+background:#16a34a;
+color:white;
+}
+
+.danger{
+background:#dc2626;
+color:white;
+}
+
+.actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:20px;
 }
 
 .status{
-  margin-top:20px;
-  padding:14px;
-  background:#f8fafc;
-  border-radius:10px;
-  line-height:1.6;
+margin-top:20px;
+padding:15px;
+border-radius:10px;
+background:#eef2ff;
+color:#3730a3;
+font-weight:700;
+line-height:1.5;
 }
 
-.back{
-  display:block;
-  margin-top:20px;
-  text-align:center;
-  color:#4f46e5;
-  font-weight:700;
-  text-decoration:none;
+.preview{
+margin-top:20px;
 }
 
-.progress{
-  width:100%;
-  height:10px;
-  background:#e2e8f0;
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:15px;
+.question{
+border:1px solid #e2e8f0;
+border-radius:10px;
+padding:15px;
+margin-top:10px;
+background:#f8fafc;
 }
 
-.progress-bar{
-  height:100%;
-  width:0%;
-  background:#4f46e5;
-  transition:width .2s;
+.question strong{
+color:#4f46e5;
+}
+
+.option{
+margin-top:6px;
+}
+
+.hidden{
+display:none;
 }
 
 @media(max-width:600px){
 
-.card{
-  padding:18px;
+.actions{
+grid-template-columns:1fr;
 }
 
-h1{
-  font-size:24px;
+.card{
+padding:18px;
 }
 
 }
@@ -142,9 +181,16 @@ h1{
 CBT Analyzer <span>Pro</span>
 </div>
 
+<button
+class="secondary"
+onclick="location.href='index.html'">
+🏠 Dashboard
+</button>
+
 </div>
 
 </header>
+
 
 <div class="container">
 
@@ -153,130 +199,220 @@ CBT Analyzer <span>Pro</span>
 <h1>📄 PDF → CBT</h1>
 
 <p>
-Upload your question PDF and convert it into a CBT test.
+Upload your question-paper PDF and convert detected MCQs
+into a CBT test.
 </p>
 
 <div class="upload">
 
 <input
-id="pdfFile"
 type="file"
+id="pdfFile"
 accept="application/pdf">
 
-<br>
+<label for="pdfFile">
+📤 Choose PDF
+</label>
 
-<button
-id="convertButton"
-type="button"
-onclick="convertPDF()">
-
-Convert PDF to CBT
-
-</button>
-
-<div class="progress">
 <div
-id="progressBar"
-class="progress-bar">
-</div>
+id="fileName"
+class="file-name">
+No PDF selected
 </div>
 
 </div>
+
 
 <div
 id="status"
 class="status">
+Choose a PDF to begin.
+</div>
 
-Waiting for PDF…
+
+<div class="actions">
+
+<button
+class="primary"
+type="button"
+onclick="readPDF()">
+🔍 Read PDF
+</button>
+
+<button
+class="success"
+type="button"
+onclick="startCBT()">
+▶️ Start CBT
+</button>
 
 </div>
 
-<a
-class="back"
-href="cbt.html">
+</div>
 
-← Open CBT Test
 
-</a>
+<div
+id="previewCard"
+class="card hidden">
+
+<h2>📋 Detected Questions</h2>
+
+<div id="count"></div>
+
+<div id="preview"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>How it works</h2>
+
+<p>1. Choose your PDF.</p>
+<p>2. Tap <b>Read PDF</b>.</p>
+<p>3. Detected MCQs are prepared.</p>
+<p>4. Tap <b>Start CBT</b>.</p>
+<p>5. The CBT page uses the imported questions.</p>
 
 </div>
 
 </div>
-<script type="module">
-
-import * as pdfjsLib from
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
 
 
-window.pdfjsLib = pdfjsLib;
+<script>
+
+"use strict";
 
 
-window.convertPDF = async function(){
+/* =====================================================
+PDF.JS SETUP
+===================================================== */
 
-const fileInput =
+if(window.pdfjsLib){
+
+pdfjsLib.GlobalWorkerOptions.workerSrc=
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+}
+
+
+/* =====================================================
+STATE
+===================================================== */
+
+let detectedQuestions=[];
+
+let pdfLoaded=false;
+
+
+/* =====================================================
+FILE SELECT
+===================================================== */
+
+document
+.getElementById("pdfFile")
+.addEventListener("change",function(){
+
+const file=this.files[0];
+
+if(!file){
+
+document.getElementById("fileName")
+.textContent="No PDF selected";
+
+return;
+
+}
+
+if(file.type!=="application/pdf"){
+
+setStatus(
+"❌ Please select a PDF file."
+);
+
+this.value="";
+
+return;
+
+}
+
+document.getElementById("fileName")
+.textContent=
+"📄 "+file.name;
+
+setStatus(
+"PDF selected. Tap Read PDF."
+);
+
+});
+
+
+/* =====================================================
+STATUS
+===================================================== */
+
+function setStatus(message){
+
+document.getElementById("status")
+.textContent=message;
+
+}
+
+
+/* =====================================================
+READ PDF
+===================================================== */
+
+async function readPDF(){
+
+const input=
 document.getElementById("pdfFile");
 
-const status =
-document.getElementById("status");
+const file=input.files[0];
 
-const button =
-document.getElementById("convertButton");
+if(!file){
 
-const progress =
-document.getElementById("progressBar");
+setStatus(
+"❌ Please choose a PDF first."
+);
 
+return;
 
-if(!fileInput.files.length){
+}
 
-status.textContent =
-"Please select a PDF first.";
+if(!window.pdfjsLib){
+
+setStatus(
+"❌ PDF reader could not load. Check your internet connection and reload the page."
+);
 
 return;
 
 }
 
 
-const file =
-fileInput.files[0];
+setStatus(
+"⏳ Reading PDF..."
+);
 
 
-if(file.type !== "application/pdf"){
-
-status.textContent =
-"Please select a valid PDF file.";
-
-return;
-
-}
+detectedQuestions=[];
 
 
 try{
 
-button.disabled=true;
-
-status.textContent =
-"📖 Reading PDF...";
-
-progress.style.width="10%";
-
-
-const arrayBuffer =
+const buffer=
 await file.arrayBuffer();
 
-
-progress.style.width="25%";
-
-
-const pdf =
-await pdfjsLib.getDocument({
-data:arrayBuffer
-}).promise;
+const pdf=
+await pdfjsLib
+.getDocument({
+data:buffer
+})
+.promise;
 
 
-let fullText="";
+let allText="";
 
 
 for(
@@ -285,209 +421,270 @@ pageNumber<=pdf.numPages;
 pageNumber++
 ){
 
-status.textContent =
-"📖 Reading page "+
+setStatus(
+"⏳ Reading page "+
 pageNumber+
 " of "+
-pdf.numPages+"...";
+pdf.numPages+
+"..."
+);
 
-
-const page =
+const page=
 await pdf.getPage(pageNumber);
 
-
-const textContent =
+const content=
 await page.getTextContent();
 
-
-const pageText =
-textContent.items
+const text=
+content.items
 .map(function(item){
 return item.str;
 })
 .join(" ");
 
-
-fullText +=
+allText+=
 "\n"+
-pageText+
+text+
 "\n";
-
-
-progress.style.width =
-(25+
-(pageNumber/pdf.numPages)*50)+
-"%";
 
 }
 
 
-status.textContent =
-"🧠 Detecting questions...";
+detectedQuestions=
+parseMCQs(allText);
 
 
-const questions =
-parseQuestions(fullText);
+if(!detectedQuestions.length){
 
+setStatus(
+"⚠️ PDF was read, but no standard MCQs were detected. This PDF may need a different question format."
+);
 
-progress.style.width="90%";
-
-
-if(!questions.length){
-
-status.textContent =
-"❌ PDF was read, but no MCQ questions were detected. Make sure the PDF contains numbered questions with options A, B, C and D.";
-
-button.disabled=false;
+showPreview();
 
 return;
 
 }
 
 
+pdfLoaded=true;
+
 localStorage.setItem(
 "pdfCbtQuestions",
-JSON.stringify(questions)
+JSON.stringify(detectedQuestions)
 );
 
-
-localStorage.setItem(
-"cbtActiveQuestions",
-JSON.stringify(questions)
+setStatus(
+"✅ Successfully detected "+
+detectedQuestions.length+
+" questions. Tap Start CBT."
 );
 
-
-progress.style.width="100%";
-
-
-status.textContent =
-"✅ "+
-questions.length+
-" questions detected. Opening CBT...";
-
-
-setTimeout(function(){
-
-window.location.href="cbt.html";
-
-},800);
+showPreview();
 
 
 }catch(error){
 
 console.error(error);
 
-status.textContent =
-"❌ PDF reader error: "+
-error.message;
-
-button.disabled=false;
-
-progress.style.width="0%";
+setStatus(
+"❌ Error while reading PDF: "+
+error.message
+);
 
 }
 
-};
+}
 
 
 /* =====================================================
-QUESTION PARSER
+MCQ PARSER
 ===================================================== */
 
-function parseQuestions(text){
+function parseMCQs(text){
 
 const questions=[];
 
 
 /*
-Clean extracted PDF text.
+Normalize PDF text.
 */
 
-text=
-String(text||"")
-.replace(/\r/g," ")
-.replace(/\n+/g," ")
-.replace(/\s+/g," ")
+text=text
+.replace(/\r/g,"\n")
+.replace(/[ \t]+/g," ")
+.replace(/\n+/g,"\n")
 .trim();
 
 
 /*
-Find numbered questions.
+Split wherever a numbered question starts.
 
 Examples:
 
 1. Question
 2) Question
-Q3. Question
-Question 4:
+10. Question
 */
 
-const questionPattern=
-/(?:^|\s)(?:Q(?:uestion)?\s*)?(\d{1,3})\s*[\.\):]\s*/gi;
+const parts=
+text.split(
+/(?=\b\d{1,3}\s*[\.\)]\s+)/g
+);
 
 
-const matches=[];
+parts.forEach(function(part){
 
-let match;
+part=part.trim();
 
+if(!part)return;
+
+
+/*
+Remove question number.
+*/
+
+const match=
+part.match(
+/^\d{1,3}\s*[\.\)]\s+([\s\S]+)$/
+);
+
+if(!match)return;
+
+const body=
+match[1].trim();
+
+
+/*
+Find A/B/C/D options.
+*/
+
+const optionMatches=
+body.match(
+/(?:^|\s)([A-D])\s*[\.\)]\s+/gi
+);
+
+if(!optionMatches ||
+optionMatches.length<2){
+
+return;
+
+}
+
+
+const positions=[];
+
+const optionRegex=
+/(?:^|\s)([A-D])\s*[\.\)]\s+/gi;
+
+let m;
 
 while(
-(match=questionPattern.exec(text))!==null
+(m=optionRegex.exec(body))!==null
 ){
 
-matches.push({
-
-number:Number(match[1]),
-
-start:match.index+
-match[0].length
-
+positions.push({
+letter:m[1].toUpperCase(),
+index:m.index,
+end:optionRegex.lastIndex
 });
 
 }
 
 
+if(positions.length<2)return;
+
+
+const questionText=
+body
+.substring(
+0,
+positions[0].index
+)
+.trim();
+
+
+const options=[];
+
+
 for(
 let i=0;
-i<matches.length;
+i<positions.length;
 i++
 ){
 
-const currentMatch=
-matches[i];
-
-
-const nextMatch=
-matches[i+1];
-
+const start=
+positions[i].end;
 
 const end=
-nextMatch
-?nextMatch.start
-:text.length;
+i+1<positions.length
+?positions[i+1].index
+:body.length;
 
+const value=
+body
+.substring(start,end)
+.trim()
+.replace(/\s+/g," ");
 
-const block=
-text.substring(
-currentMatch.start,
-end
-).trim();
+if(value){
 
-
-const parsed=
-parseQuestionBlock(block);
-
-
-if(parsed){
-
-parsed.id=
-"pdf-"+currentMatch.number+"-"+Date.now();
-
-questions.push(parsed);
+options.push(value);
 
 }
 
 }
+
+
+if(
+questionText &&
+options.length>=2
+){
+
+questions.push({
+
+id:
+"pdf-"+Date.now()+"-"+questions.length,
+
+subject:
+"Imported",
+
+topic:
+"PDF Import",
+
+question:
+questionText,
+
+options:
+options,
+
+/*
+No answer is guessed.
+
+The PDF parser does not invent
+answers when the answer key is absent.
+*/
+
+answer:
+detectAnswer(body,options),
+
+solution:
+"Review the original PDF solution or answer key.",
+
+source:
+"PDF",
+
+sourceType:
+"PDF Import",
+
+answerSource:
+"PDF / Not automatically verified"
+
+});
+
+}
+
+});
 
 
 return questions;
@@ -496,307 +693,165 @@ return questions;
 
 
 /* =====================================================
-PARSE ONE QUESTION
+ANSWER DETECTION
 ===================================================== */
 
-function parseQuestionBlock(block){
+function detectAnswer(body,options){
 
 /*
-Look for A/B/C/D options.
+Look for common answer formats
+inside the question block.
+
+Example:
+
+Answer: B
+Ans: C
+Correct Answer: D
 */
 
-const optionPattern=
-/(?:^|\s)([A-D])\s*[\.\):]\s*/gi;
+const match=
+body.match(
+/(?:answer|ans|correct\s*answer)\s*[:\-]?\s*([A-D])/i
+);
+
+if(match){
+
+const letter=
+match[1].toUpperCase();
+
+const index=
+letter.charCodeAt(0)-65;
+
+if(index>=0 && index<options.length){
+
+return index;
+
+}
+
+}
 
 
-const optionMatches=[];
+/*
+If no answer key exists,
+use -1 rather than guessing.
+*/
 
-let match;
+return -1;
+
+}
 
 
-while(
-(match=optionPattern.exec(block))!==null
-){
+/* =====================================================
+VALIDATE
+===================================================== */
 
-optionMatches.push({
+function validateQuestions(){
 
-letter:
-match[1].toUpperCase(),
+return detectedQuestions.filter(function(q){
 
-start:
-match.index+
-match[0].length
+return q &&
+typeof q.question==="string" &&
+q.question.trim()!=="" &&
+Array.isArray(q.options) &&
+q.options.length>=2 &&
+Number.isInteger(q.answer) &&
+q.answer>=0 &&
+q.answer<q.options.length;
 
 });
 
 }
 
 
-if(optionMatches.length<2){
-
-return null;
-
-}
-
-
-const questionText=
-block.substring(
-0,
-optionMatches[0].start-
-optionMatches[0].letter.length-
-2
-).trim();
-
-
-if(!questionText){
-
-return null;
-
-}
-
-
-const options=[];
-
-
-for(
-let i=0;
-i<optionMatches.length;
-i++
-){
-
-const start=
-optionMatches[i].start;
-
-
-const end=
-optionMatches[i+1]
-?optionMatches[i+1].start-
-(optionMatches[i+1].letter.length+2)
-:block.length;
-
-
-const optionText=
-block.substring(
-start,
-end
-).trim();
-
-
-if(optionText){
-
-options.push(optionText);
-
-}
-
-}
-
-
-if(options.length<2){
-
-return null;
-
-}
-
-
-/*
-Default answer is 0 because
-the PDF parser cannot safely
-invent an answer.
-
-The student can verify the
-answer key later.
-*/
-
-return{
-
-subject:"Imported",
-
-topic:"PDF Import",
-
-question:questionText,
-
-options:options,
-
-answer:0,
-
-solution:
-"Imported from PDF. Verify the answer using the original answer key.",
-
-source:"PDF",
-
-sourceType:"PDF",
-
-answerSource:"Needs Verification"
-
-};
-
-}
-
-</script>
 /* =====================================================
-COMPLETE REVIEW
+PREVIEW
 ===================================================== */
 
-function generateReview(){
+function showPreview(){
 
-    const box = document.getElementById("review");
+const card=
+document.getElementById("previewCard");
 
-    box.innerHTML = "<h3>🧠 Question Analysis</h3>";
+const preview=
+document.getElementById("preview");
 
-    questions.forEach(function(q,index){
+const count=
+document.getElementById("count");
 
-        const item = document.createElement("div");
 
-        let status;
+card.classList.remove("hidden");
 
-        if(answers[index] === null){
-            status = "skipped";
-        }
-        else if(answers[index] === q.answer){
-            status = "correct";
-        }
-        else{
-            status = "incorrect";
-        }
+preview.innerHTML="";
 
-        item.className = "review-item " + status;
 
-        const yourAnswer =
-            answers[index] === null
-            ? "Not answered"
-            : q.options[answers[index]];
+count.textContent=
+"Detected: "+
+detectedQuestions.length+
+" question(s)";
 
-        let html = "";
 
-        html += "<strong>Question " + (index+1) + "</strong>";
+detectedQuestions
+.slice(0,10)
+.forEach(function(q,index){
 
-        html += "<p>" +
-            escapeHTML(q.question) +
-            "</p>";
+const div=
+document.createElement("div");
 
-        html += "<p><strong>Your answer:</strong> " +
-            escapeHTML(yourAnswer) +
-            "</p>";
+div.className="question";
 
-        html += "<p><strong>Correct answer:</strong> " +
-            escapeHTML(q.options[q.answer]) +
-            "</p>";
+let html=
+"<strong>Q"+
+(index+1)+
+".</strong> "+
+escapeHTML(q.question);
 
-        if(status === "correct"){
+q.options.forEach(function(option,i){
 
-            html +=
-            "<div class='analysis'>" +
-            "✅ <strong>Correct</strong><br>" +
-            "Good work. You selected the correct answer.";
+html+=
+"<div class='option'>"+
+String.fromCharCode(65+i)+
+". "+
+escapeHTML(option)+
+"</div>";
 
-            if(q.solution){
+});
 
-                html +=
-                "<br><br><strong>💡 Solution:</strong><br>" +
-                escapeHTML(q.solution);
 
-            }
+if(q.answer>=0){
 
-            html += "</div>";
-        }
+html+=
+"<div><b>Answer:</b> "+
+String.fromCharCode(65+q.answer)+
+"</div>";
 
-        if(status === "skipped"){
+}else{
 
-            html +=
-            "<div class='analysis'>" +
-            "🟡 <strong>Skipped</strong><br>" +
-            "This question was not answered.";
+html+=
+"<div><b>Answer:</b> Not detected</div>";
 
-            if(q.solution){
-
-                html +=
-                "<br><br><strong>💡 Solution:</strong><br>" +
-                escapeHTML(q.solution);
-
-            }
-
-            html += "</div>";
-        }
-
-        if(status === "incorrect"){
-
-            const intelligence =
-                classifyMistake(q,answers[index]);
-
-            html +=
-            "<div class='analysis'>" +
-
-            "<strong>🧠 Mistake Intelligence</strong>" +
-
-            "<br><br>" +
-
-            "<strong>Mistake Type:</strong>" +
-
-            "<div class='analysis-type'>" +
-            escapeHTML(intelligence.type) +
-            "</div>" +
-
-            "<br>" +
-
-            "<strong>Why:</strong><br>" +
-            escapeHTML(intelligence.reason) +
-
-            "<br><br>" +
-
-            "<strong>💡 Solution:</strong><br>" +
-            escapeHTML(
-                q.solution ||
-                "Review the underlying concept and retry this question."
-            ) +
-
-            "</div>";
-        }
-
-        if(q.pdfPage || q.chapter || q.section){
-
-            html += "<div class='info'>";
-
-            if(q.pdfPage){
-                html +=
-                "📄 PDF Page: " +
-                escapeHTML(q.pdfPage);
-            }
-
-            if(q.chapter){
-                html +=
-                "<br>📚 Chapter: " +
-                escapeHTML(q.chapter);
-            }
-
-            if(q.section){
-                html +=
-                "<br>📌 Section: " +
-                escapeHTML(q.section);
-            }
-
-            html += "</div>";
-        }
-
-        item.innerHTML = html;
-
-        box.appendChild(item);
-
-    });
 }
 
 
-/* =====================================================
-ESCAPE HTML
-===================================================== */
+div.innerHTML=html;
 
-function escapeHTML(value){
+preview.appendChild(div);
 
-    return String(value ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
+});
+
+
+if(detectedQuestions.length>10){
+
+const more=
+document.createElement("p");
+
+more.textContent=
+"...and "+
+(detectedQuestions.length-10)+
+" more questions.";
+
+preview.appendChild(more);
+
+}
 
 }
 
@@ -807,79 +862,106 @@ START CBT
 
 function startCBT(){
 
-    validateQuestions();
-
-    initializeState();
-
-    renderQuestion();
-
-    renderPalette();
-
-    updateTimer();
-
-}
-
-
-/* =====================================================
-INITIAL LOAD
-===================================================== */
-
-loadPDFQuestions();
-
-validateQuestions();
-
-initializeState();
-
-startCBT();
-
-
-/* =====================================================
-PDF IMPORT CLEANUP
-===================================================== */
+if(!detectedQuestions.length){
 
 /*
-Only remove the temporary PDF queue after
-the CBT has successfully loaded.
+Try to recover existing imported data.
 */
 
-if(
-    questions.length > 0 &&
-    localStorage.getItem("pdfCbtQuestions")
-){
+try{
 
-    localStorage.removeItem("pdfCbtQuestions");
+const saved=
+localStorage.getItem("pdfCbtQuestions");
+
+if(saved){
+
+const parsed=
+JSON.parse(saved);
+
+if(Array.isArray(parsed)){
+
+detectedQuestions=parsed;
+
+}
+
+}
+
+}catch(error){}
 
 }
 
 
-/* =====================================================
-PROTECT AGAINST EMPTY TEST
-===================================================== */
+if(!detectedQuestions.length){
 
-if(!questions.length){
-
-    document.getElementById("questionNumber")
-        .textContent = "No questions loaded";
-
-    document.getElementById("question")
-        .textContent =
-        "Please import a PDF or load a question set.";
-
-    document.getElementById("options")
-        .innerHTML = "";
-
-}
-
-
-/* =====================================================
-FINISH
-===================================================== */
-
-console.log(
-    "CBT Analyzer Pro loaded:",
-    questions.length,
-    "questions"
+alert(
+"Please upload and read a PDF first."
 );
+
+return;
+
+}
+
+
+/*
+Only send questions with
+verified answer indexes.
+
+This prevents the old CBT
+from showing invalid answer data.
+*/
+
+const usable=
+detectedQuestions.filter(function(q){
+
+return Number.isInteger(q.answer) &&
+q.answer>=0 &&
+q.answer<q.options.length;
+
+});
+
+
+if(!usable.length){
+
+alert(
+"No verified answer keys were detected in this PDF.\n\nThe PDF was read, but the CBT cannot safely score questions until an answer key is available."
+);
+
+return;
+
+}
+
+
+localStorage.setItem(
+"pdfCbtQuestions",
+JSON.stringify(usable)
+);
+
+
+/*
+Open CBT.
+*/
+
+window.location.href=
+"cbt.html";
+
+}
+
+
+/* =====================================================
+ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value){
+
+return String(value==null?"":value)
+
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
 
 </script>
 
