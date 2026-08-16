@@ -8,177 +8,151 @@
 
 <style>
 *{
-box-sizing:border-box;
+  box-sizing:border-box;
 }
 
 body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#f1f5f9;
-color:#0f172a;
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f1f5f9;
+  color:#0f172a;
 }
 
 header{
-background:#fff;
-border-bottom:1px solid #e2e8f0;
-padding:16px 18px;
+  background:#fff;
+  border-bottom:1px solid #e2e8f0;
+  padding:18px 20px;
 }
 
 .header{
-max-width:1100px;
-margin:auto;
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:15px;
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
 
 .logo{
-font-size:21px;
-font-weight:900;
+  font-size:21px;
+  font-weight:800;
 }
 
 .logo span{
-color:#4f46e5;
+  color:#4f46e5;
 }
 
 .container{
-max-width:1100px;
-margin:22px auto;
-padding:0 15px;
+  max-width:1100px;
+  margin:25px auto;
+  padding:0 15px;
 }
 
 .hero{
-background:#4f46e5;
-color:#fff;
-border-radius:18px;
-padding:25px;
-margin-bottom:20px;
+  background:#fff;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 3px 14px rgba(0,0,0,.07);
+  margin-bottom:20px;
 }
 
 .hero h1{
-margin:0 0 8px;
-font-size:28px;
+  margin:0 0 8px;
+  font-size:28px;
 }
 
 .hero p{
-margin:0;
-line-height:1.6;
-opacity:.95;
+  margin:0;
+  color:#64748b;
+  line-height:1.6;
 }
 
 .grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:16px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
 }
 
 .card{
-background:#fff;
-border-radius:16px;
-padding:20px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
+  display:block;
+  text-decoration:none;
+  color:#0f172a;
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 3px 14px rgba(0,0,0,.07);
+  border:2px solid transparent;
+  transition:.15s;
+  cursor:pointer;
+}
+
+.card:hover{
+  border-color:#4f46e5;
+  transform:translateY(-2px);
+}
+
+.icon{
+  font-size:32px;
+  margin-bottom:10px;
 }
 
 .card h2{
-margin:0 0 8px;
+  margin:0 0 7px;
+  font-size:19px;
 }
 
 .card p{
-color:#64748b;
-line-height:1.5;
-}
-
-.btn{
-display:block;
-width:100%;
-border:0;
-border-radius:11px;
-padding:14px 16px;
-font-family:inherit;
-font-size:15px;
-font-weight:800;
-text-align:center;
-text-decoration:none;
-cursor:pointer;
-margin-top:12px;
+  margin:0;
+  color:#64748b;
+  line-height:1.5;
 }
 
 .primary{
-background:#4f46e5;
-color:#fff;
-}
-
-.secondary{
-background:#e2e8f0;
-color:#0f172a;
-}
-
-.green{
-background:#16a34a;
-color:#fff;
-}
-
-.orange{
-background:#f59e0b;
-color:#fff;
-}
-
-.red{
-background:#dc2626;
-color:#fff;
+  border-color:#c7d2fe;
+  background:#eef2ff;
 }
 
 .stats{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:12px;
-margin-bottom:20px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-top:20px;
 }
 
 .stat{
-background:#fff;
-border-radius:14px;
-padding:17px;
-box-shadow:0 3px 12px rgba(0,0,0,.06);
+  background:#fff;
+  padding:18px;
+  border-radius:14px;
+  text-align:center;
+  box-shadow:0 3px 12px rgba(0,0,0,.06);
 }
 
 .stat-value{
-font-size:25px;
-font-weight:900;
+  font-size:25px;
+  font-weight:800;
 }
 
 .stat-label{
-color:#64748b;
-font-size:13px;
-margin-top:5px;
+  margin-top:5px;
+  color:#64748b;
+  font-size:13px;
 }
 
-.section-title{
-margin:25px 0 12px;
-}
-
-.empty{
-text-align:center;
-padding:20px;
-color:#64748b;
-}
-
-@media(max-width:750px){
+@media(max-width:700px){
 
 .grid{
-grid-template-columns:1fr;
+  grid-template-columns:1fr;
 }
 
 .stats{
-grid-template-columns:repeat(2,1fr);
+  grid-template-columns:repeat(2,1fr);
 }
 
 .hero h1{
-font-size:24px;
+  font-size:24px;
 }
 
 }
+
 </style>
 </head>
 
@@ -200,28 +174,144 @@ CBT Analyzer <span>Pro</span>
 <div class="container">
 
 
+<!-- HERO -->
+
 <section class="hero">
 
 <h1>🎯 CBT Analyzer Pro</h1>
 
 <p>
-Practice tests, import question PDFs, analyze mistakes,
-retry weak questions and track your performance.
+Practice tests, analyze mistakes, retry weak questions,
+and convert PDF question papers into CBT tests.
 </p>
 
 </section>
 
 
-<!-- ================================
-STATS
-================================ -->
+<!-- MAIN FEATURES -->
+
+<div class="grid">
+
+
+<!-- CBT TEST -->
+
+<a
+href="cbt.html"
+class="card primary">
+
+<div class="icon">📝</div>
+
+<h2>CBT Test</h2>
+
+<p>
+Start a computer-based test and answer questions
+with the question palette.
+</p>
+
+</a>
+
+
+<!-- PDF TO CBT -->
+
+<a
+href="pdf.html"
+class="card primary">
+
+<div class="icon">📄</div>
+
+<h2>PDF → CBT</h2>
+
+<p>
+Upload a PDF question paper and convert detected
+MCQs into a CBT test.
+</p>
+
+</a>
+
+
+<!-- MISTAKE BANK -->
+
+<a
+href="mistake.html"
+class="card">
+
+<div class="icon">🧠</div>
+
+<h2>Mistake Bank</h2>
+
+<p>
+Review incorrect questions, mistake types,
+solutions and weak areas.
+</p>
+
+</a>
+
+
+<!-- RETRY -->
+
+<a
+href="retry.html"
+class="card">
+
+<div class="icon">🔄</div>
+
+<h2>Retry Mistakes</h2>
+
+<p>
+Practice questions you previously answered
+incorrectly.
+</p>
+
+</a>
+
+
+<!-- TEST HISTORY -->
+
+<a
+href="history.html"
+class="card">
+
+<div class="icon">📊</div>
+
+<h2>Test History</h2>
+
+<p>
+View previous CBT attempts, scores,
+correct answers and mistakes.
+</p>
+
+</a>
+
+
+<!-- REVIEW -->
+
+<a
+href="review.html"
+class="card">
+
+<div class="icon">🔍</div>
+
+<h2>Review</h2>
+
+<p>
+Review completed tests and analyze your
+question-by-question performance.
+</p>
+
+</a>
+
+
+</div>
+
+
+<!-- STATS -->
 
 <div class="stats">
 
 <div class="stat">
 
 <div
-id="testCount"
+id="tests"
 class="stat-value">
 0
 </div>
@@ -236,7 +326,7 @@ Tests Completed
 <div class="stat">
 
 <div
-id="mistakeCount"
+id="mistakes"
 class="stat-value">
 0
 </div>
@@ -251,13 +341,13 @@ Mistakes
 <div class="stat">
 
 <div
-id="retryCount"
+id="mastered"
 class="stat-value">
 0
 </div>
 
 <div class="stat-label">
-Retry Questions
+Mastered
 </div>
 
 </div>
@@ -266,183 +356,18 @@ Retry Questions
 <div class="stat">
 
 <div
-id="lastScore"
+id="questions"
 class="stat-value">
-—
+0
 </div>
 
 <div class="stat-label">
-Last Score
+Questions Attempted
 </div>
 
 </div>
 
 </div>
-
-
-<h2 class="section-title">
-🚀 Start Learning
-</h2>
-
-
-<div class="grid">
-
-
-<!-- PDF TO CBT -->
-
-<div class="card">
-
-<h2>📄 PDF → CBT</h2>
-
-<p>
-Upload a question PDF, detect MCQs, verify answers,
-and convert the questions into a CBT.
-</p>
-
-<a
-class="btn primary"
-href="pdf-to-cbt.html">
-
-📄 Import PDF & Create CBT
-
-</a>
-
-</div>
-
-
-<!-- NORMAL CBT -->
-
-<div class="card">
-
-<h2>📝 CBT Test</h2>
-
-<p>
-Take a standard computer-based test using the built-in
-question bank.
-</p>
-
-<a
-class="btn secondary"
-href="cbt.html">
-
-🚀 Start CBT
-
-</a>
-
-</div>
-
-
-<!-- MISTAKE BANK -->
-
-<div class="card">
-
-<h2>🧠 Mistake Bank</h2>
-
-<p>
-Review questions you answered incorrectly and understand
-your mistake patterns.
-</p>
-
-<a
-class="btn orange"
-href="mistake.html">
-
-🧠 Open Mistake Bank
-
-</a>
-
-</div>
-
-
-<!-- RETRY -->
-
-<div class="card">
-
-<h2>🔄 Retry Mistakes</h2>
-
-<p>
-Practice your previously incorrect questions again and
-build mastery.
-</p>
-
-<a
-class="btn green"
-href="retry.html">
-
-🔄 Retry Mistakes
-
-</a>
-
-</div>
-
-
-<!-- HISTORY -->
-
-<div class="card">
-
-<h2>📊 Test History</h2>
-
-<p>
-View your previous CBT attempts, scores, correct answers,
-wrong answers and skipped questions.
-</p>
-
-<a
-class="btn secondary"
-href="history.html">
-
-📊 Test History
-
-</a>
-
-</div>
-
-
-<!-- MASTERED -->
-
-<div class="card">
-
-<h2>🏆 Mastery</h2>
-
-<p>
-Questions you have successfully improved on are tracked
-through the CBT learning system.
-</p>
-
-<button
-class="btn primary"
-type="button"
-onclick="showMastery()">
-
-🏆 View Mastery
-
-</button>
-
-</div>
-
-
-</div>
-
-
-<!-- ================================
-RECENT ACTIVITY
-================================ -->
-
-<h2 class="section-title">
-📈 Recent Test
-</h2>
-
-<section class="card">
-
-<div
-id="recentTest"
-class="empty">
-
-No test history yet.
-
-</div>
-
-</section>
 
 
 </div>
@@ -453,169 +378,80 @@ No test history yet.
 "use strict";
 
 
-/* =====================================
-LOAD HISTORY
-===================================== */
+/* =====================================================
+LOAD DASHBOARD STATISTICS
+===================================================== */
 
-function getHistory(){
+function loadStats(){
+
+let history=[];
 
 try{
 
-const history=
+history=
 JSON.parse(
 localStorage.getItem("cbtHistory")||"[]"
 );
 
-return Array.isArray(history)
-?history
-:[];
+if(!Array.isArray(history)){
+history=[];
+}
 
 }catch(error){
 
-return [];
+history=[];
 
 }
 
-}
 
+/* Tests */
 
-/* =====================================
-UPDATE DASHBOARD
-===================================== */
-
-function updateDashboard(){
-
-const history=
-getHistory();
-
-
-/*
-Tests
-*/
-
-document.getElementById(
-"testCount"
-).textContent=
+document.getElementById("tests")
+.textContent=
 history.length;
 
 
-/*
-Mistakes
-*/
+/* Mistakes */
 
 let mistakes=0;
+
+let attempted=0;
 
 history.forEach(function(test){
 
 mistakes+=
-Number(test.incorrect||0);
+Number(test.incorrect||test.wrong||0);
+
+if(Array.isArray(test.questions)){
+
+test.questions.forEach(function(q){
+
+if(q.status!=="skipped"){
+
+attempted++;
+
+}
 
 });
 
-document.getElementById(
-"mistakeCount"
-).textContent=
+}
+
+});
+
+
+document.getElementById("mistakes")
+.textContent=
 mistakes;
 
 
-/*
-Retry queue
-*/
+/* Questions */
 
-let retryCount=0;
-
-try{
-
-const retry=
-JSON.parse(
-localStorage.getItem(
-"cbtAnalyzer.retryQueue"
-)||"[]"
-);
-
-if(Array.isArray(retry)){
-
-retryCount=retry.length;
-
-}
-
-}catch(error){
-
-retryCount=0;
-
-}
-
-document.getElementById(
-"retryCount"
-).textContent=
-retryCount;
+document.getElementById("questions")
+.textContent=
+attempted;
 
 
-/*
-Last score
-*/
-
-if(history.length>0){
-
-const latest=
-history[history.length-1];
-
-document.getElementById(
-"lastScore"
-).textContent=
-latest.score??"—";
-
-renderRecent(latest);
-
-}
-
-}
-
-
-/* =====================================
-RECENT TEST
-===================================== */
-
-function renderRecent(test){
-
-const box=
-document.getElementById(
-"recentTest"
-);
-
-if(!test){
-
-box.textContent=
-"No test history yet.";
-
-return;
-
-}
-
-box.innerHTML=
-"<strong>Latest Test</strong>"+
-"<br><br>"+
-"📅 "+
-escapeHTML(test.date||"")+
-"<br>"+
-"🎯 Score: "+
-escapeHTML(test.score)+
-"<br>"+
-"✅ Correct: "+
-escapeHTML(test.correct)+
-" | ❌ Incorrect: "+
-escapeHTML(test.incorrect)+
-" | ⏭ Skipped: "+
-escapeHTML(test.skipped);
-
-}
-
-
-/* =====================================
-MASTERY
-===================================== */
-
-function showMastery(){
+/* Mastered */
 
 let mastery=[];
 
@@ -623,15 +459,11 @@ try{
 
 mastery=
 JSON.parse(
-localStorage.getItem(
-"cbtMasteryV2"
-)||"[]"
+localStorage.getItem("cbtMasteryV2")||"[]"
 );
 
 if(!Array.isArray(mastery)){
-
 mastery=[];
-
 }
 
 }catch(error){
@@ -640,50 +472,20 @@ mastery=[];
 
 }
 
-
-if(mastery.length===0){
-
-alert(
-"No mastered questions yet. Keep practicing your mistakes!"
-);
-
-return;
+document.getElementById("mastered")
+.textContent=
+mastery.length;
 
 }
 
 
-alert(
-"🏆 Mastery contains "+
-mastery.length+
-" tracked question(s)."
-);
-
-}
-
-
-/* =====================================
-ESCAPE
-===================================== */
-
-function escapeHTML(value){
-
-return String(value??"")
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================
+/* =====================================================
 START
-===================================== */
+===================================================== */
 
-updateDashboard();
+loadStats();
 
 </script>
 
 </body>
-</html>
+  </html>
