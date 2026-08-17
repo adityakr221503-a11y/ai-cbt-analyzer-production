@@ -2759,7 +2759,7 @@ if(!submitted){
 
 /* =====================================================
    START APPLICATION
- ===================================================== */
+===================================================== */
 
 document.addEventListener(
 "DOMContentLoaded",
@@ -2777,7 +2777,7 @@ error
 );
 
 showFatalError(
-"Something went wrong while loading the CBT test."
+"The CBT could not be initialized. Please reload the test."
 );
 
 }
@@ -2789,34 +2789,6 @@ showFatalError(
 /* =====================================================
    END CBT ENGINE
 ===================================================== */
-<script>
-
-  // all your existing JavaScript
-  // initialize()
-  // renderQuestion()
-  // submitTest()
-  // etc.
-
-
-  document.addEventListener("DOMContentLoaded", function(){
-
-    try{
-      initialize();
-    }catch(error){
-
-      console.error(
-        "CBT initialization failed:",
-        error
-      );
-
-      showFatalError(
-        "The CBT could not be initialized. Please reload the test."
-      );
-
-    }
-
-  });
-
 </script>
 
 </body>
