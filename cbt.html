@@ -2773,11 +2773,11 @@ document.addEventListener(
 "DOMContentLoaded",
 function(){
 
-try{
+try {
 
 initialize();
 
-}catch(error){
+} catch(error) {
 
 console.error(
 "CBT initialization failed:",
@@ -2785,13 +2785,10 @@ error
 );
 
 showFatalError(
-"The CBT could not be initialized. Please reload the test."
+"CBT loading error: " + error.message
 );
 
 }
-
-}
-);
 
 
 /* =====================================================
