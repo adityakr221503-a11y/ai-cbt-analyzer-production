@@ -556,79 +556,33 @@ INITIALIZE
 
 function initialize(){
 
-const pdfLoaded=loadPDFQuestions();
+console.log("CBT Analyzer Pro: initializing...");
 
-if(!pdfLoaded){
-
-questions=fallbackQuestions.map(function(q){
-
-return {...q};
-
-});
-
-console.log(
-"⚠️ No PDF CBT found."
-);
-
-console.log(
-"Using fallback questions:",
-questions.length
-);
-
-}else{
-
-console.log(
-"✅ PDF CBT loaded."
-);
-
-console.log(
-"TOTAL QUESTIONS:",
-questions.length
-);
-
-}
-
-
-answers=
-new Array(
-questions.length
-).fill(null);
-
-
-marked=
-new Array(
-questions.length
-).fill(false);
-
-
-current=0;
-
-submitted=false;
-
-
-console.log(
-"FINAL CBT QUESTION COUNT:",
-questions.length
-);
-
-
-renderQuestion();
-
-startTimer();
-
-}
+questions=[];
 
 const pdfLoaded=loadPDFQuestions();
 
 if(!pdfLoaded){
 
+console.log("No imported questions found.");
+
 questions=fallbackQuestions.map(function(q){
 return {...q};
 });
 
-console.log(
-"No PDF CBT found. Using fallback test."
-);
+}
+
+if(!Array.isArray(questions) || questions.length===0){
+
+document.getElementById("questionNumber").textContent=
+"No questions found";
+
+document.getElementById("question").textContent=
+"Please import a PDF test first.";
+
+document.getElementById("options").innerHTML="";
+
+return;
 
 }
 
@@ -640,12 +594,19 @@ current=0;
 
 submitted=false;
 
+timeLeft=1800;
+
 renderQuestion();
 
 startTimer();
 
-}
+console.log(
+"CBT READY:",
+questions.length,
+"questions"
+);
 
+}
 
 /* =====================================================
 TIMER
