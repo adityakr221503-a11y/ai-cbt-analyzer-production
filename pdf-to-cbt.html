@@ -439,115 +439,175 @@ LOAD PDF QUESTIONS
 
 function loadPDFQuestions(){
 
-const possibleKeys = [
-"pdfCbtQuestions",
-"pdfQuestions",
-"cbtQuestions",
-"importedQuestions",
-"pdfQuestionBank",
-"questionBank"
-];
+  const key = "pdfCbtQuestions";
 
-for(const key of possibleKeys){
+  const saved = localStorage.getItem(key);
 
-const saved = localStorage.getItem(key);
+  if(!saved){
 
-if(!saved) continue;
+    console.log("No PDF CBT questions found.");
 
-try{
+    return false;
 
-const imported = JSON.parse(saved);
+  }
 
-if(!Array.isArray(imported) || imported.length === 0){
-continue;
-}
+  try{
 
-const valid = imported.filter(function(q){
+    const imported = JSON.parse(saved);
 
-return q &&
-typeof q.question === "string" &&
-q.question.trim() !== "" &&
-Array.isArray(q.options) &&
-q.options.length >= 2 &&
-Number.isInteger(Number(q.answer)) &&
-Number(q.answer) >= 0 &&
-Number(q.answer) < q.options.length;
+    if(
+      !Array.isArray(imported) ||
+      imported.length === 0
+    ){
 
-});
+      console.warn("PDF CBT question bank is empty.");
 
-if(valid.length === 0){
-continue;
-}
+      return false;
 
-questions = valid.map(function(q){
+    }
 
-return {
+    const valid = imported.filter(function(q){
 
-id: q.id || ("pdf-" + Date.now() + "-" + Math.random()),
+      if(!q || typeof q !== "object"){
+        return false;
+      }
 
-subject: q.subject || "PDF Import",
+      if(
+        typeof q.question !== "string" ||
+        q.question.trim() === ""
+      ){
+        return false;
+      }
 
-topic: q.topic || q.section || "PDF Import",
+      if(
+        !Array.isArray(q.options) ||
+        q.options.length < 2
+      ){
+        return false;
+      }
 
-question: q.question.trim(),
+      const answer = Number(q.answer);
 
-options: q.options.map(String),
+      if(
+        !Number.isInteger(answer) ||
+        answer < 0 ||
+        answer >= q.options.length
+      ){
+        return false;
+      }
 
-answer: Number(q.answer),
+      return true;
 
-solution:
-q.solution ||
-q.explanation ||
-"Review the original PDF solution.",
+    });
 
-explanation: q.explanation || "",
+    if(valid.length === 0){
 
-pdfPage: q.pdfPage || "",
+      console.warn(
+        "PDF CBT data exists, but no valid questions were found."
+      );
 
-pdfPageEnd: q.pdfPageEnd || q.pdfPage || "",
+      return false;
 
-chapter: q.chapter || "",
+    }
 
-section: q.section || "",
+    questions = valid.map(function(q,index){
 
-answerSource: q.answerSource || "PDF",
+      return {
 
-source: q.source || "PDF Import",
+        id:
+          q.id ||
+          "pdf-" +
+          Date.now() +
+          "-" +
+          index,
 
-sourceType: "PDF",
+        subject:
+          q.subject ||
+          "PDF Import",
 
-bookmarked: Boolean(q.bookmarked)
+        topic:
+          q.topic ||
+          q.section ||
+          "PDF Import",
 
-};
+        question:
+          q.question.trim(),
 
-});
+        options:
+          q.options.map(function(option){
+            return String(option).trim();
+          }),
 
-console.log(
-"CBT QUESTIONS LOADED FROM:",
-key,
-"TOTAL:",
-questions.length
-);
+        answer:
+          Number(q.answer),
 
-return questions.length > 0;
+        solution:
+          q.solution ||
+          q.explanation ||
+          "Review the original PDF solution.",
 
-}catch(error){
+        explanation:
+          q.explanation || "",
 
-console.error(
-"Error reading",
-key,
-error
-);
+        pdfPage:
+          q.pdfPage ||
+          q.page ||
+          "",
 
-}
+        pdfPageEnd:
+          q.pdfPageEnd ||
+          q.pageEnd ||
+          q.pdfPage ||
+          q.page ||
+          "",
 
-}
+        chapter:
+          q.chapter || "",
 
-console.log(
-"No imported question bank found. Fallback will be used."
-);
+        section:
+          q.section || "",
 
-return false;
+        answerSource:
+          q.answerSource ||
+          "PDF",
+
+        source:
+          q.source ||
+          "PDF Import",
+
+        sourceType:
+          "PDF",
+
+        bookmarked:
+          Boolean(q.bookmarked)
+
+      };
+
+    });
+
+    console.log(
+      "NEW PDF CBT LOADED:",
+      questions.length,
+      "questions"
+    );
+
+    console.log(
+      "First question:",
+      questions[0].question
+    );
+
+    return true;
+
+  }catch(error){
+
+    console.error(
+      "Failed to read pdfCbtQuestions:",
+      error
+    );
+
+    return false;
+
+  }
 
 }
 /* =====================================================
