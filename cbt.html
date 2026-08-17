@@ -1038,112 +1038,196 @@ return false;
    INITIALIZE
 ===================================================== */
 
+/* =====================================================
+   LOAD PDF QUESTIONS
+===================================================== */
+
+function loadPDFQuestions(){
+
+    const possibleKeys = [
+        "pdfCbtQuestions",
+        "pdfQuestions",
+        "cbtQuestions",
+        "importedQuestions",
+        "pdfQuestionBank",
+        "questionBank"
+    ];
+
+    for(const key of possibleKeys){
+
+        const saved = localStorage.getItem(key);
+
+        if(!saved){
+            continue;
+        }
+
+        try{
+
+            const imported = JSON.parse(saved);
+
+            if(
+                !Array.isArray(imported) ||
+                imported.length === 0
+            ){
+                continue;
+            }
+
+            const normalized = imported
+                .map(function(q,index){
+                    return normalizeQuestion(q,index);
+                })
+                .filter(Boolean);
+
+            if(normalized.length === 0){
+                continue;
+            }
+
+            questions = normalized;
+
+            testSource = "PDF Import";
+
+            console.log(
+                "PDF CBT LOADED:",
+                questions.length,
+                "questions",
+                "from:",
+                key
+            );
+
+            return true;
+
+        }catch(error){
+
+            console.error(
+                "PDF loading error:",
+                key,
+                error
+            );
+
+        }
+
+    }
+
+    console.warn(
+        "No valid PDF question bank found."
+    );
+
+    return false;
+}
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
 function initialize(){
 
-if(initialized){
-return;
-}
+    if(initialized){
+        return;
+    }
 
-initialized = true;
+    initialized = true;
 
-testStartedAt =
-Date.now();
+    testStartedAt = Date.now();
 
+    /* -----------------------------------------------
+       FIRST: LOAD IMPORTED PDF QUESTIONS
+    ------------------------------------------------ */
 
-const pdfLoaded = loadPDFQuestions();
+    const pdfLoaded = loadPDFQuestions();
 
-if(!pdfLoaded){
+    /* -----------------------------------------------
+       FALLBACK ONLY IF PDF IS NOT AVAILABLE
+    ------------------------------------------------ */
 
-questions = fallbackQuestions.map(function(q){
-return {...q};
-});
+    if(!pdfLoaded){
 
-testSource = "Demo Test";
+        questions = fallbackQuestions.map(function(q){
 
-console.log(
-"PDF questions not loaded. Using fallback questions:",
-questions.length
-);
+            return {...q};
 
-}else{
+        });
 
-console.log(
-"PDF questions successfully loaded:",
-questions.length
-);
+        testSource = "Demo Test";
 
-}
+        console.log(
+            "Using fallback questions:",
+            questions.length
+        );
 
+    }
 
-console.log(
-"No valid PDF CBT found. Using demo test."
-);
+    /* -----------------------------------------------
+       NO QUESTIONS
+    ------------------------------------------------ */
 
-}
+    if(!questions.length){
 
+        showFatalError(
+            "No questions are available for this test."
+        );
 
-if(!questions.length){
+        return;
+    }
 
-showFatalError(
-"No questions are available for this test."
-);
+    /* -----------------------------------------------
+       RESET TEST STATE
+    ------------------------------------------------ */
 
-return;
+    answers = new Array(
+        questions.length
+    ).fill(null);
 
-}
+    marked = questions.map(function(q){
 
+        return Boolean(
+            q.bookmarked
+        );
 
-/* Reset only the CURRENT test state.
-   Existing history/mistakes remain safe.
-*/
+    });
 
-answers =
-new Array(
-questions.length
-).fill(null);
+    current = 0;
 
+    submitted = false;
 
-marked =
-questions.map(
-function(q){
+    /* -----------------------------------------------
+       SOURCE BADGE
+    ------------------------------------------------ */
 
-return Boolean(
-q.bookmarked
-);
+    const badge =
+        document.getElementById(
+            "sourceBadge"
+        );
 
-}
-);
+    if(badge){
 
+        if(testSource === "PDF Import"){
 
-current = 0;
+            badge.textContent =
+                "📄 PDF CBT — " +
+                questions.length +
+                " Questions";
 
-submitted = false;
+        }else{
 
+            badge.textContent =
+                "📝 Demo CBT — " +
+                questions.length +
+                " Questions";
 
-/* Source badge */
+        }
 
-const badge =
-document.getElementById(
-"sourceBadge"
-);
+    }
 
-if(badge){
+    /* -----------------------------------------------
+       RENDER TEST
+    ------------------------------------------------ */
 
-badge.textContent =
-testSource === "PDF Import"
-? "📄 PDF CBT"
-: "📝 Demo CBT";
+    renderQuestion();
 
-}
+    renderPalette();
 
-
-/* Render */
-
-renderQuestion();
-
-renderPalette();
-
-startTimer();
+    startTimer();
 
 }
  /* =====================================================
