@@ -1050,21 +1050,29 @@ testStartedAt =
 Date.now();
 
 
-const pdfLoaded =
-loadPDFQuestions();
-
+const pdfLoaded = loadPDFQuestions();
 
 if(!pdfLoaded){
 
-questions =
-fallbackQuestions.map(
-function(q){
+questions = fallbackQuestions.map(function(q){
 return {...q};
-}
+});
+
+testSource = "Demo Test";
+
+console.log(
+"PDF questions not loaded. Using fallback questions:",
+questions.length
 );
 
-testSource =
-"Demo Test";
+}else{
+
+console.log(
+"PDF questions successfully loaded:",
+questions.length
+);
+
+}
 
 
 console.log(
