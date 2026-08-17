@@ -3,235 +3,361 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>CBT Analyzer Pro — CBT Test</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box;
+}
 
 body{
- margin:0;
- font-family:Arial,sans-serif;
- background:#f1f5f9;
- color:#0f172a;
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
 }
 
 header{
- background:#fff;
- border-bottom:1px solid #e2e8f0;
- padding:16px 20px;
+background:#fff;
+border-bottom:1px solid #e2e8f0;
+padding:16px 20px;
 }
 
 .header{
- max-width:1100px;
- margin:auto;
- display:flex;
- align-items:center;
- justify-content:space-between;
+max-width:1100px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:15px;
 }
 
 .logo{
- font-size:20px;
- font-weight:800;
+font-size:20px;
+font-weight:800;
 }
 
-.logo span{color:#4f46e5}
+.logo span{
+color:#4f46e5;
+}
 
 .timer{
- background:#eef2ff;
- color:#3730a3;
- padding:9px 14px;
- border-radius:9px;
- font-weight:800;
+background:#eef2ff;
+color:#3730a3;
+padding:9px 14px;
+border-radius:9px;
+font-weight:800;
+min-width:78px;
+text-align:center;
+}
+
+.timer.warning{
+background:#fef3c7;
+color:#92400e;
+}
+
+.timer.danger{
+background:#fee2e2;
+color:#991b1b;
 }
 
 .container{
- max-width:1100px;
- margin:20px auto;
- padding:0 15px;
- display:grid;
- grid-template-columns:1fr 280px;
- gap:20px;
+max-width:1100px;
+margin:20px auto;
+padding:0 15px;
+display:grid;
+grid-template-columns:1fr 280px;
+gap:20px;
 }
 
 .card{
- background:#fff;
- border-radius:16px;
- padding:22px;
- box-shadow:0 3px 14px rgba(0,0,0,.07);
+background:#fff;
+border-radius:16px;
+padding:22px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
 }
 
 .question-number{
- color:#64748b;
- font-weight:700;
- margin-bottom:12px;
+color:#64748b;
+font-weight:700;
+margin-bottom:12px;
 }
 
 .question{
- font-size:21px;
- font-weight:800;
- line-height:1.55;
- margin-bottom:20px;
+font-size:21px;
+font-weight:800;
+line-height:1.55;
+margin-bottom:20px;
+white-space:pre-wrap;
 }
 
 .option{
- display:block;
- width:100%;
- padding:15px;
- margin:10px 0;
- background:#fff;
- border:2px solid #e2e8f0;
- border-radius:11px;
- text-align:left;
- font-size:16px;
- font-weight:600;
- cursor:pointer;
+display:block;
+width:100%;
+padding:15px;
+margin:10px 0;
+background:#fff;
+border:2px solid #e2e8f0;
+border-radius:11px;
+text-align:left;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:.15s;
+}
+
+.option:hover{
+border-color:#818cf8;
 }
 
 .option.selected{
- border-color:#4f46e5;
- background:#eef2ff;
+border-color:#4f46e5;
+background:#eef2ff;
 }
 
 .buttons{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px;
- margin-top:20px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:20px;
 }
 
 button{
- font-family:inherit;
- border:0;
- border-radius:10px;
- padding:13px;
- font-weight:700;
- cursor:pointer;
+font-family:inherit;
+border:0;
+border-radius:10px;
+padding:13px;
+font-weight:700;
+cursor:pointer;
+}
+
+button:disabled{
+opacity:.55;
+cursor:not-allowed;
 }
 
 .primary{
- background:#4f46e5;
- color:#fff;
+background:#4f46e5;
+color:#fff;
 }
 
 .secondary{
- background:#e2e8f0;
- color:#0f172a;
+background:#e2e8f0;
+color:#0f172a;
 }
 
 .warning{
- background:#f59e0b;
- color:#fff;
+background:#f59e0b;
+color:#fff;
 }
 
 .danger{
- background:#dc2626;
- color:#fff;
+background:#dc2626;
+color:#fff;
 }
 
 .palette{
- display:grid;
- grid-template-columns:repeat(5,1fr);
- gap:8px;
- margin-top:15px;
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:8px;
+margin-top:15px;
 }
 
 .palette button{
- background:#e2e8f0;
- padding:10px 5px;
+background:#e2e8f0;
+padding:10px 5px;
 }
 
-.palette .answered{
- background:#bbf7d0;
+.palette button.answered{
+background:#bbf7d0;
 }
 
-.palette .review{
- background:#fde68a;
+.palette button.review{
+background:#fde68a;
 }
 
-.palette .current{
- outline:3px solid #4f46e5;
+.palette button.answered.review{
+background:#86efac;
 }
 
-#result{display:none}
+.palette button.current{
+outline:3px solid #4f46e5;
+}
+
+.palette button.skipped{
+background:#e2e8f0;
+}
+
+#result{
+display:none;
+}
 
 .score{
- font-size:38px;
- font-weight:800;
- text-align:center;
- margin:10px 0;
+font-size:38px;
+font-weight:800;
+text-align:center;
+margin:15px 0;
 }
 
-.result-actions{
- margin-top:10px;
+.summary-box{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin:20px 0;
+}
+
+.stat{
+padding:15px;
+background:#f8fafc;
+border-radius:10px;
+text-align:center;
+}
+
+.stat strong{
+display:block;
+font-size:22px;
+}
+
+.stat small{
+color:#64748b;
 }
 
 .result-actions button{
- width:100%;
- margin-top:8px;
+width:100%;
+margin-top:8px;
 }
 
 .review-item{
- margin-top:15px;
- padding:15px;
- background:#f8fafc;
- border-radius:10px;
-}
-
-.review-item.incorrect{
- border-left:5px solid #dc2626;
+margin-top:15px;
+padding:15px;
+background:#f8fafc;
+border-radius:10px;
 }
 
 .review-item.correct{
- border-left:5px solid #16a34a;
+border-left:5px solid #16a34a;
+}
+
+.review-item.incorrect{
+border-left:5px solid #dc2626;
 }
 
 .review-item.skipped{
- border-left:5px solid #f59e0b;
+border-left:5px solid #f59e0b;
 }
 
 .analysis{
- margin-top:10px;
- padding:14px;
- background:#eef2ff;
- border-radius:10px;
- line-height:1.6;
+margin-top:10px;
+padding:14px;
+background:#eef2ff;
+border-radius:10px;
+line-height:1.6;
 }
 
-.analysis-type{
- font-weight:800;
- color:#3730a3;
+.meta{
+margin-top:8px;
+color:#64748b;
+font-size:13px;
 }
 
-.source-info{
- padding:12px;
- margin-bottom:15px;
- background:#ecfeff;
- border-radius:10px;
- font-weight:700;
- color:#155e75;
+.source-badge{
+display:inline-block;
+margin-bottom:15px;
+padding:6px 10px;
+border-radius:999px;
+background:#dcfce7;
+color:#166534;
+font-size:12px;
+font-weight:800;
+}
+
+.loading{
+text-align:center;
+padding:30px 10px;
+color:#64748b;
+}
+
+.error-box{
+background:#fee2e2;
+color:#991b1b;
+padding:15px;
+border-radius:10px;
+line-height:1.5;
+}
+
+.empty-box{
+background:#f8fafc;
+padding:20px;
+border-radius:12px;
+text-align:center;
+color:#64748b;
 }
 
 @media(max-width:800px){
- .container{
-  grid-template-columns:1fr;
- }
- .question{
-  font-size:19px;
- }
+
+.container{
+grid-template-columns:1fr;
 }
+
+.question{
+font-size:19px;
+}
+
+.summary-box{
+grid-template-columns:1fr;
+}
+
+aside.card{
+order:2;
+}
+
+}
+
+@media(max-width:500px){
+
+header{
+padding:13px 15px;
+}
+
+.logo{
+font-size:17px;
+}
+
+.card{
+padding:17px;
+}
+
+.buttons{
+grid-template-columns:1fr 1fr;
+}
+
+.palette{
+grid-template-columns:repeat(5,1fr);
+}
+
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
+
 <div class="header">
+
 <div class="logo">
 CBT Analyzer <span>Pro</span>
 </div>
 
-<div id="timer" class="timer">30:00</div>
+<div id="timer" class="timer">
+30:00
 </div>
+
+</div>
+
 </header>
 
 <div class="container">
@@ -240,8 +366,8 @@ CBT Analyzer <span>Pro</span>
 
 <section id="testScreen">
 
-<div id="sourceInfo" class="source-info">
-Loading CBT...
+<div id="sourceBadge" class="source-badge">
+Loading test...
 </div>
 
 <div id="questionNumber" class="question-number">
@@ -256,22 +382,27 @@ Loading question...
 
 <div class="buttons">
 
-<button class="secondary"
+<button
+id="previousButton"
+class="secondary"
 onclick="previousQuestion()">
 Previous
 </button>
 
-<button class="warning"
+<button
+class="warning"
 onclick="markReview()">
 Mark Review
 </button>
 
-<button class="secondary"
+<button
+class="secondary"
 onclick="clearAnswer()">
 Clear
 </button>
 
-<button id="nextButton"
+<button
+id="nextButton"
 class="primary"
 onclick="nextQuestion()">
 Next
@@ -288,23 +419,28 @@ Next
 
 <div id="score" class="score"></div>
 
-<p id="summary"></p>
+<div id="summary"></div>
+
+<div id="resultStats" class="summary-box"></div>
 
 <div class="result-actions">
 
-<button id="retryButton"
+<button
+id="retryButton"
 class="primary"
 style="display:none"
 onclick="openRetry()">
 🔄 Retry Mistakes
 </button>
 
-<button class="secondary"
+<button
+class="secondary"
 onclick="location.href='mistake.html'">
 🧠 Mistake Bank
 </button>
 
-<button class="secondary"
+<button
+class="secondary"
 onclick="location.href='index.html'">
 🏠 Dashboard
 </button>
@@ -324,9 +460,11 @@ onclick="location.href='index.html'">
 
 <div id="palette" class="palette"></div>
 
-<button class="danger"
+<button
+id="submitButton"
+class="danger"
 style="width:100%;margin-top:20px"
-onclick="submitTest()">
+onclick="confirmSubmit()">
 Submit Test
 </button>
 
@@ -334,37 +472,83 @@ Submit Test
 
 </div>
 
-
 <script>
-
-"use strict";
+ "use strict";
 
 /* =====================================================
-DEFAULT QUESTIONS
-Used ONLY if there is NO imported PDF.
+   CBT ANALYZER PRO
+   PRODUCTION CBT ENGINE
 ===================================================== */
 
-let questions=[
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let questions = [];
+let current = 0;
+
+let answers = [];
+let marked = [];
+
+let submitted = false;
+let initialized = false;
+
+let timeLeft = 1800;
+let timerInterval = null;
+
+let testSource = "Fallback";
+let testStartedAt = Date.now();
+
+
+/* =====================================================
+   STORAGE KEYS
+===================================================== */
+
+const STORAGE = {
+
+  PDF: "pdfCbtQuestions",
+
+  HISTORY: "cbtHistory",
+
+  RETRY_QUEUE: "cbtAnalyzer.retryQueue",
+
+  RETRY_QUESTION: "cbtRetryQuestion",
+
+  RETRY_STARTED: "cbtRetryStartedAt"
+
+};
+
+
+/* =====================================================
+   FALLBACK QUESTIONS
+   ONLY USED WHEN NO VALID PDF TEST EXISTS
+===================================================== */
+
+const fallbackQuestions = [
 
 {
+id:"fallback-1",
 subject:"Physics",
 topic:"Basic Physics",
 question:"Which planet is known as the Red Planet?",
 options:["Earth","Mars","Jupiter","Venus"],
 answer:1,
-solution:"Mars is called the Red Planet because iron-bearing minerals give it a reddish appearance."
+solution:"Mars is called the Red Planet."
 },
 
 {
+id:"fallback-2",
 subject:"Physics",
 topic:"Units",
 question:"What is the SI unit of force?",
 options:["Joule","Newton","Watt","Pascal"],
 answer:1,
-solution:"The SI unit of force is the newton (N)."
+solution:"The SI unit of force is newton."
 },
 
 {
+id:"fallback-3",
 subject:"Biology",
 topic:"Cell Biology",
 question:"Which organelle is known as the powerhouse of the cell?",
@@ -374,60 +558,67 @@ solution:"Mitochondria are major sites of ATP production."
 },
 
 {
+id:"fallback-4",
 subject:"Chemistry",
 topic:"Periodic Table",
 question:"What is the chemical symbol of sodium?",
 options:["So","Na","S","Sd"],
 answer:1,
-solution:"The symbol Na comes from the Latin name natrium."
+solution:"The symbol Na comes from natrium."
 },
 
 {
+id:"fallback-5",
 subject:"Biology",
 topic:"Environment",
 question:"Which gas is most abundant in Earth's atmosphere?",
 options:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],
 answer:2,
-solution:"Nitrogen makes up approximately 78% of Earth's atmosphere."
+solution:"Nitrogen makes up about 78% of Earth's atmosphere."
 },
 
 {
+id:"fallback-6",
 subject:"Physics",
 topic:"Gravitation",
 question:"What is the approximate acceleration due to gravity near Earth's surface?",
 options:["4.9 m/s²","9.8 m/s²","19.6 m/s²","98 m/s²"],
 answer:1,
-solution:"The approximate acceleration due to gravity is 9.8 m/s²."
+solution:"The approximate value is 9.8 m/s²."
 },
 
 {
+id:"fallback-7",
 subject:"Biology",
 topic:"Genetics",
 question:"Which molecule carries genetic information?",
 options:["Protein","Lipid","DNA","Glucose"],
 answer:2,
-solution:"DNA stores hereditary genetic information."
+solution:"DNA stores hereditary information."
 },
 
 {
+id:"fallback-8",
 subject:"Physics",
 topic:"Electricity",
 question:"Which particle has a negative electric charge?",
 options:["Proton","Neutron","Electron","Photon"],
 answer:2,
-solution:"An electron carries a negative electric charge."
+solution:"The electron has a negative charge."
 },
 
 {
+id:"fallback-9",
 subject:"Chemistry",
 topic:"Atomic Structure",
 question:"Which particle has no electric charge?",
 options:["Proton","Electron","Neutron","Positron"],
 answer:2,
-solution:"A neutron is electrically neutral."
+solution:"The neutron is electrically neutral."
 },
 
 {
+id:"fallback-10",
 subject:"Biology",
 topic:"Human Physiology",
 question:"Which organ pumps blood throughout the human body?",
@@ -440,224 +631,583 @@ solution:"The heart pumps blood through the circulatory system."
 
 
 /* =====================================================
-STATE
+   SAFE JSON READER
 ===================================================== */
 
-let current=0;
-let answers=[];
-let marked=[];
-let submitted=false;
+function readJSON(key,fallback){
 
-let timeLeft=1800;
-let timerInterval=null;
+try{
+
+const value =
+localStorage.getItem(key);
+
+if(!value){
+return fallback;
+}
+
+return JSON.parse(value);
+
+}catch(error){
+
+console.error(
+"Storage read error:",
+key,
+error
+);
+
+return fallback;
+
+}
+
+}
 
 
 /* =====================================================
-LOAD IMPORTED PDF QUESTIONS
-IMPORTANT:
-PDF questions are checked BEFORE default questions.
+   ANSWER NORMALIZER
+===================================================== */
+
+function normalizeAnswer(answer,options){
+
+if(
+answer === null ||
+answer === undefined
+){
+return null;
+}
+
+
+/* Numeric answer */
+
+if(
+typeof answer === "number" &&
+Number.isInteger(answer)
+){
+
+if(
+answer >= 0 &&
+answer < options.length
+){
+return answer;
+}
+
+}
+
+
+/* String answer */
+
+const value =
+String(answer).trim();
+
+
+/* Numeric string */
+
+if(/^\d+$/.test(value)){
+
+const number =
+Number(value);
+
+
+/* Zero-based */
+
+if(
+number >= 0 &&
+number < options.length
+){
+return number;
+}
+
+
+/* One-based */
+
+if(
+number >= 1 &&
+number <= options.length
+){
+return number-1;
+}
+
+}
+
+
+/* A/B/C/D */
+
+if(
+/^[A-Za-z]$/.test(value)
+){
+
+const index =
+value
+.toUpperCase()
+.charCodeAt(0)-65;
+
+if(
+index >= 0 &&
+index < options.length
+){
+return index;
+}
+
+}
+
+
+/* Exact option text */
+
+const lower =
+value.toLowerCase();
+
+const found =
+options.findIndex(
+function(option){
+
+return String(option)
+.trim()
+.toLowerCase()
+=== lower;
+
+}
+);
+
+if(found >= 0){
+return found;
+}
+
+return null;
+
+}
+
+
+/* =====================================================
+   NORMALIZE PDF QUESTION
+===================================================== */
+
+function normalizeQuestion(q,index){
+
+if(
+!q ||
+typeof q !== "object"
+){
+return null;
+}
+
+
+/* Question text */
+
+const questionText =
+String(
+q.question ??
+q.questionText ??
+q.text ??
+""
+).trim();
+
+if(!questionText){
+return null;
+}
+
+
+/* Options */
+
+let options =
+Array.isArray(q.options)
+? q.options
+: Array.isArray(q.choices)
+? q.choices
+: [];
+
+
+options =
+options
+.map(function(option){
+
+return String(
+option ?? ""
+).trim();
+
+})
+.filter(function(option){
+
+return option !== "";
+
+});
+
+
+if(options.length < 2){
+return null;
+}
+
+
+/* Correct answer */
+
+const answer =
+normalizeAnswer(
+q.answer ??
+q.correctAnswer ??
+q.correctIndex ??
+q.correct,
+options
+);
+
+
+if(answer === null){
+
+console.warn(
+"Skipping question without valid answer:",
+questionText
+);
+
+return null;
+
+}
+
+
+/* Return normalized object */
+
+return {
+
+id:
+q.id ||
+"pdf-"+Date.now()+"-"+index,
+
+subject:
+q.subject ||
+"PDF Import",
+
+topic:
+q.topic ||
+q.section ||
+q.chapter ||
+"PDF Import",
+
+question:
+questionText,
+
+options:
+options,
+
+answer:
+answer,
+
+solution:
+String(
+q.solution ??
+q.explanation ??
+""
+),
+
+explanation:
+String(
+q.explanation ??
+q.solution ??
+""
+),
+
+pdfPage:
+q.pdfPage ??
+q.page ??
+"",
+
+pdfPageEnd:
+q.pdfPageEnd ??
+q.pageEnd ??
+q.pdfPage ??
+q.page ??
+"",
+
+chapter:
+q.chapter ||
+"",
+
+section:
+q.section ||
+"",
+
+answerSource:
+q.answerSource ||
+"PDF",
+
+source:
+q.source ||
+"PDF Import",
+
+sourceType:
+"PDF",
+
+bookmarked:
+Boolean(q.bookmarked)
+
+};
+
+}
+
+
+/* =====================================================
+   LOAD PDF QUESTIONS
 ===================================================== */
 
 function loadPDFQuestions(){
 
-const possibleKeys=[
-"pdfCbtQuestions",
-"pdfQuestions",
-"pdfCBTQuestions",
-"importedCbtQuestions"
-];
+const saved =
+localStorage.getItem(
+STORAGE.PDF
+);
 
-let saved=null;
-let usedKey=null;
-
-for(const key of possibleKeys){
-
-const value=localStorage.getItem(key);
-
-if(value){
-
-saved=value;
-usedKey=key;
-break;
-
-}
-
-}
 
 if(!saved){
 
+console.log(
+"No pdfCbtQuestions found."
+);
+
 return false;
+
 }
+
 
 try{
 
-const imported=JSON.parse(saved);
+const imported =
+JSON.parse(saved);
 
-if(!Array.isArray(imported) || imported.length===0){
 
-return false;
-}
+if(
+!Array.isArray(imported) ||
+imported.length === 0
+){
 
-const valid=imported.filter(function(q){
-
-return q &&
-typeof q.question==="string" &&
-q.question.trim()!=="" &&
-Array.isArray(q.options) &&
-q.options.length>=2 &&
-typeof q.answer==="number" &&
-q.answer>=0 &&
-q.answer<q.options.length;
-
-});
-
-if(valid.length===0){
+console.warn(
+"pdfCbtQuestions is empty."
+);
 
 return false;
+
 }
 
-questions=valid.map(function(q){
 
-return {
+const normalized =
+imported
+.map(normalizeQuestion)
+.filter(Boolean);
 
-id:q.id || ("pdf-"+Date.now()+"-"+Math.random()),
 
-subject:q.subject || q.subjectName || "Imported PDF",
+if(normalized.length === 0){
 
-topic:q.topic || q.section || q.chapter || "PDF Import",
+console.warn(
+"PDF data exists but contains no valid questions."
+);
 
-question:q.question,
+return false;
 
-options:q.options,
+}
 
-answer:Number(q.answer),
 
-solution:
-q.solution ||
-q.explanation ||
-"Review the original PDF solution.",
+/* IMPORTANT:
+   The CURRENT PDF test becomes
+   the active CBT test.
+*/
 
-explanation:q.explanation || "",
+questions =
+normalized;
 
-pdfPage:q.pdfPage || q.page || "",
+testSource =
+"PDF Import";
 
-pdfPageEnd:q.pdfPageEnd || q.pdfPage || q.page || "",
-
-chapter:q.chapter || "",
-
-section:q.section || "",
-
-answerSource:q.answerSource || "PDF",
-
-source:q.source || "PDF Import",
-
-sourceType:q.sourceType || "PDF",
-
-bookmarked:Boolean(q.bookmarked)
-
-};
-
-});
 
 console.log(
-"PDF CBT loaded:",
-usedKey,
-questions.length
+"CURRENT PDF CBT LOADED:",
+questions.length,
+"questions"
 );
+
 
 return true;
 
+
 }catch(error){
 
-console.error("PDF loading error:",error);
+console.error(
+"Could not load PDF CBT:",
+error
+);
 
 return false;
-
-}
 
 }
 
 
 /* =====================================================
-INITIALIZE
+   INITIALIZE
 ===================================================== */
 
 function initialize(){
 
-const pdfLoaded=loadPDFQuestions();
+if(initialized){
+return;
+}
 
-if(pdfLoaded){
+initialized = true;
 
-document.getElementById("sourceInfo").textContent=
-"📄 PDF CBT loaded • "+
-questions.length+
-" questions";
+testStartedAt =
+Date.now();
 
-}else{
 
-document.getElementById("sourceInfo").textContent=
-"📝 Practice CBT • "+
-questions.length+
-" questions";
+const pdfLoaded =
+loadPDFQuestions();
+
+
+if(!pdfLoaded){
+
+questions =
+fallbackQuestions.map(
+function(q){
+return {...q};
+}
+);
+
+testSource =
+"Demo Test";
+
+
+console.log(
+"No valid PDF CBT found. Using demo test."
+);
 
 }
 
-validateQuestions();
 
-answers=new Array(questions.length).fill(null);
+if(!questions.length){
 
-marked=new Array(questions.length).fill(false);
+showFatalError(
+"No questions are available for this test."
+);
 
-current=0;
+return;
 
-submitted=false;
+}
 
-timeLeft=1800;
 
-updateTimer();
+/* Reset only the CURRENT test state.
+   Existing history/mistakes remain safe.
+*/
+
+answers =
+new Array(
+questions.length
+).fill(null);
+
+
+marked =
+questions.map(
+function(q){
+
+return Boolean(
+q.bookmarked
+);
+
+}
+);
+
+
+current = 0;
+
+submitted = false;
+
+
+/* Source badge */
+
+const badge =
+document.getElementById(
+"sourceBadge"
+);
+
+if(badge){
+
+badge.textContent =
+testSource === "PDF Import"
+? "📄 PDF CBT"
+: "📝 Demo CBT";
+
+}
+
+
+/* Render */
 
 renderQuestion();
+
+renderPalette();
 
 startTimer();
 
 }
-
-
-/* =====================================================
-VALIDATE
+ /* =====================================================
+   TIMER
 ===================================================== */
 
-function validateQuestions(){
+function updateTimer(){
 
-questions=questions.filter(function(q){
+const timer =
+document.getElementById("timer");
 
-return q &&
-typeof q.question==="string" &&
-q.question.trim()!=="" &&
-Array.isArray(q.options) &&
-q.options.length>=2 &&
-typeof q.answer==="number" &&
-q.answer>=0 &&
-q.answer<q.options.length;
+if(!timer){
+return;
+}
 
-});
+const minutes =
+Math.floor(timeLeft / 60);
+
+const seconds =
+timeLeft % 60;
+
+timer.textContent =
+String(minutes).padStart(2,"0") +
+":" +
+String(seconds).padStart(2,"0");
+
+
+/* Timer warning */
+
+timer.classList.remove(
+"warning",
+"danger"
+);
+
+if(timeLeft <= 300){
+
+timer.classList.add("warning");
+
+}
+
+if(timeLeft <= 60){
+
+timer.classList.remove("warning");
+
+timer.classList.add("danger");
+
+}
 
 }
 
 
 /* =====================================================
-TIMER
+   START TIMER
 ===================================================== */
 
 function startTimer(){
 
 clearInterval(timerInterval);
 
-timerInterval=setInterval(function(){
+timeLeft = 1800;
+
+updateTimer();
+
+timerInterval =
+setInterval(function(){
 
 if(submitted){
 
-clearInterval(timerInterval);
+clearInterval(
+timerInterval
+);
+
 return;
 
 }
@@ -666,11 +1216,12 @@ timeLeft--;
 
 updateTimer();
 
-if(timeLeft<=0){
 
-clearInterval(timerInterval);
+if(timeLeft <= 0){
 
-alert("Time is over. Your test will be submitted.");
+clearInterval(
+timerInterval
+);
 
 submitTest();
 
@@ -681,93 +1232,144 @@ submitTest();
 }
 
 
-function updateTimer(){
-
-const min=Math.floor(timeLeft/60);
-
-const sec=timeLeft%60;
-
-document.getElementById("timer").textContent=
-String(min).padStart(2,"0")+
-":"+
-String(sec).padStart(2,"0");
-
-}
-
-
 /* =====================================================
-RENDER QUESTION
+   RENDER QUESTION
 ===================================================== */
 
 function renderQuestion(){
 
-if(!questions.length){
-
-document.getElementById("questionNumber").textContent=
-"No questions available";
-
-document.getElementById("question").textContent=
-"Please import a PDF CBT first.";
-
-document.getElementById("options").innerHTML="";
-
+if(submitted){
 return;
+}
+
+const q =
+questions[current];
+
+if(!q){
+return;
+}
+
+
+/* Question number */
+
+document.getElementById(
+"questionNumber"
+).textContent =
+"Question " +
+(current + 1) +
+" of " +
+questions.length +
+" • " +
+(q.subject || "PDF");
+
+
+/* Question text */
+
+document.getElementById(
+"question"
+).textContent =
+q.question;
+
+
+/* Options */
+
+const box =
+document.getElementById(
+"options"
+);
+
+box.innerHTML = "";
+
+
+q.options.forEach(
+function(option,index){
+
+const button =
+document.createElement(
+"button"
+);
+
+button.type =
+"button";
+
+button.className =
+"option";
+
+
+if(
+answers[current] === index
+){
+
+button.classList.add(
+"selected"
+);
 
 }
 
-const q=questions[current];
 
-document.getElementById("questionNumber").textContent=
-"Question "+
-(current+1)+
-" of "+
-questions.length+
-" • "+
-(q.subject||"Imported");
-
-document.getElementById("question").textContent=q.question;
-
-const box=document.getElementById("options");
-
-box.innerHTML="";
-
-q.options.forEach(function(option,index){
-
-const button=document.createElement("button");
-
-button.type="button";
-
-button.className="option";
-
-if(answers[current]===index){
-
-button.classList.add("selected");
-
-}
-
-button.textContent=
-String.fromCharCode(65+index)+
-". "+
+button.textContent =
+String.fromCharCode(
+65 + index
+) +
+". " +
 option;
 
-button.onclick=function(){
 
-if(submitted)return;
+button.onclick =
+function(){
 
-answers[current]=index;
+if(submitted){
+return;
+}
+
+answers[current] =
+index;
 
 renderQuestion();
 
 };
 
-box.appendChild(button);
+
+box.appendChild(
+button
+);
 
 });
 
-document.getElementById("nextButton").textContent=
-current===questions.length-1
-?"Finish"
-:"Next";
+
+/* Next / Finish */
+
+const nextButton =
+document.getElementById(
+"nextButton"
+);
+
+if(nextButton){
+
+nextButton.textContent =
+current === questions.length - 1
+? "Finish"
+: "Next";
+
+}
+
+
+/* Previous button */
+
+const previousButton =
+document.getElementById(
+"previousButton"
+);
+
+if(previousButton){
+
+previousButton.disabled =
+current === 0;
+
+}
+
+
+/* Palette */
 
 renderPalette();
 
@@ -775,43 +1377,97 @@ renderPalette();
 
 
 /* =====================================================
-PALETTE
+   QUESTION PALETTE
 ===================================================== */
 
 function renderPalette(){
 
-const palette=document.getElementById("palette");
+const palette =
+document.getElementById(
+"palette"
+);
 
-palette.innerHTML="";
+if(!palette){
+return;
+}
 
-questions.forEach(function(q,index){
+palette.innerHTML = "";
 
-const button=document.createElement("button");
 
-button.type="button";
+questions.forEach(
+function(q,index){
 
-button.textContent=index+1;
+const button =
+document.createElement(
+"button"
+);
 
-if(answers[index]!==null)
-button.classList.add("answered");
+button.type =
+"button";
 
-if(marked[index])
-button.classList.add("review");
+button.textContent =
+index + 1;
 
-if(index===current)
-button.classList.add("current");
 
-button.onclick=function(){
+/* Answered */
 
-if(submitted)return;
+if(
+answers[index] !== null
+){
 
-current=index;
+button.classList.add(
+"answered"
+);
+
+}
+
+
+/* Review */
+
+if(
+marked[index]
+){
+
+button.classList.add(
+"review"
+);
+
+}
+
+
+/* Current */
+
+if(
+index === current
+){
+
+button.classList.add(
+"current"
+);
+
+}
+
+
+/* Click */
+
+button.onclick =
+function(){
+
+if(submitted){
+return;
+}
+
+current =
+index;
 
 renderQuestion();
 
 };
 
-palette.appendChild(button);
+
+palette.appendChild(
+button
+);
 
 });
 
@@ -819,33 +1475,49 @@ palette.appendChild(button);
 
 
 /* =====================================================
-NAVIGATION
+   NEXT QUESTION
 ===================================================== */
 
 function nextQuestion(){
 
-if(submitted)return;
+if(submitted){
+return;
+}
 
-if(current<questions.length-1){
+
+if(
+current <
+questions.length - 1
+){
 
 current++;
 
 renderQuestion();
 
-}else{
-
-submitTest();
+return;
 
 }
 
+
+/* Last question */
+
+confirmSubmit();
+
 }
 
+
+/* =====================================================
+   PREVIOUS QUESTION
+===================================================== */
 
 function previousQuestion(){
 
-if(submitted)return;
+if(submitted){
+return;
+}
 
-if(current>0){
+
+if(current > 0){
 
 current--;
 
@@ -856,22 +1528,36 @@ renderQuestion();
 }
 
 
+/* =====================================================
+   CLEAR ANSWER
+===================================================== */
+
 function clearAnswer(){
 
-if(submitted)return;
+if(submitted){
+return;
+}
 
-answers[current]=null;
+answers[current] =
+null;
 
 renderQuestion();
 
 }
 
 
+/* =====================================================
+   MARK FOR REVIEW
+===================================================== */
+
 function markReview(){
 
-if(submitted)return;
+if(submitted){
+return;
+}
 
-marked[current]=!marked[current];
+marked[current] =
+!marked[current];
 
 renderPalette();
 
@@ -879,199 +1565,209 @@ renderPalette();
 
 
 /* =====================================================
-MISTAKE CLASSIFICATION
+   CONFIRM SUBMIT
+===================================================== */
+
+function confirmSubmit(){
+
+if(submitted){
+return;
+}
+
+
+const unanswered =
+answers.filter(
+function(answer){
+
+return answer === null;
+
+}
+).length;
+
+
+if(unanswered > 0){
+
+const message =
+"You have " +
+unanswered +
+" unanswered question" +
+(unanswered === 1 ? "" : "s") +
+".\n\n" +
+"Do you want to submit the test?";
+
+
+if(!confirm(message)){
+return;
+}
+
+}
+
+
+/* Submit */
+ submitTest();
+
+}
+
+
+/* =====================================================
+   FATAL ERROR
+===================================================== */
+
+function showFatalError(message){
+
+const testScreen =
+document.getElementById(
+"testScreen"
+);
+
+if(testScreen){
+
+testScreen.innerHTML =
+'<div class="error-box">' +
+"<strong>Unable to load test</strong><br><br>" +
+escapeHTML(message) +
+"<br><br>" +
+'<button class="secondary" ' +
+'onclick="location.href=\'index.html\'">' +
+"Return to Dashboard" +
+"</button>" +
+"</div>";
+
+}
+
+const aside =
+document.querySelector(
+"aside"
+);
+
+if(aside){
+
+aside.style.display =
+"none";
+
+}
+
+}
+ /* =====================================================
+   MISTAKE CLASSIFICATION
 ===================================================== */
 
 function classifyMistake(q,selectedIndex){
 
-const text=String(q.question||"").toLowerCase();
-const topic=String(q.topic||"").toLowerCase();
+const text =
+String(
+q.question || ""
+).toLowerCase();
 
-const calculationWords=[
-"calculate","calculation","numerical",
-"value of","find the","velocity",
-"acceleration","force","work",
-"energy","power","current",
-"voltage","resistance","momentum"
-];
 
-if(calculationWords.some(w=>text.includes(w))){
+/* Calculation */
 
-return{
+if(
+text.includes("calculate") ||
+text.includes("numerical") ||
+text.includes("find the") ||
+text.includes("value of") ||
+text.includes("velocity") ||
+text.includes("acceleration") ||
+text.includes("force") ||
+text.includes("calculate the")
+){
+
+return {
+
 type:"🔢 Calculation Error",
-reason:"Recheck the formula, units and calculation steps."
+
+reason:
+"Recheck the formula, units and calculation steps."
+
 };
 
 }
 
-const memoryWords=[
-"what is","which is","who","symbol",
-"unit","known as","called",
-"most abundant","organ","organelle"
-];
 
-if(memoryWords.some(w=>text.includes(w))){
+/* Memory / Recall */
 
-return{
+if(
+text.includes("which") ||
+text.includes("what is") ||
+text.includes("symbol") ||
+text.includes("unit") ||
+text.includes("known as") ||
+text.includes("called")
+){
+
+return {
+
 type:"📚 Memory / Recall Gap",
-reason:"Revise the key fact and test recall again."
+
+reason:
+"Revise the relevant factual information and test recall again."
+
 };
 
 }
 
-if(
-text.includes("why")||
-text.includes("principle")||
-text.includes("mechanism")||
-text.includes("process")||
-text.includes("function")||
-text.includes("relationship")||
-topic.includes("concept")
-){
 
-return{
+/* Default */
+
+return {
+
 type:"🧠 Concept Gap",
-reason:"Review the underlying concept rather than memorising only the answer."
-};
 
-}
+reason:
+"Review the underlying concept and retry the question."
 
-return{
-type:"⚠️ Concept Gap",
-reason:"Review the explanation and retry the question."
 };
 
 }
 
 
 /* =====================================================
-NORMALIZE
+   GET QUESTION STATUS
 ===================================================== */
 
-function normalize(value){
-
-return String(value||"")
-.trim()
-.toLowerCase()
-.replace(/\s+/g," ");
-
-}
-
-
-/* =====================================================
-REACTIVATE MASTERY
-===================================================== */
-
-function reactivateMistakes(){
-
-let mastery=[];
-
-try{
-
-mastery=
-JSON.parse(
-localStorage.getItem("cbtMasteryV2")||"[]"
-);
-
-if(!Array.isArray(mastery))
-mastery=[];
-
-}catch(e){
-
-mastery=[];
-
-}
-
-const wrong=new Set();
-
-questions.forEach(function(q,index){
+function getQuestionStatus(q,index){
 
 if(
-answers[index]!==null &&
-answers[index]!==q.answer
+answers[index] === null
 ){
 
-wrong.add(normalize(q.question));
+return "skipped";
 
 }
 
-});
+if(
+answers[index] === q.answer
+){
 
-mastery=mastery.filter(function(item){
+return "correct";
 
-if(!item||!item.question)
-return true;
+}
 
-return !wrong.has(normalize(item.question));
-
-});
-
-localStorage.setItem(
-"cbtMasteryV2",
-JSON.stringify(mastery)
-);
+return "wrong";
 
 }
 
 
 /* =====================================================
-SAVE HISTORY
+   CREATE HISTORY QUESTION
 ===================================================== */
 
-function saveHistory(correct,incorrect,skipped,score){
+function createHistoryQuestion(q,index){
 
-let history=[];
-
-try{
-
-history=
-JSON.parse(
-localStorage.getItem("cbtHistory")||"[]"
+const status =
+getQuestionStatus(
+q,
+index
 );
 
-if(!Array.isArray(history))
-history=[];
+let intelligence =
+null;
 
-}catch(e){
 
-history=[];
+if(status === "wrong"){
 
-}
-
-const record={
-
-date:new Date().toLocaleString(),
-
-timestamp:Date.now(),
-
-score:score,
-
-correct:correct,
-
-incorrect:incorrect,
-
-wrong:incorrect,
-
-skipped:skipped,
-
-questions:questions.map(function(q,index){
-
-let status="skipped";
-
-if(answers[index]!==null){
-
-status=
-answers[index]===q.answer
-?"correct"
-:"wrong";
-
-}
-
-let intelligence=null;
-
-if(status==="wrong"){
-
-intelligence=
+intelligence =
 classifyMistake(
 q,
 answers[index]
@@ -1079,179 +1775,500 @@ answers[index]
 
 }
 
-return{
 
-question:q.question,
+return {
 
-options:q.options,
+id:
+q.id ||
+("history-"+Date.now()+"-"+index),
 
-subject:q.subject,
+question:
+q.question,
 
-topic:q.topic,
+options:
+Array.isArray(q.options)
+? q.options
+: [],
 
-status:status,
+subject:
+q.subject ||
+"",
 
-selectedIndex:answers[index],
+topic:
+q.topic ||
+"",
+
+status:
+status,
+
+selectedIndex:
+answers[index],
 
 selectedAnswer:
-answers[index]===null
-?"Not answered"
-:q.options[answers[index]],
+answers[index] === null
+? "Not answered"
+: q.options[answers[index]],
 
-correctIndex:q.answer,
+correctIndex:
+q.answer,
 
-correctAnswer:q.options[q.answer],
+correctAnswer:
+q.options[q.answer],
 
 mistakeType:
-intelligence?intelligence.type:null,
+intelligence
+? intelligence.type
+: null,
 
 mistakeReason:
-intelligence?intelligence.reason:null,
+intelligence
+? intelligence.reason
+: null,
 
-solution:q.solution||"",
+solution:
+q.solution ||
+q.explanation ||
+"",
 
-bookmarked:Boolean(marked[index]),
+explanation:
+q.explanation ||
+q.solution ||
+"",
 
-markedForReview:Boolean(marked[index]),
+bookmarked:
+Boolean(
+marked[index]
+),
 
-pdfPage:q.pdfPage||"",
+markedForReview:
+Boolean(
+marked[index]
+),
 
-chapter:q.chapter||"",
+pdfPage:
+q.pdfPage ||
+"",
 
-section:q.section||"",
+pdfPageEnd:
+q.pdfPageEnd ||
+q.pdfPage ||
+"",
 
-source:q.source||"PDF Import"
+chapter:
+q.chapter ||
+"",
+
+section:
+q.section ||
+"",
+
+answerSource:
+q.answerSource ||
+"",
+
+source:
+q.source ||
+"",
+
+sourceType:
+q.sourceType ||
+""
 
 };
-
-})
-
-};
-
-history.push(record);
-
-localStorage.setItem(
-"cbtHistory",
-JSON.stringify(history)
-);
 
 }
 
 
 /* =====================================================
-CREATE RETRY QUEUE
+   SAVE TEST HISTORY
 ===================================================== */
 
-function openRetry(){
-
-const wrong=[];
-
-questions.forEach(function(q,index){
-
-if(
-answers[index]!==null &&
-answers[index]!==q.answer
+function saveHistory(
+correct,
+incorrect,
+skipped,
+score
 ){
 
-const intelligence=
-classifyMistake(q,answers[index]);
+let history =
+readJSON(
+STORAGE.HISTORY,
+[]
+);
+
+
+if(!Array.isArray(history)){
+
+history = [];
+
+}
+
+
+const historyItem = {
+
+id:
+"test-"+Date.now(),
+
+date:
+new Date().toLocaleString(),
+
+timestamp:
+Date.now(),
+
+startedAt:
+testStartedAt,
+
+completedAt:
+Date.now(),
+
+source:
+testSource,
+
+sourceType:
+testSource === "PDF Import"
+? "PDF"
+: "CBT",
+
+totalQuestions:
+questions.length,
+
+score:
+score,
+
+correct:
+correct,
+
+incorrect:
+incorrect,
+
+wrong:
+incorrect,
+
+skipped:
+skipped,
+
+percentage:
+questions.length
+? Math.round(
+(score /
+(questions.length * 4))
+* 100
+)
+: 0,
+
+questions:
+questions.map(
+function(q,index){
+
+return createHistoryQuestion(
+q,
+index
+);
+
+}
+
+};
+
+
+history.push(
+historyItem
+);
+
+
+/* Keep existing history */
+
+try{
+
+localStorage.setItem(
+STORAGE.HISTORY,
+JSON.stringify(history)
+);
+
+}catch(error){
+
+console.error(
+"Could not save CBT history:",
+error
+);
+
+}
+
+}
+
+
+/* =====================================================
+   BUILD RETRY QUESTIONS
+===================================================== */
+
+function buildRetryQueue(){
+
+const wrong = [];
+
+
+questions.forEach(
+function(q,index){
+
+if(
+answers[index] === null
+){
+return;
+}
+
+
+if(
+answers[index] === q.answer
+){
+return;
+}
+
+
+const intelligence =
+classifyMistake(
+q,
+answers[index]
+);
+
 
 wrong.push({
 
 id:
 "retry-"+Date.now()+"-"+index,
 
-question:q.question,
+question:
+q.question,
 
-options:q.options,
+options:
+Array.isArray(q.options)
+? q.options
+: [],
 
-subject:q.subject||"Imported",
+subject:
+q.subject ||
+"",
 
-topic:q.topic||"PDF Import",
+topic:
+q.topic ||
+"",
 
-correctIndex:q.answer,
+correctIndex:
+q.answer,
 
-correctAnswer:q.options[q.answer],
+correctAnswer:
+q.options[q.answer],
 
-solution:q.solution||"",
+solution:
+q.solution ||
+q.explanation ||
+"",
 
-selectedIndex:answers[index],
+explanation:
+q.explanation ||
+q.solution ||
+"",
 
-selectedAnswer:q.options[answers[index]],
+selectedIndex:
+answers[index],
 
-mistakeType:intelligence.type,
+selectedAnswer:
+q.options[answers[index]],
 
-mistakeReason:intelligence.reason,
+mistakeType:
+intelligence.type,
 
-source:q.source||"CBT",
+mistakeReason:
+intelligence.reason,
 
-pdfPage:q.pdfPage||"",
+source:
+"CBT",
 
-chapter:q.chapter||"",
+sourceType:
+"CBT",
 
-section:q.section||""
+pdfPage:
+q.pdfPage ||
+"",
+
+pdfPageEnd:
+q.pdfPageEnd ||
+q.pdfPage ||
+"",
+
+chapter:
+q.chapter ||
+"",
+
+section:
+q.section ||
+"",
+
+answerSource:
+q.answerSource ||
+"",
+
+bookmarked:
+Boolean(
+marked[index]
+)
 
 });
 
-}
-
 });
 
-if(!wrong.length){
 
-alert("There are no mistakes to retry.");
-
-return;
-
-}
-
-localStorage.setItem(
-"cbtAnalyzer.retryQueue",
-JSON.stringify(wrong)
-);
-
-localStorage.setItem(
-"cbtRetryQuestion",
-JSON.stringify(wrong[0])
-);
-
-localStorage.setItem(
-"cbtRetryStartedAt",
-String(Date.now())
-);
-
-location.href="retry.html";
+return wrong;
 
 }
 
 
 /* =====================================================
-SUBMIT
+   SAVE RETRY QUEUE
 ===================================================== */
 
-function submitTest(){
+function saveRetryQueue(wrong){
 
-if(submitted)return;
+try{
 
-if(!questions.length){
+localStorage.setItem(
+STORAGE.RETRY_QUEUE,
+JSON.stringify(wrong)
+);
 
-alert("No questions are available.");
+
+if(wrong.length > 0){
+
+localStorage.setItem(
+STORAGE.RETRY_QUESTION,
+JSON.stringify(
+wrong[0]
+)
+);
+
+localStorage.setItem(
+STORAGE.RETRY_STARTED,
+String(Date.now())
+);
+
+}
+
+}catch(error){
+
+console.error(
+"Could not save retry queue:",
+error
+);
+
+}
+
+}
+
+
+/* =====================================================
+   OPEN RETRY
+===================================================== */
+
+function openRetry(){
+
+if(!submitted){
 
 return;
 
 }
 
-let correct=0;
-let incorrect=0;
-let skipped=0;
 
-questions.forEach(function(q,index){
+const wrong =
+buildRetryQueue();
 
-if(answers[index]===null){
+
+if(!wrong.length){
+
+alert(
+"There are no mistakes to retry."
+);
+
+return;
+
+}
+
+
+/* Save complete queue */
+
+saveRetryQueue(
+wrong
+);
+
+
+/* Open existing retry page */
+
+location.href =
+"retry.html";
+
+}
+
+
+/* =====================================================
+   CLEAR OLD RETRY QUEUE
+   ONLY WHEN NEW RETRY IS CREATED
+===================================================== */
+
+function replaceRetryQueue(wrong){
+
+try{
+
+localStorage.setItem(
+STORAGE.RETRY_QUEUE,
+JSON.stringify(wrong)
+);
+
+if(wrong.length){
+
+localStorage.setItem(
+STORAGE.RETRY_QUESTION,
+JSON.stringify(
+wrong[0]
+)
+);
+
+}
+
+}catch(error){
+
+console.error(error);
+
+}
+
+}
+
+
+/* =====================================================
+   SUBMIT TEST
+===================================================== */
+
+function submitTest(){
+
+if(submitted){
+
+return;
+
+}
+
+
+let correct = 0;
+let incorrect = 0;
+let skipped = 0;
+
+
+questions.forEach(
+function(q,index){
+
+if(
+answers[index] === null
+){
 
 skipped++;
 
-}else if(answers[index]===q.answer){
+}else if(
+answers[index] === q.answer
+){
 
 correct++;
 
@@ -1263,9 +2280,15 @@ incorrect++;
 
 });
 
-const score=(correct*4)-incorrect;
 
-reactivateMistakes();
+/* NEET-style marking */
+
+const score =
+(correct * 4) -
+incorrect;
+
+
+/* Save history BEFORE showing result */
 
 saveHistory(
 correct,
@@ -1274,130 +2297,401 @@ skipped,
 score
 );
 
-submitted=true;
 
-clearInterval(timerInterval);
+/* Build retry queue */
 
-document.getElementById("testScreen")
-.style.display="none";
+const wrong =
+buildRetryQueue();
 
-document.querySelector("aside")
-.style.display="none";
 
-document.getElementById("result")
-.style.display="block";
+if(wrong.length){
 
-document.getElementById("score")
-.textContent=
-score+
-" / "+
-(questions.length*4);
-
-document.getElementById("summary")
-.textContent=
-"Correct: "+
-correct+
-" | Incorrect: "+
-incorrect+
-" | Skipped: "+
-skipped;
-
-const retry=document.getElementById("retryButton");
-
-if(incorrect>0){
-
-retry.style.display="block";
-
-retry.textContent=
-"🔄 Retry "+
-incorrect+
-" Mistake"+
-(incorrect===1?"":"s");
+saveRetryQueue(
+wrong
+);
 
 }
+
+
+submitted = true;
+
+
+/* Stop timer */
+
+clearInterval(
+timerInterval
+);
+
+
+/* Disable submit */
+
+const submitButton =
+document.getElementById(
+"submitButton"
+);
+
+if(submitButton){
+
+submitButton.disabled =
+true;
+
+}
+
+
+/* Hide test */
+
+document.getElementById(
+"testScreen"
+).style.display =
+"none";
+
+
+/* Hide palette */
+
+const aside =
+document.querySelector(
+"aside"
+);
+
+if(aside){
+
+aside.style.display =
+"none";
+
+}
+
+
+/* Show result */
+
+document.getElementById(
+"result"
+).style.display =
+"block";
+
+
+/* Score */
+
+document.getElementById(
+"score"
+).textContent =
+score +
+" / " +
+(questions.length * 4);
+
+
+/* Summary */
+
+document.getElementById(
+"summary"
+).textContent =
+"Correct: " +
+correct +
+" | Incorrect: " +
+incorrect +
+" | Skipped: " +
+skipped;
+
+
+/* Statistics */
+
+const stats =
+document.getElementById(
+"resultStats"
+);
+
+if(stats){
+
+stats.innerHTML =
+
+'<div class="stat">' +
+"<strong>" +
+correct +
+"</strong>" +
+"<small>Correct</small>" +
+"</div>" +
+
+'<div class="stat">' +
+"<strong>" +
+incorrect +
+"</strong>" +
+"<small>Incorrect</small>" +
+"</div>" +
+
+'<div class="stat">' +
+"<strong>" +
+skipped +
+"</strong>" +
+"<small>Skipped</small>" +
+"</div>";
+
+}
+
+
+/* Retry button */
+
+const retryButton =
+document.getElementById(
+"retryButton"
+);
+
+
+if(
+retryButton &&
+incorrect > 0
+){
+
+retryButton.style.display =
+"block";
+
+retryButton.textContent =
+"🔄 Retry " +
+incorrect +
+" Mistake" +
+(
+incorrect === 1
+? ""
+: "s"
+);
+
+}
+
+
+/* Review */
 
 generateReview();
 
 }
-
-
-/* =====================================================
-REVIEW
+ /* =====================================================
+   QUESTION REVIEW
 ===================================================== */
 
 function generateReview(){
 
-const box=document.getElementById("review");
+const box =
+document.getElementById(
+"review"
+);
 
-box.innerHTML="<h3>🧠 Question Analysis</h3>";
+if(!box){
+return;
+}
 
-questions.forEach(function(q,index){
+box.innerHTML =
+"<h3>🧠 Question Analysis</h3>";
 
-let status;
 
-if(answers[index]===null){
+questions.forEach(
+function(q,index){
 
-status="skipped";
+const status =
+getQuestionStatus(
+q,
+index
+);
 
-}else if(answers[index]===q.answer){
 
-status="correct";
+const item =
+document.createElement(
+"div"
+);
 
-}else{
+item.className =
+"review-item " +
+(
+status === "correct"
+? "correct"
+: status === "wrong"
+? "incorrect"
+: "skipped"
+);
 
-status="incorrect";
+
+/* Question */
+
+item.innerHTML =
+"<strong>Q" +
+(index + 1) +
+". " +
+escapeHTML(
+q.question
+) +
+"</strong>";
+
+
+/* Answers */
+
+const yourAnswer =
+answers[index] === null
+? "Not answered"
+: q.options[
+answers[index]
+];
+
+
+const correctAnswer =
+q.options[
+q.answer
+];
+
+
+item.innerHTML +=
+
+"<p>" +
+
+"<b>Your answer:</b> " +
+escapeHTML(
+yourAnswer
+) +
+
+"<br>" +
+
+"<b>Correct answer:</b> " +
+escapeHTML(
+correctAnswer
+) +
+
+"</p>";
+
+
+/* Solution */
+
+const solution =
+q.solution ||
+q.explanation ||
+"";
+
+
+if(solution){
+
+item.innerHTML +=
+
+'<div class="analysis">' +
+
+"<b>💡 Solution</b><br>" +
+
+escapeHTML(
+solution
+) +
+
+"</div>";
 
 }
 
-const item=document.createElement("div");
 
-item.className=
-"review-item "+
-status;
+/* Mistake intelligence */
 
-let html=
-"<strong>Q"+
-(index+1)+
-". "+
-q.question+
-"</strong><br><br>";
+if(status === "wrong"){
 
-if(status==="correct"){
-
-html+="✅ Correct";
-
-}else if(status==="skipped"){
-
-html+="⏭️ Skipped";
-
-}else{
-
-const intelligence=
+const intelligence =
 classifyMistake(
 q,
 answers[index]
 );
 
-html+=
-"❌ Your answer: "+
-q.options[answers[index]]+
-"<br>✅ Correct answer: "+
-q.options[q.answer]+
-"<div class='analysis'>"+
-"<div class='analysis-type'>"+
-intelligence.type+
-"</div>"+
-intelligence.reason+
-"<br><br>"+
-"<strong>Solution:</strong> "+
-(q.solution||"Review this concept.")+
+
+item.innerHTML +=
+
+'<div class="analysis">' +
+
+"<b>" +
+escapeHTML(
+intelligence.type
+) +
+"</b><br>" +
+
+escapeHTML(
+intelligence.reason
+) +
+
 "</div>";
 
 }
 
-item.innerHTML=html;
 
-box.appendChild(item);
+/* PDF information */
+
+if(
+q.pdfPage ||
+q.chapter ||
+q.section
+){
+
+let meta = "";
+
+
+if(q.pdfPage){
+
+meta +=
+"📄 PDF Page: " +
+escapeHTML(
+q.pdfPage
+);
+
+}
+
+
+if(q.pdfPageEnd &&
+q.pdfPageEnd !== q.pdfPage){
+
+meta +=
+" – " +
+escapeHTML(
+q.pdfPageEnd
+);
+
+}
+
+
+if(q.chapter){
+
+meta +=
+" | Chapter: " +
+escapeHTML(
+q.chapter
+);
+
+}
+
+
+if(q.section){
+
+meta +=
+" | Section: " +
+escapeHTML(
+q.section
+);
+
+}
+
+
+item.innerHTML +=
+
+'<div class="meta">' +
+meta +
+"</div>";
+
+}
+
+
+/* Source */
+
+if(q.source){
+
+item.innerHTML +=
+
+'<div class="meta">' +
+"Source: " +
+escapeHTML(
+q.source
+) +
+"</div>";
+
+}
+
+
+box.appendChild(
+item
+);
 
 });
 
@@ -1405,13 +2699,96 @@ box.appendChild(item);
 
 
 /* =====================================================
-START
+   ESCAPE HTML
 ===================================================== */
+
+function escapeHTML(value){
+
+return String(
+value ?? ""
+)
+
+.replace(
+/&/g,
+"&amp;"
+)
+
+.replace(
+/</g,
+"&lt;"
+)
+
+.replace(
+/>/g,
+"&gt;"
+)
+
+.replace(
+/"/g,
+"&quot;"
+)
+
+.replace(
+/'/g,
+"&#039;"
+);
+
+}
+
+
+/* =====================================================
+   PROTECT AGAINST DOUBLE SUBMIT
+===================================================== */
+
+window.addEventListener(
+"beforeunload",
+function(){
+
+if(!submitted){
+
+/*
+  We intentionally do not
+  delete any saved data here.
+*/
+
+}
+
+}
+);
+
+
+/* =====================================================
+   START APPLICATION
+ ===================================================== */
 
 document.addEventListener(
 "DOMContentLoaded",
-initialize
+function(){
+
+try{
+
+initialize();
+
+}catch(error){
+
+console.error(
+"CBT initialization failed:",
+error
 );
+
+showFatalError(
+"Something went wrong while loading the CBT test."
+);
+
+}
+
+}
+);
+
+
+/* =====================================================
+   END CBT ENGINE
+===================================================== */
 
 </script>
 
