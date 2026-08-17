@@ -614,23 +614,25 @@ function loadPDFQuestions(){
 INITIALIZE
 ===================================================== */
 
-function initialize(){
-
-console.log("CBT Analyzer Pro: initializing...");
-
-questions=[];
-
-const pdfLoaded=loadPDFQuestions();
-
 if(!pdfLoaded){
 
-console.log("No imported questions found.");
+document.getElementById("questionNumber").textContent =
+"PDF TEST NOT FOUND";
 
-questions=fallbackQuestions.map(function(q){
-return {...q};
-});
+document.getElementById("question").textContent =
+"Your new PDF questions are not being found. The CBT is falling back to the demo test.";
+
+document.getElementById("options").innerHTML = "";
+
+console.error(
+"PDF CBT NOT FOUND: pdfCbtQuestions"
+);
+
+return;
 
 }
+
+
 
 if(!Array.isArray(questions) || questions.length===0){
 
