@@ -439,102 +439,117 @@ LOAD PDF QUESTIONS
 
 function loadPDFQuestions(){
 
-const saved=localStorage.getItem("pdfCbtQuestions");
+const possibleKeys = [
+"pdfCbtQuestions",
+"pdfQuestions",
+"cbtQuestions",
+"importedQuestions",
+"pdfQuestionBank",
+"questionBank"
+];
 
-if(!saved){
-return false;
-}
+for(const key of possibleKeys){
+
+const saved = localStorage.getItem(key);
+
+if(!saved) continue;
 
 try{
 
-const imported=JSON.parse(saved);
+const imported = JSON.parse(saved);
 
-if(!Array.isArray(imported) || imported.length===0){
-return false;
+if(!Array.isArray(imported) || imported.length === 0){
+continue;
 }
 
-const valid=imported.filter(function(q){
+const valid = imported.filter(function(q){
 
 return q &&
-typeof q.question==="string" &&
-q.question.trim()!=="" &&
+typeof q.question === "string" &&
+q.question.trim() !== "" &&
 Array.isArray(q.options) &&
-q.options.length>=2 &&
+q.options.length >= 2 &&
 Number.isInteger(Number(q.answer)) &&
-Number(q.answer)>=0 &&
-Number(q.answer)<q.options.length;
+Number(q.answer) >= 0 &&
+Number(q.answer) < q.options.length;
 
 });
 
-if(valid.length===0){
-return false;
+if(valid.length === 0){
+continue;
 }
 
-questions=valid.map(function(q){
+questions = valid.map(function(q){
 
 return {
 
-id:q.id || "pdf-"+Date.now(),
+id: q.id || ("pdf-" + Date.now() + "-" + Math.random()),
 
-subject:q.subject || "PDF Import",
+subject: q.subject || "PDF Import",
 
-topic:q.topic || q.section || "PDF Import",
+topic: q.topic || q.section || "PDF Import",
 
-question:q.question.trim(),
+question: q.question.trim(),
 
-options:q.options.map(String),
+options: q.options.map(String),
 
-answer:Number(q.answer),
+answer: Number(q.answer),
 
 solution:
 q.solution ||
 q.explanation ||
 "Review the original PDF solution.",
 
-explanation:q.explanation || "",
+explanation: q.explanation || "",
 
-pdfPage:q.pdfPage || "",
+pdfPage: q.pdfPage || "",
 
-pdfPageEnd:q.pdfPageEnd || q.pdfPage || "",
+pdfPageEnd: q.pdfPageEnd || q.pdfPage || "",
 
-chapter:q.chapter || "",
+chapter: q.chapter || "",
 
-section:q.section || "",
+section: q.section || "",
 
-answerSource:q.answerSource || "PDF",
+answerSource: q.answerSource || "PDF",
 
-source:q.source || "PDF Import",
+source: q.source || "PDF Import",
 
-sourceType:"PDF",
+sourceType: "PDF",
 
-bookmarked:Boolean(q.bookmarked)
+bookmarked: Boolean(q.bookmarked)
 
 };
 
 });
 
 console.log(
-"PDF CBT loaded:",
-questions.length,
-"questions"
+"CBT QUESTIONS LOADED FROM:",
+key,
+"TOTAL:",
+questions.length
 );
 
-return true;
+return questions.length > 0;
 
 }catch(error){
 
 console.error(
-"Could not load PDF CBT:",
+"Error reading",
+key,
 error
+);
+
+}
+
+}
+
+console.log(
+"No imported question bank found. Fallback will be used."
 );
 
 return false;
 
 }
-
-}
-
-
 /* =====================================================
 INITIALIZE
 ===================================================== */
