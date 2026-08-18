@@ -1946,6 +1946,53 @@ console.log(
 );
 
 })();
+   /* =====================================================
+   AUTO INITIALIZE CBT
+===================================================== */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    console.log("CBT Analyzer Pro: starting initialization...");
+
+    try{
+
+        initialize();
+
+    }catch(error){
+
+        console.error(
+            "CBT initialization failed:",
+            error
+        );
+
+        const question =
+            document.getElementById("question");
+
+        const source =
+            document.getElementById("sourceBadge");
+
+        if(question){
+
+            question.textContent =
+                "Unable to load the CBT questions.";
+
+        }
+
+        if(source){
+
+            source.textContent =
+                "❌ CBT initialization error";
+
+        }
+
+        alert(
+            "CBT could not initialize.\n\n" +
+            (error.message || error)
+        );
+
+    }
+
+});
 </script>
 
 </body>
