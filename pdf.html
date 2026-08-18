@@ -891,80 +891,129 @@ function parseMCQs(text){
 
 const questions=[];
 
+text=String(text||"")
+.replace(/\r/g,"\n")
+.replace(/[ \t]+/g," ")
+.replace(/\n[ \t]+/g,"\n")
+.trim();
 
 /*
-Split wherever a numbered question starts.
+Convert common option formats to a
+consistent form.
 
-Examples:
-
-1. Question
-2) Question
-10. Question
+(A)   -> A.
+(B)   -> B.
+A)    -> A.
+B)    -> B.
 */
 
-const parts=
-text.split(
-/(?=\b\d{1,3}\s*[\.\)]\s+)/g
-);
-
-
-parts.forEach(function(part){
-
-part=part.trim();
-
-if(!part)return;
-
-
-/*
-Remove question number.
-*/
-
-const match=
-part.match(
-/^(\d{1,3})\s*[\.\)]\s+([\s\S]+)$/
-);
-
-if(!match)return;
-
-
-const questionNumber=
-Number(match[1]);
-
-const body=
-match[2].trim();
+text=text
+.replace(/\(\s*A\s*\)\s*/gi,"\nA. ")
+.replace(/\(\s*B\s*\)\s*/gi,"\nB. ")
+.replace(/\(\s*C\s*\)\s*/gi,"\nC. ")
+.replace(/\(\s*D\s*\)\s*/gi,"\nD. ")
+.replace(/(^|\s)A\)\s*/gi,"$1A. ")
+.replace(/(^|\s)B\)\s*/gi,"$1B. ")
+.replace(/(^|\s)C\)\s*/gi,"$1C. ")
+.replace(/(^|\s)D\)\s*/gi,"$1D. ");
 
 
 /*
-Find A/B/C/D options.
+Find numbered questions.
+Supports:
+
+1.
+1)
+Q1.
+Q1)
+Question 1.
 */
 
-const positions=[];
+const questionRegex=
+/(?:^|\n)\s*(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\)]\s+/gi;
 
-const optionRegex=
-/(?:^|\s)([A-D])\s*[\.\)]\s+/gi;
+const starts=[];
 
-let m;
+let match;
 
 while(
-(m=optionRegex.exec(body))!==null
+(match=questionRegex.exec(text))!==null
 ){
 
-positions.push({
+starts.push({
+number:Number(match[1]),
+start:match.index,
+contentStart:questionRegex.lastIndex
+});
 
-letter:m[1].toUpperCase(),
+}
 
-index:m.index,
 
-end:optionRegex.lastIndex
+for(
+let i=0;
+i<starts.length;
+i++
+){
+
+const item=starts[i];
+
+const end=
+i+1<starts.length
+?starts[i+1].start
+:text.length;
+
+let block=
+text.substring(
+item.contentStart,
+end
+).trim();
+
+
+/*
+Stop at obvious answer-key section.
+*/
+
+block=
+block.replace(
+/(?:^|\n)\s*(?:answer\s*key|answers?\s*key|solutions?\s*key)[\s\S]*$/i,
+""
+).trim();
+
+
+/*
+Find A/B/C/D.
+*/
+
+const optionRegex=
+/(?:^|\n|\s)([A-D])\.\s+/gi;
+
+const optionsFound=[];
+
+let optionMatch;
+
+while(
+(optionMatch=optionRegex.exec(block))!==null
+){
+
+optionsFound.push({
+
+letter:
+optionMatch[1].toUpperCase(),
+
+start:
+optionMatch.index,
+
+contentStart:
+optionRegex.lastIndex
 
 });
 
 }
 
 
-if(positions.length<2){
+if(optionsFound.length<2){
 
-return;
+continue;
 
 }
 
@@ -974,93 +1023,105 @@ Question text.
 */
 
 const questionText=
-body
-.substring(
+block.substring(
 0,
-positions[0].index
-)
-.trim();
+optionsFound[0].start
+).trim();
 
 
 if(!questionText){
 
-return;
+continue;
 
 }
 
 
 /*
-Extract options.
+Options.
 */
 
 const options=[];
 
-
 for(
-let i=0;
-i<positions.length;
-i++
+let j=0;
+j<optionsFound.length;
+j++
 ){
 
 const start=
-positions[i].end;
+optionsFound[j].contentStart;
 
 const end=
-i+1<positions.length
-?positions[i+1].index
-:body.length;
+j+1<optionsFound.length
+?optionsFound[j+1].start
+:block.length;
 
-
-let value=
-body
-.substring(
-start,
-end
-)
+let option=
+block
+.substring(start,end)
 .trim()
 .replace(/\s+/g," ");
 
+if(option){
+
+options.push(option);
+
+}
+
+}
+
+
+if(options.length<2){
+
+continue;
+
+}
+
 
 /*
-Remove answer text accidentally attached
-to the last option.
+Detect answer printed with question.
 */
 
-value=
-value.replace(
-/(?:answer|ans|correct\s*answer)\s*[:\-]?\s*[A-D]\s*$/i,
-""
-).trim();
+let answer=-1;
 
+const answerMatch=
+block.match(
+/(?:answer|ans|correct\s*answer|correct\s*option)\s*[:\-]?\s*\(?([A-D])\)?/i
+);
 
-if(value){
+if(answerMatch){
 
-options.push(value);
+answer=
+answerMatch[1]
+.toUpperCase()
+.charCodeAt(0)-65;
 
 }
 
-}
 
+/*
+Also check global answer key.
+*/
 
 if(
-questionText &&
-options.length>=2
+answer<0 &&
+answerKey &&
+answerKey[item.number] !== undefined
 ){
 
-const internalAnswer=
-detectAnswer(
-body,
-options
-);
+answer=
+answerKey[item.number];
+
+}
 
 
 questions.push({
 
 id:
-"pdf-"+Date.now()+"-"+questions.length,
+"pdf-"+Date.now()+"-"+i,
 
 questionNumber:
-questionNumber,
+item.number,
 
 subject:
 "Imported",
@@ -1075,10 +1136,10 @@ options:
 options,
 
 answer:
-internalAnswer,
+answer,
 
 solution:
-"Review the original PDF solution or explanation.",
+"Review the original PDF solution.",
 
 source:
 "PDF",
@@ -1087,20 +1148,27 @@ sourceType:
 "PDF Import",
 
 answerSource:
-internalAnswer>=0
-?"Answer found inside question"
-:"Not yet detected"
+answer>=0
+?"Answer detected"
+:"Answer not detected"
 
 });
 
 }
 
-});
 
+console.log(
+"PDF parser:",
+questions.length,
+"questions detected"
+);
 
 return questions;
 
 }
+
+
+
 
 
 /* =====================================================
