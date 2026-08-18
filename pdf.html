@@ -1632,7 +1632,320 @@ value==null
 .replace(/'/g,"&#039;");
 
 }
+/* =====================================================
+   PDF PARSER COMPATIBILITY PATCH
+   Added at bottom — no existing code needs replacement
+===================================================== */
 
+(function(){
+
+/* ---------- Better answer-key reader ---------- */
+
+extractGlobalAnswerKey = function(text){
+
+const map = {};
+
+const regex =
+/(?:^|\s)(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\)\-:]\s*\(?([A-D])\)?(?=\s|$)/gi;
+
+let match;
+
+while((match = regex.exec(String(text || ""))) !== null){
+
+const number = Number(match[1]);
+const letter = match[2].toUpperCase();
+
+if(number > 0){
+
+map[number] =
+letter.charCodeAt(0) - 65;
+
+}
+
+}
+
+console.log(
+"PDF answer key detected:",
+Object.keys(map).length
+);
+
+return map;
+
+};
+
+
+/* ---------- Better MCQ parser ---------- */
+
+parseMCQs = function(text){
+
+const questions = [];
+
+const source = String(text || "");
+
+/*
+Recognizes:
+
+1. Question
+1) Question
+Q1. Question
+Q1) Question
+*/
+
+const parts = source.split(
+/(?=(?:^|\s)(?:Q(?:uestion)?\s*)?\d{1,4}\s*[\.\)]\s+)/gi
+);
+
+parts.forEach(function(part){
+
+part = part.trim();
+
+if(!part) return;
+
+const match = part.match(
+/^(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\)]\s+([\s\S]+)$/i
+);
+
+if(!match) return;
+
+const questionNumber = Number(match[1]);
+
+const body = match[2].trim();
+
+/*
+Recognizes:
+
+A.
+A)
+(A)
+(A).
+(A):
+*/
+
+const optionRegex =
+/(?:^|\s)\(?([A-D])\)?\s*[\.\):\-]\s+/gi;
+
+const positions = [];
+
+let optionMatch;
+
+while(
+(optionMatch = optionRegex.exec(body)) !== null
+){
+
+positions.push({
+
+letter:
+optionMatch[1].toUpperCase(),
+
+index:
+optionMatch.index,
+
+end:
+optionRegex.lastIndex
+
+});
+
+}
+
+if(positions.length < 2){
+
+return;
+
+}
+
+
+/* Question text */
+
+const questionText =
+body.substring(
+0,
+positions[0].index
+).trim();
+
+if(!questionText){
+
+return;
+
+}
+
+
+/* Options */
+
+const options = [];
+
+for(
+let i = 0;
+i < positions.length;
+i++
+){
+
+const start =
+positions[i].end;
+
+const end =
+i + 1 < positions.length
+? positions[i + 1].index
+: body.length;
+
+let option =
+body.substring(start,end)
+.trim()
+.replace(/\s+/g," ");
+
+option =
+option.replace(
+/(?:answer|ans|correct\s*answer)\s*[:\-]?\s*\(?[A-D]\)?\s*$/i,
+""
+).trim();
+
+if(option){
+
+options.push(option);
+
+}
+
+}
+
+if(
+questionText &&
+options.length >= 2
+){
+
+const answer =
+detectAnswer(
+body,
+options
+);
+
+questions.push({
+
+id:
+"pdf-" +
+Date.now() +
+"-" +
+questions.length,
+
+questionNumber:
+questionNumber,
+
+subject:
+"Imported",
+
+topic:
+"PDF Import",
+
+question:
+questionText,
+
+options:
+options,
+
+answer:
+answer,
+
+solution:
+"Review the original PDF solution or explanation.",
+
+source:
+"PDF",
+
+sourceType:
+"PDF Import",
+
+answerSource:
+answer >= 0
+? "Answer found inside question"
+: "Not yet detected"
+
+});
+
+}
+
+});
+
+console.log(
+"PDF parser detected:",
+questions.length,
+"questions"
+);
+
+return questions;
+
+};
+
+
+/* ---------- Keep questions for preview ---------- */
+
+validateQuestions = function(questions){
+
+return questions.filter(function(q){
+
+if(!q) return false;
+
+if(
+typeof q.question !== "string" ||
+!q.question.trim()
+){
+
+return false;
+
+}
+
+if(
+!Array.isArray(q.options) ||
+q.options.length < 2
+){
+
+return false;
+
+}
+
+q.options =
+q.options
+.map(function(option){
+return String(option).trim();
+})
+.filter(function(option){
+return option !== "";
+});
+
+if(q.options.length < 2){
+
+return false;
+
+}
+
+/*
+Do NOT delete questions merely because
+their answer wasn't detected.
+
+They remain visible in the PDF analysis.
+*/
+
+if(
+!Number.isInteger(q.answer) ||
+q.answer < 0 ||
+q.answer >= q.options.length
+){
+
+q.answer = -1;
+
+q.answerSource =
+"Answer not detected";
+
+}
+
+return true;
+
+});
+
+};
+
+console.log(
+"✅ PDF parser compatibility patch loaded"
+);
+
+})();
 </script>
 
 </body>
