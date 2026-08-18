@@ -932,8 +932,7 @@ function parseMCQs(text){
      */
 
     const questionRegex =
-        /(?:^|\n|\s{2,})(?:Q(?:uestion)?\s*)?(\d{1,3})(?:\s*[\.\):\-]|\s+(?=[A-Za-z]))/gi;
-
+    /(?:^|\s)(?:Q(?:uestion)?\s*)?(\d{1,3})(?:\s*[\.):\-])(?=\s)/gi;
     const starts = [];
 
     let match;
