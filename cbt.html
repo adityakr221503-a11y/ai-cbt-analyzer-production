@@ -186,10 +186,6 @@ background:#86efac;
 outline:3px solid #4f46e5;
 }
 
-.palette button.skipped{
-background:#e2e8f0;
-}
-
 #result{
 display:none;
 }
@@ -293,6 +289,15 @@ padding:20px;
 border-radius:12px;
 text-align:center;
 color:#64748b;
+}
+
+.info-box{
+background:#eef2ff;
+color:#3730a3;
+padding:14px;
+border-radius:10px;
+margin-bottom:15px;
+line-height:1.5;
 }
 
 @media(max-width:800px){
@@ -412,7 +417,6 @@ Next
 
 </section>
 
-
 <section id="result">
 
 <h2>🎯 Test Completed</h2>
@@ -453,7 +457,6 @@ onclick="location.href='index.html'">
 
 </main>
 
-
 <aside class="card">
 
 <h3>Question Palette</h3>
@@ -473,11 +476,12 @@ Submit Test
 </div>
 
 <script>
- "use strict";
+
+"use strict";
 
 /* =====================================================
    CBT ANALYZER PRO
-   PRODUCTION CBT ENGINE
+   COMPLETE PRODUCTION CBT ENGINE
 ===================================================== */
 
 
@@ -486,43 +490,47 @@ Submit Test
 ===================================================== */
 
 let questions = [];
+
 let current = 0;
 
 let answers = [];
+
 let marked = [];
 
 let submitted = false;
+
 let initialized = false;
 
 let timeLeft = 1800;
+
 let timerInterval = null;
 
 let testSource = "Fallback";
+
 let testStartedAt = Date.now();
 
 
 /* =====================================================
-   STORAGE KEYS
+   STORAGE
 ===================================================== */
 
 const STORAGE = {
 
-  PDF: "pdfCbtQuestions",
+PDF:"pdfCbtQuestions",
 
-  HISTORY: "cbtHistory",
+HISTORY:"cbtHistory",
 
-  RETRY_QUEUE: "cbtAnalyzer.retryQueue",
+RETRY_QUEUE:"cbtAnalyzer.retryQueue",
 
-  RETRY_QUESTION: "cbtRetryQuestion",
+RETRY_QUESTION:"cbtRetryQuestion",
 
-  RETRY_STARTED: "cbtRetryStartedAt"
+RETRY_STARTED:"cbtRetryStartedAt"
 
 };
 
 
 /* =====================================================
    FALLBACK QUESTIONS
-   ONLY USED WHEN NO VALID PDF TEST EXISTS
 ===================================================== */
 
 const fallbackQuestions = [
@@ -670,70 +678,39 @@ function normalizeAnswer(answer,options){
 
 if(
 answer === null ||
-answer === undefined
+answer === undefined ||
+answer === ""
 ){
 return null;
 }
 
 
-/* Numeric answer */
+/* Number */
+
+if(typeof answer === "number"){
 
 if(
-typeof answer === "number" &&
-Number.isInteger(answer)
-){
-
-if(
+Number.isInteger(answer) &&
 answer >= 0 &&
 answer < options.length
 ){
+
 return answer;
-}
 
 }
 
+}
 
-/* String answer */
+
+/* String */
 
 const value =
 String(answer).trim();
 
 
-/* Numeric string */
-
-if(/^\d+$/.test(value)){
-
-const number =
-Number(value);
-
-
-/* Zero-based */
-
-if(
-number >= 0 &&
-number < options.length
-){
-return number;
-}
-
-
-/* One-based */
-
-if(
-number >= 1 &&
-number <= options.length
-){
-return number-1;
-}
-
-}
-
-
 /* A/B/C/D */
 
-if(
-/^[A-Za-z]$/.test(value)
-){
+if(/^[A-Za-z]$/.test(value)){
 
 const index =
 value
@@ -744,7 +721,48 @@ if(
 index >= 0 &&
 index < options.length
 ){
+
 return index;
+
+}
+
+}
+
+
+/* Numeric string */
+
+if(/^\d+$/.test(value)){
+
+const number =
+Number(value);
+
+
+/*
+1 = A
+2 = B
+3 = C
+4 = D
+*/
+
+if(
+number >= 1 &&
+number <= options.length
+){
+
+return number-1;
+
+}
+
+
+/* Zero-based */
+
+if(
+number >= 0 &&
+number < options.length
+){
+
+return number;
+
 }
 
 }
@@ -768,7 +786,9 @@ return String(option)
 );
 
 if(found >= 0){
+
 return found;
+
 }
 
 return null;
@@ -777,7 +797,7 @@ return null;
 
 
 /* =====================================================
-   NORMALIZE PDF QUESTION
+   NORMALIZE QUESTION
 ===================================================== */
 
 function normalizeQuestion(q,index){
@@ -786,7 +806,9 @@ if(
 !q ||
 typeof q !== "object"
 ){
+
 return null;
+
 }
 
 
@@ -797,27 +819,75 @@ String(
 q.question ??
 q.questionText ??
 q.text ??
+q.question_text ??
 ""
 ).trim();
 
+
 if(!questionText){
+
 return null;
+
 }
 
 
 /* Options */
 
-let options =
-Array.isArray(q.options)
-? q.options
-: Array.isArray(q.choices)
-? q.choices
-: [];
+let options = [];
+
+
+if(Array.isArray(q.options)){
+
+options = q.options;
+
+}
+else if(Array.isArray(q.choices)){
+
+options = q.choices;
+
+}
+else if(Array.isArray(q.answers)){
+
+options = q.answers;
+
+}
+else{
+
+options = [
+
+q.optionA,
+q.optionB,
+q.optionC,
+q.optionD
+
+].filter(function(x){
+
+return (
+x !== undefined &&
+x !== null &&
+String(x).trim() !== ""
+);
+
+});
+
+}
 
 
 options =
 options
 .map(function(option){
+
+if(
+option &&
+typeof option === "object" &&
+option.text !== undefined
+){
+
+return String(
+option.text
+).trim();
+
+}
 
 return String(
 option ?? ""
@@ -832,18 +902,69 @@ return option !== "";
 
 
 if(options.length < 2){
+
 return null;
+
 }
 
 
 /* Correct answer */
 
+let rawAnswer =
+q.answer;
+
+
+if(
+rawAnswer === undefined ||
+rawAnswer === null ||
+rawAnswer === ""
+){
+
+rawAnswer =
+q.correctAnswer;
+
+}
+
+
+if(
+rawAnswer === undefined ||
+rawAnswer === null ||
+rawAnswer === ""
+){
+
+rawAnswer =
+q.correctIndex;
+
+}
+
+
+if(
+rawAnswer === undefined ||
+rawAnswer === null ||
+rawAnswer === ""
+){
+
+rawAnswer =
+q.correct;
+
+}
+
+
+if(
+rawAnswer === undefined ||
+rawAnswer === null ||
+rawAnswer === ""
+){
+
+rawAnswer =
+q.answerIndex;
+
+}
+
+
 const answer =
 normalizeAnswer(
-q.answer ??
-q.correctAnswer ??
-q.correctIndex ??
-q.correct,
+rawAnswer,
 options
 );
 
@@ -860,8 +981,6 @@ return null;
 }
 
 
-/* Return normalized object */
-
 return {
 
 id:
@@ -870,6 +989,7 @@ q.id ||
 
 subject:
 q.subject ||
+q.subjectName ||
 "PDF Import",
 
 topic:
@@ -891,6 +1011,7 @@ solution:
 String(
 q.solution ??
 q.explanation ??
+q.detailedSolution ??
 ""
 ),
 
@@ -941,32 +1062,111 @@ Boolean(q.bookmarked)
 
 
 /* =====================================================
+   EXTRACT QUESTION ARRAY
+===================================================== */
+
+function extractQuestionArray(data){
+
+if(Array.isArray(data)){
+
+return data;
+
+}
+
+
+if(
+data &&
+Array.isArray(data.questions)
+){
+
+return data.questions;
+
+}
+
+
+if(
+data &&
+Array.isArray(data.data)
+){
+
+return data.data;
+
+}
+
+
+if(
+data &&
+Array.isArray(data.items)
+){
+
+return data.items;
+
+}
+
+
+if(
+data &&
+Array.isArray(data.questionBank)
+){
+
+return data.questionBank;
+
+}
+
+
+return [];
+
+}
+
+
+/* =====================================================
    LOAD PDF QUESTIONS
+   IMPORTANT:
+   ONLY ONE DEFINITION
 ===================================================== */
 
 function loadPDFQuestions(){
 
+const possibleKeys = [
+
+"pdfCbtQuestions",
+
+"pdfQuestions",
+
+"cbtQuestions",
+
+"importedQuestions",
+
+"pdfQuestionBank",
+
+"questionBank"
+
+];
+
+
+for(
+const key of possibleKeys
+){
+
 const saved =
-localStorage.getItem(
-STORAGE.PDF
-);
+localStorage.getItem(key);
 
 
 if(!saved){
 
-console.log(
-"No pdfCbtQuestions found."
-);
-
-return false;
+continue;
 
 }
 
 
 try{
 
-const imported =
+const data =
 JSON.parse(saved);
+
+
+const imported =
+extractQuestionArray(data);
 
 
 if(
@@ -975,35 +1175,41 @@ imported.length === 0
 ){
 
 console.warn(
-"pdfCbtQuestions is empty."
+"Question key is empty:",
+key
 );
 
-return false;
+continue;
 
 }
 
 
 const normalized =
 imported
-.map(normalizeQuestion)
+.map(function(q,index){
+
+return normalizeQuestion(
+q,
+index
+);
+
+})
 .filter(Boolean);
 
 
 if(normalized.length === 0){
 
 console.warn(
-"PDF data exists but contains no valid questions."
+"No valid questions found in:",
+key
 );
 
-return false;
+continue;
 
 }
 
 
-/* IMPORTANT:
-   The CURRENT PDF test becomes
-   the active CBT test.
-*/
+/* SUCCESS */
 
 questions =
 normalized;
@@ -1013,9 +1219,25 @@ testSource =
 
 
 console.log(
-"CURRENT PDF CBT LOADED:",
-questions.length,
-"questions"
+"================================"
+);
+
+console.log(
+"PDF CBT SUCCESSFULLY LOADED"
+);
+
+console.log(
+"Storage key:",
+key
+);
+
+console.log(
+"Total questions:",
+questions.length
+);
+
+console.log(
+"================================"
 );
 
 
@@ -1025,8 +1247,20 @@ return true;
 }catch(error){
 
 console.error(
-"Could not load PDF CBT:",
+"PDF loading error:",
+key,
 error
+);
+
+}
+
+}
+
+
+/* No PDF */
+
+console.warn(
+"No valid PDF question bank found."
 );
 
 return false;
@@ -1038,196 +1272,129 @@ return false;
    INITIALIZE
 ===================================================== */
 
-/* =====================================================
-   LOAD PDF QUESTIONS
-===================================================== */
+function initialize(){
 
-function loadPDFQuestions(){
+if(initialized){
 
-    const possibleKeys = [
-        "pdfCbtQuestions",
-        "pdfQuestions",
-        "cbtQuestions",
-        "importedQuestions",
-        "pdfQuestionBank",
-        "questionBank"
-    ];
+return;
 
-    for(const key of possibleKeys){
+}
 
-        const saved = localStorage.getItem(key);
+initialized = true;
 
-        if(!saved){
-            continue;
-        }
+testStartedAt =
+Date.now();
 
-        try{
 
-            const imported = JSON.parse(saved);
+/* PDF FIRST */
 
-            if(
-                !Array.isArray(imported) ||
-                imported.length === 0
-            ){
-                continue;
-            }
+const pdfLoaded =
+loadPDFQuestions();
 
-            const normalized = imported
-                .map(function(q,index){
-                    return normalizeQuestion(q,index);
-                })
-                .filter(Boolean);
 
-            if(normalized.length === 0){
-                continue;
-            }
+/* FALLBACK ONLY IF PDF FAILED */
 
-            questions = normalized;
+if(!pdfLoaded){
 
-            testSource = "PDF Import";
+questions =
+fallbackQuestions.map(
+function(q){
 
-            console.log(
-                "PDF CBT LOADED:",
-                questions.length,
-                "questions",
-                "from:",
-                key
-            );
+return {
 
-            return true;
+...q,
 
-        }catch(error){
+options:[
+...q.options
+]
 
-            console.error(
-                "PDF loading error:",
-                key,
-                error
-            );
+};
 
-        }
+}
+);
 
-    }
+testSource =
+"Demo Test";
 
-    console.warn(
-        "No valid PDF question bank found."
-    );
 
-    return false;
+console.log(
+"Using fallback questions:",
+questions.length
+);
+
 }
 
 
-/* =====================================================
-   INITIALIZE
-===================================================== */
+/* Safety */
 
-function initialize(){
+if(!questions.length){
 
-    if(initialized){
-        return;
-    }
+showFatalError(
+"No questions are available for this test."
+);
 
-    initialized = true;
+return;
 
-    testStartedAt = Date.now();
+}
 
-    /* -----------------------------------------------
-       FIRST: LOAD IMPORTED PDF QUESTIONS
-    ------------------------------------------------ */
 
-    const pdfLoaded = loadPDFQuestions();
+/* Reset */
 
-    /* -----------------------------------------------
-       FALLBACK ONLY IF PDF IS NOT AVAILABLE
-    ------------------------------------------------ */
+answers =
+new Array(
+questions.length
+).fill(null);
 
-    if(!pdfLoaded){
 
-        questions = fallbackQuestions.map(function(q){
+marked =
+new Array(
+questions.length
+).fill(false);
 
-            return {...q};
 
-        });
+current = 0;
 
-        testSource = "Demo Test";
+submitted = false;
 
-        console.log(
-            "Using fallback questions:",
-            questions.length
-        );
 
-    }
+/* Source badge */
 
-    /* -----------------------------------------------
-       NO QUESTIONS
-    ------------------------------------------------ */
+const badge =
+document.getElementById(
+"sourceBadge"
+);
 
-    if(!questions.length){
 
-        showFatalError(
-            "No questions are available for this test."
-        );
+if(badge){
 
-        return;
-    }
+if(
+testSource === "PDF Import"
+){
 
-    /* -----------------------------------------------
-       RESET TEST STATE
-    ------------------------------------------------ */
+badge.textContent =
+"📄 PDF CBT — "+
+questions.length+
+" Questions";
 
-    answers = new Array(
-        questions.length
-    ).fill(null);
+}else{
 
-    marked = questions.map(function(q){
+badge.textContent =
+"📝 Demo CBT — "+
+questions.length+
+" Questions";
 
-        return Boolean(
-            q.bookmarked
-        );
+}
 
-    });
+}
 
-    current = 0;
 
-    submitted = false;
+/* Start */
 
-    /* -----------------------------------------------
-       SOURCE BADGE
-    ------------------------------------------------ */
+renderQuestion();
 
-    const badge =
-        document.getElementById(
-            "sourceBadge"
-        );
+renderPalette();
 
-    if(badge){
-
-        if(testSource === "PDF Import"){
-
-            badge.textContent =
-                "📄 PDF CBT — " +
-                questions.length +
-                " Questions";
-
-        }else{
-
-            badge.textContent =
-                "📝 Demo CBT — " +
-                questions.length +
-                " Questions";
-
-        }
-
-    }
-
-    /* -----------------------------------------------
-       RENDER TEST
-    ------------------------------------------------ */
-
-    renderQuestion();
-
-    renderPalette();
-
-    startTimer();
+startTimer();
 
 }
  /* =====================================================
@@ -1255,24 +1422,30 @@ String(minutes).padStart(2,"0") +
 String(seconds).padStart(2,"0");
 
 
-/* Timer warning */
-
 timer.classList.remove(
 "warning",
 "danger"
 );
 
+
 if(timeLeft <= 300){
 
-timer.classList.add("warning");
+timer.classList.add(
+"warning"
+);
 
 }
 
+
 if(timeLeft <= 60){
 
-timer.classList.remove("warning");
+timer.classList.remove(
+"warning"
+);
 
-timer.classList.add("danger");
+timer.classList.add(
+"danger"
+);
 
 }
 
@@ -1285,11 +1458,14 @@ timer.classList.add("danger");
 
 function startTimer(){
 
-clearInterval(timerInterval);
+clearInterval(
+timerInterval
+);
 
 timeLeft = 1800;
 
 updateTimer();
+
 
 timerInterval =
 setInterval(function(){
@@ -1303,6 +1479,7 @@ timerInterval
 return;
 
 }
+
 
 timeLeft--;
 
@@ -1331,22 +1508,34 @@ submitTest();
 function renderQuestion(){
 
 if(submitted){
+
 return;
+
 }
+
 
 const q =
 questions[current];
 
+
 if(!q){
+
 return;
+
 }
 
 
 /* Question number */
 
+const questionNumber =
 document.getElementById(
 "questionNumber"
-).textContent =
+);
+
+
+if(questionNumber){
+
+questionNumber.textContent =
 "Question " +
 (current + 1) +
 " of " +
@@ -1354,13 +1543,23 @@ questions.length +
 " • " +
 (q.subject || "PDF");
 
+}
+
 
 /* Question text */
 
+const question =
 document.getElementById(
 "question"
-).textContent =
+);
+
+
+if(question){
+
+question.textContent =
 q.question;
+
+}
 
 
 /* Options */
@@ -1369,6 +1568,14 @@ const box =
 document.getElementById(
 "options"
 );
+
+
+if(!box){
+
+return;
+
+}
+
 
 box.innerHTML = "";
 
@@ -1381,12 +1588,16 @@ document.createElement(
 "button"
 );
 
+
 button.type =
 "button";
+
 
 button.className =
 "option";
 
+
+/* Selected */
 
 if(
 answers[current] === index
@@ -1399,6 +1610,8 @@ button.classList.add(
 }
 
 
+/* Option text */
+
 button.textContent =
 String.fromCharCode(
 65 + index
@@ -1407,15 +1620,21 @@ String.fromCharCode(
 option;
 
 
+/* Click */
+
 button.onclick =
 function(){
 
 if(submitted){
+
 return;
+
 }
+
 
 answers[current] =
 index;
+
 
 renderQuestion();
 
@@ -1429,29 +1648,41 @@ button
 });
 
 
-/* Next / Finish */
+/* Next button */
 
 const nextButton =
 document.getElementById(
 "nextButton"
 );
 
+
 if(nextButton){
 
+if(
+current ===
+questions.length - 1
+){
+
 nextButton.textContent =
-current === questions.length - 1
-? "Finish"
-: "Next";
+"Finish";
+
+}else{
+
+nextButton.textContent =
+"Next";
+
+}
 
 }
 
 
-/* Previous button */
+/* Previous */
 
 const previousButton =
 document.getElementById(
 "previousButton"
 );
+
 
 if(previousButton){
 
@@ -1479,9 +1710,13 @@ document.getElementById(
 "palette"
 );
 
+
 if(!palette){
+
 return;
+
 }
+
 
 palette.innerHTML = "";
 
@@ -1494,8 +1729,10 @@ document.createElement(
 "button"
 );
 
+
 button.type =
 "button";
+
 
 button.textContent =
 index + 1;
@@ -1540,17 +1777,21 @@ button.classList.add(
 }
 
 
-/* Click */
+/* Navigation */
 
 button.onclick =
 function(){
 
 if(submitted){
+
 return;
+
 }
+
 
 current =
 index;
+
 
 renderQuestion();
 
@@ -1573,7 +1814,9 @@ button
 function nextQuestion(){
 
 if(submitted){
+
 return;
+
 }
 
 
@@ -1586,14 +1829,11 @@ current++;
 
 renderQuestion();
 
-return;
-
-}
-
-
-/* Last question */
+}else{
 
 confirmSubmit();
+
+}
 
 }
 
@@ -1605,7 +1845,9 @@ confirmSubmit();
 function previousQuestion(){
 
 if(submitted){
+
 return;
+
 }
 
 
@@ -1627,11 +1869,15 @@ renderQuestion();
 function clearAnswer(){
 
 if(submitted){
+
 return;
+
 }
+
 
 answers[current] =
 null;
+
 
 renderQuestion();
 
@@ -1645,13 +1891,17 @@ renderQuestion();
 function markReview(){
 
 if(submitted){
+
 return;
+
 }
+
 
 marked[current] =
 !marked[current];
 
-renderPalette();
+
+renderQuestion();
 
 }
 
@@ -1663,7 +1913,9 @@ renderPalette();
 function confirmSubmit(){
 
 if(submitted){
+
 return;
+
 }
 
 
@@ -1680,653 +1932,22 @@ return answer === null;
 if(unanswered > 0){
 
 const message =
-"You have " +
+"There are " +
 unanswered +
-" unanswered question" +
-(unanswered === 1 ? "" : "s") +
-".\n\n" +
-"Do you want to submit the test?";
+" unanswered question(s).\n\n" +
+"Do you still want to submit?";
 
 
 if(!confirm(message)){
-return;
-}
-
-}
-
-
-/* Submit */
- submitTest();
-
-}
-
-
-/* =====================================================
-   FATAL ERROR
-===================================================== */
-
-function showFatalError(message){
-
-const testScreen =
-document.getElementById(
-"testScreen"
-);
-
-if(testScreen){
-
-testScreen.innerHTML =
-'<div class="error-box">' +
-"<strong>Unable to load test</strong><br><br>" +
-escapeHTML(message) +
-"<br><br>" +
-'<button class="secondary" ' +
-'onclick="location.href=\'index.html\'">' +
-"Return to Dashboard" +
-"</button>" +
-"</div>";
-
-}
-
-const aside =
-document.querySelector(
-"aside"
-);
-
-if(aside){
-
-aside.style.display =
-"none";
-
-}
-
-}
- /* =====================================================
-   MISTAKE CLASSIFICATION
-===================================================== */
-
-function classifyMistake(q,selectedIndex){
-
-const text =
-String(
-q.question || ""
-).toLowerCase();
-
-
-/* Calculation */
-
-if(
-text.includes("calculate") ||
-text.includes("numerical") ||
-text.includes("find the") ||
-text.includes("value of") ||
-text.includes("velocity") ||
-text.includes("acceleration") ||
-text.includes("force") ||
-text.includes("calculate the")
-){
-
-return {
-
-type:"🔢 Calculation Error",
-
-reason:
-"Recheck the formula, units and calculation steps."
-
-};
-
-}
-
-
-/* Memory / Recall */
-
-if(
-text.includes("which") ||
-text.includes("what is") ||
-text.includes("symbol") ||
-text.includes("unit") ||
-text.includes("known as") ||
-text.includes("called")
-){
-
-return {
-
-type:"📚 Memory / Recall Gap",
-
-reason:
-"Revise the relevant factual information and test recall again."
-
-};
-
-}
-
-
-/* Default */
-
-return {
-
-type:"🧠 Concept Gap",
-
-reason:
-"Review the underlying concept and retry the question."
-
-};
-
-}
-
-
-/* =====================================================
-   GET QUESTION STATUS
-===================================================== */
-
-function getQuestionStatus(q,index){
-
-if(
-answers[index] === null
-){
-
-return "skipped";
-
-}
-
-if(
-answers[index] === q.answer
-){
-
-return "correct";
-
-}
-
-return "wrong";
-
-}
-
-
-/* =====================================================
-   CREATE HISTORY QUESTION
-===================================================== */
-
-function createHistoryQuestion(q,index){
-
-const status =
-getQuestionStatus(
-q,
-index
-);
-
-let intelligence =
-null;
-
-
-if(status === "wrong"){
-
-intelligence =
-classifyMistake(
-q,
-answers[index]
-);
-
-}
-
-
-return {
-
-id:
-q.id ||
-("history-"+Date.now()+"-"+index),
-
-question:
-q.question,
-
-options:
-Array.isArray(q.options)
-? q.options
-: [],
-
-subject:
-q.subject ||
-"",
-
-topic:
-q.topic ||
-"",
-
-status:
-status,
-
-selectedIndex:
-answers[index],
-
-selectedAnswer:
-answers[index] === null
-? "Not answered"
-: q.options[answers[index]],
-
-correctIndex:
-q.answer,
-
-correctAnswer:
-q.options[q.answer],
-
-mistakeType:
-intelligence
-? intelligence.type
-: null,
-
-mistakeReason:
-intelligence
-? intelligence.reason
-: null,
-
-solution:
-q.solution ||
-q.explanation ||
-"",
-
-explanation:
-q.explanation ||
-q.solution ||
-"",
-
-bookmarked:
-Boolean(
-marked[index]
-),
-
-markedForReview:
-Boolean(
-marked[index]
-),
-
-pdfPage:
-q.pdfPage ||
-"",
-
-pdfPageEnd:
-q.pdfPageEnd ||
-q.pdfPage ||
-"",
-
-chapter:
-q.chapter ||
-"",
-
-section:
-q.section ||
-"",
-
-answerSource:
-q.answerSource ||
-"",
-
-source:
-q.source ||
-"",
-
-sourceType:
-q.sourceType ||
-""
-
-};
-
-}
-
-
-/* =====================================================
-   SAVE TEST HISTORY
-===================================================== */
-
-function saveHistory(
-correct,
-incorrect,
-skipped,
-score
-){
-
-let history =
-readJSON(
-STORAGE.HISTORY,
-[]
-);
-
-
-if(!Array.isArray(history)){
-
-history = [];
-
-}
-
-
-const historyItem = {
-
-id:
-"test-"+Date.now(),
-
-date:
-new Date().toLocaleString(),
-
-timestamp:
-Date.now(),
-
-startedAt:
-testStartedAt,
-
-completedAt:
-Date.now(),
-
-source:
-testSource,
-
-sourceType:
-testSource === "PDF Import"
-? "PDF"
-: "CBT",
-
-totalQuestions:
-questions.length,
-
-score:
-score,
-
-correct:
-correct,
-
-incorrect:
-incorrect,
-
-wrong:
-incorrect,
-
-skipped:
-skipped,
-
-percentage:
-questions.length
-? Math.round(
-(score /
-(questions.length * 4))
-* 100
-)
-: 0,
-
-questions:
-questions.map(
-function(q,index){
-
-return createHistoryQuestion(
-q,
-index
-);
-
-}
-
-};
-
-
-history.push(
-historyItem
-);
-
-
-/* Keep existing history */
-
-try{
-
-localStorage.setItem(
-STORAGE.HISTORY,
-JSON.stringify(history)
-);
-
-}catch(error){
-
-console.error(
-"Could not save CBT history:",
-error
-);
-
-}
-
-}
-
-
-/* =====================================================
-   BUILD RETRY QUESTIONS
-===================================================== */
-
-function buildRetryQueue(){
-
-const wrong = [];
-
-
-questions.forEach(
-function(q,index){
-
-if(
-answers[index] === null
-){
-return;
-}
-
-
-if(
-answers[index] === q.answer
-){
-return;
-}
-
-
-const intelligence =
-classifyMistake(
-q,
-answers[index]
-);
-
-
-wrong.push({
-
-id:
-"retry-"+Date.now()+"-"+index,
-
-question:
-q.question,
-
-options:
-Array.isArray(q.options)
-? q.options
-: [],
-
-subject:
-q.subject ||
-"",
-
-topic:
-q.topic ||
-"",
-
-correctIndex:
-q.answer,
-
-correctAnswer:
-q.options[q.answer],
-
-solution:
-q.solution ||
-q.explanation ||
-"",
-
-explanation:
-q.explanation ||
-q.solution ||
-"",
-
-selectedIndex:
-answers[index],
-
-selectedAnswer:
-q.options[answers[index]],
-
-mistakeType:
-intelligence.type,
-
-mistakeReason:
-intelligence.reason,
-
-source:
-"CBT",
-
-sourceType:
-"CBT",
-
-pdfPage:
-q.pdfPage ||
-"",
-
-pdfPageEnd:
-q.pdfPageEnd ||
-q.pdfPage ||
-"",
-
-chapter:
-q.chapter ||
-"",
-
-section:
-q.section ||
-"",
-
-answerSource:
-q.answerSource ||
-"",
-
-bookmarked:
-Boolean(
-marked[index]
-)
-
-});
-
-});
-
-
-return wrong;
-
-}
-
-
-/* =====================================================
-   SAVE RETRY QUEUE
-===================================================== */
-
-function saveRetryQueue(wrong){
-
-try{
-
-localStorage.setItem(
-STORAGE.RETRY_QUEUE,
-JSON.stringify(wrong)
-);
-
-
-if(wrong.length > 0){
-
-localStorage.setItem(
-STORAGE.RETRY_QUESTION,
-JSON.stringify(
-wrong[0]
-)
-);
-
-localStorage.setItem(
-STORAGE.RETRY_STARTED,
-String(Date.now())
-);
-
-}
-
-}catch(error){
-
-console.error(
-"Could not save retry queue:",
-error
-);
-
-}
-
-}
-
-
-/* =====================================================
-   OPEN RETRY
-===================================================== */
-
-function openRetry(){
-
-if(!submitted){
 
 return;
 
 }
 
-
-const wrong =
-buildRetryQueue();
-
-
-if(!wrong.length){
-
-alert(
-"There are no mistakes to retry."
-);
-
-return;
-
 }
 
 
-/* Save complete queue */
-
-saveRetryQueue(
-wrong
-);
-
-
-/* Open existing retry page */
-
-location.href =
-"retry.html";
-
-}
-
-
-/* =====================================================
-   CLEAR OLD RETRY QUEUE
-   ONLY WHEN NEW RETRY IS CREATED
-===================================================== */
-
-function replaceRetryQueue(wrong){
-
-try{
-
-localStorage.setItem(
-STORAGE.RETRY_QUEUE,
-JSON.stringify(wrong)
-);
-
-if(wrong.length){
-
-localStorage.setItem(
-STORAGE.RETRY_QUESTION,
-JSON.stringify(
-wrong[0]
-)
-);
-
-}
-
-}catch(error){
-
-console.error(error);
-
-}
+submitTest();
 
 }
 
@@ -2344,110 +1965,274 @@ return;
 }
 
 
-let correct = 0;
-let incorrect = 0;
-let skipped = 0;
-
-
-questions.forEach(
-function(q,index){
-
-if(
-answers[index] === null
-){
-
-skipped++;
-
-}else if(
-answers[index] === q.answer
-){
-
-correct++;
-
-}else{
-
-incorrect++;
-
-}
-
-});
-
-
-/* NEET-style marking */
-
-const score =
-(correct * 4) -
-incorrect;
-
-
-/* Save history BEFORE showing result */
-
-saveHistory(
-correct,
-incorrect,
-skipped,
-score
-);
-
-
-/* Build retry queue */
-
-const wrong =
-buildRetryQueue();
-
-
-if(wrong.length){
-
-saveRetryQueue(
-wrong
-);
-
-}
-
-
 submitted = true;
 
-
-/* Stop timer */
 
 clearInterval(
 timerInterval
 );
 
 
-/* Disable submit */
+calculateResult();
 
-const submitButton =
-document.getElementById(
-"submitButton"
-);
+}
+ /* =====================================================
+   CALCULATE RESULT
+===================================================== */
 
-if(submitButton){
+function calculateResult(){
 
-submitButton.disabled =
-true;
+let correct = 0;
+
+let wrong = 0;
+
+let skipped = 0;
+
+const mistakes = [];
+
+
+questions.forEach(
+function(q,index){
+
+const selected =
+answers[index];
+
+
+/* Skipped */
+
+if(selected === null){
+
+skipped++;
+
+return;
 
 }
 
 
-/* Hide test */
+/* Correct */
 
-document.getElementById(
-"testScreen"
-).style.display =
-"none";
+if(selected === q.answer){
+
+correct++;
+
+return;
+
+}
 
 
-/* Hide palette */
+/* Wrong */
 
-const aside =
-document.querySelector(
-"aside"
+wrong++;
+
+
+/* Save mistake */
+
+mistakes.push({
+
+...q,
+
+selectedAnswer:
+selected,
+
+correctAnswer:
+q.answer,
+
+mistakeReason:
+classifyMistake(
+q,
+selected
+)
+
+});
+
+});
+
+
+/* Total */
+
+const total =
+questions.length;
+
+
+/*
+   NEET-style scoring:
+
+   Correct = +4
+   Wrong   = -1
+   Skipped = 0
+*/
+
+const score =
+(correct * 4) -
+wrong;
+
+
+const maxScore =
+total * 4;
+
+
+/* Show */
+
+showResult(
+correct,
+wrong,
+skipped,
+score,
+maxScore,
+mistakes
 );
 
-if(aside){
 
-aside.style.display =
+/* Save */
+
+saveHistory(
+correct,
+wrong,
+skipped,
+score,
+maxScore,
+mistakes
+);
+
+
+/* Mistake Bank */
+
+saveMistakes(
+mistakes
+);
+
+}
+
+
+/* =====================================================
+   MISTAKE CLASSIFICATION
+===================================================== */
+
+function classifyMistake(
+q,
+selectedIndex
+){
+
+const text =
+String(
+q.question || ""
+).toLowerCase();
+
+
+/* Calculation */
+
+if(
+
+text.includes("calculate") ||
+
+text.includes("calculation") ||
+
+text.includes("numerical") ||
+
+text.includes("find the") ||
+
+text.includes("value of") ||
+
+text.includes("velocity") ||
+
+text.includes("acceleration") ||
+
+text.includes("force") ||
+
+text.includes("mass") ||
+
+text.includes("molar") ||
+
+text.includes("concentration") ||
+
+text.includes("equilibrium") ||
+
+text.includes("pressure") ||
+
+text.includes("work done") ||
+
+text.includes("energy")
+
+){
+
+return "Calculation Error";
+
+}
+
+
+/* Misread */
+
+if(
+
+text.includes("incorrect") ||
+
+text.includes("not correct") ||
+
+text.includes("except") ||
+
+text.includes("false") ||
+
+text.includes("wrong statement")
+
+){
+
+return "Misread Question";
+
+}
+
+
+/* Concept */
+
+if(
+
+text.includes("according to") ||
+
+text.includes("concept") ||
+
+text.includes("principle") ||
+
+text.includes("statement") ||
+
+text.includes("which of the following")
+
+){
+
+return "Concept Gap";
+
+}
+
+
+/* Default */
+
+return "Concept Gap";
+
+}
+
+
+/* =====================================================
+   SHOW RESULT
+===================================================== */
+
+function showResult(
+correct,
+wrong,
+skipped,
+score,
+maxScore,
+mistakes
+){
+
+/* Hide test */
+
+const testScreen =
+document.getElementById(
+"testScreen"
+);
+
+
+if(testScreen){
+
+testScreen.style.display =
 "none";
 
 }
@@ -2455,65 +2240,143 @@ aside.style.display =
 
 /* Show result */
 
+const result =
 document.getElementById(
 "result"
-).style.display =
+);
+
+
+if(result){
+
+result.style.display =
 "block";
+
+}
+
+
+/* Hide submit */
+
+const submitButton =
+document.getElementById(
+"submitButton"
+);
+
+
+if(submitButton){
+
+submitButton.style.display =
+"none";
+
+}
 
 
 /* Score */
 
+const scoreBox =
 document.getElementById(
 "score"
-).textContent =
+);
+
+
+if(scoreBox){
+
+scoreBox.textContent =
 score +
 " / " +
-(questions.length * 4);
+maxScore;
+
+}
+
+
+/* Percentage */
+
+let percentage = 0;
+
+if(maxScore > 0){
+
+percentage =
+Math.round(
+(score / maxScore) * 100
+);
+
+}
 
 
 /* Summary */
 
+const summary =
 document.getElementById(
 "summary"
-).textContent =
-"Correct: " +
-correct +
-" | Incorrect: " +
-incorrect +
-" | Skipped: " +
-skipped;
+);
+
+
+if(summary){
+
+summary.innerHTML =
+
+"<div class='info-box'>" +
+
+"<strong>Test completed successfully.</strong><br><br>" +
+
+"Source: " +
+escapeHTML(testSource) +
+
+"<br>" +
+
+"Total Questions: " +
+questions.length +
+
+"<br>" +
+
+"Percentage: " +
+percentage +
+"%" +
+
+"</div>";
+
+}
 
 
 /* Statistics */
 
-const stats =
+const resultStats =
 document.getElementById(
 "resultStats"
 );
 
-if(stats){
 
-stats.innerHTML =
+if(resultStats){
 
-'<div class="stat">' +
+resultStats.innerHTML =
+
+"<div class='stat'>" +
+
 "<strong>" +
 correct +
 "</strong>" +
+
 "<small>Correct</small>" +
+
 "</div>" +
 
-'<div class="stat">' +
+"<div class='stat'>" +
+
 "<strong>" +
-incorrect +
+wrong +
 "</strong>" +
-"<small>Incorrect</small>" +
+
+"<small>Wrong</small>" +
+
 "</div>" +
 
-'<div class="stat">' +
+"<div class='stat'>" +
+
 "<strong>" +
 skipped +
 "</strong>" +
+
 "<small>Skipped</small>" +
+
 "</div>";
 
 }
@@ -2527,59 +2390,62 @@ document.getElementById(
 );
 
 
-if(
-retryButton &&
-incorrect > 0
-){
+if(retryButton){
+
+if(mistakes.length > 0){
 
 retryButton.style.display =
 "block";
 
-retryButton.textContent =
-"🔄 Retry " +
-incorrect +
-" Mistake" +
-(
-incorrect === 1
-? ""
-: "s"
-);
+}else{
+
+retryButton.style.display =
+"none";
+
+}
 
 }
 
 
 /* Review */
 
-generateReview();
+renderReview(
+mistakes
+);
 
 }
- /* =====================================================
+
+
+/* =====================================================
    QUESTION REVIEW
 ===================================================== */
 
-function generateReview(){
+function renderReview(
+mistakes
+){
 
 const box =
 document.getElementById(
 "review"
 );
 
+
 if(!box){
+
 return;
+
 }
 
+
 box.innerHTML =
-"<h3>🧠 Question Analysis</h3>";
+"<h3>Question Review</h3>";
 
 
 questions.forEach(
 function(q,index){
 
-const status =
-getQuestionStatus(
-q,
-index
-);
+const selected =
+answers[index];
 
 
 const item =
@@ -2587,198 +2453,144 @@ document.createElement(
 "div"
 );
 
+
 item.className =
-"review-item " +
-(
-status === "correct"
-? "correct"
-: status === "wrong"
-? "incorrect"
-: "skipped"
+"review-item";
+
+
+/* Status */
+
+if(selected === null){
+
+item.classList.add(
+"skipped"
 );
 
+}
+else if(
+selected === q.answer
+){
 
-/* Question */
+item.classList.add(
+"correct"
+);
+
+}
+else{
+
+item.classList.add(
+"incorrect"
+);
+
+}
+
+
+/* Your answer */
+
+let selectedText =
+"Not answered";
+
+
+if(
+selected !== null &&
+q.options[selected] !== undefined
+){
+
+selectedText =
+q.options[selected];
+
+}
+
+
+/* Correct */
+
+let correctText =
+"Not available";
+
+
+if(
+q.options[q.answer] !== undefined
+){
+
+correctText =
+q.options[q.answer];
+
+}
+
+
+/* HTML */
 
 item.innerHTML =
-"<strong>Q" +
+
+"<strong>" +
+
 (index + 1) +
+
 ". " +
+
 escapeHTML(
 q.question
 ) +
-"</strong>";
 
+"</strong>" +
 
-/* Answers */
+"<div class='meta'>" +
 
-const yourAnswer =
-answers[index] === null
-? "Not answered"
-: q.options[
-answers[index]
-];
+"Subject: " +
 
+escapeHTML(
+q.subject || "Unknown"
+) +
 
-const correctAnswer =
-q.options[
-q.answer
-];
+" • Topic: " +
 
+escapeHTML(
+q.topic || "Unknown"
+) +
 
-item.innerHTML +=
+"</div>" +
 
-"<p>" +
+"<div style='margin-top:10px'>" +
 
 "<b>Your answer:</b> " +
+
 escapeHTML(
-yourAnswer
+selectedText
 ) +
 
-"<br>" +
+"</div>" +
+
+"<div style='margin-top:6px'>" +
 
 "<b>Correct answer:</b> " +
+
 escapeHTML(
-correctAnswer
+correctText
 ) +
 
-"</p>";
+"</div>" +
 
+(
 
-/* Solution */
+q.solution
 
-const solution =
-q.solution ||
-q.explanation ||
-"";
+?
 
+"<div class='analysis'>" +
 
-if(solution){
-
-item.innerHTML +=
-
-'<div class="analysis">' +
-
-"<b>💡 Solution</b><br>" +
+"<b>Solution:</b><br>" +
 
 escapeHTML(
-solution
+q.solution
 ) +
 
-"</div>";
+"</div>"
 
-}
+:
 
+""
 
-/* Mistake intelligence */
-
-if(status === "wrong"){
-
-const intelligence =
-classifyMistake(
-q,
-answers[index]
 );
-
-
-item.innerHTML +=
-
-'<div class="analysis">' +
-
-"<b>" +
-escapeHTML(
-intelligence.type
-) +
-"</b><br>" +
-
-escapeHTML(
-intelligence.reason
-) +
-
-"</div>";
-
-}
-
-
-/* PDF information */
-
-if(
-q.pdfPage ||
-q.chapter ||
-q.section
-){
-
-let meta = "";
-
-
-if(q.pdfPage){
-
-meta +=
-"📄 PDF Page: " +
-escapeHTML(
-q.pdfPage
-);
-
-}
-
-
-if(q.pdfPageEnd &&
-q.pdfPageEnd !== q.pdfPage){
-
-meta +=
-" – " +
-escapeHTML(
-q.pdfPageEnd
-);
-
-}
-
-
-if(q.chapter){
-
-meta +=
-" | Chapter: " +
-escapeHTML(
-q.chapter
-);
-
-}
-
-
-if(q.section){
-
-meta +=
-" | Section: " +
-escapeHTML(
-q.section
-);
-
-}
-
-
-item.innerHTML +=
-
-'<div class="meta">' +
-meta +
-"</div>";
-
-}
-
-
-/* Source */
-
-if(q.source){
-
-item.innerHTML +=
-
-'<div class="meta">' +
-"Source: " +
-escapeHTML(
-q.source
-) +
-"</div>";
-
-}
 
 
 box.appendChild(
@@ -2791,10 +2603,465 @@ item
 
 
 /* =====================================================
-   ESCAPE HTML
+   SAVE TEST HISTORY
 ===================================================== */
 
-function escapeHTML(value){
+function saveHistory(
+correct,
+wrong,
+skipped,
+score,
+maxScore,
+mistakes
+){
+
+let history =
+readJSON(
+STORAGE.HISTORY,
+[]
+);
+
+
+if(!Array.isArray(history)){
+
+history = [];
+
+}
+
+
+/* Test record */
+
+const record = {
+
+id:
+"test-" +
+Date.now(),
+
+date:
+new Date().toISOString(),
+
+timestamp:
+Date.now(),
+
+startedAt:
+testStartedAt,
+
+completedAt:
+Date.now(),
+
+source:
+testSource,
+
+totalQuestions:
+questions.length,
+
+correct:
+correct,
+
+wrong:
+wrong,
+
+skipped:
+skipped,
+
+score:
+score,
+
+maxScore:
+maxScore,
+
+percentage:
+maxScore > 0
+?
+Math.round(
+(score / maxScore) * 100
+)
+:
+0,
+
+questions:
+questions.map(
+function(q,index){
+
+return {
+
+...q,
+
+selectedAnswer:
+answers[index],
+
+marked:
+marked[index]
+
+};
+
+}
+
+)
+
+};
+
+
+/* Add latest first */
+
+history.unshift(
+record
+);
+
+
+/* Keep latest 100 */
+
+history =
+history.slice(
+0,
+100
+);
+
+
+/* Save */
+
+try{
+
+localStorage.setItem(
+STORAGE.HISTORY,
+JSON.stringify(
+history
+)
+);
+
+console.log(
+"Test history saved."
+);
+
+}catch(error){
+
+console.error(
+"Could not save test history:",
+error
+);
+
+}
+
+}
+
+
+/* =====================================================
+   SAVE MISTAKES
+===================================================== */
+
+function saveMistakes(
+mistakes
+){
+
+if(
+!Array.isArray(mistakes) ||
+mistakes.length === 0
+){
+
+return;
+
+}
+
+
+let existing =
+readJSON(
+"cbtMistakes",
+[]
+);
+
+
+if(!Array.isArray(existing)){
+
+existing = [];
+
+}
+
+
+/* Add mistakes */
+
+mistakes.forEach(
+function(q){
+
+existing.push({
+
+id:
+"mistake-" +
+Date.now() +
+"-" +
+Math.random()
+.toString(36)
+.substring(2,8),
+
+question:
+q.question,
+
+options:
+q.options,
+
+answer:
+q.answer,
+
+selectedAnswer:
+q.selectedAnswer,
+
+correctAnswer:
+q.correctAnswer,
+
+subject:
+q.subject,
+
+topic:
+q.topic,
+
+mistakeType:
+q.mistakeReason,
+
+mistakeReason:
+q.mistakeReason,
+
+solution:
+q.solution || "",
+
+explanation:
+q.explanation || "",
+
+date:
+new Date().toISOString(),
+
+timestamp:
+Date.now(),
+
+source:
+testSource,
+
+mastered:
+false
+
+});
+
+});
+
+
+/* Keep latest 500 */
+
+existing =
+existing.slice(
+-500
+);
+
+
+/* Save */
+
+try{
+
+localStorage.setItem(
+"cbtMistakes",
+JSON.stringify(
+existing
+)
+);
+
+console.log(
+"Mistakes saved:",
+mistakes.length
+);
+
+}catch(error){
+
+console.error(
+"Mistake save error:",
+error
+);
+
+}
+
+ }
+ /* =====================================================
+   RETRY MISTAKES
+===================================================== */
+
+function openRetry(){
+
+const mistakes =
+readJSON(
+"cbtMistakes",
+[]
+);
+
+
+if(
+!Array.isArray(mistakes) ||
+mistakes.length === 0
+){
+
+alert(
+"No mistakes available for retry."
+);
+
+return;
+
+}
+
+
+/*
+   Only retry mistakes that are
+   not mastered.
+*/
+
+const retryQuestions =
+mistakes
+.filter(function(item){
+
+return item.mastered !== true;
+
+})
+.map(function(item){
+
+return {
+
+id:
+item.id,
+
+subject:
+item.subject ||
+"Unknown",
+
+topic:
+item.topic ||
+"Unknown",
+
+question:
+item.question,
+
+options:
+item.options,
+
+answer:
+item.correctAnswer ??
+item.answer,
+
+solution:
+item.solution ||
+"",
+
+explanation:
+item.explanation ||
+"",
+
+source:
+"Mistake Retry"
+
+};
+
+});
+
+
+if(
+retryQuestions.length === 0
+){
+
+alert(
+"All your saved mistakes are mastered."
+);
+
+return;
+
+}
+
+
+/* Save retry queue */
+
+try{
+
+localStorage.setItem(
+STORAGE.RETRY_QUEUE,
+JSON.stringify(
+retryQuestions
+)
+);
+
+
+localStorage.setItem(
+STORAGE.RETRY_STARTED,
+String(
+Date.now()
+)
+);
+
+
+/* Open retry page */
+
+window.location.href =
+"retry.html";
+
+
+}catch(error){
+
+console.error(
+"Retry error:",
+error
+);
+
+
+alert(
+"Could not open retry test."
+);
+
+}
+
+}
+
+
+/* =====================================================
+   FATAL ERROR
+===================================================== */
+
+function showFatalError(
+message
+){
+
+const testScreen =
+document.getElementById(
+"testScreen"
+);
+
+
+if(!testScreen){
+
+return;
+
+}
+
+
+testScreen.innerHTML =
+
+"<div class='error-box'>" +
+
+"<strong>CBT Error</strong>" +
+
+"<br><br>" +
+
+escapeHTML(
+message
+) +
+
+"<br><br>" +
+
+"Please return to the Dashboard " +
+"and open the test again." +
+
+"</div>";
+
+}
+
+
+/* =====================================================
+   HTML ESCAPE
+===================================================== */
+
+function escapeHTML(
+value
+){
 
 return String(
 value ?? ""
@@ -2829,56 +3096,82 @@ value ?? ""
 
 
 /* =====================================================
-   PROTECT AGAINST DOUBLE SUBMIT
+   KEYBOARD NAVIGATION
+===================================================== */
+
+document.addEventListener(
+"keydown",
+function(event){
+
+if(submitted){
+
+return;
+
+}
+
+
+/* Right arrow */
+
+if(
+event.key ===
+ "ArrowRight"
+){
+
+nextQuestion();
+
+}
+
+
+/* Left arrow */
+
+if(
+event.key ===
+"ArrowLeft"
+){
+
+previousQuestion();
+
+}
+
+});
+
+
+/* =====================================================
+   PREVENT ACCIDENTAL RELOAD
 ===================================================== */
 
 window.addEventListener(
 "beforeunload",
-function(){
+function(event){
 
-if(!submitted){
+if(
+!submitted &&
+questions.length > 0
+){
 
-/*
-  We intentionally do not
-  delete any saved data here.
-*/
+event.preventDefault();
+
+event.returnValue = "";
 
 }
 
-}
-);
+});
 
 
 /* =====================================================
-   START APPLICATION
+   START CBT
 ===================================================== */
 
 document.addEventListener(
 "DOMContentLoaded",
 function(){
 
-try {
-
 initialize();
 
-} catch(error) {
-
-console.error(
-"CBT initialization failed:",
-error
-);
-
-showFatalError(
-"CBT loading error: " + error.message
-);
-
-}
+});
 
 
-/* =====================================================
-   END CBT ENGINE
-===================================================== */
 </script>
 
 </body>
-</html>
+</html
