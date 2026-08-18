@@ -887,287 +887,347 @@ return map;
 PARSE MCQs
 ===================================================== */
 
+
+
 function parseMCQs(text){
 
-const questions=[];
+    const questions = [];
 
-text=String(text||"")
-.replace(/\r/g,"\n")
-.replace(/[ \t]+/g," ")
-.replace(/\n[ \t]+/g,"\n")
-.trim();
+    text = String(text || "")
+        .replace(/\r/g, "\n")
+        .replace(/\u00a0/g, " ")
+        .replace(/[ \t]+/g, " ")
+        .trim();
 
-/*
-Convert common option formats to a
-consistent form.
+    /*
+     * Normalize option labels.
+     *
+     * Supports:
+     * (A)   A)   A.   [A]
+     */
 
-(A)   -> A.
-(B)   -> B.
-A)    -> A.
-B)    -> B.
-*/
+    text = text
+        .replace(/\(\s*A\s*\)/gi, "\nA. ")
+        .replace(/\(\s*B\s*\)/gi, "\nB. ")
+        .replace(/\(\s*C\s*\)/gi, "\nC. ")
+        .replace(/\(\s*D\s*\)/gi, "\nD. ")
+        .replace(/\[\s*A\s*\]/gi, "\nA. ")
+        .replace(/\[\s*B\s*\]/gi, "\nB. ")
+        .replace(/\[\s*C\s*\]/gi, "\nC. ")
+        .replace(/\[\s*D\s*\]/gi, "\nD. ");
 
-text=text
-.replace(/\(\s*A\s*\)\s*/gi,"\nA. ")
-.replace(/\(\s*B\s*\)\s*/gi,"\nB. ")
-.replace(/\(\s*C\s*\)\s*/gi,"\nC. ")
-.replace(/\(\s*D\s*\)\s*/gi,"\nD. ")
-.replace(/(^|\s)A\)\s*/gi,"$1A. ")
-.replace(/(^|\s)B\)\s*/gi,"$1B. ")
-.replace(/(^|\s)C\)\s*/gi,"$1C. ")
-.replace(/(^|\s)D\)\s*/gi,"$1D. ");
+    /*
+     * IMPORTANT:
+     * Accept question numbers with:
+     *
+     * 1
+     * 1.
+     * 1)
+     * Q1
+     * Q1.
+     *
+     * A question number must appear at the
+     * beginning of a line or after substantial
+     * whitespace.
+     */
+
+    const questionRegex =
+        /(?:^|\n|\s{2,})(?:Q(?:uestion)?\s*)?(\d{1,3})(?:\s*[\.\):\-]|\s+(?=[A-Za-z]))/gi;
+
+    const starts = [];
+
+    let match;
+
+    while ((match = questionRegex.exec(text)) !== null) {
+
+        starts.push({
+            number: Number(match[1]),
+            start: match.index,
+            contentStart: questionRegex.lastIndex
+        });
+
+    }
+
+    /*
+     * Remove duplicate / false question starts.
+     */
+
+    const cleanStarts = [];
+
+    starts.forEach(function(item){
+
+        if (
+            !cleanStarts.length ||
+            item.start >
+            cleanStarts[cleanStarts.length - 1].start + 10
+        ){
+
+            cleanStarts.push(item);
+
+        }
+
+    });
 
 
-/*
-Find numbered questions.
-Supports:
+    /*
+     * Build individual question blocks.
+     */
 
-1.
-1)
-Q1.
-Q1)
-Question 1.
-*/
+    for(
+        let i = 0;
+        i < cleanStarts.length;
+        i++
+    ){
 
-const questionRegex=
-/(?:^|\n)\s*(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\)]\s+/gi;
+        const current = cleanStarts[i];
 
-const starts=[];
+        const end =
+            i + 1 < cleanStarts.length
+                ? cleanStarts[i + 1].start
+                : text.length;
 
-let match;
+        let block =
+            text.substring(
+                current.contentStart,
+                end
+            ).trim();
 
-while(
-(match=questionRegex.exec(text))!==null
-){
+        if(!block){
+            continue;
+        }
 
-starts.push({
-number:Number(match[1]),
-start:match.index,
-contentStart:questionRegex.lastIndex
-});
+
+        /*
+         * Ignore obvious answer-key material.
+         */
+
+        if(
+            /^(?:answer\s*key|solutions?\s*key|answers?\s*:)/i
+                .test(block)
+        ){
+
+            continue;
+
+        }
+
+
+        /*
+         * Find option labels.
+         */
+
+        const optionRegex =
+            /(?:^|\n|\s)([A-D])\s*[\.\):]\s+/gi;
+
+        const optionsFound = [];
+
+        let optionMatch;
+
+        while(
+            (optionMatch =
+                optionRegex.exec(block)) !== null
+        ){
+
+            optionsFound.push({
+
+                letter:
+                    optionMatch[1].toUpperCase(),
+
+                start:
+                    optionMatch.index,
+
+                contentStart:
+                    optionRegex.lastIndex
+
+            });
+
+        }
+
+
+        /*
+         * Need at least A/B.
+         */
+
+        if(optionsFound.length < 2){
+            continue;
+        }
+
+
+        /*
+         * Question text.
+         */
+
+        let questionText =
+            block.substring(
+                0,
+                optionsFound[0].start
+            )
+            .replace(/\s+/g, " ")
+            .trim();
+
+
+        if(!questionText){
+            continue;
+        }
+
+
+        /*
+         * Extract options.
+         */
+
+        const options = [];
+
+        for(
+            let j = 0;
+            j < optionsFound.length;
+            j++
+        ){
+
+            const start =
+                optionsFound[j].contentStart;
+
+            const end =
+                j + 1 < optionsFound.length
+                    ? optionsFound[j + 1].start
+                    : block.length;
+
+            let option =
+                block.substring(
+                    start,
+                    end
+                )
+                .replace(/\s+/g, " ")
+                .trim();
+
+
+            /*
+             * Remove answer text accidentally
+             * attached to final option.
+             */
+
+            option =
+                option.replace(
+                    /(?:answer|ans|correct\s*answer)\s*[:\-]?\s*[A-D]\s*$/i,
+                    ""
+                )
+                .trim();
+
+
+            if(option){
+                options.push(option);
+            }
+
+        }
+
+
+        if(options.length < 2){
+            continue;
+        }
+
+
+        /*
+         * Detect answer printed inside question.
+         */
+
+        let answer = -1;
+
+        const answerMatch =
+            block.match(
+                /(?:answer|ans|correct\s*answer|correct\s*option)\s*[:\-]?\s*\(?([A-D])\)?/i
+            );
+
+
+        if(answerMatch){
+
+            answer =
+                answerMatch[1]
+                    .toUpperCase()
+                    .charCodeAt(0) - 65;
+
+        }
+
+
+        /*
+         * Use global answer key if available.
+         */
+
+        if(
+            answer < 0 &&
+            typeof answerKey === "object" &&
+            answerKey !== null &&
+            answerKey[current.number] !== undefined
+        ){
+
+            answer =
+                Number(
+                    answerKey[current.number]
+                );
+
+        }
+
+
+        questions.push({
+
+            id:
+                "pdf-" +
+                Date.now() +
+                "-" +
+                questions.length,
+
+            questionNumber:
+                current.number,
+
+            subject:
+                "Imported",
+
+            topic:
+                "PDF Import",
+
+            question:
+                questionText,
+
+            options:
+                options,
+
+            answer:
+                Number.isInteger(answer)
+                    ? answer
+                    : -1,
+
+            solution:
+                "Review the original PDF solution.",
+
+            source:
+                "PDF",
+
+            sourceType:
+                "PDF Import",
+
+            answerSource:
+                answer >= 0
+                    ? "Answer detected"
+                    : "Answer not detected"
+
+        });
+
+    }
+
+
+    console.log(
+        "================================"
+    );
+
+    console.log(
+        "QUESTIONS DETECTED:",
+        questions.length
+    );
+
+    console.log(
+        "================================"
+    );
+
+    return questions;
 
 }
-
-
-for(
-let i=0;
-i<starts.length;
-i++
-){
-
-const item=starts[i];
-
-const end=
-i+1<starts.length
-?starts[i+1].start
-:text.length;
-
-let block=
-text.substring(
-item.contentStart,
-end
-).trim();
-
-
-/*
-Stop at obvious answer-key section.
-*/
-
-block=
-block.replace(
-/(?:^|\n)\s*(?:answer\s*key|answers?\s*key|solutions?\s*key)[\s\S]*$/i,
-""
-).trim();
-
-
-/*
-Find A/B/C/D.
-*/
-
-const optionRegex=
-/(?:^|\n|\s)([A-D])\.\s+/gi;
-
-const optionsFound=[];
-
-let optionMatch;
-
-while(
-(optionMatch=optionRegex.exec(block))!==null
-){
-
-optionsFound.push({
-
-letter:
-optionMatch[1].toUpperCase(),
-
-start:
-optionMatch.index,
-
-contentStart:
-optionRegex.lastIndex
-
-});
-
-}
-
-
-if(optionsFound.length<2){
-
-continue;
-
-}
-
-
-/*
-Question text.
-*/
-
-const questionText=
-block.substring(
-0,
-optionsFound[0].start
-).trim();
-
-
-if(!questionText){
-
-continue;
-
-}
-
-
-/*
-Options.
-*/
-
-const options=[];
-
-for(
-let j=0;
-j<optionsFound.length;
-j++
-){
-
-const start=
-optionsFound[j].contentStart;
-
-const end=
-j+1<optionsFound.length
-?optionsFound[j+1].start
-:block.length;
-
-let option=
-block
-.substring(start,end)
-.trim()
-.replace(/\s+/g," ");
-
-if(option){
-
-options.push(option);
-
-}
-
-}
-
-
-if(options.length<2){
-
-continue;
-
-}
-
-
-/*
-Detect answer printed with question.
-*/
-
-let answer=-1;
-
-const answerMatch=
-block.match(
-/(?:answer|ans|correct\s*answer|correct\s*option)\s*[:\-]?\s*\(?([A-D])\)?/i
-);
-
-if(answerMatch){
-
-answer=
-answerMatch[1]
-.toUpperCase()
-.charCodeAt(0)-65;
-
-}
-
-
-/*
-Also check global answer key.
-*/
-
-if(
-answer<0 &&
-answerKey &&
-answerKey[item.number] !== undefined
-){
-
-answer=
-answerKey[item.number];
-
-}
-
-
-questions.push({
-
-id:
-"pdf-"+Date.now()+"-"+i,
-
-questionNumber:
-item.number,
-
-subject:
-"Imported",
-
-topic:
-"PDF Import",
-
-question:
-questionText,
-
-options:
-options,
-
-answer:
-answer,
-
-solution:
-"Review the original PDF solution.",
-
-source:
-"PDF",
-
-sourceType:
-"PDF Import",
-
-answerSource:
-answer>=0
-?"Answer detected"
-:"Answer not detected"
-
-});
-
-}
-
-
-console.log(
-"PDF parser:",
-questions.length,
-"questions detected"
-);
-
-return questions;
-
-}
-
-
 
 
 
