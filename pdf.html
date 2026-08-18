@@ -2061,6 +2061,504 @@ document.addEventListener("DOMContentLoaded", function(){
     }
 
 });
+  /* =====================================================
+   MIXED COLUMN PDF EXTRACTION PATCH
+===================================================== */
+
+async function extractPDFTextInReadingOrder(pdf){
+
+    let pages = [];
+
+    for(
+        let pageNumber = 1;
+        pageNumber <= pdf.numPages;
+        pageNumber++
+    ){
+
+        setStatus(
+            "⏳ Reading page " +
+            pageNumber +
+            " of " +
+            pdf.numPages +
+            "..."
+        );
+
+        const page =
+            await pdf.getPage(pageNumber);
+
+        const content =
+            await page.getTextContent();
+
+        const items =
+            content.items
+            .filter(function(item){
+
+                return item.str &&
+                       String(item.str).trim() !== "";
+
+            })
+            .map(function(item){
+
+                return {
+
+                    text:
+                        String(item.str).trim(),
+
+                    x:
+                        item.transform
+                        ? item.transform[4]
+                        : 0,
+
+                    y:
+                        item.transform
+                        ? item.transform[5]
+                        : 0,
+
+                    width:
+                        item.width || 0
+
+                };
+
+            });
+
+        if(!items.length){
+
+            pages.push("");
+
+            continue;
+
+        }
+
+
+        /*
+         * Estimate page width.
+         */
+
+        let pageWidth = 0;
+
+        try{
+
+            const viewport =
+                page.getViewport({
+                    scale:1
+                });
+
+            pageWidth =
+                viewport.width;
+
+        }catch(e){
+
+            pageWidth =
+                Math.max.apply(
+                    null,
+                    items.map(function(x){
+                        return x.x+x.width;
+                    })
+                );
+
+        }
+
+
+        /*
+         * Detect whether the page contains
+         * two distinct text columns.
+         */
+
+        const left =
+            items.filter(function(item){
+
+                return item.x <
+                    pageWidth * 0.48;
+
+            });
+
+        const right =
+            items.filter(function(item){
+
+                return item.x >=
+                    pageWidth * 0.48;
+
+            });
+
+
+        /*
+         * Only use two-column mode when
+         * both columns contain substantial text.
+         */
+
+        const isTwoColumn =
+            left.length >= 8 &&
+            right.length >= 8;
+
+
+        function sortColumn(list){
+
+            return list.sort(
+                function(a,b){
+
+                    /*
+                     * PDF y coordinates usually
+                     * increase upward, so reverse y.
+                     */
+
+                    const yDifference =
+                        b.y-a.y;
+
+                    if(
+                        Math.abs(yDifference)>3
+                    ){
+
+                        return yDifference;
+
+                    }
+
+                    return a.x-b.x;
+
+                }
+            );
+
+        }
+
+
+        let ordered=[];
+
+
+        if(isTwoColumn){
+
+            sortColumn(left);
+
+            sortColumn(right);
+
+            ordered =
+                left.concat(right);
+
+        }else{
+
+            ordered =
+                sortColumn(items);
+
+        }
+
+
+        /*
+         * Reconstruct lines.
+         */
+
+        const lines=[];
+
+        ordered.forEach(function(item){
+
+            let line =
+                lines.length
+                ? lines[lines.length-1]
+                : null;
+
+
+            if(
+                !line ||
+                Math.abs(
+                    line.y-item.y
+                ) > 4
+            ){
+
+                line = {
+
+                    y:item.y,
+
+                    items:[]
+
+                };
+
+                lines.push(line);
+
+            }
+
+
+            line.items.push(item);
+
+        });
+
+
+        const pageText =
+            lines.map(function(line){
+
+                line.items.sort(
+                    function(a,b){
+                        return a.x-b.x;
+                    }
+                );
+
+                return line.items
+                    .map(function(item){
+                        return item.text;
+                    })
+                    .join(" ")
+                    .replace(/\s+/g," ")
+                    .trim();
+
+            })
+            .filter(Boolean)
+            .join("\n");
+
+
+        pages.push(pageText);
+
+    }
+
+
+    return pages.join("\n\n");
+
+}
+
+
+/* =====================================================
+   OVERRIDE READ PDF
+===================================================== */
+
+const originalReadPDF =
+    window.readPDF;
+
+
+window.readPDF =
+async function(){
+
+    const input =
+        document.getElementById("pdfFile");
+
+    const file =
+        input && input.files
+        ? input.files[0]
+        : null;
+
+
+    if(!file){
+
+        setStatus(
+            "❌ Please choose a PDF first."
+        );
+
+        return;
+
+    }
+
+
+    if(!window.pdfjsLib){
+
+        setStatus(
+            "❌ PDF reader could not load."
+        );
+
+        return;
+
+    }
+
+
+    setStatus(
+        "⏳ Opening PDF..."
+    );
+
+
+    detectedQuestions=[];
+
+    answerKey={};
+
+    pdfLoaded=false;
+
+
+    try{
+
+        const buffer =
+            await file.arrayBuffer();
+
+
+        const pdf =
+            await pdfjsLib
+            .getDocument({
+                data:buffer
+            })
+            .promise;
+
+
+        /*
+         * NEW:
+         * Read pages in visual order,
+         * including mixed columns.
+         */
+
+        let allText =
+            await extractPDFTextInReadingOrder(pdf);
+
+
+        if(!allText.trim()){
+
+            setStatus(
+                "⚠️ PDF contains no readable text."
+            );
+
+            showPreview();
+
+            return;
+
+        }
+
+
+        allText =
+            normalizePDFText(allText);
+
+
+        /*
+         * Answer key.
+         */
+
+        answerKey =
+            extractGlobalAnswerKey(allText);
+
+
+        /*
+         * Remove answer-key section
+         * from question parsing.
+         */
+
+        const questionText =
+            removeAnswerKeySection(
+                allText
+            );
+
+
+        /*
+         * Parse questions.
+         */
+
+        detectedQuestions =
+            parseMCQs(
+                questionText
+            );
+
+
+        /*
+         * Apply global answers.
+         */
+
+        detectedQuestions =
+            applyAnswerKey(
+                detectedQuestions,
+                answerKey
+            );
+
+
+        /*
+         * Validate but DON'T destroy
+         * unanswered questions.
+         */
+
+        detectedQuestions =
+            validateQuestions(
+                detectedQuestions
+            );
+
+
+        if(
+            !detectedQuestions.length
+        ){
+
+            setStatus(
+                "⚠️ PDF was read, but no MCQs were detected."
+            );
+
+            showPreview();
+
+            return;
+
+        }
+
+
+        pdfLoaded=true;
+
+
+        /*
+         * Save all detected questions.
+         */
+
+        localStorage.setItem(
+            "pdfCbtQuestions",
+            JSON.stringify(
+                detectedQuestions
+            )
+        );
+
+
+        const answerCount =
+            detectedQuestions.filter(
+                function(q){
+
+                    return (
+                        Number.isInteger(
+                            q.answer
+                        ) &&
+                        q.answer >= 0
+                    );
+
+                }
+            ).length;
+
+
+        const missing =
+            detectedQuestions.length -
+            answerCount;
+
+
+        if(missing===0){
+
+            setStatus(
+                "✅ " +
+                detectedQuestions.length +
+                " questions detected and all " +
+                answerCount +
+                " answers matched. Tap Start CBT."
+            );
+
+        }else{
+
+            setStatus(
+                "⚠️ " +
+                detectedQuestions.length +
+                " questions detected. " +
+                answerCount +
+                " answers found, " +
+                missing +
+                " answers missing."
+            );
+
+        }
+
+
+        showPreview();
+
+
+    }catch(error){
+
+        console.error(
+            "Mixed-column PDF error:",
+            error
+        );
+
+
+        setStatus(
+            "❌ Error while reading PDF: " +
+            (
+                error.message ||
+                error
+            )
+        );
+
+    }
+
+};
+
+
+console.log(
+    "✅ Mixed-column PDF reader enabled"
+); 
 </script>
 
 </body>
