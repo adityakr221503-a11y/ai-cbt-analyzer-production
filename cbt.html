@@ -1850,7 +1850,6 @@ return;
 
 }
 
-
 if(current > 0){
 
 current--;
@@ -1874,10 +1873,8 @@ return;
 
 }
 
-
 answers[current] =
 null;
-
 
 renderQuestion();
 
@@ -1896,10 +1893,8 @@ return;
 
 }
 
-
 marked[current] =
 !marked[current];
-
 
 renderQuestion();
 
@@ -1917,7 +1912,6 @@ if(submitted){
 return;
 
 }
-
 
 const unanswered =
 answers.filter(
@@ -1946,7 +1940,6 @@ return;
 
 }
 
-
 submitTest();
 
 }
@@ -1964,19 +1957,18 @@ return;
 
 }
 
-
 submitted = true;
-
 
 clearInterval(
 timerInterval
 );
 
-
 calculateResult();
 
 }
- /* =====================================================
+
+
+/* =====================================================
    CALCULATE RESULT
 ===================================================== */
 
@@ -1998,8 +1990,6 @@ const selected =
 answers[index];
 
 
-/* Skipped */
-
 if(selected === null){
 
 skipped++;
@@ -2008,8 +1998,6 @@ return;
 
 }
 
-
-/* Correct */
 
 if(selected === q.answer){
 
@@ -2020,12 +2008,8 @@ return;
 }
 
 
-/* Wrong */
-
 wrong++;
 
-
-/* Save mistake */
 
 mistakes.push({
 
@@ -2048,30 +2032,16 @@ selected
 });
 
 
-/* Total */
-
 const total =
 questions.length;
-
-
-/*
-   NEET-style scoring:
-
-   Correct = +4
-   Wrong   = -1
-   Skipped = 0
-*/
 
 const score =
 (correct * 4) -
 wrong;
 
-
 const maxScore =
 total * 4;
 
-
-/* Show */
 
 showResult(
 correct,
@@ -2083,19 +2053,13 @@ mistakes
 );
 
 
-/* Save */
-
 saveHistory(
 correct,
 wrong,
 skipped,
 score,
-maxScore,
-mistakes
+maxScore
 );
-
-
-/* Mistake Bank */
 
 saveMistakes(
 mistakes
@@ -2119,38 +2083,22 @@ q.question || ""
 ).toLowerCase();
 
 
-/* Calculation */
-
 if(
 
 text.includes("calculate") ||
-
 text.includes("calculation") ||
-
 text.includes("numerical") ||
-
 text.includes("find the") ||
-
 text.includes("value of") ||
-
 text.includes("velocity") ||
-
 text.includes("acceleration") ||
-
 text.includes("force") ||
-
 text.includes("mass") ||
-
 text.includes("molar") ||
-
 text.includes("concentration") ||
-
 text.includes("equilibrium") ||
-
 text.includes("pressure") ||
-
 text.includes("work done") ||
-
 text.includes("energy")
 
 ){
@@ -2160,18 +2108,12 @@ return "Calculation Error";
 }
 
 
-/* Misread */
-
 if(
 
 text.includes("incorrect") ||
-
 text.includes("not correct") ||
-
 text.includes("except") ||
-
 text.includes("false") ||
-
 text.includes("wrong statement")
 
 ){
@@ -2180,29 +2122,6 @@ return "Misread Question";
 
 }
 
-
-/* Concept */
-
-if(
-
-text.includes("according to") ||
-
-text.includes("concept") ||
-
-text.includes("principle") ||
-
-text.includes("statement") ||
-
-text.includes("which of the following")
-
-){
-
-return "Concept Gap";
-
-}
-
-
-/* Default */
 
 return "Concept Gap";
 
@@ -2222,13 +2141,10 @@ maxScore,
 mistakes
 ){
 
-/* Hide test */
-
 const testScreen =
 document.getElementById(
 "testScreen"
 );
-
 
 if(testScreen){
 
@@ -2238,13 +2154,10 @@ testScreen.style.display =
 }
 
 
-/* Show result */
-
 const result =
 document.getElementById(
 "result"
 );
-
 
 if(result){
 
@@ -2254,13 +2167,10 @@ result.style.display =
 }
 
 
-/* Hide submit */
-
 const submitButton =
 document.getElementById(
 "submitButton"
 );
-
 
 if(submitButton){
 
@@ -2270,13 +2180,10 @@ submitButton.style.display =
 }
 
 
-/* Score */
-
 const scoreBox =
 document.getElementById(
 "score"
 );
-
 
 if(scoreBox){
 
@@ -2288,27 +2195,20 @@ maxScore;
 }
 
 
-/* Percentage */
-
-let percentage = 0;
-
-if(maxScore > 0){
-
-percentage =
+const percentage =
+maxScore > 0
+?
 Math.round(
 (score / maxScore) * 100
-);
+)
+:
+0;
 
-}
-
-
-/* Summary */
 
 const summary =
 document.getElementById(
 "summary"
 );
-
 
 if(summary){
 
@@ -2316,7 +2216,9 @@ summary.innerHTML =
 
 "<div class='info-box'>" +
 
-"<strong>Test completed successfully.</strong><br><br>" +
+"<strong>Test completed successfully.</strong>" +
+
+"<br><br>" +
 
 "Source: " +
 escapeHTML(testSource) +
@@ -2337,98 +2239,71 @@ percentage +
 }
 
 
-/* Statistics */
-
 const resultStats =
 document.getElementById(
 "resultStats"
 );
-
 
 if(resultStats){
 
 resultStats.innerHTML =
 
 "<div class='stat'>" +
-
 "<strong>" +
 correct +
 "</strong>" +
-
 "<small>Correct</small>" +
-
 "</div>" +
 
 "<div class='stat'>" +
-
 "<strong>" +
 wrong +
 "</strong>" +
-
 "<small>Wrong</small>" +
-
 "</div>" +
 
 "<div class='stat'>" +
-
 "<strong>" +
 skipped +
 "</strong>" +
-
 "<small>Skipped</small>" +
-
 "</div>";
 
 }
 
-
-/* Retry button */
 
 const retryButton =
 document.getElementById(
 "retryButton"
 );
 
-
 if(retryButton){
 
-if(mistakes.length > 0){
-
 retryButton.style.display =
-"block";
-
-}else{
-
-retryButton.style.display =
+mistakes.length > 0
+?
+"block"
+:
 "none";
 
 }
 
-}
 
-
-/* Review */
-
-renderReview(
-mistakes
-);
+renderReview();
 
 }
 
 
 /* =====================================================
-   QUESTION REVIEW
+   REVIEW
 ===================================================== */
 
-function renderReview(
-mistakes
-){
+function renderReview(){
 
 const box =
 document.getElementById(
 "review"
 );
-
 
 if(!box){
 
@@ -2447,18 +2322,14 @@ function(q,index){
 const selected =
 answers[index];
 
-
 const item =
 document.createElement(
 "div"
 );
 
-
 item.className =
 "review-item";
 
-
-/* Status */
 
 if(selected === null){
 
@@ -2485,117 +2356,68 @@ item.classList.add(
 }
 
 
-/* Your answer */
-
-let selectedText =
+const selectedText =
+selected !== null &&
+q.options[selected] !== undefined
+?
+q.options[selected]
+:
 "Not answered";
 
 
-if(
-selected !== null &&
-q.options[selected] !== undefined
-){
-
-selectedText =
-q.options[selected];
-
-}
-
-
-/* Correct */
-
-let correctText =
+const correctText =
+q.options[q.answer] !== undefined
+?
+q.options[q.answer]
+:
 "Not available";
 
-
-if(
-q.options[q.answer] !== undefined
-){
-
-correctText =
-q.options[q.answer];
-
-}
-
-
-/* HTML */
 
 item.innerHTML =
 
 "<strong>" +
-
 (index + 1) +
-
 ". " +
-
-escapeHTML(
-q.question
-) +
-
+escapeHTML(q.question) +
 "</strong>" +
 
 "<div class='meta'>" +
 
 "Subject: " +
-
-escapeHTML(
-q.subject || "Unknown"
-) +
+escapeHTML(q.subject || "Unknown") +
 
 " • Topic: " +
-
-escapeHTML(
-q.topic || "Unknown"
-) +
+escapeHTML(q.topic || "Unknown") +
 
 "</div>" +
 
 "<div style='margin-top:10px'>" +
 
 "<b>Your answer:</b> " +
-
-escapeHTML(
-selectedText
-) +
+escapeHTML(selectedText) +
 
 "</div>" +
 
 "<div style='margin-top:6px'>" +
 
 "<b>Correct answer:</b> " +
-
-escapeHTML(
-correctText
-) +
+escapeHTML(correctText) +
 
 "</div>" +
 
 (
-
 q.solution
-
 ?
-
 "<div class='analysis'>" +
-
 "<b>Solution:</b><br>" +
-
-escapeHTML(
-q.solution
-) +
-
+escapeHTML(q.solution) +
 "</div>"
-
 :
-
 ""
-
 );
 
 
-box.appendChild(
-item
-);
+box.appendChild(item);
 
 });
 
@@ -2603,7 +2425,7 @@ item
 
 
 /* =====================================================
-   SAVE TEST HISTORY
+   SAVE HISTORY
 ===================================================== */
 
 function saveHistory(
@@ -2611,8 +2433,7 @@ correct,
 wrong,
 skipped,
 score,
-maxScore,
-mistakes
+maxScore
 ){
 
 let history =
@@ -2628,8 +2449,6 @@ history = [];
 
 }
 
-
-/* Test record */
 
 const record = {
 
@@ -2677,56 +2496,22 @@ Math.round(
 (score / maxScore) * 100
 )
 :
-0,
-
-questions:
-questions.map(
-function(q,index){
-
-return {
-
-...q,
-
-selectedAnswer:
-answers[index],
-
-marked:
-marked[index]
-
-};
-
-}
-
-)
+0
 
 };
 
 
-/* Add latest first */
-
-history.unshift(
-record
-);
-
-
-/* Keep latest 100 */
+history.unshift(record);
 
 history =
-history.slice(
-0,
-100
-);
+history.slice(0,100);
 
-
-/* Save */
 
 try{
 
 localStorage.setItem(
 STORAGE.HISTORY,
-JSON.stringify(
-history
-)
+JSON.stringify(history)
 );
 
 console.log(
@@ -2736,7 +2521,7 @@ console.log(
 }catch(error){
 
 console.error(
-"Could not save test history:",
+"History save error:",
 error
 );
 
@@ -2776,8 +2561,6 @@ existing = [];
 
 }
 
-
-/* Add mistakes */
 
 mistakes.forEach(
 function(q){
@@ -2842,28 +2625,15 @@ false
 });
 
 
-/* Keep latest 500 */
-
 existing =
-existing.slice(
--500
-);
+existing.slice(-500);
 
-
-/* Save */
 
 try{
 
 localStorage.setItem(
 "cbtMistakes",
-JSON.stringify(
-existing
-)
-);
-
-console.log(
-"Mistakes saved:",
-mistakes.length
+JSON.stringify(existing)
 );
 
 }catch(error){
@@ -2875,8 +2645,10 @@ error
 
 }
 
- }
- /* =====================================================
+}
+
+
+/* =====================================================
    RETRY MISTAKES
 ===================================================== */
 
@@ -2902,11 +2674,6 @@ return;
 
 }
 
-
-/*
-   Only retry mistakes that are
-   not mastered.
-*/
 
 const retryQuestions =
 mistakes
@@ -2941,12 +2708,10 @@ item.correctAnswer ??
 item.answer,
 
 solution:
-item.solution ||
-"",
+item.solution || "",
 
 explanation:
-item.explanation ||
-"",
+item.explanation || "",
 
 source:
 "Mistake Retry"
@@ -2969,8 +2734,6 @@ return;
 }
 
 
-/* Save retry queue */
-
 try{
 
 localStorage.setItem(
@@ -2980,20 +2743,13 @@ retryQuestions
 )
 );
 
-
 localStorage.setItem(
 STORAGE.RETRY_STARTED,
-String(
-Date.now()
-)
+String(Date.now())
 );
-
-
-/* Open retry page */
 
 window.location.href =
 "retry.html";
-
 
 }catch(error){
 
@@ -3001,7 +2757,6 @@ console.error(
 "Retry error:",
 error
 );
-
 
 alert(
 "Could not open retry test."
@@ -3025,7 +2780,6 @@ document.getElementById(
 "testScreen"
 );
 
-
 if(!testScreen){
 
 return;
@@ -3041,9 +2795,7 @@ testScreen.innerHTML =
 
 "<br><br>" +
 
-escapeHTML(
-message
-) +
+escapeHTML(message) +
 
 "<br><br>" +
 
@@ -3067,30 +2819,11 @@ return String(
 value ?? ""
 )
 
-.replace(
-/&/g,
-"&amp;"
-)
-
-.replace(
-/</g,
-"&lt;"
-)
-
-.replace(
-/>/g,
-"&gt;"
-)
-
-.replace(
-/"/g,
-"&quot;"
-)
-
-.replace(
-/'/g,
-"&#039;"
-);
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
@@ -3110,11 +2843,8 @@ return;
 }
 
 
-/* Right arrow */
-
 if(
-event.key ===
- "ArrowRight"
+event.key === "ArrowRight"
 ){
 
 nextQuestion();
@@ -3122,11 +2852,8 @@ nextQuestion();
 }
 
 
-/* Left arrow */
-
 if(
-event.key ===
-"ArrowLeft"
+event.key === "ArrowLeft"
 ){
 
 previousQuestion();
@@ -3170,8 +2897,7 @@ initialize();
 
 });
 
-
 </script>
 
 </body>
-</html
+</html>
