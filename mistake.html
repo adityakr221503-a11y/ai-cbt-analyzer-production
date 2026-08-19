@@ -500,8 +500,7 @@ ACTIVE
 
 function getActive(){
 
-const history=readJSON(HISTORY_KEY);
-
+const history=readJSON("cbtMistakes");
 const mastered=getMastered();
 
 const masteredSet=new Set(
