@@ -497,67 +497,41 @@ return Object.values(map);
 /* ================================
 ACTIVE
 ================================ */
-
 function getActive(){
 
-const history=readJSON("cbtMistakes");
-const mastered=getMastered();
+const mistakes =
+readJSON("cbtMistakes");
 
-const masteredSet=new Set(
+const mastered =
+getMastered();
+
+const masteredSet =
+new Set(
 mastered.map(function(item){
 return normalize(item.question);
 })
 );
 
-const map={};
+const map = {};
 
-history.forEach(function(test){
+mistakes.forEach(function(q){
 
-if(!test||!Array.isArray(test.questions)){
+if(!q || !q.question){
 return;
 }
 
-test.questions.forEach(function(q){
-
-if(!q||!q.question){
-return;
-}
-
-const wrong=
-q.status==="wrong"||
-q.correct===false||
-q.isCorrect===false;
-
-if(!wrong)return;
-
-const key=normalize(q.question);
+const key =
+normalize(q.question);
 
 if(masteredSet.has(key)){
 return;
 }
 
-map[key]=q;
-
-});
+map[key] = q;
 
 });
 
 return Object.values(map);
-
-}
-
-
-/* ================================
-COUNTS
-================================ */
-
-function updateCounts(){
-
-document.getElementById("activeCount").textContent=
-getActive().length;
-
-document.getElementById("masteredCount").textContent=
-getMastered().length;
 
 }
 
