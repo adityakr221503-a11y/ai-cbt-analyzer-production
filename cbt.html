@@ -1131,14 +1131,7 @@ if (typeof pdfjsLib !== "undefined") {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 }
-</script>
-   <script>
-alert(
-  typeof pdfjsLib !== "undefined"
-    ? "PDF.js LOADED ✅"
-    : "PDF.js NOT LOADED ❌"
-);
-   </script>
+
 function loadPDFQuestions(){
 
 const possibleKeys = [
@@ -1349,121 +1342,7 @@ showFatalError(
 
 return;
 
-}
 
-
-/* Reset */
-
-answers =
-new Array(
-questions.length
-).fill(null);
-
-
-marked =
-new Array(
-questions.length
-).fill(false);
-
-
-current = 0;
-
-submitted = false;
-
-
-/* Source badge */
-
-const badge =
-document.getElementById(
-"sourceBadge"
-);
-
-
-if(badge){
-
-if(
-testSource === "PDF Import"
-){
-
-badge.textContent =
-"📄 PDF CBT — "+
-questions.length+
-" Questions";
-
-}else{
-
-badge.textContent =
-"📝 Demo CBT — "+
-questions.length+
-" Questions";
-
-}
-
-}
-
-
-/* Start */
-
-renderQuestion();
-
-renderPalette();
-
-startTimer();
-
-}
- /* =====================================================
-   TIMER
-===================================================== */
-
-function updateTimer(){
-
-const timer =
-document.getElementById("timer");
-
-if(!timer){
-return;
-}
-
-const minutes =
-Math.floor(timeLeft / 60);
-
-const seconds =
-timeLeft % 60;
-
-timer.textContent =
-String(minutes).padStart(2,"0") +
-":" +
-String(seconds).padStart(2,"0");
-
-
-timer.classList.remove(
-"warning",
-"danger"
-);
-
-
-if(timeLeft <= 300){
-
-timer.classList.add(
-"warning"
-);
-
-}
-
-
-if(timeLeft <= 60){
-
-timer.classList.remove(
-"warning"
-);
-
-timer.classList.add(
-"danger"
-);
-
-}
-
-}
 
 
 /* =====================================================
@@ -1636,81 +1515,6 @@ option;
 
 /* Click */
 
-button.onclick =
-function(){
-
-if(submitted){
-
-return;
-
-}
-
-
-answers[current] =
-index;
-
-
-renderQuestion();
-
-};
-
-
-box.appendChild(
-button
-);
-
-});
-
-
-/* Next button */
-
-const nextButton =
-document.getElementById(
-"nextButton"
-);
-
-
-if(nextButton){
-
-if(
-current ===
-questions.length - 1
-){
-
-nextButton.textContent =
-"Finish";
-
-}else{
-
-nextButton.textContent =
-"Next";
-
-}
-
-}
-
-
-/* Previous */
-
-const previousButton =
-document.getElementById(
-"previousButton"
-);
-
-
-if(previousButton){
-
-previousButton.disabled =
-current === 0;
-
-}
-
-
-/* Palette */
-
-renderPalette();
-
-}
 
 
 /* =====================================================
