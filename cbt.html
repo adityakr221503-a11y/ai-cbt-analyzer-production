@@ -6,6 +6,9 @@
 
 <title>CBT Analyzer Pro — CBT Test</title>
 
+<!-- PDF.JS — MUST BE IN HEAD, NOT INSIDE JAVASCRIPT -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
 <style>
 
 *{
@@ -105,7 +108,6 @@ text-align:left;
 font-size:16px;
 font-weight:600;
 cursor:pointer;
-transition:.15s;
 }
 
 .option:hover{
@@ -346,7 +348,6 @@ grid-template-columns:repeat(5,1fr);
 
 </style>
 </head>
-
 <body>
 
 <header>
@@ -365,6 +366,7 @@ CBT Analyzer <span>Pro</span>
 
 </header>
 
+
 <div class="container">
 
 <main class="card">
@@ -375,15 +377,19 @@ CBT Analyzer <span>Pro</span>
 Loading test...
 </div>
 
+
 <div id="questionNumber" class="question-number">
 Loading...
 </div>
+
 
 <div id="question" class="question">
 Loading question...
 </div>
 
+
 <div id="options"></div>
+
 
 <div class="buttons">
 
@@ -394,17 +400,20 @@ onclick="previousQuestion()">
 Previous
 </button>
 
+
 <button
 class="warning"
 onclick="markReview()">
 Mark Review
 </button>
 
+
 <button
 class="secondary"
 onclick="clearAnswer()">
 Clear
 </button>
+
 
 <button
 id="nextButton"
@@ -417,15 +426,20 @@ Next
 
 </section>
 
+
 <section id="result">
 
 <h2>🎯 Test Completed</h2>
 
+
 <div id="score" class="score"></div>
+
 
 <div id="summary"></div>
 
+
 <div id="resultStats" class="summary-box"></div>
+
 
 <div class="result-actions">
 
@@ -437,11 +451,13 @@ onclick="openRetry()">
 🔄 Retry Mistakes
 </button>
 
+
 <button
 class="secondary"
 onclick="location.href='mistake.html'">
 🧠 Mistake Bank
 </button>
+
 
 <button
 class="secondary"
@@ -451,17 +467,20 @@ onclick="location.href='index.html'">
 
 </div>
 
+
 <div id="review"></div>
 
 </section>
 
 </main>
 
+
 <aside class="card">
 
 <h3>Question Palette</h3>
 
 <div id="palette" class="palette"></div>
+
 
 <button
 id="submitButton"
@@ -475,17 +494,24 @@ Submit Test
 
 </div>
 
+
 <script>
 
 "use strict";
 
+
 /* =====================================================
-   CBT ANALYZER PRO
-   COMPLETE PRODUCTION CBT ENGINE
+   PDF.JS WORKER
 ===================================================== */
 
+if(typeof pdfjsLib !== "undefined"){
 
-/* =====================================================
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+}
+   /* =====================================================
+   CBT ANALYZER PRO
    STATE
 ===================================================== */
 
@@ -540,7 +566,12 @@ id:"fallback-1",
 subject:"Physics",
 topic:"Basic Physics",
 question:"Which planet is known as the Red Planet?",
-options:["Earth","Mars","Jupiter","Venus"],
+options:[
+"Earth",
+"Mars",
+"Jupiter",
+"Venus"
+],
 answer:1,
 solution:"Mars is called the Red Planet."
 },
@@ -550,7 +581,12 @@ id:"fallback-2",
 subject:"Physics",
 topic:"Units",
 question:"What is the SI unit of force?",
-options:["Joule","Newton","Watt","Pascal"],
+options:[
+"Joule",
+"Newton",
+"Watt",
+"Pascal"
+],
 answer:1,
 solution:"The SI unit of force is newton."
 },
@@ -560,7 +596,12 @@ id:"fallback-3",
 subject:"Biology",
 topic:"Cell Biology",
 question:"Which organelle is known as the powerhouse of the cell?",
-options:["Nucleus","Ribosome","Mitochondria","Golgi apparatus"],
+options:[
+"Nucleus",
+"Ribosome",
+"Mitochondria",
+"Golgi apparatus"
+],
 answer:2,
 solution:"Mitochondria are major sites of ATP production."
 },
@@ -570,7 +611,12 @@ id:"fallback-4",
 subject:"Chemistry",
 topic:"Periodic Table",
 question:"What is the chemical symbol of sodium?",
-options:["So","Na","S","Sd"],
+options:[
+"So",
+"Na",
+"S",
+"Sd"
+],
 answer:1,
 solution:"The symbol Na comes from natrium."
 },
@@ -580,7 +626,12 @@ id:"fallback-5",
 subject:"Biology",
 topic:"Environment",
 question:"Which gas is most abundant in Earth's atmosphere?",
-options:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],
+options:[
+"Oxygen",
+"Carbon dioxide",
+"Nitrogen",
+"Hydrogen"
+],
 answer:2,
 solution:"Nitrogen makes up about 78% of Earth's atmosphere."
 },
@@ -590,7 +641,12 @@ id:"fallback-6",
 subject:"Physics",
 topic:"Gravitation",
 question:"What is the approximate acceleration due to gravity near Earth's surface?",
-options:["4.9 m/s²","9.8 m/s²","19.6 m/s²","98 m/s²"],
+options:[
+"4.9 m/s²",
+"9.8 m/s²",
+"19.6 m/s²",
+"98 m/s²"
+],
 answer:1,
 solution:"The approximate value is 9.8 m/s²."
 },
@@ -600,7 +656,12 @@ id:"fallback-7",
 subject:"Biology",
 topic:"Genetics",
 question:"Which molecule carries genetic information?",
-options:["Protein","Lipid","DNA","Glucose"],
+options:[
+"Protein",
+"Lipid",
+"DNA",
+"Glucose"
+],
 answer:2,
 solution:"DNA stores hereditary information."
 },
@@ -610,7 +671,12 @@ id:"fallback-8",
 subject:"Physics",
 topic:"Electricity",
 question:"Which particle has a negative electric charge?",
-options:["Proton","Neutron","Electron","Photon"],
+options:[
+"Proton",
+"Neutron",
+"Electron",
+"Photon"
+],
 answer:2,
 solution:"The electron has a negative charge."
 },
@@ -620,7 +686,12 @@ id:"fallback-9",
 subject:"Chemistry",
 topic:"Atomic Structure",
 question:"Which particle has no electric charge?",
-options:["Proton","Electron","Neutron","Positron"],
+options:[
+"Proton",
+"Electron",
+"Neutron",
+"Positron"
+],
 answer:2,
 solution:"The neutron is electrically neutral."
 },
@@ -630,19 +701,22 @@ id:"fallback-10",
 subject:"Biology",
 topic:"Human Physiology",
 question:"Which organ pumps blood throughout the human body?",
-options:["Liver","Kidney","Heart","Lung"],
+options:[
+"Liver",
+"Kidney",
+"Heart",
+"Lung"
+],
 answer:2,
 solution:"The heart pumps blood through the circulatory system."
 }
 
 ];
-
-
-/* =====================================================
+   /* =====================================================
    SAFE JSON READER
 ===================================================== */
 
-function readJSON(key,fallback){
+function readJSON(key, fallback){
 
 try{
 
@@ -674,14 +748,16 @@ return fallback;
    ANSWER NORMALIZER
 ===================================================== */
 
-function normalizeAnswer(answer,options){
+function normalizeAnswer(answer, options){
 
 if(
 answer === null ||
 answer === undefined ||
 answer === ""
 ){
+
 return null;
+
 }
 
 
@@ -708,14 +784,14 @@ const value =
 String(answer).trim();
 
 
-/* A/B/C/D */
+/* A / B / C / D */
 
 if(/^[A-Za-z]$/.test(value)){
 
 const index =
 value
 .toUpperCase()
-.charCodeAt(0)-65;
+.charCodeAt(0) - 65;
 
 if(
 index >= 0 &&
@@ -737,24 +813,19 @@ const number =
 Number(value);
 
 
-/*
-1 = A
-2 = B
-3 = C
-4 = D
-*/
+/* 1-based answer */
 
 if(
 number >= 1 &&
 number <= options.length
 ){
 
-return number-1;
+return number - 1;
 
 }
 
 
-/* Zero-based */
+/* 0-based answer */
 
 if(
 number >= 0 &&
@@ -779,8 +850,7 @@ function(option){
 
 return String(option)
 .trim()
-.toLowerCase()
-=== lower;
+.toLowerCase() === lower;
 
 }
 );
@@ -790,6 +860,7 @@ if(found >= 0){
 return found;
 
 }
+
 
 return null;
 
@@ -831,7 +902,9 @@ return null;
 }
 
 
-/* Options */
+/* =====================================================
+   OPTIONS
+===================================================== */
 
 let options = [];
 
@@ -862,7 +935,7 @@ q.optionD
 
 ].filter(function(x){
 
-return (
+return(
 x !== undefined &&
 x !== null &&
 String(x).trim() !== ""
@@ -908,10 +981,11 @@ return null;
 }
 
 
-/* Correct answer */
+/* =====================================================
+   CORRECT ANSWER
+===================================================== */
 
-let rawAnswer =
-q.answer;
+let rawAnswer = q.answer;
 
 
 if(
@@ -920,8 +994,7 @@ rawAnswer === null ||
 rawAnswer === ""
 ){
 
-rawAnswer =
-q.correctAnswer;
+rawAnswer = q.correctAnswer;
 
 }
 
@@ -932,8 +1005,7 @@ rawAnswer === null ||
 rawAnswer === ""
 ){
 
-rawAnswer =
-q.correctIndex;
+rawAnswer = q.correctIndex;
 
 }
 
@@ -944,8 +1016,7 @@ rawAnswer === null ||
 rawAnswer === ""
 ){
 
-rawAnswer =
-q.correct;
+rawAnswer = q.correct;
 
 }
 
@@ -956,8 +1027,7 @@ rawAnswer === null ||
 rawAnswer === ""
 ){
 
-rawAnswer =
-q.answerIndex;
+rawAnswer = q.answerIndex;
 
 }
 
@@ -981,11 +1051,18 @@ return null;
 }
 
 
-return {
+/* =====================================================
+   NORMALIZED OBJECT
+===================================================== */
+
+return{
 
 id:
 q.id ||
-"pdf-"+Date.now()+"-"+index,
+"pdf-" +
+Date.now() +
+"-" +
+index,
 
 subject:
 q.subject ||
@@ -1117,26 +1194,16 @@ return data.questionBank;
 return [];
 
 }
-
-
-/* =====================================================
+   /* =====================================================
    LOAD PDF QUESTIONS
-   IMPORTANT:
-   ONLY ONE DEFINITION
+   PDF IS ALWAYS TRIED FIRST
 ===================================================== */
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
-<script>
-if (typeof pdfjsLib !== "undefined") {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-}
 
 function loadPDFQuestions(){
 
 const possibleKeys = [
 
-"pdfCbtQuestions",
+STORAGE.PDF,
 
 "pdfQuestions",
 
@@ -1216,7 +1283,9 @@ continue;
 }
 
 
-/* SUCCESS */
+/* =====================================================
+   PDF SUCCESS
+===================================================== */
 
 questions =
 normalized;
@@ -1264,7 +1333,9 @@ error
 }
 
 
-/* No PDF */
+/* =====================================================
+   NO PDF FOUND
+===================================================== */
 
 console.warn(
 "No valid PDF question bank found."
@@ -1293,13 +1364,17 @@ testStartedAt =
 Date.now();
 
 
-/* PDF FIRST */
+/* =====================================================
+   PDF FIRST
+===================================================== */
 
 const pdfLoaded =
 loadPDFQuestions();
 
 
-/* FALLBACK ONLY IF PDF FAILED */
+/* =====================================================
+   FALLBACK ONLY IF PDF FAILED
+===================================================== */
 
 if(!pdfLoaded){
 
@@ -1307,7 +1382,7 @@ questions =
 fallbackQuestions.map(
 function(q){
 
-return {
+return{
 
 ...q,
 
@@ -1332,7 +1407,9 @@ questions.length
 }
 
 
-/* Safety */
+/* =====================================================
+   SAFETY CHECK
+===================================================== */
 
 if(!questions.length){
 
@@ -1342,18 +1419,117 @@ showFatalError(
 
 return;
 
-
+}
 
 
 /* =====================================================
+   INITIAL ARRAYS
+===================================================== */
+
+answers =
+new Array(
+questions.length
+).fill(null);
+
+
+marked =
+new Array(
+questions.length
+).fill(false);
+
+
+current = 0;
+
+submitted = false;
+
+
+/* =====================================================
+   SOURCE BADGE
+===================================================== */
+
+const badge =
+document.getElementById(
+"sourceBadge"
+);
+
+
+if(badge){
+
+if(testSource === "PDF Import"){
+
+badge.textContent =
+"📄 PDF CBT — " +
+questions.length +
+" Questions";
+
+}else{
+
+badge.textContent =
+"📝 Demo CBT — " +
+questions.length +
+" Questions";
+
+}
+
+}
+
+
+/* =====================================================
+   FIRST RENDER
+===================================================== */
+
+renderQuestion();
+
+renderPalette();
+
+startTimer();
+
+}
+
+
+/* =====================================================
+   FATAL ERROR
+===================================================== */
+
+function showFatalError(message){
+
+const screen =
+document.getElementById(
+"testScreen"
+);
+
+
+if(!screen){
+
+return;
+
+}
+
+
+screen.innerHTML =
+
+'<div class="error-box">' +
+
+"<strong>⚠️ CBT could not start</strong>" +
+
+"<br><br>" +
+
+String(message) +
+
+"<br><br>" +
+
+"Please import a PDF question bank first." +
+
+"</div>";
+
+}
+   /* =====================================================
    START TIMER
 ===================================================== */
 
 function startTimer(){
 
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 timeLeft = 1800;
 
@@ -1365,9 +1541,7 @@ setInterval(function(){
 
 if(submitted){
 
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 return;
 
@@ -1381,15 +1555,63 @@ updateTimer();
 
 if(timeLeft <= 0){
 
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 submitTest();
 
 }
 
 },1000);
+
+}
+
+
+/* =====================================================
+   UPDATE TIMER
+===================================================== */
+
+function updateTimer(){
+
+const timer =
+document.getElementById("timer");
+
+
+if(!timer){
+
+return;
+
+}
+
+
+const minutes =
+Math.floor(timeLeft / 60);
+
+const seconds =
+timeLeft % 60;
+
+
+timer.textContent =
+String(minutes).padStart(2,"0") +
+":" +
+String(seconds).padStart(2,"0");
+
+
+timer.classList.remove(
+"warning",
+"danger"
+);
+
+
+if(timeLeft <= 300){
+
+timer.classList.add("danger");
+
+}
+else if(timeLeft <= 600){
+
+timer.classList.add("warning");
+
+}
 
 }
 
@@ -1418,7 +1640,9 @@ return;
 }
 
 
-/* Question number */
+/* =====================================================
+   QUESTION NUMBER
+===================================================== */
 
 const questionNumber =
 document.getElementById(
@@ -1439,7 +1663,9 @@ questions.length +
 }
 
 
-/* Question text */
+/* =====================================================
+   QUESTION TEXT
+===================================================== */
 
 const question =
 document.getElementById(
@@ -1455,7 +1681,9 @@ q.question;
 }
 
 
-/* Options */
+/* =====================================================
+   OPTIONS
+===================================================== */
 
 const box =
 document.getElementById(
@@ -1477,9 +1705,7 @@ q.options.forEach(
 function(option,index){
 
 const button =
-document.createElement(
-"button"
-);
+document.createElement("button");
 
 
 button.type =
@@ -1490,7 +1716,7 @@ button.className =
 "option";
 
 
-/* Selected */
+/* Selected answer */
 
 if(
 answers[current] === index
@@ -1513,89 +1739,9 @@ String.fromCharCode(
 option;
 
 
-/* Click */
-
-
-
-/* =====================================================
-   QUESTION PALETTE
-===================================================== */
-
-function renderPalette(){
-
-const palette =
-document.getElementById(
-"palette"
-);
-
-
-if(!palette){
-
-return;
-
-}
-
-
-palette.innerHTML = "";
-
-
-questions.forEach(
-function(q,index){
-
-const button =
-document.createElement(
-"button"
-);
-
-
-button.type =
-"button";
-
-
-button.textContent =
-index + 1;
-
-
-/* Answered */
-
-if(
-answers[index] !== null
-){
-
-button.classList.add(
-"answered"
-);
-
-}
-
-
-/* Review */
-
-if(
-marked[index]
-){
-
-button.classList.add(
-"review"
-);
-
-}
-
-
-/* Current */
-
-if(
-index === current
-){
-
-button.classList.add(
-"current"
-);
-
-}
-
-
-/* Navigation */
+/* =================================================
+   SELECT ANSWER
+================================================= */
 
 button.onclick =
 function(){
@@ -1607,7 +1753,7 @@ return;
 }
 
 
-current =
+answers[current] =
 index;
 
 
@@ -1616,56 +1762,28 @@ renderQuestion();
 };
 
 
-palette.appendChild(
-button
-);
+box.appendChild(button);
 
 });
 
-}
-
 
 /* =====================================================
-   NEXT QUESTION
+   PREVIOUS BUTTON
 ===================================================== */
 
-function nextQuestion(){
+<button
+id="previousButton"
+class="secondary"
+onclick="previousQuestion()">
+Previous
+</button>
 
-if(submitted){
-
-return;
-
-}
-
-
-if(
-current <
-questions.length - 1
-){
-
-current++;
-
-renderQuestion();
-
-}else{
-
-confirmSubmit();
-
-}
-
-}
-
-
-/* =====================================================
-   PREVIOUS QUESTION
-===================================================== */
+<script>
 
 function previousQuestion(){
 
 if(submitted){
-
 return;
-
 }
 
 if(current > 0){
@@ -1678,7 +1796,7 @@ renderQuestion();
 
 }
 
-
+</script>
 /* =====================================================
    CLEAR ANSWER
 ===================================================== */
@@ -1686,13 +1804,10 @@ renderQuestion();
 function clearAnswer(){
 
 if(submitted){
-
 return;
-
 }
 
-answers[current] =
-null;
+answers[current] = null;
 
 renderQuestion();
 
@@ -1706,9 +1821,7 @@ renderQuestion();
 function markReview(){
 
 if(submitted){
-
 return;
-
 }
 
 marked[current] =
@@ -1726,19 +1839,15 @@ renderQuestion();
 function confirmSubmit(){
 
 if(submitted){
-
 return;
-
 }
 
 const unanswered =
-answers.filter(
-function(answer){
+answers.filter(function(answer){
 
 return answer === null;
 
-}
-).length;
+}).length;
 
 
 if(unanswered > 0){
@@ -1751,9 +1860,7 @@ unanswered +
 
 
 if(!confirm(message)){
-
 return;
-
 }
 
 }
@@ -1770,45 +1877,41 @@ submitTest();
 function submitTest(){
 
 if(submitted){
-
 return;
-
 }
 
 submitted = true;
 
-clearInterval(
-timerInterval
-);
+clearInterval(timerInterval);
 
 calculateResult();
 
 }
-
-
-/* =====================================================
+   /* =====================================================
    CALCULATE RESULT
 ===================================================== */
 
 function calculateResult(){
 
 let correct = 0;
-
 let wrong = 0;
-
 let skipped = 0;
 
 const mistakes = [];
 
 
-questions.forEach(
-function(q,index){
+questions.forEach(function(q,index){
 
 const selected =
 answers[index];
 
 
-if(selected === null){
+/* SKIPPED */
+
+if(
+selected === null ||
+selected === undefined
+){
 
 skipped++;
 
@@ -1817,7 +1920,11 @@ return;
 }
 
 
-if(selected === q.answer){
+/* CORRECT */
+
+if(
+selected === q.answer
+){
 
 correct++;
 
@@ -1826,29 +1933,50 @@ return;
 }
 
 
+/* WRONG */
+
 wrong++;
 
 
 mistakes.push({
 
-...q,
+id:q.id,
+
+question:q.question,
+
+subject:q.subject || "Unknown",
+
+topic:q.topic || "Unknown",
+
+mistakeType:"Concept Gap",
 
 selectedAnswer:
-selected,
+q.options[selected] ?? "",
 
 correctAnswer:
-q.answer,
+q.options[q.answer] ?? "",
 
 mistakeReason:
-classifyMistake(
-q,
-selected
-)
+"Incorrect answer selected.",
+
+solution:
+q.solution ||
+q.explanation ||
+"Review this question and its concept.",
+
+timestamp:
+Date.now()
 
 });
 
 });
 
+
+/* =====================================================
+   SCORE
+   +4 CORRECT
+   -1 WRONG
+===================================================== */
 
 const total =
 questions.length;
@@ -1861,6 +1989,10 @@ const maxScore =
 total * 4;
 
 
+/* =====================================================
+   SHOW RESULT
+===================================================== */
+
 showResult(
 correct,
 wrong,
@@ -1871,6 +2003,10 @@ mistakes
 );
 
 
+/* =====================================================
+   SAVE HISTORY
+===================================================== */
+
 saveHistory(
 correct,
 wrong,
@@ -1879,69 +2015,14 @@ score,
 maxScore
 );
 
+
+/* =====================================================
+   SAVE MISTAKES
+===================================================== */
+
 saveMistakes(
 mistakes
 );
-
-}
-
-
-/* =====================================================
-   MISTAKE CLASSIFICATION
-===================================================== */
-
-function classifyMistake(
-q,
-selectedIndex
-){
-
-const text =
-String(
-q.question || ""
-).toLowerCase();
-
-
-if(
-
-text.includes("calculate") ||
-text.includes("calculation") ||
-text.includes("numerical") ||
-text.includes("find the") ||
-text.includes("value of") ||
-text.includes("velocity") ||
-text.includes("acceleration") ||
-text.includes("force") ||
-text.includes("mass") ||
-text.includes("molar") ||
-text.includes("concentration") ||
-text.includes("equilibrium") ||
-text.includes("pressure") ||
-text.includes("work done") ||
-text.includes("energy")
-
-){
-
-return "Calculation Error";
-
-}
-
-
-if(
-
-text.includes("incorrect") ||
-text.includes("not correct") ||
-text.includes("except") ||
-text.includes("false") ||
-text.includes("wrong statement")
-
-){
-
-return "Misread Question";
-
-}
-
-
-return "Concept Gap";
 
 }
 
@@ -1964,18 +2045,23 @@ document.getElementById(
 "testScreen"
 );
 
+const result =
+document.getElementById(
+"result"
+);
+
+const aside =
+document.querySelector(
+"aside.card"
+);
+
+
 if(testScreen){
 
 testScreen.style.display =
 "none";
 
 }
-
-
-const result =
-document.getElementById(
-"result"
-);
 
 if(result){
 
@@ -1984,19 +2070,15 @@ result.style.display =
 
 }
 
+if(aside){
 
-const submitButton =
-document.getElementById(
-"submitButton"
-);
-
-if(submitButton){
-
-submitButton.style.display =
+aside.style.display =
 "none";
 
 }
 
+
+/* SCORE */
 
 const scoreBox =
 document.getElementById(
@@ -2013,15 +2095,7 @@ maxScore;
 }
 
 
-const percentage =
-maxScore > 0
-?
-Math.round(
-(score / maxScore) * 100
-)
-:
-0;
-
+/* SUMMARY */
 
 const summary =
 document.getElementById(
@@ -2031,64 +2105,63 @@ document.getElementById(
 if(summary){
 
 summary.innerHTML =
-
 "<div class='info-box'>" +
 
-"<strong>Test completed successfully.</strong>" +
-
-"<br><br>" +
-
-"Source: " +
-escapeHTML(testSource) +
-
-"<br>" +
+"<strong>Test Summary</strong><br>" +
 
 "Total Questions: " +
 questions.length +
 
 "<br>" +
 
-"Percentage: " +
-percentage +
-"%" +
+"Correct: " +
+correct +
+
+"<br>" +
+
+"Wrong: " +
+wrong +
+
+"<br>" +
+
+"Skipped: " +
+skipped +
 
 "</div>";
 
 }
 
 
-const resultStats =
+/* STATS */
+
+const stats =
 document.getElementById(
 "resultStats"
 );
 
-if(resultStats){
+if(stats){
 
-resultStats.innerHTML =
+stats.innerHTML =
 
 "<div class='stat'>" +
-"<strong>" +
-correct +
-"</strong>" +
+"<strong>" + correct + "</strong>" +
 "<small>Correct</small>" +
 "</div>" +
 
 "<div class='stat'>" +
-"<strong>" +
-wrong +
-"</strong>" +
+"<strong>" + wrong + "</strong>" +
 "<small>Wrong</small>" +
 "</div>" +
 
 "<div class='stat'>" +
-"<strong>" +
-skipped +
-"</strong>" +
+"<strong>" + skipped + "</strong>" +
 "<small>Skipped</small>" +
 "</div>";
 
 }
 
+
+/* RETRY BUTTON */
 
 const retryButton =
 document.getElementById(
@@ -2099,38 +2172,27 @@ if(retryButton){
 
 retryButton.style.display =
 mistakes.length > 0
-?
-"block"
-:
-"none";
+? "block"
+: "none";
 
 }
 
 
-renderReview();
+/* REVIEW */
 
-}
-
-
-/* =====================================================
-   REVIEW
-===================================================== */
-
-function renderReview(){
-
-const box =
+const review =
 document.getElementById(
 "review"
 );
 
-if(!box){
+if(!review){
 
 return;
 
 }
 
 
-box.innerHTML =
+review.innerHTML =
 "<h3>Question Review</h3>";
 
 
@@ -2140,110 +2202,103 @@ function(q,index){
 const selected =
 answers[index];
 
+let className =
+"review-item";
+
+let status =
+"⏭️ Skipped";
+
+
+if(
+selected !== null &&
+selected !== undefined
+){
+
+if(
+selected === q.answer
+){
+
+className +=
+" correct";
+
+status =
+"✅ Correct";
+
+}else{
+
+className +=
+" incorrect";
+
+status =
+"❌ Incorrect";
+
+}
+
+}else{
+
+className +=
+" skipped";
+
+}
+
+
 const item =
 document.createElement(
 "div"
 );
 
 item.className =
-"review-item";
-
-
-if(selected === null){
-
-item.classList.add(
-"skipped"
-);
-
-}
-else if(
-selected === q.answer
-){
-
-item.classList.add(
-"correct"
-);
-
-}
-else{
-
-item.classList.add(
-"incorrect"
-);
-
-}
+className;
 
 
 const selectedText =
-selected !== null &&
-q.options[selected] !== undefined
-?
-q.options[selected]
-:
-"Not answered";
+selected === null ||
+selected === undefined
+? "Not answered"
+: q.options[selected];
 
 
 const correctText =
-q.options[q.answer] !== undefined
-?
-q.options[q.answer]
-:
-"Not available";
+q.options[q.answer];
 
 
 item.innerHTML =
 
 "<strong>" +
-(index + 1) +
-". " +
-escapeHTML(q.question) +
+status +
 "</strong>" +
 
+"<p>" +
+q.question +
+"</p>" +
+
 "<div class='meta'>" +
-
-"Subject: " +
-escapeHTML(q.subject || "Unknown") +
-
-" • Topic: " +
-escapeHTML(q.topic || "Unknown") +
-
-"</div>" +
-
-"<div style='margin-top:10px'>" +
-
-"<b>Your answer:</b> " +
-escapeHTML(selectedText) +
-
-"</div>" +
-
-"<div style='margin-top:6px'>" +
-
-"<b>Correct answer:</b> " +
-escapeHTML(correctText) +
-
+"Your answer: " +
+selectedText +
+"<br>" +
+"Correct answer: " +
+correctText +
 "</div>" +
 
 (
 q.solution
 ?
 "<div class='analysis'>" +
-"<b>Solution:</b><br>" +
-escapeHTML(q.solution) +
+"<strong>Solution:</strong><br>" +
+q.solution +
 "</div>"
 :
 ""
 );
 
 
-box.appendChild(item);
+review.appendChild(item);
 
 });
 
 }
-
-
-/* =====================================================
-   SAVE HISTORY
+   /* =====================================================
+   SAVE TEST HISTORY
 ===================================================== */
 
 function saveHistory(
@@ -2254,7 +2309,9 @@ score,
 maxScore
 ){
 
-let history =
+try{
+
+const history =
 readJSON(
 STORAGE.HISTORY,
 []
@@ -2262,13 +2319,11 @@ STORAGE.HISTORY,
 
 
 if(!Array.isArray(history)){
-
-history = [];
-
+return;
 }
 
 
-const record = {
+history.unshift({
 
 id:
 "test-" +
@@ -2277,19 +2332,7 @@ Date.now(),
 date:
 new Date().toISOString(),
 
-timestamp:
-Date.now(),
-
-startedAt:
-testStartedAt,
-
-completedAt:
-Date.now(),
-
-source:
-testSource,
-
-totalQuestions:
+total:
 questions.length,
 
 correct:
@@ -2307,34 +2350,28 @@ score,
 maxScore:
 maxScore,
 
-percentage:
-maxScore > 0
-?
-Math.round(
-(score / maxScore) * 100
+source:
+testSource,
+
+duration:
+Math.floor(
+(Date.now() - testStartedAt) / 1000
 )
-:
-0
 
-};
+});
 
 
-history.unshift(record);
+/* Keep latest 100 tests */
 
-history =
+const trimmed =
 history.slice(0,100);
 
 
-try{
-
 localStorage.setItem(
 STORAGE.HISTORY,
-JSON.stringify(history)
+JSON.stringify(trimmed)
 );
 
-console.log(
-"Test history saved."
-);
 
 }catch(error){
 
@@ -2352,9 +2389,7 @@ error
    SAVE MISTAKES
 ===================================================== */
 
-function saveMistakes(
-mistakes
-){
+function saveMistakes(mistakes){
 
 if(
 !Array.isArray(mistakes) ||
@@ -2365,6 +2400,8 @@ return;
 
 }
 
+
+try{
 
 let existing =
 readJSON(
@@ -2380,79 +2417,79 @@ existing = [];
 }
 
 
-mistakes.forEach(
-function(q){
+/*
+Compatibility with existing
+Mistake Bank data
+*/
 
-existing.push({
+const prepared =
+mistakes.map(function(mistake){
 
-id:
-"mistake-" +
-Date.now() +
-"-" +
-Math.random()
-.toString(36)
-.substring(2,8),
+return{
 
-question:
-q.question,
+...mistake,
 
-options:
-q.options,
-
-answer:
-q.answer,
-
-selectedAnswer:
-q.selectedAnswer,
-
-correctAnswer:
-q.correctAnswer,
-
-subject:
-q.subject,
-
-topic:
-q.topic,
-
-mistakeType:
-q.mistakeReason,
-
-mistakeReason:
-q.mistakeReason,
-
-solution:
-q.solution || "",
-
-explanation:
-q.explanation || "",
-
-date:
-new Date().toISOString(),
-
-timestamp:
+createdAt:
+mistake.timestamp ||
 Date.now(),
 
-source:
-testSource,
+mastered:false,
 
-mastered:
-false
+retryCount:0
 
-});
+};
 
 });
 
 
-existing =
-existing.slice(-500);
+const combined =
+prepared.concat(existing);
 
 
-try{
+/* Remove duplicate IDs */
+
+const unique = [];
+
+const seen = new Set();
+
+
+combined.forEach(function(item){
+
+const key =
+item.id ||
+(
+item.question +
+"|" +
+item.timestamp
+);
+
+
+if(!seen.has(key)){
+
+seen.add(key);
+
+unique.push(item);
+
+}
+
+});
+
 
 localStorage.setItem(
 "cbtMistakes",
-JSON.stringify(existing)
+JSON.stringify(unique)
 );
+
+
+/*
+Also save retry queue
+*/
+
+localStorage.setItem(
+STORAGE.RETRY_QUEUE,
+JSON.stringify(prepared)
+);
+
 
 }catch(error){
 
@@ -2467,14 +2504,16 @@ error
 
 
 /* =====================================================
-   RETRY MISTAKES
+   OPEN RETRY
 ===================================================== */
 
 function openRetry(){
 
+try{
+
 const mistakes =
 readJSON(
-"cbtMistakes",
+STORAGE.RETRY_QUEUE,
 []
 );
 
@@ -2493,81 +2532,83 @@ return;
 }
 
 
+/*
+Convert mistakes back into
+CBT questions
+*/
+
 const retryQuestions =
-mistakes
-.filter(function(item){
+mistakes.map(function(m,index){
 
-return item.mastered !== true;
-
-})
-.map(function(item){
-
-return {
+return{
 
 id:
-item.id,
+m.id ||
+"retry-" +
+Date.now() +
+"-" +
+index,
 
 subject:
-item.subject ||
-"Unknown",
+m.subject ||
+"Retry",
 
 topic:
-item.topic ||
-"Unknown",
+m.topic ||
+"Retry",
 
 question:
-item.question,
+m.question,
 
 options:
-item.options,
+m.options ||
+[
+m.selectedAnswer,
+m.correctAnswer
+],
 
 answer:
-item.correctAnswer ??
-item.answer,
+m.correctIndex ??
+(
+Array.isArray(m.options)
+? m.options.indexOf(
+m.correctAnswer
+)
+: 1
+),
 
 solution:
-item.solution || "",
-
-explanation:
-item.explanation || "",
-
-source:
-"Mistake Retry"
+m.solution ||
+m.explanation ||
+"Review this question again."
 
 };
 
 });
 
 
-if(
-retryQuestions.length === 0
-){
-
-alert(
-"All your saved mistakes are mastered."
-);
-
-return;
-
-}
-
-
-try{
-
 localStorage.setItem(
-STORAGE.RETRY_QUEUE,
+STORAGE.PDF,
 JSON.stringify(
 retryQuestions
 )
 );
+
 
 localStorage.setItem(
 STORAGE.RETRY_STARTED,
 String(Date.now())
 );
 
-window.location.href =
-"retry.html";
+
+/*
+Reload CBT page
+with retry data
+*/
+
+location.href =
+"cbt.html?retry=1";
+
 
 }catch(error){
 
@@ -2577,7 +2618,7 @@ error
 );
 
 alert(
-"Could not open retry test."
+"Unable to open retry."
 );
 
 }
@@ -2586,125 +2627,7 @@ alert(
 
 
 /* =====================================================
-   FATAL ERROR
-===================================================== */
-
-function showFatalError(
-message
-){
-
-const testScreen =
-document.getElementById(
-"testScreen"
-);
-
-if(!testScreen){
-
-return;
-
-}
-
-
-testScreen.innerHTML =
-
-"<div class='error-box'>" +
-
-"<strong>CBT Error</strong>" +
-
-"<br><br>" +
-
-escapeHTML(message) +
-
-"<br><br>" +
-
-"Please return to the Dashboard " +
-"and open the test again." +
-
-"</div>";
-
-}
-
-
-/* =====================================================
-   HTML ESCAPE
-===================================================== */
-
-function escapeHTML(
-value
-){
-
-return String(
-value ?? ""
-)
-
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
-   KEYBOARD NAVIGATION
-===================================================== */
-
-document.addEventListener(
-"keydown",
-function(event){
-
-if(submitted){
-
-return;
-
-}
-
-
-if(
-event.key === "ArrowRight"
-){
-
-nextQuestion();
-
-}
-
-
-if(
-event.key === "ArrowLeft"
-){
-
-previousQuestion();
-
-}
-
-});
-
-
-/* =====================================================
-   PREVENT ACCIDENTAL RELOAD
-===================================================== */
-
-window.addEventListener(
-"beforeunload",
-function(event){
-
-if(
-!submitted &&
-questions.length > 0
-){
-
-event.preventDefault();
-
-event.returnValue = "";
-
-}
-
-});
-
-
-/* =====================================================
-   START CBT
+   FINAL INITIALIZATION
 ===================================================== */
 
 document.addEventListener(
@@ -2713,7 +2636,13 @@ function(){
 
 initialize();
 
-});
+}
+);
+
+
+/* =====================================================
+   END CBT ENGINE
+===================================================== */
 
 </script>
 
