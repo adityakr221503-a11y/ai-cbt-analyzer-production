@@ -442,8 +442,13 @@ Next
 
 
 <div class="result-actions">
-
 <button
+  type="button"
+  class="secondary"
+  onclick="downloadResultPDF()">
+  📄 Download Result PDF
+</button>
+
 id="retryButton"
 class="primary"
 style="display:none"
@@ -494,7 +499,9 @@ Submit Test
 
 </div>
 
-
+function downloadResultPDF() {
+  window.print();
+}
 <script>
 
 "use strict";
