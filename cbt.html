@@ -2643,7 +2643,853 @@ initialize();
 
 }
 );
+/* =========================================================
+   PHASE 1 — RANK BOOSTER MISTAKE INTELLIGENCE
+   ========================================================= */
 
+const RB_DIAGNOSIS_KEY = "rankBoosterDiagnosisV1";
+
+/*
+  Root-cause categories used by the personal mentor.
+*/
+const RB_MISTAKE_TYPES = {
+  CONCEPT: "Concept Gap",
+  NCERT: "NCERT / Recall Gap",
+  APPROACH: "Wrong Approach",
+  CALCULATION: "Calculation Error",
+  MISREAD: "Question Misread",
+  GUESS: "Guessing",
+  TIME: "Time Pressure",
+  CLICK: "Wrong Click",
+  APPLICATION: "Application Gap",
+  PERSISTENT: "Persistent Weakness"
+};
+
+
+/* ---------------------------------------------------------
+   SAFE JSON HELPERS
+--------------------------------------------------------- */
+
+function rbRead(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return fallback;
+
+    const value = JSON.parse(raw);
+
+    return value ?? fallback;
+  }catch(error){
+    console.error("Rank Booster storage error:", error);
+    return fallback;
+  }
+}
+
+
+function rbWrite(key, value){
+  try{
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  }catch(error){
+    console.error("Rank Booster write error:", error);
+    return false;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   NORMALIZE QUESTION RECORD
+--------------------------------------------------------- */
+
+function rbNormalizeQuestion(q){
+
+  if(!q || !q.question){
+    return null;
+  }
+
+  return {
+    id:
+      q.id ||
+      q.questionId ||
+      null,
+
+    question:
+      String(q.question),
+
+    subject:
+      q.subject ||
+      q.subjectName ||
+      q.section ||
+      "Unknown",
+
+    topic:
+      q.topic ||
+      q.chapter ||
+      q.unit ||
+      "Unknown",
+
+    selectedAnswer:
+      q.selectedAnswer ??
+      "",
+
+    correctAnswer:
+      getCorrectAnswer(q),
+
+    selectedIndex:
+      q.selectedIndex ??
+      null,
+
+    correctIndex:
+      q.correctIndex ??
+      q.answerIndex ??
+      null,
+
+    timeSpent:
+      Number(q.timeSpent ?? q.time ?? 0),
+
+    confidence:
+      q.confidence ??
+      null,
+
+    mistakeType:
+      q.mistakeType ??
+      "",
+
+    mistakeReason:
+      q.mistakeReason ??
+      "",
+
+    solution:
+      q.solution ||
+      q.explanation ||
+      "",
+
+    timestamp:
+      q.timestamp ||
+      Date.now()
+  };
+}
+
+
+/* ---------------------------------------------------------
+   CONFIDENCE NORMALIZATION
+--------------------------------------------------------- */
+
+function rbConfidenceValue(value){
+
+  if(value === null || value === undefined){
+    return null;
+  }
+
+  if(typeof value === "number"){
+    return Math.max(0, Math.min(100, value));
+  }
+
+  const text =
+    String(value)
+      .trim()
+      .toLowerCase();
+
+  if(
+    text.includes("very high") ||
+    text.includes("certain")
+  ){
+    return 95;
+  }
+
+  if(
+    text.includes("high") ||
+    text.includes("confident")
+  ){
+    return 80;
+  }
+
+  if(
+    text.includes("medium") ||
+    text.includes("moderate")
+  ){
+    return 60;
+  }
+
+  if(
+    text.includes("low") ||
+    text.includes("unsure")
+  ){
+    return 35;
+  }
+
+  if(text.includes("guess")){
+    return 20;
+  }
+
+  return null;
+}
+
+
+/* ---------------------------------------------------------
+   CORRECT / WRONG CLICK DETECTION
+--------------------------------------------------------- */
+
+function rbIsCorrect(q){
+
+  const selected =
+    normalize(q.selectedAnswer);
+
+  const correct =
+    normalize(q.correctAnswer);
+
+  if(
+    selected &&
+    correct &&
+    selected === correct
+  ){
+    return true;
+  }
+
+  if(
+    Number.isInteger(Number(q.selectedIndex)) &&
+    Number.isInteger(Number(q.correctIndex))
+  ){
+
+    return Number(q.selectedIndex) ===
+           Number(q.correctIndex);
+  }
+
+  return false;
+}
+
+
+function rbLooksLikeWrongClick(q){
+
+  const selected =
+    String(q.selectedAnswer || "").trim();
+
+  const correct =
+    String(q.correctAnswer || "").trim();
+
+  if(!selected){
+    return false;
+  }
+
+  /*
+    If the system has explicit interaction metadata,
+    trust it first.
+  */
+
+  if(q.wrongClick === true){
+    return true;
+  }
+
+  if(q.answerChangedImmediately === true){
+    return true;
+  }
+
+  /*
+    Very short time + otherwise normal performance
+    is a signal, not proof.
+  */
+
+  const time =
+    Number(q.timeSpent || 0);
+
+  if(
+    time > 0 &&
+    time < 3 &&
+    selected !== correct &&
+    q.confidence !== null
+  ){
+    const confidence =
+      rbConfidenceValue(q.confidence);
+
+    if(
+      confidence !== null &&
+      confidence >= 70
+    ){
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+/* ---------------------------------------------------------
+   ROOT CAUSE DIAGNOSIS
+--------------------------------------------------------- */
+
+function rbDiagnose(q){
+
+  const item =
+    rbNormalizeQuestion(q);
+
+  if(!item){
+    return {
+      type: RB_MISTAKE_TYPES.CONCEPT,
+      confidence: 0,
+      reason: "Insufficient question data.",
+      action: "Review the concept and retry."
+    };
+  }
+
+  const explicit =
+    String(item.mistakeType || "")
+      .trim();
+
+  /*
+    Existing explicit diagnosis gets priority.
+  */
+
+  if(explicit){
+
+    return {
+      type: explicit,
+      confidence: 95,
+      reason:
+        item.mistakeReason ||
+        "Previously classified mistake.",
+      action:
+        rbActionForType(explicit)
+    };
+  }
+
+  /*
+    1. Empty answer
+  */
+
+  if(!item.selectedAnswer){
+
+    return {
+      type: RB_MISTAKE_TYPES.TIME,
+      confidence: 75,
+      reason:
+        "The question was not answered.",
+      action:
+        "Practice faster question selection and time allocation."
+    };
+  }
+
+
+  /*
+    2. Wrong click
+  */
+
+  if(rbLooksLikeWrongClick(item)){
+
+    return {
+      type: RB_MISTAKE_TYPES.CLICK,
+      confidence: 70,
+      reason:
+        "The answer pattern suggests an accidental or rushed selection.",
+      action:
+        "Slow down for the final answer selection and verify the chosen option."
+    };
+  }
+
+
+  /*
+    3. Guessing / low confidence
+  */
+
+  const confidence =
+    rbConfidenceValue(item.confidence);
+
+  if(
+    confidence !== null &&
+    confidence <= 30 &&
+    !rbIsCorrect(item)
+  ){
+
+    return {
+      type: RB_MISTAKE_TYPES.GUESS,
+      confidence: 88,
+      reason:
+        "The answer was selected with low confidence.",
+      action:
+        "Strengthen concept recognition before attempting similar questions."
+    };
+  }
+
+
+  /*
+    4. Calculation clues
+  */
+
+  const text =
+    normalize(
+      item.question +
+      " " +
+      item.solution
+    );
+
+  const calculationWords = [
+    "calculate",
+    "find the value",
+    "numerical",
+    "velocity",
+    "acceleration",
+    "force",
+    "energy",
+    "power",
+    "current",
+    "resistance",
+    "molarity",
+    "percentage",
+    "ratio"
+  ];
+
+  if(
+    calculationWords.some(function(word){
+      return text.includes(word);
+    })
+  ){
+
+    return {
+      type: RB_MISTAKE_TYPES.CALCULATION,
+      confidence: 68,
+      reason:
+        "The question appears calculation-heavy and the selected answer was incorrect.",
+      action:
+        "Recheck formula selection, substitution, units and arithmetic."
+    };
+  }
+
+
+  /*
+    5. Misread clues
+  */
+
+  const misreadWords = [
+    "incorrect",
+    "not true",
+    "except",
+    "least",
+    "most appropriate",
+    "false",
+    "wrong statement"
+  ];
+
+  if(
+    misreadWords.some(function(word){
+      return normalize(item.question).includes(word);
+    })
+  ){
+
+    return {
+      type: RB_MISTAKE_TYPES.MISREAD,
+      confidence: 62,
+      reason:
+        "The wording contains a reversal or exception condition that can cause an avoidable error.",
+      action:
+        "Underline the command word mentally before checking the options."
+    };
+  }
+
+
+  /*
+    6. Default conceptual diagnosis
+  */
+
+  return {
+    type: RB_MISTAKE_TYPES.CONCEPT,
+    confidence: 55,
+    reason:
+      "The answer was incorrect without enough evidence for a more specific diagnosis.",
+    action:
+      "Review the underlying concept and retry the question without looking at the answer."
+  };
+}
+
+
+/* ---------------------------------------------------------
+   ACTION LIBRARY
+--------------------------------------------------------- */
+
+function rbActionForType(type){
+
+  const actions = {
+
+    "Concept Gap":
+      "Review the core concept, explain it in your own words, then solve 3 fresh questions.",
+
+    "NCERT / Recall Gap":
+      "Revise the relevant NCERT line/table/diagram and immediately test recall.",
+
+    "Wrong Approach":
+      "Learn the shortest reliable approach and compare it with your original method.",
+
+    "Calculation Error":
+      "Repeat the calculation slowly, identify the first incorrect step, then solve two similar questions.",
+
+    "Question Misread":
+      "Read the command words first: NOT, EXCEPT, incorrect, least, most appropriate, etc.",
+
+    "Guessing":
+      "Stop option-first guessing. Identify the governing concept before eliminating options.",
+
+    "Time Pressure":
+      "Train question selection and set a strict time target for this question type.",
+
+    "Wrong Click":
+      "Verify the selected option before submitting and avoid rushed final clicks.",
+
+    "Application Gap":
+      "Review the concept-to-question connection and practise unfamiliar applications.",
+
+    "Persistent Weakness":
+      "Move this topic into focused practice until repeated retests show stable mastery."
+  };
+
+  return actions[type] ||
+    "Review the concept and retry the question.";
+}
+
+
+/* ---------------------------------------------------------
+   PERSISTENT WEAKNESS DETECTION
+--------------------------------------------------------- */
+
+function rbFindPersistentWeaknesses(records){
+
+  const groups = {};
+
+  records.forEach(function(q){
+
+    const item =
+      rbNormalizeQuestion(q);
+
+    if(!item){
+      return;
+    }
+
+    const topic =
+      item.subject +
+      "::" +
+      item.topic;
+
+    if(!groups[topic]){
+      groups[topic] = {
+        subject: item.subject,
+        topic: item.topic,
+        attempts: 0,
+        wrong: 0,
+        times: [],
+        types: {}
+      };
+    }
+
+    groups[topic].attempts++;
+
+    if(!rbIsCorrect(item)){
+      groups[topic].wrong++;
+    }
+
+    if(item.timeSpent > 0){
+      groups[topic].times.push(item.timeSpent);
+    }
+
+    const diagnosis =
+      rbDiagnose(item);
+
+    groups[topic].types[diagnosis.type] =
+      (groups[topic].types[diagnosis.type] || 0) + 1;
+  });
+
+
+  return Object.values(groups)
+    .filter(function(group){
+
+      /*
+        Persistent = repeated errors OR
+        high error rate across several attempts.
+      */
+
+      return (
+        group.attempts >= 3 &&
+        group.wrong >= 2
+      );
+    })
+    .map(function(group){
+
+      let dominantType =
+        RB_MISTAKE_TYPES.CONCEPT;
+
+      let highest = 0;
+
+      Object.keys(group.types)
+        .forEach(function(type){
+
+          if(group.types[type] > highest){
+
+            highest =
+              group.types[type];
+
+            dominantType = type;
+          }
+        });
+
+
+      const avgTime =
+        group.times.length
+        ? group.times.reduce(
+            function(a,b){ return a+b; },
+            0
+          ) / group.times.length
+        : 0;
+
+
+      return {
+        subject: group.subject,
+        topic: group.topic,
+        attempts: group.attempts,
+        wrong: group.wrong,
+        errorRate:
+          Math.round(
+            group.wrong /
+            group.attempts *
+            100
+          ),
+        dominantType: dominantType,
+        averageTime:
+          Math.round(avgTime),
+        priority:
+          group.wrong >= 4
+          ? "HIGH"
+          : "MEDIUM"
+      };
+    })
+    .sort(function(a,b){
+
+      return (
+        b.wrong - a.wrong ||
+        b.errorRate - a.errorRate
+      );
+    });
+}
+
+
+/* ---------------------------------------------------------
+   BUILD PERSONAL MENTOR SNAPSHOT
+--------------------------------------------------------- */
+
+function buildRankBoosterSnapshot(){
+
+  const history =
+    rbRead(HISTORY_KEY, []);
+
+  const mistakes =
+    rbRead("cbtMistakes", []);
+
+  const diagnosisRecords =
+    [];
+
+  mistakes.forEach(function(q){
+
+    const item =
+      rbNormalizeQuestion(q);
+
+    if(!item){
+      return;
+    }
+
+    const diagnosis =
+      rbDiagnose(item);
+
+    diagnosisRecords.push({
+
+      question: item.question,
+
+      subject: item.subject,
+
+      topic: item.topic,
+
+      correct:
+        rbIsCorrect(item),
+
+      timeSpent:
+        item.timeSpent,
+
+      confidence:
+        rbConfidenceValue(item.confidence),
+
+      diagnosis:
+        diagnosis.type,
+
+      diagnosisConfidence:
+        diagnosis.confidence,
+
+      reason:
+        diagnosis.reason,
+
+      action:
+        diagnosis.action,
+
+      timestamp:
+        item.timestamp
+    });
+  });
+
+
+  const weaknesses =
+    rbFindPersistentWeaknesses(
+      mistakes
+    );
+
+
+  const correct =
+    diagnosisRecords.filter(
+      function(x){ return x.correct; }
+    ).length;
+
+
+  const total =
+    diagnosisRecords.length;
+
+
+  const accuracy =
+    total
+    ? Math.round(correct / total * 100)
+    : 0;
+
+
+  const snapshot = {
+
+    version: 1,
+
+    updatedAt:
+      Date.now(),
+
+    totalQuestions:
+      total,
+
+    correct:
+      correct,
+
+    accuracy:
+      accuracy,
+
+    activeMistakes:
+      getActive().length,
+
+    mastered:
+      getMastered().length,
+
+    diagnosis:
+      diagnosisRecords,
+
+    persistentWeaknesses:
+      weaknesses,
+
+    nextPriority:
+      weaknesses.length
+      ? weaknesses[0]
+      : null
+  };
+
+
+  rbWrite(
+    RB_DIAGNOSIS_KEY,
+    snapshot
+  );
+
+  return snapshot;
+}
+
+
+/* ---------------------------------------------------------
+   MENTOR NEXT ACTION
+--------------------------------------------------------- */
+
+function getRankBoosterNextAction(){
+
+  const snapshot =
+    rbRead(
+      RB_DIAGNOSIS_KEY,
+      null
+    );
+
+  if(
+    !snapshot ||
+    !snapshot.nextPriority
+  ){
+
+    return {
+      title:
+        "Build your baseline",
+
+      message:
+        "Complete a full test first. The mentor needs enough performance data to identify your highest-impact weakness.",
+
+      priority:
+        "BASELINE"
+    };
+  }
+
+
+  const weakness =
+    snapshot.nextPriority;
+
+
+  return {
+
+    title:
+      "Fix " +
+      weakness.topic,
+
+    message:
+      weakness.subject +
+      " → " +
+      weakness.topic +
+      " has " +
+      weakness.wrong +
+      " mistakes across " +
+      weakness.attempts +
+      " attempts. Dominant issue: " +
+      weakness.dominantType +
+      ".",
+
+    priority:
+      weakness.priority,
+
+    action:
+      rbActionForType(
+        weakness.dominantType
+      )
+  };
+}
+
+
+/* ---------------------------------------------------------
+   RUN AFTER A TEST
+--------------------------------------------------------- */
+
+function runRankBoosterAnalysis(){
+
+  try{
+
+    const snapshot =
+      buildRankBoosterSnapshot();
+
+    console.log(
+      "🏆 Rank Booster Analysis",
+      snapshot
+    );
+
+    console.log(
+      "➡️ Next Mentor Action:",
+      getRankBoosterNextAction()
+    );
+
+    return snapshot;
+
+  }catch(error){
+
+    console.error(
+      "Rank Booster analysis failed:",
+      error
+    );
+
+    return null;
+  }
+  }
 
 /* =====================================================
    END CBT ENGINE
