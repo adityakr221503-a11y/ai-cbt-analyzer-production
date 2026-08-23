@@ -48,6 +48,12 @@ export {
   removeItem,
   clearCollection,
   storageStats,
+  getQuestion,
+  saveQuestion,
+  saveQuestions,
+  hasItem,
+  collectionCount,
+  clearAllStorage,
 } from "./storage/storage.js";
 
 
