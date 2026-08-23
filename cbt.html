@@ -6,1619 +6,651 @@
 
 <title>CBT Analyzer Pro — CBT Test</title>
 
-<!-- PDF.JS — MUST BE IN HEAD, NOT INSIDE JAVASCRIPT -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
 <style>
-
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#f1f5f9;
-color:#0f172a;
+  margin:0;
+  font-family:system-ui,Arial,sans-serif;
+  background:#f1f5f9;
+  color:#0f172a;
 }
 
 header{
-background:#fff;
-border-bottom:1px solid #e2e8f0;
-padding:16px 20px;
+  background:#fff;
+  border-bottom:1px solid #e2e8f0;
+  padding:15px;
+  position:sticky;
+  top:0;
+  z-index:10;
 }
 
 .header{
-max-width:1100px;
-margin:auto;
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:15px;
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
 
 .logo{
-font-size:20px;
-font-weight:800;
+  font-size:20px;
+  font-weight:800;
 }
 
 .logo span{
-color:#4f46e5;
+  color:#4f46e5;
 }
 
 .timer{
-background:#eef2ff;
-color:#3730a3;
-padding:9px 14px;
-border-radius:9px;
-font-weight:800;
-min-width:78px;
-text-align:center;
+  padding:9px 13px;
+  border-radius:10px;
+  background:#eef2ff;
+  color:#4338ca;
+  font-weight:800;
 }
 
 .timer.warning{
-background:#fef3c7;
-color:#92400e;
+  background:#fef3c7;
+  color:#92400e;
 }
 
 .timer.danger{
-background:#fee2e2;
-color:#991b1b;
+  background:#fee2e2;
+  color:#991b1b;
 }
 
 .container{
-max-width:1100px;
-margin:20px auto;
-padding:0 15px;
-display:grid;
-grid-template-columns:1fr 280px;
-gap:20px;
+  max-width:1100px;
+  margin:20px auto;
+  padding:0 14px;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 280px;
+  gap:16px;
 }
 
 .card{
-background:#fff;
-border-radius:16px;
-padding:22px;
-box-shadow:0 3px 14px rgba(0,0,0,.07);
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 3px 14px rgba(0,0,0,.07);
+}
+
+.test-title{
+  margin:0 0 5px;
 }
 
 .question-number{
-color:#64748b;
-font-weight:700;
-margin-bottom:12px;
+  color:#64748b;
+  font-size:14px;
 }
 
 .question{
-font-size:21px;
-font-weight:800;
-line-height:1.55;
-margin-bottom:20px;
-white-space:pre-wrap;
+  font-size:20px;
+  font-weight:700;
+  line-height:1.6;
+  margin:20px 0;
 }
 
 .option{
-display:block;
-width:100%;
-padding:15px;
-margin:10px 0;
-background:#fff;
-border:2px solid #e2e8f0;
-border-radius:11px;
-text-align:left;
-font-size:16px;
-font-weight:600;
-cursor:pointer;
+  width:100%;
+  display:block;
+  padding:14px;
+  margin:10px 0;
+  border:2px solid #e2e8f0;
+  border-radius:12px;
+  background:#fff;
+  color:#0f172a;
+  text-align:left;
+  font-size:16px;
+  cursor:pointer;
 }
 
 .option:hover{
-border-color:#818cf8;
+  border-color:#818cf8;
 }
 
 .option.selected{
-border-color:#4f46e5;
-background:#eef2ff;
+  border-color:#4f46e5;
+  background:#eef2ff;
 }
 
-.buttons{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:20px;
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:20px;
 }
 
-button{
-font-family:inherit;
-border:0;
-border-radius:10px;
-padding:13px;
-font-weight:700;
-cursor:pointer;
+.action{
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:10px;
+  background:#4f46e5;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
 }
 
-button:disabled{
-opacity:.55;
-cursor:not-allowed;
+.action.secondary{
+  background:#64748b;
 }
 
-.primary{
-background:#4f46e5;
-color:#fff;
+.action.submit{
+  background:#15803d;
+  margin-top:10px;
 }
 
-.secondary{
-background:#e2e8f0;
-color:#0f172a;
+.action:disabled{
+  opacity:.5;
+  cursor:not-allowed;
 }
 
-.warning{
-background:#f59e0b;
-color:#fff;
-}
-
-.danger{
-background:#dc2626;
-color:#fff;
+.palette-title{
+  margin-top:0;
 }
 
 .palette{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:8px;
-margin-top:15px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:7px;
 }
 
 .palette button{
-background:#e2e8f0;
-padding:10px 5px;
-}
-
-.palette button.answered{
-background:#bbf7d0;
-}
-
-.palette button.review{
-background:#fde68a;
-}
-
-.palette button.answered.review{
-background:#86efac;
+  min-height:42px;
+  border:0;
+  border-radius:8px;
+  cursor:pointer;
+  background:#e2e8f0;
+  color:#0f172a;
+  font-weight:700;
 }
 
 .palette button.current{
-outline:3px solid #4f46e5;
+  outline:3px solid #4f46e5;
 }
 
-#result{
-display:none;
+.palette button.answered{
+  background:#c7d2fe;
 }
 
-.score{
-font-size:38px;
-font-weight:800;
-text-align:center;
-margin:15px 0;
+.legend{
+  margin-top:15px;
+  font-size:12px;
+  color:#64748b;
+  line-height:1.8;
 }
 
-.summary-box{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:10px;
-margin:20px 0;
+.result{
+  margin-top:20px;
 }
 
-.stat{
-padding:15px;
-background:#f8fafc;
-border-radius:10px;
-text-align:center;
+.result-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
 }
 
-.stat strong{
-display:block;
-font-size:22px;
+.result-box{
+  padding:16px;
+  border-radius:12px;
+  background:#f8fafc;
+  text-align:center;
 }
 
-.stat small{
-color:#64748b;
+.result-value{
+  font-size:25px;
+  font-weight:800;
 }
 
-.result-actions button{
-width:100%;
-margin-top:8px;
+.result-label{
+  color:#64748b;
+  font-size:13px;
 }
 
-.review-item{
-margin-top:15px;
-padding:15px;
-background:#f8fafc;
-border-radius:10px;
+.hidden{
+  display:none!important;
 }
 
-.review-item.correct{
-border-left:5px solid #16a34a;
-}
-
-.review-item.incorrect{
-border-left:5px solid #dc2626;
-}
-
-.review-item.skipped{
-border-left:5px solid #f59e0b;
-}
-
-.analysis{
-margin-top:10px;
-padding:14px;
-background:#eef2ff;
-border-radius:10px;
-line-height:1.6;
-}
-
-.meta{
-margin-top:8px;
-color:#64748b;
-font-size:13px;
-}
-
-.source-badge{
-display:inline-block;
-margin-bottom:15px;
-padding:6px 10px;
-border-radius:999px;
-background:#dcfce7;
-color:#166534;
-font-size:12px;
-font-weight:800;
-}
-
-.loading{
-text-align:center;
-padding:30px 10px;
-color:#64748b;
-}
-
-.error-box{
-background:#fee2e2;
-color:#991b1b;
-padding:15px;
-border-radius:10px;
-line-height:1.5;
-}
-
-.empty-box{
-background:#f8fafc;
-padding:20px;
-border-radius:12px;
-text-align:center;
-color:#64748b;
-}
-
-.info-box{
-background:#eef2ff;
-color:#3730a3;
-padding:14px;
-border-radius:10px;
-margin-bottom:15px;
-line-height:1.5;
+.error{
+  background:#fee2e2;
+  color:#991b1b;
+  padding:14px;
+  border-radius:10px;
+  margin-bottom:15px;
 }
 
 @media(max-width:800px){
+  .layout{
+    grid-template-columns:1fr;
+  }
 
-.container{
-grid-template-columns:1fr;
-}
-
-.question{
-font-size:19px;
-}
-
-.summary-box{
-grid-template-columns:1fr;
-}
-
-aside.card{
-order:2;
-}
-
+  .palette-card{
+    order:-1;
+  }
 }
 
 @media(max-width:500px){
+  .actions{
+    grid-template-columns:1fr;
+  }
 
-header{
-padding:13px 15px;
+  .question{
+    font-size:18px;
+  }
 }
-
-.logo{
-font-size:17px;
-}
-
-.card{
-padding:17px;
-}
-
-.buttons{
-grid-template-columns:1fr 1fr;
-}
-
-.palette{
-grid-template-columns:repeat(5,1fr);
-}
-
-}
-
 </style>
 </head>
+
 <body>
 
 <header>
+  <div class="header">
 
-<div class="header">
+    <div class="logo">
+      CBT Analyzer <span>Pro</span>
+    </div>
 
-<div class="logo">
-CBT Analyzer <span>Pro</span>
-</div>
+    <div id="timer" class="timer">
+      180:00
+    </div>
 
-<div id="timer" class="timer">
-30:00
-</div>
-
-</div>
-
+  </div>
 </header>
-
 
 <div class="container">
 
-<main class="card">
+  <div id="errorBox" class="error hidden"></div>
 
-<section id="testScreen">
+  <div id="testScreen">
 
-<div id="sourceBadge" class="source-badge">
-Loading test...
-</div>
+    <div class="layout">
 
+      <main class="card">
 
-<div id="questionNumber" class="question-number">
-Loading...
-</div>
+        <h1 id="testTitle" class="test-title">
+          CBT Test
+        </h1>
 
+        <div
+          id="questionNumber"
+          class="question-number">
+        </div>
 
-<div id="question" class="question">
-Loading question...
-</div>
+        <div
+          id="question"
+          class="question">
+        </div>
 
+        <div id="options"></div>
 
-<div id="options"></div>
+        <div class="actions">
 
+          <button
+            id="previousButton"
+            class="action secondary">
+            Previous
+          </button>
 
-<div class="buttons">
+          <button
+            id="nextButton"
+            class="action">
+            Next
+          </button>
 
-<button
-id="previousButton"
-class="secondary"
-onclick="previousQuestion()">
-Previous
-</button>
+        </div>
 
+        <button
+          id="submitButton"
+          class="action submit">
+          Submit Test
+        </button>
 
-<button
-class="warning"
-onclick="markReview()">
-Mark Review
-</button>
+      </main>
 
+      <aside class="card palette-card">
 
-<button
-class="secondary"
-onclick="clearAnswer()">
-Clear
-</button>
+        <h3 class="palette-title">
+          Question Palette
+        </h3>
 
+        <div
+          id="palette"
+          class="palette">
+        </div>
 
-<button
-id="nextButton"
-class="primary"
-onclick="nextQuestion()">
-Next
-</button>
+        <div class="legend">
+          <div>⬜ Not answered</div>
+          <div>🟦 Answered</div>
+          <div>🔵 Current</div>
+        </div>
 
-</div>
+      </aside>
 
-</section>
+    </div>
 
+  </div>
 
-<section id="result">
+  <section
+    id="resultScreen"
+    class="card result hidden">
 
-<h2>🎯 Test Completed</h2>
+    <h2>🎯 Test Completed</h2>
 
+    <div id="resultSummary"></div>
 
-<div id="score" class="score"></div>
+    <div class="actions">
 
+      <button
+        id="historyButton"
+        class="action secondary">
+        Test History
+      </button>
 
-<div id="summary"></div>
+      <button
+        id="mistakeButton"
+        class="action">
+        Mistake Bank
+      </button>
 
+    </div>
 
-<div id="resultStats" class="summary-box"></div>
+    <button
+      id="retryButton"
+      class="action submit">
+      Retry Mistakes
+    </button>
 
-
-<div class="result-actions">
-<button
-  type="button"
-  class="secondary"
-  onclick="downloadResultPDF()">
-  📄 Download Result PDF
-</button>
-
-id="retryButton"
-class="primary"
-style="display:none"
-onclick="openRetry()">
-🔄 Retry Mistakes
-</button>
-
-
-<button
-class="secondary"
-onclick="location.href='mistake.html'">
-🧠 Mistake Bank
-</button>
-
-
-<button
-class="secondary"
-onclick="location.href='index.html'">
-🏠 Dashboard
-</button>
-
-</div>
-
-
-<div id="review"></div>
-
-</section>
-
-</main>
-
-
-<aside class="card">
-
-<h3>Question Palette</h3>
-
-<div id="palette" class="palette"></div>
-
-
-<button
-id="submitButton"
-class="danger"
-style="width:100%;margin-top:20px"
-onclick="confirmSubmit()">
-Submit Test
-</button>
-
-</aside>
+  </section>
 
 </div>
-
-function downloadResultPDF() {
-  window.print();
-}
-<script>
+<script type="module">
 
 "use strict";
 
+import {
+  createQuestion,
+  createTest,
+  startAttempt,
+  saveAnswer,
+  submitAttempt
+} from "./core/index.js";
+
 
 /* =====================================================
-   PDF.JS WORKER
+   QUESTIONS
 ===================================================== */
 
-if(typeof pdfjsLib !== "undefined"){
+const questions = [
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  createQuestion({
+    id: "demo-q1",
+    text: "Which planet is known as the Red Planet?",
+    options: [
+      "Earth",
+      "Mars",
+      "Jupiter",
+      "Venus"
+    ],
+    correctAnswer: "Mars",
+    subject: "General Science",
+    chapter: "Astronomy",
+    topic: "Solar System",
+    difficulty: "easy",
+    marks: 4,
+    negativeMarks: 1,
+    explanation:
+      "Mars is called the Red Planet because of iron oxide on its surface."
+  }),
 
-}
-   /* =====================================================
-   CBT ANALYZER PRO
+  createQuestion({
+    id: "demo-q2",
+    text: "What is 2 + 2?",
+    options: [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    correctAnswer: "4",
+    subject: "Mathematics",
+    chapter: "Arithmetic",
+    topic: "Basic Operations",
+    difficulty: "easy",
+    marks: 4,
+    negativeMarks: 1,
+    explanation:
+      "2 + 2 = 4."
+  })
+
+];
+
+
+/* =====================================================
+   TEST
+===================================================== */
+
+const test = createTest({
+
+  id: "demo-test-1",
+
+  title: "Demo CBT Test",
+
+  subject: "General",
+
+  exam: "NEET",
+
+  durationMinutes: 180,
+
+  questions:
+    questions.map(
+      question => question.id
+    ),
+
+  totalMarks:
+    questions.length * 4,
+
+  negativeMarking: true
+
+});
+
+
+/* =====================================================
+   ATTEMPT
+===================================================== */
+
+let attempt = startAttempt({
+
+  id: `attempt-${Date.now()}`,
+
+  testId: test.id
+
+});
+
+
+/* =====================================================
    STATE
 ===================================================== */
 
-let questions = [];
+let currentIndex = 0;
 
-let current = 0;
-
-let answers = [];
-
-let marked = [];
+let selectedAnswer = null;
 
 let submitted = false;
 
-let initialized = false;
 
-let timeLeft = 1800;
+/*
+  Local answer cache.
+  This keeps answers while moving between questions.
+*/
 
-let timerInterval = null;
-
-let testSource = "Fallback";
-
-let testStartedAt = Date.now();
+const answers = {};
 
 
 /* =====================================================
-   STORAGE
+   ELEMENTS
 ===================================================== */
 
-const STORAGE = {
+const testTitle =
+  document.getElementById("testTitle");
 
-PDF:"pdfCbtQuestions",
+const questionNumber =
+  document.getElementById("questionNumber");
 
-HISTORY:"cbtHistory",
+const questionElement =
+  document.getElementById("question");
 
-RETRY_QUEUE:"cbtAnalyzer.retryQueue",
+const optionsElement =
+  document.getElementById("options");
 
-RETRY_QUESTION:"cbtRetryQuestion",
+const paletteElement =
+  document.getElementById("palette");
 
-RETRY_STARTED:"cbtRetryStartedAt"
+const previousButton =
+  document.getElementById("previousButton");
 
-};
+const nextButton =
+  document.getElementById("nextButton");
+
+const submitButton =
+  document.getElementById("submitButton");
+
+const timerElement =
+  document.getElementById("timer");
+
+const testScreen =
+  document.getElementById("testScreen");
+
+const resultScreen =
+  document.getElementById("resultScreen");
+
+const resultSummary =
+  document.getElementById("resultSummary");
+
+const errorBox =
+  document.getElementById("errorBox");
+
+const historyButton =
+  document.getElementById("historyButton");
+
+const mistakeButton =
+  document.getElementById("mistakeButton");
+
+const retryButton =
+  document.getElementById("retryButton");
 
 
 /* =====================================================
-   FALLBACK QUESTIONS
+   TITLE
 ===================================================== */
 
-const fallbackQuestions = [
-
-{
-id:"fallback-1",
-subject:"Physics",
-topic:"Basic Physics",
-question:"Which planet is known as the Red Planet?",
-options:[
-"Earth",
-"Mars",
-"Jupiter",
-"Venus"
-],
-answer:1,
-solution:"Mars is called the Red Planet."
-},
-
-{
-id:"fallback-2",
-subject:"Physics",
-topic:"Units",
-question:"What is the SI unit of force?",
-options:[
-"Joule",
-"Newton",
-"Watt",
-"Pascal"
-],
-answer:1,
-solution:"The SI unit of force is newton."
-},
-
-{
-id:"fallback-3",
-subject:"Biology",
-topic:"Cell Biology",
-question:"Which organelle is known as the powerhouse of the cell?",
-options:[
-"Nucleus",
-"Ribosome",
-"Mitochondria",
-"Golgi apparatus"
-],
-answer:2,
-solution:"Mitochondria are major sites of ATP production."
-},
-
-{
-id:"fallback-4",
-subject:"Chemistry",
-topic:"Periodic Table",
-question:"What is the chemical symbol of sodium?",
-options:[
-"So",
-"Na",
-"S",
-"Sd"
-],
-answer:1,
-solution:"The symbol Na comes from natrium."
-},
-
-{
-id:"fallback-5",
-subject:"Biology",
-topic:"Environment",
-question:"Which gas is most abundant in Earth's atmosphere?",
-options:[
-"Oxygen",
-"Carbon dioxide",
-"Nitrogen",
-"Hydrogen"
-],
-answer:2,
-solution:"Nitrogen makes up about 78% of Earth's atmosphere."
-},
-
-{
-id:"fallback-6",
-subject:"Physics",
-topic:"Gravitation",
-question:"What is the approximate acceleration due to gravity near Earth's surface?",
-options:[
-"4.9 m/s²",
-"9.8 m/s²",
-"19.6 m/s²",
-"98 m/s²"
-],
-answer:1,
-solution:"The approximate value is 9.8 m/s²."
-},
-
-{
-id:"fallback-7",
-subject:"Biology",
-topic:"Genetics",
-question:"Which molecule carries genetic information?",
-options:[
-"Protein",
-"Lipid",
-"DNA",
-"Glucose"
-],
-answer:2,
-solution:"DNA stores hereditary information."
-},
-
-{
-id:"fallback-8",
-subject:"Physics",
-topic:"Electricity",
-question:"Which particle has a negative electric charge?",
-options:[
-"Proton",
-"Neutron",
-"Electron",
-"Photon"
-],
-answer:2,
-solution:"The electron has a negative charge."
-},
-
-{
-id:"fallback-9",
-subject:"Chemistry",
-topic:"Atomic Structure",
-question:"Which particle has no electric charge?",
-options:[
-"Proton",
-"Electron",
-"Neutron",
-"Positron"
-],
-answer:2,
-solution:"The neutron is electrically neutral."
-},
-
-{
-id:"fallback-10",
-subject:"Biology",
-topic:"Human Physiology",
-question:"Which organ pumps blood throughout the human body?",
-options:[
-"Liver",
-"Kidney",
-"Heart",
-"Lung"
-],
-answer:2,
-solution:"The heart pumps blood through the circulatory system."
-}
-
-];
-   /* =====================================================
-   SAFE JSON READER
-===================================================== */
-
-function readJSON(key, fallback){
-
-try{
-
-const value =
-localStorage.getItem(key);
-
-if(!value){
-return fallback;
-}
-
-return JSON.parse(value);
-
-}catch(error){
-
-console.error(
-"Storage read error:",
-key,
-error
-);
-
-return fallback;
-
-}
-
-}
+testTitle.textContent =
+  test.title;
 
 
 /* =====================================================
-   ANSWER NORMALIZER
+   TIMER
 ===================================================== */
 
-function normalizeAnswer(answer, options){
-
-if(
-answer === null ||
-answer === undefined ||
-answer === ""
-){
-
-return null;
-
-}
+let remainingSeconds =
+  Number(test.durationMinutes) * 60;
 
 
-/* Number */
+function updateTimer() {
 
-if(typeof answer === "number"){
+  const minutes =
+    Math.floor(
+      remainingSeconds / 60
+    );
 
-if(
-Number.isInteger(answer) &&
-answer >= 0 &&
-answer < options.length
-){
-
-return answer;
-
-}
-
-}
+  const seconds =
+    remainingSeconds % 60;
 
 
-/* String */
+  timerElement.textContent =
+    `${String(minutes).padStart(2, "0")}:` +
+    `${String(seconds).padStart(2, "0")}`;
 
-const value =
-String(answer).trim();
+
+  timerElement.classList.remove(
+    "warning",
+    "danger"
+  );
 
 
-/* A / B / C / D */
+  if (
+    remainingSeconds <= 300
+  ) {
 
-if(/^[A-Za-z]$/.test(value)){
+    timerElement.classList.add(
+      "danger"
+    );
 
-const index =
-value
-.toUpperCase()
-.charCodeAt(0) - 65;
+  } else if (
+    remainingSeconds <= 900
+  ) {
 
-if(
-index >= 0 &&
-index < options.length
-){
+    timerElement.classList.add(
+      "warning"
+    );
 
-return index;
+  }
 
 }
 
-}
-
-
-/* Numeric string */
-
-if(/^\d+$/.test(value)){
-
-const number =
-Number(value);
-
-
-/* 1-based answer */
-
-if(
-number >= 1 &&
-number <= options.length
-){
-
-return number - 1;
-
-}
-
-
-/* 0-based answer */
-
-if(
-number >= 0 &&
-number < options.length
-){
-
-return number;
-
-}
-
-}
-
-
-/* Exact option text */
-
-const lower =
-value.toLowerCase();
-
-const found =
-options.findIndex(
-function(option){
-
-return String(option)
-.trim()
-.toLowerCase() === lower;
-
-}
-);
-
-if(found >= 0){
-
-return found;
-
-}
-
-
-return null;
-
-}
-
-
-/* =====================================================
-   NORMALIZE QUESTION
-===================================================== */
-
-function normalizeQuestion(q,index){
-
-if(
-!q ||
-typeof q !== "object"
-){
-
-return null;
-
-}
-
-
-/* Question text */
-
-const questionText =
-String(
-q.question ??
-q.questionText ??
-q.text ??
-q.question_text ??
-""
-).trim();
-
-
-if(!questionText){
-
-return null;
-
-}
-
-
-/* =====================================================
-   OPTIONS
-===================================================== */
-
-let options = [];
-
-
-if(Array.isArray(q.options)){
-
-options = q.options;
-
-}
-else if(Array.isArray(q.choices)){
-
-options = q.choices;
-
-}
-else if(Array.isArray(q.answers)){
-
-options = q.answers;
-
-}
-else{
-
-options = [
-
-q.optionA,
-q.optionB,
-q.optionC,
-q.optionD
-
-].filter(function(x){
-
-return(
-x !== undefined &&
-x !== null &&
-String(x).trim() !== ""
-);
-
-});
-
-}
-
-
-options =
-options
-.map(function(option){
-
-if(
-option &&
-typeof option === "object" &&
-option.text !== undefined
-){
-
-return String(
-option.text
-).trim();
-
-}
-
-return String(
-option ?? ""
-).trim();
-
-})
-.filter(function(option){
-
-return option !== "";
-
-});
-
-
-if(options.length < 2){
-
-return null;
-
-}
-
-
-/* =====================================================
-   CORRECT ANSWER
-===================================================== */
-
-let rawAnswer = q.answer;
-
-
-if(
-rawAnswer === undefined ||
-rawAnswer === null ||
-rawAnswer === ""
-){
-
-rawAnswer = q.correctAnswer;
-
-}
-
-
-if(
-rawAnswer === undefined ||
-rawAnswer === null ||
-rawAnswer === ""
-){
-
-rawAnswer = q.correctIndex;
-
-}
-
-
-if(
-rawAnswer === undefined ||
-rawAnswer === null ||
-rawAnswer === ""
-){
-
-rawAnswer = q.correct;
-
-}
-
-
-if(
-rawAnswer === undefined ||
-rawAnswer === null ||
-rawAnswer === ""
-){
-
-rawAnswer = q.answerIndex;
-
-}
-
-
-const answer =
-normalizeAnswer(
-rawAnswer,
-options
-);
-
-
-if(answer === null){
-
-console.warn(
-"Skipping question without valid answer:",
-questionText
-);
-
-return null;
-
-}
-
-
-/* =====================================================
-   NORMALIZED OBJECT
-===================================================== */
-
-return{
-
-id:
-q.id ||
-"pdf-" +
-Date.now() +
-"-" +
-index,
-
-subject:
-q.subject ||
-q.subjectName ||
-"PDF Import",
-
-topic:
-q.topic ||
-q.section ||
-q.chapter ||
-"PDF Import",
-
-question:
-questionText,
-
-options:
-options,
-
-answer:
-answer,
-
-solution:
-String(
-q.solution ??
-q.explanation ??
-q.detailedSolution ??
-""
-),
-
-explanation:
-String(
-q.explanation ??
-q.solution ??
-""
-),
-
-pdfPage:
-q.pdfPage ??
-q.page ??
-"",
-
-pdfPageEnd:
-q.pdfPageEnd ??
-q.pageEnd ??
-q.pdfPage ??
-q.page ??
-"",
-
-chapter:
-q.chapter ||
-"",
-
-section:
-q.section ||
-"",
-
-answerSource:
-q.answerSource ||
-"PDF",
-
-source:
-q.source ||
-"PDF Import",
-
-sourceType:
-"PDF",
-
-bookmarked:
-Boolean(q.bookmarked)
-
-};
-
-}
-
-
-/* =====================================================
-   EXTRACT QUESTION ARRAY
-===================================================== */
-
-function extractQuestionArray(data){
-
-if(Array.isArray(data)){
-
-return data;
-
-}
-
-
-if(
-data &&
-Array.isArray(data.questions)
-){
-
-return data.questions;
-
-}
-
-
-if(
-data &&
-Array.isArray(data.data)
-){
-
-return data.data;
-
-}
-
-
-if(
-data &&
-Array.isArray(data.items)
-){
-
-return data.items;
-
-}
-
-
-if(
-data &&
-Array.isArray(data.questionBank)
-){
-
-return data.questionBank;
-
-}
-
-
-return [];
-
-}
-   /* =====================================================
-   LOAD PDF QUESTIONS
-   PDF IS ALWAYS TRIED FIRST
-===================================================== */
-
-function loadPDFQuestions(){
-
-const possibleKeys = [
-
-STORAGE.PDF,
-
-"pdfQuestions",
-
-"cbtQuestions",
-
-"importedQuestions",
-
-"pdfQuestionBank",
-
-"questionBank"
-
-];
-
-
-for(
-const key of possibleKeys
-){
-
-const saved =
-localStorage.getItem(key);
-
-
-if(!saved){
-
-continue;
-
-}
-
-
-try{
-
-const data =
-JSON.parse(saved);
-
-
-const imported =
-extractQuestionArray(data);
-
-
-if(
-!Array.isArray(imported) ||
-imported.length === 0
-){
-
-console.warn(
-"Question key is empty:",
-key
-);
-
-continue;
-
-}
-
-
-const normalized =
-imported
-.map(function(q,index){
-
-return normalizeQuestion(
-q,
-index
-);
-
-})
-.filter(Boolean);
-
-
-if(normalized.length === 0){
-
-console.warn(
-"No valid questions found in:",
-key
-);
-
-continue;
-
-}
-
-
-/* =====================================================
-   PDF SUCCESS
-===================================================== */
-
-questions =
-normalized;
-
-testSource =
-"PDF Import";
-
-
-console.log(
-"================================"
-);
-
-console.log(
-"PDF CBT SUCCESSFULLY LOADED"
-);
-
-console.log(
-"Storage key:",
-key
-);
-
-console.log(
-"Total questions:",
-questions.length
-);
-
-console.log(
-"================================"
-);
-
-
-return true;
-
-
-}catch(error){
-
-console.error(
-"PDF loading error:",
-key,
-error
-);
-
-}
-
-}
-
-
-/* =====================================================
-   NO PDF FOUND
-===================================================== */
-
-console.warn(
-"No valid PDF question bank found."
-);
-
-return false;
-
-}
-
-
-/* =====================================================
-   INITIALIZE
-===================================================== */
-
-function initialize(){
-
-if(initialized){
-
-return;
-
-}
-
-initialized = true;
-
-testStartedAt =
-Date.now();
-
-
-/* =====================================================
-   PDF FIRST
-===================================================== */
-
-const pdfLoaded =
-loadPDFQuestions();
-
-
-/* =====================================================
-   FALLBACK ONLY IF PDF FAILED
-===================================================== */
-
-if(!pdfLoaded){
-
-questions =
-fallbackQuestions.map(
-function(q){
-
-return{
-
-...q,
-
-options:[
-...q.options
-]
-
-};
-
-}
-);
-
-testSource =
-"Demo Test";
-
-
-console.log(
-"Using fallback questions:",
-questions.length
-);
-
-}
-
-
-/* =====================================================
-   SAFETY CHECK
-===================================================== */
-
-if(!questions.length){
-
-showFatalError(
-"No questions are available for this test."
-);
-
-return;
-
-}
-
-
-/* =====================================================
-   INITIAL ARRAYS
-===================================================== */
-
-answers =
-new Array(
-questions.length
-).fill(null);
-
-
-marked =
-new Array(
-questions.length
-).fill(false);
-
-
-current = 0;
-
-submitted = false;
-
-
-/* =====================================================
-   SOURCE BADGE
-===================================================== */
-
-const badge =
-document.getElementById(
-"sourceBadge"
-);
-
-
-if(badge){
-
-if(testSource === "PDF Import"){
-
-badge.textContent =
-"📄 PDF CBT — " +
-questions.length +
-" Questions";
-
-}else{
-
-badge.textContent =
-"📝 Demo CBT — " +
-questions.length +
-" Questions";
-
-}
-
-}
-
-
-/* =====================================================
-   FIRST RENDER
-===================================================== */
-
-renderQuestion();
-
-renderPalette();
-
-startTimer();
-
-}
-
-
-/* =====================================================
-   FATAL ERROR
-===================================================== */
-
-function showFatalError(message){
-
-const screen =
-document.getElementById(
-"testScreen"
-);
-
-
-if(!screen){
-
-return;
-
-}
-
-
-screen.innerHTML =
-
-'<div class="error-box">' +
-
-"<strong>⚠️ CBT could not start</strong>" +
-
-"<br><br>" +
-
-String(message) +
-
-"<br><br>" +
-
-"Please import a PDF question bank first." +
-
-"</div>";
-
-}
-   /* =====================================================
-   START TIMER
-===================================================== */
-
-function startTimer(){
-
-clearInterval(timerInterval);
-
-timeLeft = 1800;
-
-updateTimer();
-
-
-timerInterval =
-setInterval(function(){
-
-if(submitted){
-
-clearInterval(timerInterval);
-
-return;
-
-}
-
-
-timeLeft--;
-
-updateTimer();
-
-
-if(timeLeft <= 0){
-
-clearInterval(timerInterval);
-
-submitTest();
-
-}
-
-},1000);
-
-}
-
-
-/* =====================================================
-   UPDATE TIMER
-===================================================== */
-
-function updateTimer(){
 
 const timer =
-document.getElementById("timer");
+  setInterval(
+    function () {
+
+      if (submitted) {
+
+        clearInterval(timer);
+
+        return;
+
+      }
 
 
-if(!timer){
+      remainingSeconds--;
 
-return;
-
-}
+      updateTimer();
 
 
-const minutes =
-Math.floor(timeLeft / 60);
+      if (
+        remainingSeconds <= 0
+      ) {
 
-const seconds =
-timeLeft % 60;
+        clearInterval(timer);
 
+        finishTest(true);
 
-timer.textContent =
-String(minutes).padStart(2,"0") +
-":" +
-String(seconds).padStart(2,"0");
+      }
 
-
-timer.classList.remove(
-"warning",
-"danger"
-);
+    },
+    1000
+  );
 
 
-if(timeLeft <= 300){
+updateTimer();
 
-timer.classList.add("danger");
 
-}
-else if(timeLeft <= 600){
+/* =====================================================
+   ERROR
+===================================================== */
 
-timer.classList.add("warning");
+function showError(message) {
 
-}
+  errorBox.textContent =
+    String(message);
+
+  errorBox.classList.remove(
+    "hidden"
+  );
 
 }
 
@@ -1627,1872 +659,499 @@ timer.classList.add("warning");
    RENDER QUESTION
 ===================================================== */
 
-function renderQuestion(){
+function renderQuestion() {
 
-if(submitted){
-
-return;
-
-}
+  const question =
+    questions[currentIndex];
 
 
-const q =
-questions[current];
+  selectedAnswer =
+    answers[question.id] ?? null;
 
 
-if(!q){
+  questionNumber.textContent =
+    `Question ${currentIndex + 1} of ${questions.length}`;
 
-return;
+
+  questionElement.textContent =
+    question.text;
+
+
+  optionsElement.innerHTML =
+    "";
+
+
+  question.options.forEach(
+    function (option) {
+
+      const button =
+        document.createElement("button");
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "option";
+
+
+      button.textContent =
+        option;
+
+
+      if (
+        selectedAnswer !== null &&
+        String(selectedAnswer) ===
+        String(option)
+      ) {
+
+        button.classList.add(
+          "selected"
+        );
+
+      }
+
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          if (submitted) {
+
+            return;
+
+          }
+
+
+          selectedAnswer =
+            option;
+
+
+          answers[question.id] =
+            option;
+
+
+          attempt =
+            saveAnswer(
+              attempt,
+              question.id,
+              option
+            );
+
+
+          renderQuestion();
+
+        }
+      );
+
+
+      optionsElement.appendChild(
+        button
+      );
+
+    }
+  );
+
+
+  previousButton.disabled =
+    currentIndex === 0;
+
+
+  nextButton.textContent =
+    currentIndex === questions.length - 1
+      ? "Finish"
+      : "Next";
+
+
+  renderPalette();
 
 }
 
 
 /* =====================================================
-   QUESTION NUMBER
+   QUESTION PALETTE
 ===================================================== */
 
-const questionNumber =
-document.getElementById(
-"questionNumber"
-);
+function renderPalette() {
+
+  paletteElement.innerHTML =
+    "";
 
 
-if(questionNumber){
+  questions.forEach(
+    function (question, index) {
 
-questionNumber.textContent =
-"Question " +
-(current + 1) +
-" of " +
-questions.length +
-" • " +
-(q.subject || "PDF");
+      const button =
+        document.createElement("button");
+
+
+      button.type =
+        "button";
+
+
+      button.textContent =
+        index + 1;
+
+
+      if (
+        index === currentIndex
+      ) {
+
+        button.classList.add(
+          "current"
+        );
+
+      }
+
+
+      if (
+        answers[question.id] !== undefined
+      ) {
+
+        button.classList.add(
+          "answered"
+        );
+
+      }
+
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          if (submitted) {
+
+            return;
+
+          }
+
+
+          currentIndex =
+            index;
+
+
+          renderQuestion();
+
+        }
+      );
+
+
+      paletteElement.appendChild(
+        button
+      );
+
+    }
+  );
 
 }
 
 
 /* =====================================================
-   QUESTION TEXT
+   PREVIOUS
 ===================================================== */
 
-const question =
-document.getElementById(
-"question"
-);
+previousButton.addEventListener(
+  "click",
+  function () {
 
+    if (
+      currentIndex > 0
+    ) {
 
-if(question){
+      currentIndex--;
 
-question.textContent =
-q.question;
+      renderQuestion();
 
-}
+    }
 
-
-/* =====================================================
-   OPTIONS
-===================================================== */
-
-const box =
-document.getElementById(
-"options"
-);
-
-
-if(!box){
-
-return;
-
-}
-
-
-box.innerHTML = "";
-
-
-q.options.forEach(
-function(option,index){
-
-const button =
-document.createElement("button");
-
-
-button.type =
-"button";
-
-
-button.className =
-"option";
-
-
-/* Selected answer */
-
-if(
-answers[current] === index
-){
-
-button.classList.add(
-"selected"
-);
-
-}
-
-
-/* Option text */
-
-button.textContent =
-String.fromCharCode(
-65 + index
-) +
-". " +
-option;
-
-
-/* =================================================
-   SELECT ANSWER
-================================================= */
-
-button.onclick =
-function(){
-
-if(submitted){
-
-return;
-
-}
-
-
-answers[current] =
-index;
-
-
-renderQuestion();
-
-};
-
-
-box.appendChild(button);
-
-});
-
-
-/* =====================================================
-   PREVIOUS BUTTON
-===================================================== */
-
-<button
-id="previousButton"
-class="secondary"
-onclick="previousQuestion()">
-Previous
-</button>
-
-<script>
-
-function previousQuestion(){
-
-if(submitted){
-return;
-}
-
-if(current > 0){
-
-current--;
-
-renderQuestion();
-
-}
-
-
-/* =====================================================
-   CLEAR ANSWER
-===================================================== */
-
-function clearAnswer(){
-
-if(submitted){
-return;
-}
-
-answers[current] = null;
-
-renderQuestion();
-
-}
-
-
-/* =====================================================
-   MARK FOR REVIEW
-===================================================== */
-
-function markReview(){
-
-if(submitted){
-return;
-}
-
-marked[current] =
-!marked[current];
-
-renderQuestion();
-
-}
-
-
-/* =====================================================
-   CONFIRM SUBMIT
-===================================================== */
-
-function confirmSubmit(){
-
-if(submitted){
-return;
-}
-
-const unanswered =
-answers.filter(function(answer){
-
-return answer === null;
-
-}).length;
-
-
-if(unanswered > 0){
-
-const message =
-"There are " +
-unanswered +
-" unanswered question(s).\n\n" +
-"Do you still want to submit?";
-
-
-if(!confirm(message)){
-return;
-}
-
-}
-
-submitTest();
-
-}
-
-
-/* =====================================================
-   SUBMIT TEST
-===================================================== */
-
-function submitTest(){
-
-if(submitted){
-return;
-}
-
-submitted = true;
-
-clearInterval(timerInterval);
-
-calculateResult();
-
-}
-   /* =====================================================
-   CALCULATE RESULT
-===================================================== */
-
-function calculateResult(){
-
-let correct = 0;
-let wrong = 0;
-let skipped = 0;
-
-const mistakes = [];
-
-
-questions.forEach(function(q,index){
-
-const selected =
-answers[index];
-
-
-/* SKIPPED */
-
-if(
-selected === null ||
-selected === undefined
-){
-
-skipped++;
-
-return;
-
-}
-
-
-/* CORRECT */
-
-if(
-selected === q.answer
-){
-
-correct++;
-
-return;
-
-}
-
-
-/* WRONG */
-
-wrong++;
-
-
-mistakes.push({
-
-id:q.id,
-
-question:q.question,
-
-subject:q.subject || "Unknown",
-
-topic:q.topic || "Unknown",
-
-mistakeType:"Concept Gap",
-
-selectedAnswer:
-q.options[selected] ?? "",
-
-correctAnswer:
-q.options[q.answer] ?? "",
-
-mistakeReason:
-"Incorrect answer selected.",
-
-solution:
-q.solution ||
-q.explanation ||
-"Review this question and its concept.",
-
-timestamp:
-Date.now()
-
-});
-
-});
-
-
-/* =====================================================
-   SCORE
-   +4 CORRECT
-   -1 WRONG
-===================================================== */
-
-const total =
-questions.length;
-
-const score =
-(correct * 4) -
-wrong;
-
-const maxScore =
-total * 4;
-
-
-/* =====================================================
-   SHOW RESULT
-===================================================== */
-
-showResult(
-correct,
-wrong,
-skipped,
-score,
-maxScore,
-mistakes
+  }
 );
 
 
 /* =====================================================
-   SAVE HISTORY
+   NEXT
 ===================================================== */
 
-saveHistory(
-correct,
-wrong,
-skipped,
-score,
-maxScore
+nextButton.addEventListener(
+  "click",
+  function () {
+
+    if (
+      currentIndex <
+      questions.length - 1
+    ) {
+
+      currentIndex++;
+
+      renderQuestion();
+
+      return;
+
+    }
+
+
+    finishTest(false);
+
+  }
 );
 
 
 /* =====================================================
-   SAVE MISTAKES
+   SUBMIT BUTTON
 ===================================================== */
 
-saveMistakes(
-mistakes
+submitButton.addEventListener(
+  "click",
+  function () {
+
+    const unanswered =
+      questions.filter(
+        question =>
+          answers[question.id] === undefined
+      ).length;
+
+
+    let message =
+      "Submit test?";
+
+
+    if (
+      unanswered > 0
+    ) {
+
+      message +=
+        `\n\n${unanswered} question(s) unanswered.`;
+
+    }
+
+
+    if (
+      window.confirm(message)
+    ) {
+
+      finishTest(false);
+
+    }
+
+  }
 );
+
+
+/* =====================================================
+   FINISH TEST
+===================================================== */
+
+function finishTest(
+  autoSubmitted = false
+) {
+
+  if (submitted) {
+
+    return;
+
+  }
+
+
+  submitted = true;
+
+
+  clearInterval(timer);
+
+
+  let submission;
+
+
+  try {
+
+    submission =
+      submitAttempt({
+
+        attempt,
+
+        questions,
+
+        correctMarks: 4,
+
+        negativeMarks: 1
+
+      });
+
+  } catch (error) {
+
+    submitted = false;
+
+    showError(
+      error.message ||
+      "Unable to submit test."
+    );
+
+    return;
+
+  }
+
+
+  showResult(
+    submission,
+    autoSubmitted
+  );
 
 }
 
 
 /* =====================================================
-   SHOW RESULT
+   RESULT
 ===================================================== */
 
 function showResult(
-correct,
-wrong,
-skipped,
-score,
-maxScore,
-mistakes
-){
-
-const testScreen =
-document.getElementById(
-"testScreen"
-);
-
-const result =
-document.getElementById(
-"result"
-);
-
-const aside =
-document.querySelector(
-"aside.card"
-);
-
-
-if(testScreen){
-
-testScreen.style.display =
-"none";
-
-}
-
-if(result){
-
-result.style.display =
-"block";
-
-}
-
-if(aside){
-
-aside.style.display =
-"none";
-
-}
-
-
-/* SCORE */
-
-const scoreBox =
-document.getElementById(
-"score"
-);
-
-if(scoreBox){
-
-scoreBox.textContent =
-score +
-" / " +
-maxScore;
-
-}
-
-
-/* SUMMARY */
-
-const summary =
-document.getElementById(
-"summary"
-);
-
-if(summary){
-
-summary.innerHTML =
-"<div class='info-box'>" +
-
-"<strong>Test Summary</strong><br>" +
-
-"Total Questions: " +
-questions.length +
-
-"<br>" +
-
-"Correct: " +
-correct +
-
-"<br>" +
-
-"Wrong: " +
-wrong +
-
-"<br>" +
-
-"Skipped: " +
-skipped +
-
-"</div>";
-
-}
-
-
-/* STATS */
-
-const stats =
-document.getElementById(
-"resultStats"
-);
-
-if(stats){
-
-stats.innerHTML =
-
-"<div class='stat'>" +
-"<strong>" + correct + "</strong>" +
-"<small>Correct</small>" +
-"</div>" +
-
-"<div class='stat'>" +
-"<strong>" + wrong + "</strong>" +
-"<small>Wrong</small>" +
-"</div>" +
-
-"<div class='stat'>" +
-"<strong>" + skipped + "</strong>" +
-"<small>Skipped</small>" +
-"</div>";
-
-}
-
-
-/* RETRY BUTTON */
-
-const retryButton =
-document.getElementById(
-"retryButton"
-);
-
-if(retryButton){
-
-retryButton.style.display =
-mistakes.length > 0
-? "block"
-: "none";
-
-}
-
-
-/* REVIEW */
-
-const review =
-document.getElementById(
-"review"
-);
-
-if(!review){
-
-return;
-
-}
-
-
-review.innerHTML =
-"<h3>Question Review</h3>";
-
-
-questions.forEach(
-function(q,index){
-
-const selected =
-answers[index];
-
-let className =
-"review-item";
-
-let status =
-"⏭️ Skipped";
-
-
-if(
-selected !== null &&
-selected !== undefined
-){
-
-if(
-selected === q.answer
-){
-
-className +=
-" correct";
-
-status =
-"✅ Correct";
-
-}else{
-
-className +=
-" incorrect";
-
-status =
-"❌ Incorrect";
-
-}
-
-}else{
-
-className +=
-" skipped";
-
-}
-
-
-const item =
-document.createElement(
-"div"
-);
-
-item.className =
-className;
-
-
-const selectedText =
-selected === null ||
-selected === undefined
-? "Not answered"
-: q.options[selected];
-
-
-const correctText =
-q.options[q.answer];
-
-
-item.innerHTML =
-
-"<strong>" +
-status +
-"</strong>" +
-
-"<p>" +
-q.question +
-"</p>" +
-
-"<div class='meta'>" +
-"Your answer: " +
-selectedText +
-"<br>" +
-"Correct answer: " +
-correctText +
-"</div>" +
-
-(
-q.solution
-?
-"<div class='analysis'>" +
-"<strong>Solution:</strong><br>" +
-q.solution +
-"</div>"
-:
-""
-);
-
-
-review.appendChild(item);
-
-});
-
-}
-   /* =====================================================
-   SAVE TEST HISTORY
-===================================================== */
-
-function saveHistory(
-correct,
-wrong,
-skipped,
-score,
-maxScore
-){
-
-try{
-
-const history =
-readJSON(
-STORAGE.HISTORY,
-[]
-);
-
-
-if(!Array.isArray(history)){
-return;
-}
-
-
-history.unshift({
-
-id:
-"test-" +
-Date.now(),
-
-date:
-new Date().toISOString(),
-
-total:
-questions.length,
-
-correct:
-correct,
-
-wrong:
-wrong,
-
-skipped:
-skipped,
-
-score:
-score,
-
-maxScore:
-maxScore,
-
-source:
-testSource,
-
-duration:
-Math.floor(
-(Date.now() - testStartedAt) / 1000
-)
-
-});
-
-
-/* Keep latest 100 tests */
-
-const trimmed =
-history.slice(0,100);
-
-
-localStorage.setItem(
-STORAGE.HISTORY,
-JSON.stringify(trimmed)
-);
-
-
-}catch(error){
-
-console.error(
-"History save error:",
-error
-);
-
-}
-
-}
-
-
-/* =====================================================
-   SAVE MISTAKES
-===================================================== */
-
-function saveMistakes(mistakes){
-
-if(
-!Array.isArray(mistakes) ||
-mistakes.length === 0
-){
-
-return;
-
-}
-
-
-try{
-
-let existing =
-readJSON(
-"cbtMistakes",
-[]
-);
-
-
-if(!Array.isArray(existing)){
-
-existing = [];
-
-}
-
-
-/*
-Compatibility with existing
-Mistake Bank data
-*/
-
-const prepared =
-mistakes.map(function(mistake){
-
-return{
-
-...mistake,
-
-createdAt:
-mistake.timestamp ||
-Date.now(),
-
-mastered:false,
-
-retryCount:0
-
-};
-
-});
-
-
-const combined =
-prepared.concat(existing);
-
-
-/* Remove duplicate IDs */
-
-const unique = [];
-
-const seen = new Set();
-
-
-combined.forEach(function(item){
-
-const key =
-item.id ||
-(
-item.question +
-"|" +
-item.timestamp
-);
-
-
-if(!seen.has(key)){
-
-seen.add(key);
-
-unique.push(item);
-
-}
-
-});
-
-
-localStorage.setItem(
-"cbtMistakes",
-JSON.stringify(unique)
-);
-
-
-/*
-Also save retry queue
-*/
-
-localStorage.setItem(
-STORAGE.RETRY_QUEUE,
-JSON.stringify(prepared)
-);
-
-
-}catch(error){
-
-console.error(
-"Mistake save error:",
-error
-);
-
-}
-
-}
-
-
-/* =====================================================
-   OPEN RETRY
-===================================================== */
-
-function openRetry(){
-
-try{
-
-const mistakes =
-readJSON(
-STORAGE.RETRY_QUEUE,
-[]
-);
-
-
-if(
-!Array.isArray(mistakes) ||
-mistakes.length === 0
-){
-
-alert(
-"No mistakes available for retry."
-);
-
-return;
-
-}
-
-
-/*
-Convert mistakes back into
-CBT questions
-*/
-
-const retryQuestions =
-mistakes.map(function(m,index){
-
-return{
-
-id:
-m.id ||
-"retry-" +
-Date.now() +
-"-" +
-index,
-
-subject:
-m.subject ||
-"Retry",
-
-topic:
-m.topic ||
-"Retry",
-
-question:
-m.question,
-
-options:
-m.options ||
-[
-m.selectedAnswer,
-m.correctAnswer
-],
-
-answer:
-m.correctIndex ??
-(
-Array.isArray(m.options)
-? m.options.indexOf(
-m.correctAnswer
-)
-: 1
-),
-
-solution:
-m.solution ||
-m.explanation ||
-"Review this question again."
-
-};
-
-});
-
-
-localStorage.setItem(
-STORAGE.PDF,
-JSON.stringify(
-retryQuestions
-)
-);
-
-
-localStorage.setItem(
-STORAGE.RETRY_STARTED,
-String(Date.now())
-);
-
-
-/*
-Reload CBT page
-with retry data
-*/
-
-location.href =
-"cbt.html?retry=1";
-
-
-}catch(error){
-
-console.error(
-"Retry error:",
-error
-);
-
-alert(
-"Unable to open retry."
-);
-
-}
-
-}
-
-
-/* =====================================================
-   FINAL INITIALIZATION
-===================================================== */
-
-document.addEventListener(
-"DOMContentLoaded",
-function(){
-
-initialize();
-
-}
-);
-/* =========================================================
-   PHASE 1 — RANK BOOSTER MISTAKE INTELLIGENCE
-   ========================================================= */
-
-const RB_DIAGNOSIS_KEY = "rankBoosterDiagnosisV1";
-
-/*
-  Root-cause categories used by the personal mentor.
-*/
-const RB_MISTAKE_TYPES = {
-  CONCEPT: "Concept Gap",
-  NCERT: "NCERT / Recall Gap",
-  APPROACH: "Wrong Approach",
-  CALCULATION: "Calculation Error",
-  MISREAD: "Question Misread",
-  GUESS: "Guessing",
-  TIME: "Time Pressure",
-  CLICK: "Wrong Click",
-  APPLICATION: "Application Gap",
-  PERSISTENT: "Persistent Weakness"
-};
-
-
-/* ---------------------------------------------------------
-   SAFE JSON HELPERS
---------------------------------------------------------- */
-
-function rbRead(key, fallback){
-  try{
-    const raw = localStorage.getItem(key);
-    if(!raw) return fallback;
-
-    const value = JSON.parse(raw);
-
-    return value ?? fallback;
-  }catch(error){
-    console.error("Rank Booster storage error:", error);
-    return fallback;
-  }
-}
-
-
-function rbWrite(key, value){
-  try{
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  }catch(error){
-    console.error("Rank Booster write error:", error);
-    return false;
-  }
-}
-
-
-/* ---------------------------------------------------------
-   NORMALIZE QUESTION RECORD
---------------------------------------------------------- */
-
-function rbNormalizeQuestion(q){
-
-  if(!q || !q.question){
-    return null;
-  }
-
-  return {
-    id:
-      q.id ||
-      q.questionId ||
-      null,
-
-    question:
-      String(q.question),
-
-    subject:
-      q.subject ||
-      q.subjectName ||
-      q.section ||
-      "Unknown",
-
-    topic:
-      q.topic ||
-      q.chapter ||
-      q.unit ||
-      "Unknown",
-
-    selectedAnswer:
-      q.selectedAnswer ??
-      "",
-
-    correctAnswer:
-      getCorrectAnswer(q),
-
-    selectedIndex:
-      q.selectedIndex ??
-      null,
-
-    correctIndex:
-      q.correctIndex ??
-      q.answerIndex ??
-      null,
-
-    timeSpent:
-      Number(q.timeSpent ?? q.time ?? 0),
-
-    confidence:
-      q.confidence ??
-      null,
-
-    mistakeType:
-      q.mistakeType ??
-      "",
-
-    mistakeReason:
-      q.mistakeReason ??
-      "",
-
-    solution:
-      q.solution ||
-      q.explanation ||
-      "",
-
-    timestamp:
-      q.timestamp ||
-      Date.now()
-  };
-}
-
-
-/* ---------------------------------------------------------
-   CONFIDENCE NORMALIZATION
---------------------------------------------------------- */
-
-function rbConfidenceValue(value){
-
-  if(value === null || value === undefined){
-    return null;
-  }
-
-  if(typeof value === "number"){
-    return Math.max(0, Math.min(100, value));
-  }
-
-  const text =
-    String(value)
-      .trim()
-      .toLowerCase();
-
-  if(
-    text.includes("very high") ||
-    text.includes("certain")
-  ){
-    return 95;
-  }
-
-  if(
-    text.includes("high") ||
-    text.includes("confident")
-  ){
-    return 80;
-  }
-
-  if(
-    text.includes("medium") ||
-    text.includes("moderate")
-  ){
-    return 60;
-  }
-
-  if(
-    text.includes("low") ||
-    text.includes("unsure")
-  ){
-    return 35;
-  }
-
-  if(text.includes("guess")){
-    return 20;
-  }
-
-  return null;
-}
-
-
-/* ---------------------------------------------------------
-   CORRECT / WRONG CLICK DETECTION
---------------------------------------------------------- */
-
-function rbIsCorrect(q){
-
-  const selected =
-    normalize(q.selectedAnswer);
-
-  const correct =
-    normalize(q.correctAnswer);
-
-  if(
-    selected &&
-    correct &&
-    selected === correct
-  ){
-    return true;
-  }
-
-  if(
-    Number.isInteger(Number(q.selectedIndex)) &&
-    Number.isInteger(Number(q.correctIndex))
-  ){
-
-    return Number(q.selectedIndex) ===
-           Number(q.correctIndex);
-  }
-
-  return false;
-}
-
-
-function rbLooksLikeWrongClick(q){
-
-  const selected =
-    String(q.selectedAnswer || "").trim();
-
-  const correct =
-    String(q.correctAnswer || "").trim();
-
-  if(!selected){
-    return false;
-  }
-
-  /*
-    If the system has explicit interaction metadata,
-    trust it first.
-  */
-
-  if(q.wrongClick === true){
-    return true;
-  }
-
-  if(q.answerChangedImmediately === true){
-    return true;
-  }
-
-  /*
-    Very short time + otherwise normal performance
-    is a signal, not proof.
-  */
-
-  const time =
-    Number(q.timeSpent || 0);
-
-  if(
-    time > 0 &&
-    time < 3 &&
-    selected !== correct &&
-    q.confidence !== null
-  ){
-    const confidence =
-      rbConfidenceValue(q.confidence);
-
-    if(
-      confidence !== null &&
-      confidence >= 70
-    ){
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-/* ---------------------------------------------------------
-   ROOT CAUSE DIAGNOSIS
---------------------------------------------------------- */
-
-function rbDiagnose(q){
-
-  const item =
-    rbNormalizeQuestion(q);
-
-  if(!item){
-    return {
-      type: RB_MISTAKE_TYPES.CONCEPT,
-      confidence: 0,
-      reason: "Insufficient question data.",
-      action: "Review the concept and retry."
-    };
-  }
-
-  const explicit =
-    String(item.mistakeType || "")
-      .trim();
-
-  /*
-    Existing explicit diagnosis gets priority.
-  */
-
-  if(explicit){
-
-    return {
-      type: explicit,
-      confidence: 95,
-      reason:
-        item.mistakeReason ||
-        "Previously classified mistake.",
-      action:
-        rbActionForType(explicit)
-    };
-  }
-
-  /*
-    1. Empty answer
-  */
-
-  if(!item.selectedAnswer){
-
-    return {
-      type: RB_MISTAKE_TYPES.TIME,
-      confidence: 75,
-      reason:
-        "The question was not answered.",
-      action:
-        "Practice faster question selection and time allocation."
-    };
-  }
-
-
-  /*
-    2. Wrong click
-  */
-
-  if(rbLooksLikeWrongClick(item)){
-
-    return {
-      type: RB_MISTAKE_TYPES.CLICK,
-      confidence: 70,
-      reason:
-        "The answer pattern suggests an accidental or rushed selection.",
-      action:
-        "Slow down for the final answer selection and verify the chosen option."
-    };
-  }
-
-
-  /*
-    3. Guessing / low confidence
-  */
-
-  const confidence =
-    rbConfidenceValue(item.confidence);
-
-  if(
-    confidence !== null &&
-    confidence <= 30 &&
-    !rbIsCorrect(item)
-  ){
-
-    return {
-      type: RB_MISTAKE_TYPES.GUESS,
-      confidence: 88,
-      reason:
-        "The answer was selected with low confidence.",
-      action:
-        "Strengthen concept recognition before attempting similar questions."
-    };
-  }
-
-
-  /*
-    4. Calculation clues
-  */
-
-  const text =
-    normalize(
-      item.question +
-      " " +
-      item.solution
-    );
-
-  const calculationWords = [
-    "calculate",
-    "find the value",
-    "numerical",
-    "velocity",
-    "acceleration",
-    "force",
-    "energy",
-    "power",
-    "current",
-    "resistance",
-    "molarity",
-    "percentage",
-    "ratio"
-  ];
-
-  if(
-    calculationWords.some(function(word){
-      return text.includes(word);
-    })
-  ){
-
-    return {
-      type: RB_MISTAKE_TYPES.CALCULATION,
-      confidence: 68,
-      reason:
-        "The question appears calculation-heavy and the selected answer was incorrect.",
-      action:
-        "Recheck formula selection, substitution, units and arithmetic."
-    };
-  }
-
-
-  /*
-    5. Misread clues
-  */
-
-  const misreadWords = [
-    "incorrect",
-    "not true",
-    "except",
-    "least",
-    "most appropriate",
-    "false",
-    "wrong statement"
-  ];
-
-  if(
-    misreadWords.some(function(word){
-      return normalize(item.question).includes(word);
-    })
-  ){
-
-    return {
-      type: RB_MISTAKE_TYPES.MISREAD,
-      confidence: 62,
-      reason:
-        "The wording contains a reversal or exception condition that can cause an avoidable error.",
-      action:
-        "Underline the command word mentally before checking the options."
-    };
-  }
-
-
-  /*
-    6. Default conceptual diagnosis
-  */
-
-  return {
-    type: RB_MISTAKE_TYPES.CONCEPT,
-    confidence: 55,
-    reason:
-      "The answer was incorrect without enough evidence for a more specific diagnosis.",
-    action:
-      "Review the underlying concept and retry the question without looking at the answer."
-  };
-}
-
-
-/* ---------------------------------------------------------
-   ACTION LIBRARY
---------------------------------------------------------- */
-
-function rbActionForType(type){
-
-  const actions = {
-
-    "Concept Gap":
-      "Review the core concept, explain it in your own words, then solve 3 fresh questions.",
-
-    "NCERT / Recall Gap":
-      "Revise the relevant NCERT line/table/diagram and immediately test recall.",
-
-    "Wrong Approach":
-      "Learn the shortest reliable approach and compare it with your original method.",
-
-    "Calculation Error":
-      "Repeat the calculation slowly, identify the first incorrect step, then solve two similar questions.",
-
-    "Question Misread":
-      "Read the command words first: NOT, EXCEPT, incorrect, least, most appropriate, etc.",
-
-    "Guessing":
-      "Stop option-first guessing. Identify the governing concept before eliminating options.",
-
-    "Time Pressure":
-      "Train question selection and set a strict time target for this question type.",
-
-    "Wrong Click":
-      "Verify the selected option before submitting and avoid rushed final clicks.",
-
-    "Application Gap":
-      "Review the concept-to-question connection and practise unfamiliar applications.",
-
-    "Persistent Weakness":
-      "Move this topic into focused practice until repeated retests show stable mastery."
-  };
-
-  return actions[type] ||
-    "Review the concept and retry the question.";
-}
-
-
-/* ---------------------------------------------------------
-   PERSISTENT WEAKNESS DETECTION
---------------------------------------------------------- */
-
-function rbFindPersistentWeaknesses(records){
-
-  const groups = {};
-
-  records.forEach(function(q){
-
-    const item =
-      rbNormalizeQuestion(q);
-
-    if(!item){
-      return;
-    }
-
-    const topic =
-      item.subject +
-      "::" +
-      item.topic;
-
-    if(!groups[topic]){
-      groups[topic] = {
-        subject: item.subject,
-        topic: item.topic,
-        attempts: 0,
-        wrong: 0,
-        times: [],
-        types: {}
-      };
-    }
-
-    groups[topic].attempts++;
-
-    if(!rbIsCorrect(item)){
-      groups[topic].wrong++;
-    }
-
-    if(item.timeSpent > 0){
-      groups[topic].times.push(item.timeSpent);
-    }
-
-    const diagnosis =
-      rbDiagnose(item);
-
-    groups[topic].types[diagnosis.type] =
-      (groups[topic].types[diagnosis.type] || 0) + 1;
-  });
-
-
-  return Object.values(groups)
-    .filter(function(group){
-
-      /*
-        Persistent = repeated errors OR
-        high error rate across several attempts.
-      */
-
-      return (
-        group.attempts >= 3 &&
-        group.wrong >= 2
-      );
-    })
-    .map(function(group){
-
-      let dominantType =
-        RB_MISTAKE_TYPES.CONCEPT;
-
-      let highest = 0;
-
-      Object.keys(group.types)
-        .forEach(function(type){
-
-          if(group.types[type] > highest){
-
-            highest =
-              group.types[type];
-
-            dominantType = type;
-          }
-        });
-
-
-      const avgTime =
-        group.times.length
-        ? group.times.reduce(
-            function(a,b){ return a+b; },
-            0
-          ) / group.times.length
-        : 0;
-
-
-      return {
-        subject: group.subject,
-        topic: group.topic,
-        attempts: group.attempts,
-        wrong: group.wrong,
-        errorRate:
-          Math.round(
-            group.wrong /
-            group.attempts *
-            100
-          ),
-        dominantType: dominantType,
-        averageTime:
-          Math.round(avgTime),
-        priority:
-          group.wrong >= 4
-          ? "HIGH"
-          : "MEDIUM"
-      };
-    })
-    .sort(function(a,b){
-
-      return (
-        b.wrong - a.wrong ||
-        b.errorRate - a.errorRate
-      );
-    });
-}
-
-
-/* ---------------------------------------------------------
-   BUILD PERSONAL MENTOR SNAPSHOT
---------------------------------------------------------- */
-
-function buildRankBoosterSnapshot(){
-
-  const history =
-    rbRead(HISTORY_KEY, []);
-
-  const mistakes =
-    rbRead("cbtMistakes", []);
-
-  const diagnosisRecords =
-    [];
-
-  mistakes.forEach(function(q){
-
-    const item =
-      rbNormalizeQuestion(q);
-
-    if(!item){
-      return;
-    }
-
-    const diagnosis =
-      rbDiagnose(item);
-
-    diagnosisRecords.push({
-
-      question: item.question,
-
-      subject: item.subject,
-
-      topic: item.topic,
-
-      correct:
-        rbIsCorrect(item),
-
-      timeSpent:
-        item.timeSpent,
-
-      confidence:
-        rbConfidenceValue(item.confidence),
-
-      diagnosis:
-        diagnosis.type,
-
-      diagnosisConfidence:
-        diagnosis.confidence,
-
-      reason:
-        diagnosis.reason,
-
-      action:
-        diagnosis.action,
-
-      timestamp:
-        item.timestamp
-    });
-  });
-
-
-  const weaknesses =
-    rbFindPersistentWeaknesses(
-      mistakes
-    );
-
-
-  const correct =
-    diagnosisRecords.filter(
-      function(x){ return x.correct; }
-    ).length;
-
-
-  const total =
-    diagnosisRecords.length;
-
-
-  const accuracy =
-    total
-    ? Math.round(correct / total * 100)
-    : 0;
-
-
-  const snapshot = {
-
-    version: 1,
-
-    updatedAt:
-      Date.now(),
-
-    totalQuestions:
-      total,
-
-    correct:
-      correct,
-
-    accuracy:
-      accuracy,
-
-    activeMistakes:
-      getActive().length,
-
-    mastered:
-      getMastered().length,
-
-    diagnosis:
-      diagnosisRecords,
-
-    persistentWeaknesses:
-      weaknesses,
-
-    nextPriority:
-      weaknesses.length
-      ? weaknesses[0]
-      : null
-  };
-
-
-  rbWrite(
-    RB_DIAGNOSIS_KEY,
-    snapshot
+  submission,
+  autoSubmitted
+) {
+
+  testScreen.classList.add(
+    "hidden"
   );
 
-  return snapshot;
+
+  resultScreen.classList.remove(
+    "hidden"
+  );
+
+
+  const score =
+    submission.score;
+
+
+  resultSummary.innerHTML = `
+
+    ${
+      autoSubmitted
+        ? `
+          <div class="error">
+            ⏰ Time limit reached.
+            The test was submitted automatically.
+          </div>
+        `
+        : ""
+    }
+
+    <div class="result-grid">
+
+      <div class="result-box">
+        <div class="result-value">
+          ${score.score}
+        </div>
+        <div class="result-label">
+          Score
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-value">
+          ${score.correct}
+        </div>
+        <div class="result-label">
+          Correct
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-value">
+          ${score.incorrect}
+        </div>
+        <div class="result-label">
+          Incorrect
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-value">
+          ${score.skipped}
+        </div>
+        <div class="result-label">
+          Skipped
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-value">
+          ${score.accuracy}%
+        </div>
+        <div class="result-label">
+          Accuracy
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-value">
+          ${submission.mistakes.length}
+        </div>
+        <div class="result-label">
+          New Mistakes
+        </div>
+      </div>
+
+    </div>
+
+  `;
+
 }
+  /* =====================================================
+   RESULT NAVIGATION
+===================================================== */
 
-
-/* ---------------------------------------------------------
-   MENTOR NEXT ACTION
---------------------------------------------------------- */
-
-function getRankBoosterNextAction(){
-
-  const snapshot =
-    rbRead(
-      RB_DIAGNOSIS_KEY,
-      null
-    );
-
-  if(
-    !snapshot ||
-    !snapshot.nextPriority
-  ){
-
-    return {
-      title:
-        "Build your baseline",
-
-      message:
-        "Complete a full test first. The mentor needs enough performance data to identify your highest-impact weakness.",
-
-      priority:
-        "BASELINE"
-    };
+historyButton.addEventListener(
+  "click",
+  function () {
+    window.location.href = "history.html";
   }
+);
 
 
-  const weakness =
-    snapshot.nextPriority;
-
-
-  return {
-
-    title:
-      "Fix " +
-      weakness.topic,
-
-    message:
-      weakness.subject +
-      " → " +
-      weakness.topic +
-      " has " +
-      weakness.wrong +
-      " mistakes across " +
-      weakness.attempts +
-      " attempts. Dominant issue: " +
-      weakness.dominantType +
-      ".",
-
-    priority:
-      weakness.priority,
-
-    action:
-      rbActionForType(
-        weakness.dominantType
-      )
-  };
-}
-
-
-/* ---------------------------------------------------------
-   RUN AFTER A TEST
---------------------------------------------------------- */
-
-function runRankBoosterAnalysis(){
-
-  try{
-
-    const snapshot =
-      buildRankBoosterSnapshot();
-
-    console.log(
-      "🏆 Rank Booster Analysis",
-      snapshot
-    );
-
-    console.log(
-      "➡️ Next Mentor Action:",
-      getRankBoosterNextAction()
-    );
-
-    return snapshot;
-
-  }catch(error){
-
-    console.error(
-      "Rank Booster analysis failed:",
-      error
-    );
-
-    return null;
+mistakeButton.addEventListener(
+  "click",
+  function () {
+    window.location.href = "mistake.html";
   }
+);
+
+
+retryButton.addEventListener(
+  "click",
+  function () {
+    window.location.href = "retry.html";
   }
+);
+
 
 /* =====================================================
-   END CBT ENGINE
+   INITIALIZE CBT
+===================================================== */
+
+try {
+
+  if (!Array.isArray(questions) || questions.length === 0) {
+
+    throw new Error(
+      "No questions are available for this test."
+    );
+
+  }
+
+  renderQuestion();
+
+} catch (error) {
+
+  showError(
+    error.message ||
+    "Unable to load CBT test."
+  );
+
+}
+
+
+/* =====================================================
+   END SCRIPT
 ===================================================== */
 
 </script>
