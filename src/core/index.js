@@ -2,12 +2,30 @@
  * CBT Analyzer Pro
  * Production Core — Public API
  *
- * v9.1.1
+ * v10.0.0 — Rank Booster / TOPPER
+ *
+ * Central export point for the entire core system.
  */
 
-export { createQuestion } from "./models/question.js";
-export { createTest } from "./models/test.js";
-export { createAttempt } from "./models/attempt.js";
+
+/* =====================================================
+   MODELS
+===================================================== */
+
+export {
+  createQuestion,
+} from "./models/question.js";
+
+
+export {
+  createTest,
+} from "./models/test.js";
+
+
+export {
+  createAttempt,
+} from "./models/attempt.js";
+
 
 export {
   createMistake,
@@ -16,6 +34,11 @@ export {
   VALID_REASONS,
   VALID_STATUS,
 } from "./models/mistake.js";
+
+
+/* =====================================================
+   STORAGE
+===================================================== */
 
 export {
   readCollection,
@@ -27,22 +50,42 @@ export {
   storageStats,
 } from "./storage/storage.js";
 
-export { scoreAttempt } from "./scoring/scoring.js";
+
+/* =====================================================
+   SCORING
+===================================================== */
+
+export {
+  scoreAttempt,
+} from "./scoring/scoring.js";
+
+
+/* =====================================================
+   CBT ENGINE
+===================================================== */
+
+export {
+  startAttempt,
+  saveAnswer,
+  submitAttempt,
+} from "./cbt/engine.js";
+
+
+/* =====================================================
+   MISTAKE ENGINE
+===================================================== */
 
 export {
   createMistakesFromAttempt,
+  calculateMistakePriority,
+  updateMistakeReason,
+  recordPracticeResult,
 } from "./mistakes/mistakeEngine.js";
 
-export {
-  calculateAttemptAnalytics,
-  calculateMistakeAnalytics,
-  calculateImprovement,
-} from "./analytics/analytics.js";
-export {
-  getMistakeForPractice,
-  recordPractice,
-  getPracticeProgress,
-} from "./practice/practiceEngine.js";
+
+/* =====================================================
+   MISTAKE BOOK
+===================================================== */
 
 export {
   getMistakeBook,
@@ -51,21 +94,41 @@ export {
   getMistakesByStatus,
   getActiveMistakes,
 } from "./mistakes/mistakeBook.js";
+
+
+/* =====================================================
+   PRACTICE ENGINE
+===================================================== */
+
 export {
   getMistakeForPractice,
   recordPractice,
   getPracticeProgress,
 } from "./practice/practiceEngine.js";
 
+
+/* =====================================================
+   ANALYTICS
+===================================================== */
+
 export {
-  getMistakeBook,
-  getMistake,
-  getMistakesByReason,
-  getMistakesByStatus,
-  getActiveMistakes,
-} from "./mistake/mistakeBook.js";
+  calculateAttemptAnalytics,
+  calculateMistakeAnalytics,
+  calculateImprovement,
+} from "./analytics/analytics.js";
+
+
+/* =====================================================
+   ADAPTIVE / DPP ENGINE
+===================================================== */
+
 export {
-  startAttempt,
-  saveAnswer,
-  submitAttempt,
-} from "./cbt/engine.js";
+  calculateDPPPriority,
+  getDPPStage,
+  needsMoreDPP,
+  isReadyForMasteryCheck,
+  createDPPTarget,
+  getDPPTargets,
+  getNextDPPTarget,
+  getDPPSummary,
+} from "./adaptive/dppEngine.js";
