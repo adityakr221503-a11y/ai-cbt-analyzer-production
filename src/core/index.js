@@ -2,9 +2,7 @@
  * CBT Analyzer Pro
  * Production Core — Public API
  *
- * v10.0.0 — Rank Booster / TOPPER
- *
- * Central export point for the entire core system.
+ * v9.1.2
  */
 
 
@@ -13,17 +11,17 @@
 ===================================================== */
 
 export {
-  createQuestion,
+  createQuestion
 } from "./models/question.js";
 
 
 export {
-  createTest,
+  createTest
 } from "./models/test.js";
 
 
 export {
-  createAttempt,
+  createAttempt
 } from "./models/attempt.js";
 
 
@@ -32,7 +30,7 @@ export {
   updateMistakeReason,
   recordPracticeResult,
   VALID_REASONS,
-  VALID_STATUS,
+  VALID_STATUS
 } from "./models/mistake.js";
 
 
@@ -47,13 +45,7 @@ export {
   getItem,
   removeItem,
   clearCollection,
-  storageStats,
-  getQuestion,
-  saveQuestion,
-  saveQuestions,
-  hasItem,
-  collectionCount,
-  clearAllStorage,
+  storageStats
 } from "./storage/storage.js";
 
 
@@ -62,7 +54,7 @@ export {
 ===================================================== */
 
 export {
-  scoreAttempt,
+  scoreAttempt
 } from "./scoring/scoring.js";
 
 
@@ -73,7 +65,7 @@ export {
 export {
   startAttempt,
   saveAnswer,
-  submitAttempt,
+  submitAttempt
 } from "./cbt/engine.js";
 
 
@@ -82,10 +74,7 @@ export {
 ===================================================== */
 
 export {
-  createMistakesFromAttempt,
-  calculateMistakePriority,
-  updateMistakeReason,
-  recordPracticeResult,
+  createMistakesFromAttempt
 } from "./mistakes/mistakeEngine.js";
 
 
@@ -98,7 +87,7 @@ export {
   getMistake,
   getMistakesByReason,
   getMistakesByStatus,
-  getActiveMistakes,
+  getActiveMistakes
 } from "./mistakes/mistakeBook.js";
 
 
@@ -109,7 +98,7 @@ export {
 export {
   getMistakeForPractice,
   recordPractice,
-  getPracticeProgress,
+  getPracticeProgress
 } from "./practice/practiceEngine.js";
 
 
@@ -120,21 +109,5 @@ export {
 export {
   calculateAttemptAnalytics,
   calculateMistakeAnalytics,
-  calculateImprovement,
+  calculateImprovement
 } from "./analytics/analytics.js";
-
-
-/* =====================================================
-   ADAPTIVE / DPP ENGINE
-===================================================== */
-
-export {
-  calculateDPPPriority,
-  getDPPStage,
-  needsMoreDPP,
-  isReadyForMasteryCheck,
-  createDPPTarget,
-  getDPPTargets,
-  getNextDPPTarget,
-  getDPPSummary,
-} from "./adaptive/dppEngine.js";
