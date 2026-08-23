@@ -1,393 +1,399 @@
 /**
  * CBT Analyzer Pro
- * Production Core — Adaptive DPP Engine
+ * Production Core — DPP / Rank Booster Engine
  *
- * v10.0.0 — Rank Booster / TOPPER
+ * v10.3.0
  *
- * Purpose:
- * - Identify high-priority mistakes
- * - Decide which mistakes need DPP
- * - Build a structured DPP target
- * - Separate familiar, novel and transfer practice
- * - Decide when a student is ready for mastery checking
+ * DPP = Daily Practice / Diagnostic Practice
+ *
+ * Flow:
+ * Mistake
+ *   ↓
+ * Priority
+ *   ↓
+ * DPP Target
+ *   ↓
+ * Familiar
+ *   ↓
+ * Novel
+ *   ↓
+ * Transfer
+ *   ↓
+ * Mastery
  */
 
 import {
-  getMistakeBook,
-  getActiveMistakes,
-} from "../mistakes/mistakeBook.js";
+  readCollection,
+  addItem,
+} from "../storage/storage.js";
 
 
-/* ==========================================
+/* =====================================================
    CONFIGURATION
-========================================== */
+===================================================== */
 
-const DEFAULT_LIMIT = 10;
+const DPP_CONFIG = {
 
-const MASTERY = {
-  familiarAttempts: 5,
-  familiarSuccessRate: 0.90,
+  maxDailyTargets: 10,
 
-  novelAttempts: 3,
-  novelSuccessRate: 0.80,
+  highPriorityLimit: 5,
 
-  transferAttempts: 2,
-  transferSuccessRate: 0.75,
+  recurrenceThreshold: 2,
+
+  familiarTarget: 5,
+
+  novelTarget: 3,
+
+  transferTarget: 2,
+
 };
 
 
-/* ==========================================
+/* =====================================================
    SAFE NUMBER
-========================================== */
+===================================================== */
 
-function number(value, fallback = 0) {
-  const n = Number(value);
+function num(
+  value,
+  fallback = 0
+) {
 
-  return Number.isFinite(n)
-    ? n
+  const result =
+    Number(value);
+
+  return Number.isFinite(result)
+    ? result
     : fallback;
+
 }
 
 
-/* ==========================================
-   SUCCESS RATE
-========================================== */
+/* =====================================================
+   GET MISTAKES
+===================================================== */
 
-function successRate(
-  successful = 0,
-  attempts = 0
+function getMistakes() {
+
+  const mistakes =
+    readCollection(
+      "mistakes"
+    );
+
+
+  return Array.isArray(mistakes)
+    ? mistakes
+    : [];
+}
+
+
+/* =====================================================
+   PRIORITY
+===================================================== */
+
+export function calculateDPPPriority(
+  mistake
 ) {
-  const a = number(attempts);
 
-  if (a <= 0) {
+  if (!mistake) {
     return 0;
   }
 
-  return Number(
-    (
-      (number(successful) / a) *
-      100
-    ).toFixed(2)
-  );
-}
-
-
-/* ==========================================
-   MISTAKE PRIORITY
-========================================== */
-
-export function calculateDPPPriority(
-  mistake = {}
-) {
 
   let priority =
-    number(mistake.priority, 5);
-
-
-  /*
-   * Conceptual failures receive
-   * higher priority.
-   */
-
-  const reasonWeight = {
-
-    concept_gap: 5,
-
-    application_error: 5,
-
-    forgotten_fact: 4,
-
-    calculation_error: 4,
-
-    misread_question: 3,
-
-    guess: 3,
-
-    time_pressure: 3,
-
-    silly_mistake: 2,
-
-    unknown: 1,
-
-  };
-
-
-  priority +=
-    number(
-      reasonWeight[mistake.reason],
-      1
+    num(
+      mistake.priority,
+      5
     );
 
 
   /*
-   * Repeated failure increases urgency.
+   * Repeated weakness.
+   */
+
+  priority += Math.min(
+    3,
+    num(
+      mistake.recurrenceCount
+    )
+  );
+
+
+  /*
+   * Incorrect practice.
    */
 
   const practiceAttempts =
-    number(
+    num(
       mistake.practiceCount
     );
 
-  const practiceSuccess =
-    number(
+  const successfulAttempts =
+    num(
       mistake.successfulAttempts
     );
 
 
   if (
-    practiceAttempts > 0 &&
-    practiceSuccess === 0
+    practiceAttempts > 0
   ) {
-    priority += 2;
+
+    const successRate =
+      successfulAttempts /
+      practiceAttempts;
+
+
+    if (
+      successRate < 0.60
+    ) {
+
+      priority += 2;
+
+    } else if (
+      successRate < 0.80
+    ) {
+
+      priority += 1;
+
+    }
+
   }
 
 
   /*
-   * Failed novel questions are
-   * especially important.
+   * Active mistakes are more important
+   * than already improving weaknesses.
    */
 
-  const novelAttempts =
-    number(
-      mistake.novelAttempts
-    );
-
-  const novelSuccesses =
-    number(
-      mistake.novelSuccesses
-    );
-
-
   if (
-    novelAttempts >= 1 &&
-    novelSuccesses < novelAttempts
+    mistake.status ===
+    "new"
   ) {
+
     priority += 2;
+
   }
 
 
-  /*
-   * Transfer failure indicates that
-   * the concept is not yet generalized.
-   */
-
-  const transferAttempts =
-    number(
-      mistake.transferAttempts
-    );
-
-  const transferSuccesses =
-    number(
-      mistake.transferSuccesses
-    );
-
-
   if (
-    transferAttempts >= 1 &&
-    transferSuccesses < transferAttempts
+    mistake.status ===
+    "practicing"
   ) {
-    priority += 2;
-  }
 
-
-  /*
-   * Hard questions receive additional
-   * attention.
-   */
-
-  if (
-    [
-      "hard",
-      "very-hard",
-      "topper"
-    ].includes(
-      String(mistake.difficulty)
-    )
-  ) {
     priority += 1;
+
+  }
+
+
+  /*
+   * DPP-triggered mistakes move up.
+   */
+
+  if (
+    mistake.dppTrigger
+  ) {
+
+    priority += 2;
+
   }
 
 
   return Math.min(
-    10,
+    100,
     Math.max(
-      1,
+      0,
       priority
     )
   );
 }
 
 
-/* ==========================================
+/* =====================================================
    DETERMINE PRACTICE STAGE
-========================================== */
+===================================================== */
 
 export function getDPPStage(
-  mistake = {}
+  mistake
 ) {
 
-  const familiarAttempts =
-    number(
-      mistake.practiceCount
-    );
-
-  const familiarSuccesses =
-    number(
-      mistake.successfulAttempts
-    );
-
-
-  const novelAttempts =
-    number(
-      mistake.novelAttempts
-    );
-
-  const novelSuccesses =
-    number(
-      mistake.novelSuccesses
-    );
-
-
-  const transferAttempts =
-    number(
-      mistake.transferAttempts
-    );
-
-  const transferSuccesses =
-    number(
-      mistake.transferSuccesses
-    );
-
-
-  const familiarRate =
-    successRate(
-      familiarSuccesses,
-      familiarAttempts
-    );
-
-
-  const novelRate =
-    successRate(
-      novelSuccesses,
-      novelAttempts
-    );
-
-
-  const transferRate =
-    successRate(
-      transferSuccesses,
-      transferAttempts
-    );
-
-
-  /*
-   * Stage 1
-   *
-   * Student still needs basic
-   * familiar reinforcement.
-   */
-
-  if (
-    familiarAttempts <
-    MASTERY.familiarAttempts ||
-    familiarRate <
-    MASTERY.familiarSuccessRate * 100
-  ) {
+  if (!mistake) {
     return "familiar";
   }
 
 
-  /*
-   * Stage 2
-   *
-   * Familiar questions are good,
-   * but concept must survive a
-   * changed question.
-   */
+  const familiarAttempts =
+    num(
+      mistake.practiceCount
+    );
+
+
+  const novelAttempts =
+    num(
+      mistake.novelAttempts
+    );
+
+
+  const transferAttempts =
+    num(
+      mistake.transferAttempts
+    );
+
+
+  const familiarSuccess =
+    familiarAttempts >=
+      DPP_CONFIG.familiarTarget &&
+
+    (
+      num(
+        mistake.successfulAttempts
+      ) /
+      familiarAttempts
+    ) >= 0.90;
+
+
+  const novelSuccess =
+    novelAttempts >=
+      DPP_CONFIG.novelTarget &&
+
+    (
+      num(
+        mistake.novelSuccesses
+      ) /
+      novelAttempts
+    ) >= 0.80;
+
+
+  const transferSuccess =
+    transferAttempts >=
+      DPP_CONFIG.transferTarget &&
+
+    (
+      num(
+        mistake.transferSuccesses
+      ) /
+      transferAttempts
+    ) >= 0.75;
+
 
   if (
-    novelAttempts <
-    MASTERY.novelAttempts ||
-    novelRate <
-    MASTERY.novelSuccessRate * 100
+    !familiarSuccess
   ) {
+
+    return "familiar";
+
+  }
+
+
+  if (
+    !novelSuccess
+  ) {
+
     return "novel";
+
   }
 
-
-  /*
-   * Stage 3
-   *
-   * Test transfer/application.
-   */
 
   if (
-    transferAttempts <
-    MASTERY.transferAttempts ||
-    transferRate <
-    MASTERY.transferSuccessRate * 100
+    !transferSuccess
   ) {
+
     return "transfer";
+
   }
 
 
-  /*
-   * All stages passed.
-   */
-
-  return "mastery-check";
+  return "mastered";
 }
 
 
-/* ==========================================
-   WHETHER DPP IS REQUIRED
-========================================== */
+/* =====================================================
+   SHOULD CONTINUE DPP
+===================================================== */
 
 export function needsMoreDPP(
-  mistake = {}
+  mistake
 ) {
 
+  if (!mistake) {
+    return false;
+  }
+
+
   if (
-    mistake.status === "mastered"
+    mistake.status ===
+    "mastered"
   ) {
+
+    return false;
+
+  }
+
+
+  return (
+    getDPPStage(
+      mistake
+    ) !==
+    "mastered"
+  );
+}
+
+
+/* =====================================================
+   MASTERY CHECK
+===================================================== */
+
+export function isReadyForMasteryCheck(
+  mistake
+) {
+
+  if (!mistake) {
     return false;
   }
 
 
   const stage =
-    getDPPStage(mistake);
+    getDPPStage(
+      mistake
+    );
 
-
-  return stage !== "mastery-check";
-}
-
-
-/* ==========================================
-   MASTERY CHECK
-========================================== */
-
-export function isReadyForMasteryCheck(
-  mistake = {}
-) {
 
   return (
-    mistake.status !== "mastered" &&
-    getDPPStage(mistake) ===
-      "mastery-check"
+    stage ===
+    "mastered"
   );
 }
 
 
-/* ==========================================
-   BUILD DPP TARGET
-========================================== */
+/* =====================================================
+   CREATE DPP TARGET
+===================================================== */
 
 export function createDPPTarget(
-  mistake = {}
+  mistake
 ) {
 
+  if (!mistake) {
+
+    throw new Error(
+      "Mistake is required."
+    );
+
+  }
+
+
   const stage =
-    getDPPStage(mistake);
+    getDPPStage(
+      mistake
+    );
+
+
+  if (
+    stage ===
+    "mastered"
+  ) {
+
+    return null;
+
+  }
 
 
   const priority =
@@ -398,11 +404,21 @@ export function createDPPTarget(
 
   return {
 
+    id:
+      `dpp_${mistake.id}`,
+
     mistakeId:
       String(mistake.id),
 
     questionId:
       String(mistake.questionId),
+
+    studentId:
+      mistake.studentId ?? null,
+
+    attemptId:
+      mistake.attemptId ?? null,
+
 
     subject:
       mistake.subject || "",
@@ -416,103 +432,171 @@ export function createDPPTarget(
     concept:
       mistake.concept || "",
 
-    skillTested:
-      mistake.skillTested || "",
-
     masterySkill:
-      mistake.masterySkill || "",
+      mistake.masterySkill ||
+      mistake.skillTested ||
+      "",
 
-    reason:
-      mistake.reason || "unknown",
 
     difficulty:
-      mistake.difficulty || "medium",
+      mistake.difficulty ||
+      "medium",
 
-    questionType:
-      mistake.questionType ||
-      "standard",
 
-    trapType:
-      mistake.trapType || "",
+    reason:
+      mistake.reason ||
+      "unknown",
 
-    priority,
 
     stage,
 
-    dppTrigger:
-      needsMoreDPP(mistake),
+    priority,
 
-    recommendedCount:
-      stage === "familiar"
-        ? 5
-        : stage === "novel"
-          ? 3
-          : stage === "transfer"
-            ? 2
-            : 1,
 
-    variationRequired:
-      stage !== "familiar",
+    recurrenceCount:
+      num(
+        mistake.recurrenceCount
+      ),
 
-    masteryCheck:
-      stage === "mastery-check",
+
+    practiceCount:
+      num(
+        mistake.practiceCount
+      ),
+
+
+    status:
+      mistake.status ||
+      "new",
+
+
+    createdAt:
+      new Date().toISOString(),
 
   };
 }
 
 
-/* ==========================================
+/* =====================================================
    GET ALL DPP TARGETS
-========================================== */
+===================================================== */
 
 export function getDPPTargets({
-  limit = DEFAULT_LIMIT,
-  includeMastered = false,
+
+  limit =
+    DPP_CONFIG.maxDailyTargets,
+
+  subject = null,
+
 } = {}) {
 
-  const mistakes =
-    includeMastered
-      ? getMistakeBook()
-      : getActiveMistakes();
+  let mistakes =
+    getMistakes();
 
 
-  return mistakes
+  /*
+   * Remove mastered mistakes.
+   */
 
-    .filter(
+  mistakes =
+    mistakes.filter(
       (mistake) =>
-        includeMastered ||
-        needsMoreDPP(mistake)
-    )
+        mistake.status !==
+        "mastered"
+    );
 
-    .map(
+
+  /*
+   * Optional subject filter.
+   */
+
+  if (subject) {
+
+    mistakes =
+      mistakes.filter(
+        (mistake) =>
+          String(
+            mistake.subject || ""
+          ).toLowerCase() ===
+          String(subject)
+            .toLowerCase()
+      );
+
+  }
+
+
+  /*
+   * Only weaknesses requiring DPP.
+   */
+
+  mistakes =
+    mistakes.filter(
       (mistake) =>
-        createDPPTarget(
+        needsMoreDPP(
           mistake
         )
-    )
+    );
 
-    .sort(
-      (a, b) =>
-        b.priority -
-        a.priority
-    )
 
-    .slice(
+  /*
+   * Highest priority first.
+   */
+
+  mistakes.sort(
+    (a, b) => {
+
+      return (
+        calculateDPPPriority(b) -
+        calculateDPPPriority(a)
+      );
+
+    }
+  );
+
+
+  /*
+   * Convert into DPP targets.
+   */
+
+  const targets = [];
+
+
+  for (
+    const mistake
+    of mistakes.slice(
       0,
       Math.max(
         1,
-        number(
-          limit,
-          DEFAULT_LIMIT
-        )
+        Number(limit) ||
+          DPP_CONFIG.maxDailyTargets
       )
-    );
+    )
+  ) {
+
+    const target =
+      createDPPTarget(
+        mistake
+      );
+
+
+    if (target) {
+
+      targets.push(
+        target
+      );
+
+    }
+
+  }
+
+
+  return targets;
 }
 
 
-/* ==========================================
+/* =====================================================
    GET NEXT DPP TARGET
-========================================== */
+===================================================== */
 
 export function getNextDPPTarget() {
 
@@ -528,70 +612,96 @@ export function getNextDPPTarget() {
 }
 
 
-/* ==========================================
-   DPP SUMMARY
-========================================== */
+/* =====================================================
+   GET DPP SUMMARY
+===================================================== */
 
 export function getDPPSummary() {
 
   const mistakes =
-    getActiveMistakes();
+    getMistakes();
 
 
-  const targets =
-    getDPPTargets({
-      limit: mistakes.length || 1,
-    });
+  const active =
+    mistakes.filter(
+      (mistake) =>
+        mistake.status !==
+        "mastered"
+    );
 
 
-  const summary = {
+  const mastered =
+    mistakes.filter(
+      (mistake) =>
+        mistake.status ===
+        "mastered"
+    );
 
-    totalActiveMistakes:
+
+  const dppRequired =
+    active.filter(
+      (mistake) =>
+        needsMoreDPP(
+          mistake
+        )
+    );
+
+
+  const familiar =
+    active.filter(
+      (mistake) =>
+        getDPPStage(
+          mistake
+        ) === "familiar"
+    );
+
+
+  const novel =
+    active.filter(
+      (mistake) =>
+        getDPPStage(
+          mistake
+        ) === "novel"
+    );
+
+
+  const transfer =
+    active.filter(
+      (mistake) =>
+        getDPPStage(
+          mistake
+        ) === "transfer"
+    );
+
+
+  return {
+
+    totalMistakes:
       mistakes.length,
 
-    totalDPPRequired:
-      targets.filter(
-        (target) =>
-          target.dppTrigger
-      ).length,
+    activeMistakes:
+      active.length,
+
+    mastered:
+      mastered.length,
+
+    dppRequired:
+      dppRequired.length,
 
     familiar:
-      targets.filter(
-        (target) =>
-          target.stage === "familiar"
-      ).length,
+      familiar.length,
 
     novel:
-      targets.filter(
-        (target) =>
-          target.stage === "novel"
-      ).length,
+      novel.length,
 
     transfer:
-      targets.filter(
-        (target) =>
-          target.stage === "transfer"
-      ).length,
+      transfer.length,
 
-    masteryReady:
-      targets.filter(
-        (target) =>
-          target.stage ===
-          "mastery-check"
-      ).length,
-
-    highestPriority:
-      targets.length > 0
-        ? targets[0].priority
-        : 0,
-
-    next:
-      targets.length > 0
-        ? targets[0]
-        : null,
+    dailyTargetCount:
+      Math.min(
+        DPP_CONFIG.maxDailyTargets,
+        dppRequired.length
+      ),
 
   };
-
-
-  return summary;
-    }
+}
