@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -31,8 +29,7 @@
     }
 
     button,
-    select,
-    input {
+    select {
       font: inherit;
     }
 
@@ -43,8 +40,6 @@
     .hidden {
       display: none !important;
     }
-
-    /* HEADER */
 
     header {
       background: #ffffff;
@@ -59,6 +54,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+
+      gap: 15px;
     }
 
     .logo {
@@ -70,15 +67,11 @@
       color: #4f46e5;
     }
 
-    /* CONTAINER */
-
     .container {
       max-width: 1200px;
       margin: 25px auto;
       padding: 0 15px;
     }
-
-    /* CARD */
 
     .card {
       background: #ffffff;
@@ -87,10 +80,9 @@
       margin-bottom: 18px;
 
       box-shadow:
-        0 4px 15px rgba(15, 23, 42, 0.07);
+        0 4px 15px
+        rgba(15, 23, 42, 0.07);
     }
-
-    /* SETUP */
 
     .setup {
       max-width: 700px;
@@ -115,9 +107,12 @@
     select {
       width: 100%;
       padding: 13px;
+
       border: 1px solid #cbd5e1;
       border-radius: 10px;
+
       background: #ffffff;
+      color: #0f172a;
     }
 
     .mode-grid {
@@ -128,10 +123,11 @@
 
     .mode {
       padding: 15px;
+
       border: 2px solid #e2e8f0;
       border-radius: 12px;
+
       background: #ffffff;
-      cursor: pointer;
     }
 
     .mode.selected {
@@ -148,16 +144,17 @@
       color: #64748b;
     }
 
-    /* BUTTONS */
-
     .primary {
       width: 100%;
       margin-top: 20px;
       padding: 14px;
+
       border: 0;
       border-radius: 10px;
+
       background: #4f46e5;
       color: #ffffff;
+
       font-weight: 800;
     }
 
@@ -166,13 +163,12 @@
       cursor: not-allowed;
     }
 
-    /* CBT */
-
     .cbt-layout {
       display: grid;
       grid-template-columns:
         minmax(0, 1fr)
         320px;
+
       gap: 18px;
     }
 
@@ -186,9 +182,12 @@
     .timer {
       min-width: 95px;
       padding: 10px 14px;
+
       border-radius: 10px;
+
       background: #0f172a;
       color: #ffffff;
+
       text-align: center;
       font-weight: 800;
       font-size: 18px;
@@ -210,12 +209,12 @@
 
     .question-text {
       margin-top: 12px;
+
       font-size: 20px;
       line-height: 1.6;
+
       white-space: pre-wrap;
     }
-
-    /* OPTIONS */
 
     .options {
       margin-top: 20px;
@@ -223,6 +222,7 @@
 
     .option {
       display: block;
+
       width: 100%;
       padding: 15px;
       margin-bottom: 10px;
@@ -246,12 +246,11 @@
       background: #dcfce7;
     }
 
-    /* NAVIGATION */
-
     .navigation {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+
       margin-top: 20px;
     }
 
@@ -259,8 +258,10 @@
     .review-button,
     .submit-button {
       padding: 13px;
+
       border: 0;
       border-radius: 10px;
+
       color: #ffffff;
       font-weight: 700;
     }
@@ -271,6 +272,7 @@
 
     .navigation button:disabled {
       opacity: 0.4;
+      cursor: not-allowed;
     }
 
     .review-button {
@@ -285,8 +287,6 @@
       background: #dc2626;
     }
 
-    /* PALETTE */
-
     .palette-title {
       font-size: 19px;
       font-weight: 800;
@@ -296,8 +296,10 @@
     .legend {
       display: grid;
       grid-template-columns: 1fr 1fr;
+
       gap: 9px;
       margin-bottom: 18px;
+
       font-size: 12px;
     }
 
@@ -310,6 +312,7 @@
     .legend-dot {
       width: 17px;
       height: 17px;
+
       border-radius: 5px;
       flex-shrink: 0;
     }
@@ -318,14 +321,17 @@
       display: grid;
       grid-template-columns:
         repeat(5, 1fr);
+
       gap: 7px;
     }
 
     .palette button {
       height: 42px;
       padding: 0;
+
       border: 0;
       border-radius: 8px;
+
       font-weight: 800;
     }
 
@@ -342,7 +348,9 @@
     .palette-notanswered {
       background: #f8fafc;
       color: #475569;
-      border: 2px solid #cbd5e1 !important;
+
+      border:
+        2px solid #cbd5e1 !important;
     }
 
     .palette-notvisited {
@@ -360,17 +368,15 @@
       color: #ffffff;
     }
 
-    /* INFO */
-
     .info {
       margin-top: 15px;
       padding: 13px;
+
       border-radius: 10px;
+
       background: #eef2ff;
       color: #3730a3;
     }
-
-    /* RESULT */
 
     .result {
       max-width: 700px;
@@ -386,11 +392,11 @@
     .result-row {
       padding: 13px;
       margin-top: 8px;
+
       border-radius: 9px;
+
       background: #f8fafc;
     }
-
-    /* MOBILE */
 
     @media (max-width: 800px) {
 
@@ -418,10 +424,6 @@
         font-size: 18px;
       }
 
-      .test-header {
-        align-items: flex-start;
-      }
-
     }
 
   </style>
@@ -446,13 +448,7 @@
 
 </header>
 
-
 <div class="container">
-
-
-  <!-- =========================================
-       SETUP SCREEN
-  ========================================== -->
 
   <section
     id="setupScreen"
@@ -465,10 +461,7 @@
 
     <p class="subtitle">
       Choose your test and start the CBT.
-      The question palette will track every
-      question automatically.
     </p>
-
 
     <div class="field">
 
@@ -482,14 +475,13 @@
           Select Test
         </option>
 
-        <option value="demo">
+        <option value="demo-test">
           Demo CBT Test — 5 Questions
         </option>
 
       </select>
 
     </div>
-
 
     <div class="field">
 
@@ -515,13 +507,11 @@
 
     </div>
 
-
     <div class="field">
 
       <label>
         Question Order
       </label>
-
 
       <div class="mode-grid">
 
@@ -539,7 +529,6 @@
           </small>
 
         </div>
-
 
         <div
           id="randomMode"
@@ -560,14 +549,12 @@
 
     </div>
 
-
     <div
       id="testInfo"
       class="info"
     >
       Select a test to continue.
     </div>
-
 
     <button
       id="startButton"
@@ -578,11 +565,9 @@
     </button>
 
   </section>
-
-
-  <!-- =========================================
+    <!-- =================================================
        CBT SCREEN
-  ========================================== -->
+  ================================================== -->
 
   <section
     id="cbtScreen"
@@ -591,8 +576,7 @@
 
     <div class="cbt-layout">
 
-
-      <!-- QUESTION AREA -->
+      <!-- MAIN QUESTION AREA -->
 
       <div class="card">
 
@@ -616,6 +600,7 @@
           id="questionNumber"
           class="question-number"
         >
+          Question 1
         </div>
 
 
@@ -623,15 +608,17 @@
           id="questionText"
           class="question-text"
         >
+          Question will appear here.
         </div>
 
 
         <div
           id="options"
           class="options"
-        >
-        </div>
+        ></div>
 
+
+        <!-- NAVIGATION -->
 
         <div class="navigation">
 
@@ -641,6 +628,7 @@
           >
             Previous
           </button>
+
 
           <button
             id="nextButton"
@@ -652,6 +640,8 @@
         </div>
 
 
+        <!-- REVIEW -->
+
         <button
           id="reviewButton"
           class="review-button"
@@ -660,6 +650,8 @@
           Mark for Review
         </button>
 
+
+        <!-- SUBMIT -->
 
         <button
           id="submitButton"
@@ -672,7 +664,9 @@
       </div>
 
 
-      <!-- QUESTION PALETTE -->
+      <!-- =================================================
+           QUESTION PALETTE
+      ================================================== -->
 
       <aside class="card">
 
@@ -681,14 +675,17 @@
         </div>
 
 
-        <div class="legend">
+        <!-- LEGEND -->
 
+        <div class="legend">
 
           <div class="legend-item">
 
             <span
               class="legend-dot"
-              style="background:#7c3aed;"
+              style="
+                background:#7c3aed;
+              "
             ></span>
 
             Current
@@ -700,7 +697,9 @@
 
             <span
               class="legend-dot"
-              style="background:#22c55e;"
+              style="
+                background:#22c55e;
+              "
             ></span>
 
             Answered
@@ -727,7 +726,9 @@
 
             <span
               class="legend-dot"
-              style="background:#3b82f6;"
+              style="
+                background:#3b82f6;
+              "
             ></span>
 
             Not Visited
@@ -739,22 +740,24 @@
 
             <span
               class="legend-dot"
-              style="background:#f59e0b;"
+              style="
+                background:#f59e0b;
+              "
             ></span>
 
             Review
 
           </div>
 
-
         </div>
 
+
+        <!-- PALETTE BUTTONS WILL BE CREATED BY JS -->
 
         <div
           id="palette"
           class="palette"
-        >
-        </div>
+        ></div>
 
       </aside>
 
@@ -763,9 +766,9 @@
   </section>
 
 
-  <!-- =========================================
+  <!-- =================================================
        RESULT SCREEN
-  ========================================== -->
+  ================================================== -->
 
   <section
     id="resultScreen"
@@ -776,17 +779,26 @@
       🎯 Test Completed
     </h2>
 
-    <div id="resultContent">
-    </div>
+
+    <div
+      id="resultContent"
+    ></div>
 
   </section>
+
 
 </div>
 
 
+<!-- =====================================================
+     JAVASCRIPT START
+===================================================== -->
+
 <script>
-  /* =====================================================
-   BUILT-IN NON-ADAPTIVE QUESTION BANK
+
+
+/* =====================================================
+   QUESTION BANK
 ===================================================== */
 
 const QUESTION_BANK = [
@@ -1126,6 +1138,42 @@ testSelect.addEventListener(
 
 
 /* =====================================================
+   QUESTION COUNT
+===================================================== */
+
+questionCount.addEventListener(
+  "change",
+  function () {
+
+    if (!selectedTest) {
+      return;
+    }
+
+
+    const count =
+      questionCount.value ===
+      "all"
+
+        ? selectedTest.questionIds.length
+
+        : Math.min(
+            Number(
+              questionCount.value
+            ),
+            selectedTest.questionIds.length
+          );
+
+
+    testInfo.textContent =
+      `${selectedTest.title} • ` +
+      `${count} questions • ` +
+      `${selectedTest.duration} minutes`;
+
+  }
+);
+
+
+/* =====================================================
    QUESTION ORDER
 ===================================================== */
 
@@ -1135,7 +1183,6 @@ sequentialMode.addEventListener(
 
     selectionMode =
       "sequential";
-
 
     sequentialMode.classList.add(
       "selected"
@@ -1156,7 +1203,6 @@ randomMode.addEventListener(
     selectionMode =
       "random";
 
-
     randomMode.classList.add(
       "selected"
     );
@@ -1170,7 +1216,7 @@ randomMode.addEventListener(
 
 
 /* =====================================================
-   SHUFFLE QUESTIONS
+   SHUFFLE
 ===================================================== */
 
 function shuffleQuestions(
@@ -1231,39 +1277,29 @@ function getSelectedQuestions() {
         id =>
           QUESTION_BANK.find(
             question =>
-              question.id === id
+              question.id ===
+              id
           )
       )
       .filter(Boolean);
 
 
-  const requestedCount =
-    questionCount.value;
-
-
   if (
-    requestedCount !==
+    questionCount.value !==
     "all"
   ) {
 
     const count =
       Number(
-        requestedCount
+        questionCount.value
       );
 
 
-    if (
-      Number.isInteger(count) &&
-      count > 0
-    ) {
-
-      questions =
-        questions.slice(
-          0,
-          count
-        );
-
-    }
+    questions =
+      questions.slice(
+        0,
+        count
+      );
 
   }
 
@@ -1296,6 +1332,10 @@ startButton.addEventListener(
 
     if (!selectedTest) {
 
+      alert(
+        "Please select a test first."
+      );
+
       return;
 
     }
@@ -1322,7 +1362,6 @@ startButton.addEventListener(
     currentIndex =
       0;
 
-
     answers =
       {};
 
@@ -1345,11 +1384,11 @@ startButton.addEventListener(
       "hidden"
     );
 
-    resultScreen.classList.add(
+    cbtScreen.classList.remove(
       "hidden"
     );
 
-    cbtScreen.classList.remove(
+    resultScreen.classList.add(
       "hidden"
     );
 
@@ -1365,7 +1404,7 @@ startButton.addEventListener(
   }
 );
   /* =====================================================
-   RENDER QUESTION
+   RENDER CURRENT QUESTION
 ===================================================== */
 
 function renderQuestion() {
@@ -1383,7 +1422,7 @@ function renderQuestion() {
     ];
 
 
-  /* Mark current question as visited */
+  /* Mark this question as visited */
 
   visitedQuestions.add(
     currentIndex
@@ -1402,7 +1441,7 @@ function renderQuestion() {
     question.text;
 
 
-  /* Clear old options */
+  /* Remove old options */
 
   options.innerHTML =
     "";
@@ -1411,7 +1450,10 @@ function renderQuestion() {
   /* Create options */
 
   question.options.forEach(
-    function(option, optionIndex) {
+    function (
+      option,
+      optionIndex
+    ) {
 
       const button =
         document.createElement(
@@ -1432,7 +1474,7 @@ function renderQuestion() {
 
 
       /*
-       * Restore selected answer.
+       * Restore previously selected answer.
        */
 
       if (
@@ -1453,7 +1495,7 @@ function renderQuestion() {
 
       button.addEventListener(
         "click",
-        function() {
+        function () {
 
           if (submitted) {
             return;
@@ -1465,7 +1507,8 @@ function renderQuestion() {
 
 
           /*
-           * Refresh options.
+           * Re-render question so
+           * selected option appears.
            */
 
           renderQuestion();
@@ -1489,24 +1532,33 @@ function renderQuestion() {
   );
 
 
-  /* Previous button */
+  /* Previous */
 
   previousButton.disabled =
     currentIndex === 0;
 
 
-  /* Next button */
+  /* Next / Finish */
 
-  nextButton.textContent =
+  if (
     currentIndex ===
     selectedQuestions.length - 1
-      ? "Finish"
-      : "Next";
+  ) {
+
+    nextButton.textContent =
+      "Finish";
+
+  }
+
+  else {
+
+    nextButton.textContent =
+      "Next";
+
+  }
 
 
-  /*
-   * Review button state.
-   */
+  /* Review button */
 
   if (
     reviewQuestions.has(
@@ -1517,7 +1569,9 @@ function renderQuestion() {
     reviewButton.textContent =
       "Remove Review";
 
-  } else {
+  }
+
+  else {
 
     reviewButton.textContent =
       "Mark for Review";
@@ -1525,9 +1579,7 @@ function renderQuestion() {
   }
 
 
-  /*
-   * Update palette.
-   */
+  /* Refresh palette */
 
   renderPalette();
 
@@ -1545,7 +1597,10 @@ function renderPalette() {
 
 
   selectedQuestions.forEach(
-    function(question, index) {
+    function (
+      question,
+      index
+    ) {
 
       const button =
         document.createElement(
@@ -1562,7 +1617,7 @@ function renderPalette() {
 
 
       /*
-       * Determine palette state.
+       * Question status.
        */
 
       const isCurrent =
@@ -1572,9 +1627,11 @@ function renderPalette() {
 
       const isAnswered =
         answers[index] !==
-        undefined &&
+          undefined &&
         answers[index] !==
-        null;
+          null &&
+        answers[index] !==
+          "";
 
 
       const isVisited =
@@ -1590,8 +1647,7 @@ function renderPalette() {
 
 
       /*
-       * Current always gets
-       * highest visual priority.
+       * Current question.
        */
 
       if (isCurrent) {
@@ -1618,7 +1674,7 @@ function renderPalette() {
 
 
       /*
-       * Review but unanswered.
+       * Review.
        */
 
       else if (isReview) {
@@ -1654,7 +1710,7 @@ function renderPalette() {
 
 
       /*
-       * Never visited.
+       * Not visited.
        */
 
       else {
@@ -1666,12 +1722,13 @@ function renderPalette() {
 
 
       /*
-       * Jump directly to question.
+       * Click palette number
+       * to jump directly.
        */
 
       button.addEventListener(
         "click",
-        function() {
+        function () {
 
           if (submitted) {
             return;
@@ -1704,7 +1761,7 @@ function renderPalette() {
 
 previousButton.addEventListener(
   "click",
-  function() {
+  function () {
 
     if (
       currentIndex <= 0
@@ -1716,6 +1773,7 @@ previousButton.addEventListener(
 
 
     currentIndex--;
+
 
     renderQuestion();
 
@@ -1729,7 +1787,12 @@ previousButton.addEventListener(
 
 nextButton.addEventListener(
   "click",
-  function() {
+  function () {
+
+    /*
+     * If this isn't the last
+     * question, go forward.
+     */
 
     if (
       currentIndex <
@@ -1738,7 +1801,9 @@ nextButton.addEventListener(
 
       currentIndex++;
 
+
       renderQuestion();
+
 
       return;
 
@@ -1750,19 +1815,21 @@ nextButton.addEventListener(
      * Finish the test.
      */
 
-    submitTest();
+    submitTest(
+      false
+    );
 
   }
 );
 
 
 /* =====================================================
-   MARK / REMOVE REVIEW
+   MARK FOR REVIEW
 ===================================================== */
 
 reviewButton.addEventListener(
   "click",
-  function() {
+  function () {
 
     if (
       reviewQuestions.has(
@@ -1770,11 +1837,21 @@ reviewButton.addEventListener(
       )
     ) {
 
+      /*
+       * Remove review.
+       */
+
       reviewQuestions.delete(
         currentIndex
       );
 
-    } else {
+    }
+
+    else {
+
+      /*
+       * Add review.
+       */
 
       reviewQuestions.add(
         currentIndex
@@ -1795,6 +1872,10 @@ reviewButton.addEventListener(
 
 function startTimer() {
 
+  /*
+   * Prevent multiple timers.
+   */
+
   stopTimer();
 
 
@@ -1803,15 +1884,20 @@ function startTimer() {
 
   timerInterval =
     setInterval(
-      function() {
+      function () {
 
-        if (remainingSeconds <= 0) {
+        if (
+          remainingSeconds <=
+          0
+        ) {
 
           stopTimer();
+
 
           submitTest(
             true
           );
+
 
           return;
 
@@ -1837,12 +1923,14 @@ function startTimer() {
 function stopTimer() {
 
   if (
-    timerInterval !== null
+    timerInterval !==
+    null
   ) {
 
     clearInterval(
       timerInterval
     );
+
 
     timerInterval =
       null;
@@ -1860,12 +1948,14 @@ function updateTimer() {
 
   const minutes =
     Math.floor(
-      remainingSeconds / 60
+      remainingSeconds /
+      60
     );
 
 
   const seconds =
-    remainingSeconds % 60;
+    remainingSeconds %
+    60;
 
 
   timer.textContent =
@@ -1873,14 +1963,23 @@ function updateTimer() {
     `${String(seconds).padStart(2, "0")}`;
 
 
+  /*
+   * Remove previous states.
+   */
+
   timer.classList.remove(
     "warning",
     "danger"
   );
 
 
+  /*
+   * Last 60 seconds.
+   */
+
   if (
-    remainingSeconds <= 60
+    remainingSeconds <=
+    60
   ) {
 
     timer.classList.add(
@@ -1889,8 +1988,14 @@ function updateTimer() {
 
   }
 
+
+  /*
+   * Last 5 minutes.
+   */
+
   else if (
-    remainingSeconds <= 300
+    remainingSeconds <=
+    300
   ) {
 
     timer.classList.add(
@@ -1908,7 +2013,7 @@ function updateTimer() {
 
 submitButton.addEventListener(
   "click",
-  function() {
+  function () {
 
     submitTest(
       false
@@ -1926,6 +2031,10 @@ function submitTest(
   automatic = false
 ) {
 
+  /*
+   * Prevent double submission.
+   */
+
   if (submitted) {
 
     return;
@@ -1934,18 +2043,23 @@ function submitTest(
 
 
   /*
-   * Count unanswered questions.
+   * Count unanswered.
    */
 
   const unanswered =
     selectedQuestions.filter(
-      function(question, index) {
+      function (
+        question,
+        index
+      ) {
 
         return (
           answers[index] ===
-          undefined ||
+            undefined ||
           answers[index] ===
-          null
+            null ||
+          answers[index] ===
+            ""
         );
 
       }
@@ -1953,8 +2067,7 @@ function submitTest(
 
 
   /*
-   * Ask before manual submission
-   * if questions remain unanswered.
+   * Manual submission warning.
    */
 
   if (
@@ -1964,7 +2077,7 @@ function submitTest(
 
     const proceed =
       confirm(
-        `${unanswered} question(s) are not answered.\n\n` +
+        `${unanswered} question(s) are unanswered.\n\n` +
         `Do you want to submit the test?`
       );
 
@@ -1986,7 +2099,11 @@ function submitTest(
 
 
   /*
-   * Calculate result.
+   * Calculate score.
+   *
+   * Correct = +4
+   * Wrong   = -1
+   * Skipped = 0
    */
 
   let correct =
@@ -2003,25 +2120,39 @@ function submitTest(
 
 
   selectedQuestions.forEach(
-    function(question, index) {
+    function (
+      question,
+      index
+    ) {
 
       const answer =
         answers[index];
 
 
+      /*
+       * Skipped.
+       */
+
       if (
         answer ===
-        undefined ||
+          undefined ||
         answer ===
-        null
+          null ||
+        answer ===
+          ""
       ) {
 
         skipped++;
+
 
         return;
 
       }
 
+
+      /*
+       * Correct.
+       */
 
       if (
         answer ===
@@ -2030,11 +2161,20 @@ function submitTest(
 
         correct++;
 
+
         score += 4;
 
-      } else {
+      }
+
+
+      /*
+       * Incorrect.
+       */
+
+      else {
 
         incorrect++;
+
 
         score -= 1;
 
@@ -2055,26 +2195,41 @@ function submitTest(
 
   const accuracy =
     attempted > 0
+
       ? (
           correct /
           attempted *
           100
         ).toFixed(2)
+
       : "0.00";
 
 
+  /*
+   * Send result to Part 4.
+   */
+
   showResult({
+
     automatic,
+
     score,
+
     total,
+
     attempted,
+
     correct,
+
     incorrect,
+
     skipped,
+
     accuracy
+
   });
 
-  }
+      }
   /* =====================================================
    SHOW RESULT
 ===================================================== */
@@ -2090,14 +2245,183 @@ function showResult({
   accuracy
 }) {
 
+  /*
+   * Hide CBT screen.
+   */
+
   cbtScreen.classList.add(
     "hidden"
   );
+
+
+  /*
+   * Show result screen.
+   */
 
   resultScreen.classList.remove(
     "hidden"
   );
 
+
+  /*
+   * Create question review.
+   */
+
+  let reviewHTML =
+    "";
+
+
+  selectedQuestions.forEach(
+    function (
+      question,
+      index
+    ) {
+
+      const userAnswer =
+        answers[index];
+
+
+      let statusHTML =
+        "";
+
+
+      if (
+        userAnswer ===
+          undefined ||
+        userAnswer ===
+          null ||
+        userAnswer ===
+          ""
+      ) {
+
+        statusHTML = `
+          <div
+            style="
+              color:#64748b;
+              font-weight:700;
+            "
+          >
+            Skipped
+          </div>
+        `;
+
+      }
+
+
+      else if (
+        userAnswer ===
+        question.correctAnswer
+      ) {
+
+        statusHTML = `
+          <div
+            style="
+              color:#15803d;
+              font-weight:700;
+            "
+          >
+            ✓ Correct
+          </div>
+        `;
+
+      }
+
+
+      else {
+
+        statusHTML = `
+          <div
+            style="
+              color:#dc2626;
+              font-weight:700;
+            "
+          >
+            ✗ Incorrect
+          </div>
+        `;
+
+      }
+
+
+      reviewHTML += `
+
+        <div
+          style="
+            margin-top:12px;
+            padding:15px;
+            border-radius:10px;
+            background:#f8fafc;
+          "
+        >
+
+          <strong>
+            Q${index + 1}.
+            ${escapeHTML(
+              question.text
+            )}
+          </strong>
+
+          <div
+            style="
+              margin-top:8px;
+            "
+          >
+            Your answer:
+            <strong>
+              ${
+                userAnswer
+                  ? escapeHTML(
+                      userAnswer
+                    )
+                  : "Not answered"
+              }
+            </strong>
+          </div>
+
+          <div
+            style="
+              margin-top:5px;
+            "
+          >
+            Correct answer:
+            <strong>
+              ${escapeHTML(
+                question.correctAnswer
+              )}
+            </strong>
+          </div>
+
+          <div
+            style="
+              margin-top:8px;
+            "
+          >
+            ${statusHTML}
+          </div>
+
+          <div
+            style="
+              margin-top:8px;
+              color:#64748b;
+              line-height:1.5;
+            "
+          >
+            ${escapeHTML(
+              question.explanation
+            )}
+          </div>
+
+        </div>
+
+      `;
+
+    }
+  );
+
+
+  /*
+   * Result HTML.
+   */
 
   resultContent.innerHTML = `
 
@@ -2112,44 +2436,97 @@ function showResult({
         : ""
     }
 
-    <div class="score">
-      ${score}
+
+    <div
+      style="
+        margin-top:15px;
+      "
+    >
+
+      <div class="score">
+        ${score}
+      </div>
+
+      <div
+        style="
+          color:#64748b;
+        "
+      >
+        Final Score
+      </div>
+
     </div>
+
 
     <div class="result-row">
       Total Questions:
-      <strong>${total}</strong>
+      <strong>
+        ${total}
+      </strong>
     </div>
+
 
     <div class="result-row">
       Attempted:
-      <strong>${attempted}</strong>
+      <strong>
+        ${attempted}
+      </strong>
     </div>
+
 
     <div class="result-row">
       Correct:
-      <strong>${correct}</strong>
+      <strong>
+        ${correct}
+      </strong>
     </div>
+
 
     <div class="result-row">
       Incorrect:
-      <strong>${incorrect}</strong>
+      <strong>
+        ${incorrect}
+      </strong>
     </div>
+
 
     <div class="result-row">
       Skipped:
-      <strong>${skipped}</strong>
+      <strong>
+        ${skipped}
+      </strong>
     </div>
+
 
     <div class="result-row">
       Accuracy:
-      <strong>${accuracy}%</strong>
+      <strong>
+        ${accuracy}%
+      </strong>
     </div>
+
 
     <div class="result-row">
       Marking:
-      <strong>+4 / -1</strong>
+      <strong>
+        +4 / -1
+      </strong>
     </div>
+
+
+    <h3
+      style="
+        margin-top:25px;
+      "
+    >
+      Question Review
+    </h3>
+
+
+    <div>
+      ${reviewHTML}
+    </div>
+
 
     <button
       id="restartButton"
@@ -2162,19 +2539,129 @@ function showResult({
   `;
 
 
-  document
-    .getElementById(
+  /*
+   * Restart button.
+   */
+
+  const restartButton =
+    document.getElementById(
       "restartButton"
+    );
+
+
+  restartButton.addEventListener(
+    "click",
+    function () {
+
+      stopTimer();
+
+
+      /*
+       * Return to test selection.
+       */
+
+      resultScreen.classList.add(
+        "hidden"
+      );
+
+
+      setupScreen.classList.remove(
+        "hidden"
+      );
+
+
+      /*
+       * Reset state.
+       */
+
+      selectedTest =
+        null;
+
+      selectedQuestions =
+        [];
+
+      currentIndex =
+        0;
+
+      answers =
+        {};
+
+      visitedQuestions =
+        new Set();
+
+      reviewQuestions =
+        new Set();
+
+      submitted =
+        false;
+
+      remainingSeconds =
+        0;
+
+
+      /*
+       * Reset controls.
+       */
+
+      testSelect.value =
+        "";
+
+      questionCount.value =
+        "all";
+
+
+      testInfo.textContent =
+        "Select a test to continue.";
+
+
+      startButton.disabled =
+        true;
+
+
+      timer.textContent =
+        "30:00";
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   SAFE HTML ESCAPE
+===================================================== */
+
+function escapeHTML(
+  value
+) {
+
+  return String(
+    value
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
     )
-    .addEventListener(
-      "click",
-      function() {
 
-        stopTimer();
+    .replace(
+      /</g,
+      "&lt;"
+    )
 
-        location.reload();
+    .replace(
+      />/g,
+      "&gt;"
+    )
 
-      }
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
     );
 
 }
@@ -2192,12 +2679,12 @@ startButton.disabled =
 
 
 /* =====================================================
-   END SCRIPT
+   END JAVASCRIPT
 ===================================================== */
 
 </script>
 
+
 </body>
 
 </html>
-  
