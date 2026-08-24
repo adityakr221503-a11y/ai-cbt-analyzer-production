@@ -24,6 +24,7 @@
         BlinkMacSystemFont,
         "Segoe UI",
         sans-serif;
+
       background: #f1f5f9;
       color: #0f172a;
     }
@@ -54,8 +55,6 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-
-      gap: 15px;
     }
 
     .logo {
@@ -165,6 +164,7 @@
 
     .cbt-layout {
       display: grid;
+
       grid-template-columns:
         minmax(0, 1fr)
         320px;
@@ -319,9 +319,7 @@
 
     .palette {
       display: grid;
-      grid-template-columns:
-        repeat(5, 1fr);
-
+      grid-template-columns: repeat(5, 1fr);
       gap: 7px;
     }
 
@@ -398,6 +396,14 @@
       background: #f8fafc;
     }
 
+    .review-item {
+      margin-top: 12px;
+      padding: 15px;
+
+      border-radius: 10px;
+      background: #f8fafc;
+    }
+
     @media (max-width: 800px) {
 
       .cbt-layout {
@@ -441,7 +447,7 @@
     </div>
 
     <div>
-      Non-Adaptive CBT
+      Test Series
     </div>
 
   </div>
@@ -449,6 +455,10 @@
 </header>
 
 <div class="container">
+
+  <!-- =================================================
+       TEST SETUP
+  ================================================== -->
 
   <section
     id="setupScreen"
@@ -460,8 +470,9 @@
     </h1>
 
     <p class="subtitle">
-      Choose your test and start the CBT.
+      Select a test and configure it before starting.
     </p>
+
 
     <div class="field">
 
@@ -476,12 +487,13 @@
         </option>
 
         <option value="demo-test">
-          Demo CBT Test — 5 Questions
+          Demo CBT Test — 10 Questions
         </option>
 
       </select>
 
     </div>
+
 
     <div class="field">
 
@@ -495,8 +507,8 @@
           All Questions
         </option>
 
-        <option value="3">
-          3 Questions
+        <option value="10">
+          10 Questions
         </option>
 
         <option value="5">
@@ -506,6 +518,7 @@
       </select>
 
     </div>
+
 
     <div class="field">
 
@@ -530,6 +543,7 @@
 
         </div>
 
+
         <div
           id="randomMode"
           class="mode"
@@ -540,7 +554,7 @@
           </strong>
 
           <small>
-            Questions appear randomly.
+            Questions are randomly selected.
           </small>
 
         </div>
@@ -549,6 +563,7 @@
 
     </div>
 
+
     <div
       id="testInfo"
       class="info"
@@ -556,9 +571,11 @@
       Select a test to continue.
     </div>
 
+
     <button
       id="startButton"
       class="primary"
+      type="button"
       disabled
     >
       Start Test
@@ -576,9 +593,10 @@
 
     <div class="cbt-layout">
 
-      <!-- MAIN QUESTION AREA -->
 
-      <div class="card">
+      <!-- ================= MAIN QUESTION ================= -->
+
+      <main class="card">
 
         <div class="test-header">
 
@@ -607,9 +625,7 @@
         <div
           id="questionText"
           class="question-text"
-        >
-          Question will appear here.
-        </div>
+        ></div>
 
 
         <div
@@ -661,12 +677,10 @@
           Submit Test
         </button>
 
-      </div>
+      </main>
 
 
-      <!-- =================================================
-           QUESTION PALETTE
-      ================================================== -->
+      <!-- ================= QUESTION PALETTE ================= -->
 
       <aside class="card">
 
@@ -679,13 +693,12 @@
 
         <div class="legend">
 
+
           <div class="legend-item">
 
             <span
               class="legend-dot"
-              style="
-                background:#7c3aed;
-              "
+              style="background:#7c3aed"
             ></span>
 
             Current
@@ -697,9 +710,7 @@
 
             <span
               class="legend-dot"
-              style="
-                background:#22c55e;
-              "
+              style="background:#22c55e"
             ></span>
 
             Answered
@@ -713,7 +724,7 @@
               class="legend-dot"
               style="
                 background:#f8fafc;
-                border:2px solid #cbd5e1;
+                border:2px solid #cbd5e1
               "
             ></span>
 
@@ -726,9 +737,7 @@
 
             <span
               class="legend-dot"
-              style="
-                background:#3b82f6;
-              "
+              style="background:#3b82f6"
             ></span>
 
             Not Visited
@@ -740,33 +749,32 @@
 
             <span
               class="legend-dot"
-              style="
-                background:#f59e0b;
-              "
+              style="background:#f59e0b"
             ></span>
 
             Review
 
           </div>
 
+
         </div>
 
 
-        <!-- PALETTE BUTTONS WILL BE CREATED BY JS -->
+        <!-- PALETTE -->
 
         <div
           id="palette"
           class="palette"
         ></div>
 
+
       </aside>
+
 
     </div>
 
   </section>
-
-
-  <!-- =================================================
+    <!-- =================================================
        RESULT SCREEN
   ================================================== -->
 
@@ -779,10 +787,7 @@
       🎯 Test Completed
     </h2>
 
-
-    <div
-      id="resultContent"
-    ></div>
+    <div id="resultContent"></div>
 
   </section>
 
@@ -790,172 +795,254 @@
 </div>
 
 
-<!-- =====================================================
-     JAVASCRIPT START
-===================================================== -->
-
 <script>
 
-
 /* =====================================================
-   QUESTION BANK
+   QUESTION BANK — 10 QUESTIONS
 ===================================================== */
 
+const QUESTION_BANK = [
 
-    const QUESTION_BANK = [
-        {
+  {
     id: "check-bio-1",
-    text: "A plant cell is placed in a hypertonic solution. What is most likely to occur?",
+
+    text:
+      "A plant cell is placed in a hypertonic solution. What is most likely to occur?",
+
     options: [
       "Water enters the cell and it becomes turgid",
       "Water leaves the cell and plasmolysis may occur",
       "No movement of water occurs",
       "The cell immediately undergoes mitosis"
     ],
-    correctAnswer: "Water leaves the cell and plasmolysis may occur",
+
+    correctAnswer:
+      "Water leaves the cell and plasmolysis may occur",
+
     subject: "Biology",
-    explanation: "In a hypertonic solution, water moves out of the plant cell by osmosis, causing the plasma membrane to pull away from the cell wall, a condition called plasmolysis."
+
+    explanation:
+      "Water moves out of the plant cell by osmosis in a hypertonic solution, which may cause plasmolysis."
   },
+
 
   {
     id: "check-bio-2",
-    text: "Which feature of mitochondria is most directly associated with their ability to produce ATP efficiently?",
+
+    text:
+      "Which feature of mitochondria is most directly associated with efficient ATP production?",
+
     options: [
       "Presence of a single membrane",
       "Extensive inner membrane folds",
       "Absence of DNA",
       "Storage of cellulose"
     ],
-    correctAnswer: "Extensive inner membrane folds",
+
+    correctAnswer:
+      "Extensive inner membrane folds",
+
     subject: "Biology",
-    explanation: "The inner mitochondrial membrane forms folds called cristae, increasing surface area for components involved in oxidative phosphorylation and ATP production."
+
+    explanation:
+      "The folds of the inner mitochondrial membrane increase surface area for oxidative phosphorylation."
   },
+
 
   {
     id: "check-bio-3",
-    text: "If both alleles of a gene are identical in an individual, the individual is described as:",
+
+    text:
+      "If both alleles of a gene are identical in an individual, the individual is described as:",
+
     options: [
       "Heterozygous",
       "Homozygous",
       "Hemizygous",
       "Polyploid"
     ],
-    correctAnswer: "Homozygous",
+
+    correctAnswer:
+      "Homozygous",
+
     subject: "Biology",
-    explanation: "An individual carrying two identical alleles of a particular gene is homozygous for that gene."
+
+    explanation:
+      "An individual carrying two identical alleles is homozygous for that gene."
   },
+
 
   {
     id: "check-bio-4",
-    text: "Which process directly converts the information present in mRNA into a sequence of amino acids?",
+
+    text:
+      "Which process converts information present in mRNA into a sequence of amino acids?",
+
     options: [
       "Replication",
       "Transcription",
       "Translation",
       "Mutation"
     ],
-    correctAnswer: "Translation",
+
+    correctAnswer:
+      "Translation",
+
     subject: "Biology",
-    explanation: "During translation, ribosomes read the codons of mRNA and assemble the corresponding amino acids into a polypeptide."
+
+    explanation:
+      "During translation, ribosomes read mRNA codons and assemble the corresponding amino acids."
   },
 
 
   {
     id: "check-phy-1",
-    text: "A body initially at rest accelerates uniformly at 2 m/s² for 5 seconds. What is its final velocity?",
+
+    text:
+      "A body initially at rest accelerates uniformly at 2 m/s² for 5 seconds. What is its final velocity?",
+
     options: [
       "5 m/s",
       "10 m/s",
       "15 m/s",
       "20 m/s"
     ],
-    correctAnswer: "10 m/s",
+
+    correctAnswer:
+      "10 m/s",
+
     subject: "Physics",
-    explanation: "Using v = u + at, with u = 0, a = 2 m/s² and t = 5 s, v = 10 m/s."
+
+    explanation:
+      "Using v = u + at, v = 0 + (2 × 5) = 10 m/s."
   },
+
 
   {
     id: "check-phy-2",
-    text: "Two resistors of 6 Ω and 3 Ω are connected in parallel. What is their equivalent resistance?",
+
+    text:
+      "Two resistors of 6 Ω and 3 Ω are connected in parallel. What is their equivalent resistance?",
+
     options: [
       "1 Ω",
       "2 Ω",
       "3 Ω",
       "9 Ω"
     ],
-    correctAnswer: "2 Ω",
+
+    correctAnswer:
+      "2 Ω",
+
     subject: "Physics",
-    explanation: "For parallel resistors, 1/R = 1/6 + 1/3 = 1/2, therefore R = 2 Ω."
+
+    explanation:
+      "For parallel resistors, 1/R = 1/6 + 1/3 = 1/2. Therefore R = 2 Ω."
   },
+
 
   {
     id: "check-phy-3",
-    text: "A particle moves in a circular path with constant speed. Which quantity continuously changes its direction?",
+
+    text:
+      "A particle moves in a circular path with constant speed. Which quantity continuously changes its direction?",
+
     options: [
       "Speed",
       "Mass",
       "Velocity",
       "Time"
     ],
-    correctAnswer: "Velocity",
+
+    correctAnswer:
+      "Velocity",
+
     subject: "Physics",
-    explanation: "Although the speed remains constant in uniform circular motion, the direction of velocity continuously changes."
+
+    explanation:
+      "The speed remains constant, but the direction of velocity continuously changes."
   },
 
 
   {
     id: "check-chem-1",
-    text: "Which type of bond is formed primarily by transfer of electrons from one atom to another?",
+
+    text:
+      "Which type of bond is formed primarily by transfer of electrons from one atom to another?",
+
     options: [
       "Ionic bond",
       "Covalent bond",
       "Hydrogen bond",
       "Metallic bond"
     ],
-    correctAnswer: "Ionic bond",
+
+    correctAnswer:
+      "Ionic bond",
+
     subject: "Chemistry",
-    explanation: "An ionic bond results from electrostatic attraction between oppositely charged ions formed after electron transfer."
+
+    explanation:
+      "An ionic bond results from electrostatic attraction between oppositely charged ions."
   },
+
 
   {
     id: "check-chem-2",
-    text: "At constant temperature, if the volume of an ideal gas is doubled, what happens to its pressure when the amount of gas remains constant?",
+
+    text:
+      "At constant temperature, if the volume of an ideal gas is doubled, what happens to its pressure?",
+
     options: [
       "It doubles",
       "It becomes four times larger",
       "It becomes half",
       "It remains unchanged"
     ],
-    correctAnswer: "It becomes half",
+
+    correctAnswer:
+      "It becomes half",
+
     subject: "Chemistry",
-    explanation: "Boyle's law states that pressure is inversely proportional to volume at constant temperature, so doubling volume halves the pressure."
+
+    explanation:
+      "Boyle's law states that pressure is inversely proportional to volume at constant temperature."
   },
+
 
   {
     id: "check-chem-3",
-    text: "Which particle determines the atomic number of an element?",
+
+    text:
+      "Which particle determines the atomic number of an element?",
+
     options: [
       "Electron",
       "Neutron",
       "Proton",
       "Nucleon"
     ],
-    correctAnswer: "Proton",
+
+    correctAnswer:
+      "Proton",
+
     subject: "Chemistry",
-    explanation: "The atomic number is defined as the number of protons in the nucleus of an atom."
+
+    explanation:
+      "The atomic number of an element equals the number of protons in its nucleus."
   }
-    
-    
+
+];
+
 
 /* =====================================================
-   TEST DATA
+   TEST LIST
 ===================================================== */
 
 const TESTS = [
 
   {
-    id:
-      "demo-test",
+    id: "demo-test",
 
     title:
       "Demo CBT Test",
@@ -965,9 +1052,11 @@ const TESTS = [
 
     questionIds:
       QUESTION_BANK.map(
-        question =>
-          question.id
+        function (question) {
+          return question.id;
+        }
       )
+
   }
 
 ];
@@ -977,35 +1066,25 @@ const TESTS = [
    APPLICATION STATE
 ===================================================== */
 
-let selectedTest =
-  null;
+let selectedTest = null;
 
-let selectedQuestions =
-  [];
+let selectedQuestions = [];
 
-let currentIndex =
-  0;
+let currentIndex = 0;
 
-let answers =
-  {};
+let answers = {};
 
-let visitedQuestions =
-  new Set();
+let visitedQuestions = new Set();
 
-let reviewQuestions =
-  new Set();
+let reviewQuestions = new Set();
 
-let timerInterval =
-  null;
+let selectionMode = "sequential";
 
-let remainingSeconds =
-  0;
+let timerInterval = null;
 
-let submitted =
-  false;
+let remainingSeconds = 0;
 
-let selectionMode =
-  "sequential";
+let submitted = false;
 
 
 /* =====================================================
@@ -1114,46 +1193,78 @@ const resultContent =
 
 
 /* =====================================================
-   TEST SELECTION
+   TEST INFORMATION
+===================================================== */
+
+function updateTestInfo() {
+
+  if (!selectedTest) {
+
+    testInfo.textContent =
+      "Select a test to continue.";
+
+    startButton.disabled = true;
+
+    return;
+  }
+
+
+  let count;
+
+  if (
+    questionCount.value === "all"
+  ) {
+
+    count =
+      selectedTest.questionIds.length;
+
+  } else {
+
+    count =
+      Math.min(
+        Number(
+          questionCount.value
+        ),
+        selectedTest.questionIds.length
+      );
+
+  }
+
+
+  testInfo.textContent =
+    `${selectedTest.title} • ` +
+    `${count} questions • ` +
+    `${selectedTest.duration} minutes`;
+
+
+  startButton.disabled =
+    count <= 0;
+
+}
+
+
+/* =====================================================
+   TEST SELECTOR
 ===================================================== */
 
 testSelect.addEventListener(
   "change",
   function () {
 
-    const testId =
-      testSelect.value;
-
-
     selectedTest =
       TESTS.find(
-        test =>
-          test.id ===
-          testId
-      );
+        function (test) {
+
+          return (
+            test.id ===
+            testSelect.value
+          );
+
+        }
+      ) || null;
 
 
-    if (!selectedTest) {
-
-      testInfo.textContent =
-        "Select a test to continue.";
-
-      startButton.disabled =
-        true;
-
-      return;
-
-    }
-
-
-    testInfo.textContent =
-      `${selectedTest.title} • ` +
-      `${selectedTest.questionIds.length} questions • ` +
-      `${selectedTest.duration} minutes`;
-
-
-    startButton.disabled =
-      false;
+    updateTestInfo();
 
   }
 );
@@ -1167,36 +1278,14 @@ questionCount.addEventListener(
   "change",
   function () {
 
-    if (!selectedTest) {
-      return;
-    }
-
-
-    const count =
-      questionCount.value ===
-      "all"
-
-        ? selectedTest.questionIds.length
-
-        : Math.min(
-            Number(
-              questionCount.value
-            ),
-            selectedTest.questionIds.length
-          );
-
-
-    testInfo.textContent =
-      `${selectedTest.title} • ` +
-      `${count} questions • ` +
-      `${selectedTest.duration} minutes`;
+    updateTestInfo();
 
   }
 );
 
 
 /* =====================================================
-   QUESTION ORDER
+   SEQUENTIAL
 ===================================================== */
 
 sequentialMode.addEventListener(
@@ -1217,6 +1306,10 @@ sequentialMode.addEventListener(
   }
 );
 
+
+/* =====================================================
+   RANDOM
+===================================================== */
 
 randomMode.addEventListener(
   "click",
@@ -1281,70 +1374,6 @@ function shuffleQuestions(
 
 
 /* =====================================================
-   GET SELECTED QUESTIONS
-===================================================== */
-
-function getSelectedQuestions() {
-
-  if (!selectedTest) {
-
-    return [];
-
-  }
-
-
-  let questions =
-    selectedTest.questionIds
-      .map(
-        id =>
-          QUESTION_BANK.find(
-            question =>
-              question.id ===
-              id
-          )
-      )
-      .filter(Boolean);
-
-
-  if (
-    questionCount.value !==
-    "all"
-  ) {
-
-    const count =
-      Number(
-        questionCount.value
-      );
-
-
-    questions =
-      questions.slice(
-        0,
-        count
-      );
-
-  }
-
-
-  if (
-    selectionMode ===
-    "random"
-  ) {
-
-    questions =
-      shuffleQuestions(
-        questions
-      );
-
-  }
-
-
-  return questions;
-
-}
-
-
-/* =====================================================
    START TEST
 ===================================================== */
 
@@ -1363,13 +1392,66 @@ startButton.addEventListener(
     }
 
 
-    selectedQuestions =
-      getSelectedQuestions();
+    let questions =
+      selectedTest.questionIds
+        .map(
+          function (id) {
+
+            return QUESTION_BANK.find(
+              function (question) {
+
+                return (
+                  question.id ===
+                  id
+                );
+
+              }
+            );
+
+          }
+        )
+        .filter(Boolean);
+
+
+    /*
+     * Randomize entire question pool.
+     */
+
+    if (
+      selectionMode ===
+      "random"
+    ) {
+
+      questions =
+        shuffleQuestions(
+          questions
+        );
+
+    }
+
+
+    /*
+     * Select requested number.
+     */
+
+    if (
+      questionCount.value !==
+      "all"
+    ) {
+
+      questions =
+        questions.slice(
+          0,
+          Number(
+            questionCount.value
+          )
+        );
+
+    }
 
 
     if (
-      selectedQuestions.length ===
-      0
+      questions.length === 0
     ) {
 
       alert(
@@ -1381,11 +1463,12 @@ startButton.addEventListener(
     }
 
 
-    currentIndex =
-      0;
+    selectedQuestions =
+      questions;
 
-    answers =
-      {};
+    currentIndex = 0;
+
+    answers = {};
 
     visitedQuestions =
       new Set();
@@ -1393,8 +1476,7 @@ startButton.addEventListener(
     reviewQuestions =
       new Set();
 
-    submitted =
-      false;
+    submitted = false;
 
 
     remainingSeconds =
@@ -1419,89 +1501,55 @@ startButton.addEventListener(
       selectedTest.title;
 
 
-    startTimer();
-
     renderQuestion();
+
+    renderPalette();
+
+    startTimer();
 
   }
 );
   /* =====================================================
-   RENDER CURRENT QUESTION
+   RENDER QUESTION
 ===================================================== */
 
 function renderQuestion() {
 
-  if (
-    !selectedQuestions.length
-  ) {
+  const question =
+    selectedQuestions[currentIndex];
+
+  if (!question) {
     return;
   }
-
-
-  const question =
-    selectedQuestions[
-      currentIndex
-    ];
-
-
-  /* Mark this question as visited */
 
   visitedQuestions.add(
     currentIndex
   );
 
-
-  /* Question number */
-
   questionNumber.textContent =
     `Question ${currentIndex + 1} of ${selectedQuestions.length}`;
-
-
-  /* Question text */
 
   questionText.textContent =
     question.text;
 
+  options.innerHTML = "";
 
-  /* Remove old options */
-
-  options.innerHTML =
-    "";
-
-
-  /* Create options */
 
   question.options.forEach(
-    function (
-      option,
-      optionIndex
-    ) {
+    function (option, index) {
 
       const button =
-        document.createElement(
-          "button"
-        );
+        document.createElement("button");
 
-
-      button.type =
-        "button";
-
-
-      button.className =
-        "option";
-
+      button.type = "button";
+      button.className = "option";
 
       button.textContent =
-        `${String.fromCharCode(65 + optionIndex)}. ${option}`;
+        `${String.fromCharCode(65 + index)}. ${option}`;
 
-
-      /*
-       * Restore previously selected answer.
-       */
 
       if (
-        answers[currentIndex] ===
-        option
+        answers[currentIndex] === option
       ) {
 
         button.classList.add(
@@ -1511,36 +1559,11 @@ function renderQuestion() {
       }
 
 
-      /*
-       * Select answer.
-       */
-
       button.addEventListener(
         "click",
         function () {
 
-          if (submitted) {
-            return;
-          }
-
-
-          answers[currentIndex] =
-            option;
-
-
-          /*
-           * Re-render question so
-           * selected option appears.
-           */
-
-          renderQuestion();
-
-
-          /*
-           * Refresh palette.
-           */
-
-          renderPalette();
+          selectAnswer(option);
 
         }
       );
@@ -1554,54 +1577,50 @@ function renderQuestion() {
   );
 
 
-  /* Previous */
-
   previousButton.disabled =
     currentIndex === 0;
 
-
-  /* Next / Finish */
-
-  if (
+  nextButton.disabled =
     currentIndex ===
-    selectedQuestions.length - 1
-  ) {
-
-    nextButton.textContent =
-      "Finish";
-
-  }
-
-  else {
-
-    nextButton.textContent =
-      "Next";
-
-  }
+    selectedQuestions.length - 1;
 
 
-  /* Review button */
-
-  if (
-    reviewQuestions.has(
-      currentIndex
-    )
-  ) {
-
-    reviewButton.textContent =
-      "Remove Review";
-
-  }
-
-  else {
-
-    reviewButton.textContent =
-      "Mark for Review";
-
-  }
+  reviewButton.textContent =
+    reviewQuestions.has(currentIndex)
+      ? "Remove Review"
+      : "Mark for Review";
 
 
-  /* Refresh palette */
+  renderPalette();
+
+}
+
+
+/* =====================================================
+   SELECT ANSWER
+===================================================== */
+
+function selectAnswer(answer) {
+
+  answers[currentIndex] =
+    answer;
+
+  renderQuestion();
+
+  renderPalette();
+
+}
+
+
+/* =====================================================
+   CLEAR ANSWER
+===================================================== */
+
+function clearAnswer() {
+
+  delete answers[currentIndex];
+
+  renderQuestion();
 
   renderPalette();
 
@@ -1614,65 +1633,29 @@ function renderQuestion() {
 
 function renderPalette() {
 
-  palette.innerHTML =
-    "";
+  palette.innerHTML = "";
 
 
   selectedQuestions.forEach(
-    function (
-      question,
-      index
-    ) {
+    function (question, index) {
 
       const button =
-        document.createElement(
-          "button"
-        );
+        document.createElement("button");
 
 
-      button.type =
-        "button";
-
+      button.type = "button";
 
       button.textContent =
         index + 1;
 
 
       /*
-       * Question status.
+       * Current question
        */
 
-      const isCurrent =
-        index ===
-        currentIndex;
-
-
-      const isAnswered =
-        answers[index] !==
-          undefined &&
-        answers[index] !==
-          null &&
-        answers[index] !==
-          "";
-
-
-      const isVisited =
-        visitedQuestions.has(
-          index
-        );
-
-
-      const isReview =
-        reviewQuestions.has(
-          index
-        );
-
-
-      /*
-       * Current question.
-       */
-
-      if (isCurrent) {
+      if (
+        index === currentIndex
+      ) {
 
         button.className =
           "palette-current";
@@ -1681,12 +1664,12 @@ function renderPalette() {
 
 
       /*
-       * Answered + Review.
+       * Answered
        */
 
       else if (
-        isAnswered &&
-        isReview
+        answers[index] !== undefined &&
+        reviewQuestions.has(index)
       ) {
 
         button.className =
@@ -1696,10 +1679,12 @@ function renderPalette() {
 
 
       /*
-       * Review.
+       * Review
        */
 
-      else if (isReview) {
+      else if (
+        reviewQuestions.has(index)
+      ) {
 
         button.className =
           "palette-review";
@@ -1708,10 +1693,12 @@ function renderPalette() {
 
 
       /*
-       * Answered.
+       * Answered
        */
 
-      else if (isAnswered) {
+      else if (
+        answers[index] !== undefined
+      ) {
 
         button.className =
           "palette-answered";
@@ -1720,10 +1707,12 @@ function renderPalette() {
 
 
       /*
-       * Visited but unanswered.
+       * Visited but not answered
        */
 
-      else if (isVisited) {
+      else if (
+        visitedQuestions.has(index)
+      ) {
 
         button.className =
           "palette-notanswered";
@@ -1732,7 +1721,7 @@ function renderPalette() {
 
 
       /*
-       * Not visited.
+       * Not visited
        */
 
       else {
@@ -1743,23 +1732,12 @@ function renderPalette() {
       }
 
 
-      /*
-       * Click palette number
-       * to jump directly.
-       */
-
       button.addEventListener(
         "click",
         function () {
 
-          if (submitted) {
-            return;
-          }
-
-
           currentIndex =
             index;
-
 
           renderQuestion();
 
@@ -1778,7 +1756,7 @@ function renderPalette() {
 
 
 /* =====================================================
-   PREVIOUS QUESTION
+   PREVIOUS
 ===================================================== */
 
 previousButton.addEventListener(
@@ -1786,35 +1764,26 @@ previousButton.addEventListener(
   function () {
 
     if (
-      currentIndex <= 0
+      currentIndex > 0
     ) {
 
-      return;
+      currentIndex--;
+
+      renderQuestion();
 
     }
-
-
-    currentIndex--;
-
-
-    renderQuestion();
 
   }
 );
 
 
 /* =====================================================
-   NEXT QUESTION
+   NEXT
 ===================================================== */
 
 nextButton.addEventListener(
   "click",
   function () {
-
-    /*
-     * If this isn't the last
-     * question, go forward.
-     */
 
     if (
       currentIndex <
@@ -1823,30 +1792,16 @@ nextButton.addEventListener(
 
       currentIndex++;
 
-
       renderQuestion();
 
-
-      return;
-
     }
-
-
-    /*
-     * Last question.
-     * Finish the test.
-     */
-
-    submitTest(
-      false
-    );
 
   }
 );
 
 
 /* =====================================================
-   MARK FOR REVIEW
+   REVIEW
 ===================================================== */
 
 reviewButton.addEventListener(
@@ -1859,10 +1814,6 @@ reviewButton.addEventListener(
       )
     ) {
 
-      /*
-       * Remove review.
-       */
-
       reviewQuestions.delete(
         currentIndex
       );
@@ -1870,10 +1821,6 @@ reviewButton.addEventListener(
     }
 
     else {
-
-      /*
-       * Add review.
-       */
 
       reviewQuestions.add(
         currentIndex
@@ -1883,6 +1830,8 @@ reviewButton.addEventListener(
 
 
     renderQuestion();
+
+    renderPalette();
 
   }
 );
@@ -1894,11 +1843,9 @@ reviewButton.addEventListener(
 
 function startTimer() {
 
-  /*
-   * Prevent multiple timers.
-   */
-
-  stopTimer();
+  clearInterval(
+    timerInterval
+  );
 
 
   updateTimer();
@@ -1909,17 +1856,16 @@ function startTimer() {
       function () {
 
         if (
-          remainingSeconds <=
-          0
+          remainingSeconds <= 0
         ) {
 
-          stopTimer();
-
+          clearInterval(
+            timerInterval
+          );
 
           submitTest(
             true
           );
-
 
           return;
 
@@ -1928,36 +1874,11 @@ function startTimer() {
 
         remainingSeconds--;
 
-
         updateTimer();
 
       },
       1000
     );
-
-}
-
-
-/* =====================================================
-   STOP TIMER
-===================================================== */
-
-function stopTimer() {
-
-  if (
-    timerInterval !==
-    null
-  ) {
-
-    clearInterval(
-      timerInterval
-    );
-
-
-    timerInterval =
-      null;
-
-  }
 
 }
 
@@ -1970,14 +1891,11 @@ function updateTimer() {
 
   const minutes =
     Math.floor(
-      remainingSeconds /
-      60
+      remainingSeconds / 60
     );
 
-
   const seconds =
-    remainingSeconds %
-    60;
+    remainingSeconds % 60;
 
 
   timer.textContent =
@@ -1985,23 +1903,14 @@ function updateTimer() {
     `${String(seconds).padStart(2, "0")}`;
 
 
-  /*
-   * Remove previous states.
-   */
-
   timer.classList.remove(
     "warning",
     "danger"
   );
 
 
-  /*
-   * Last 60 seconds.
-   */
-
   if (
-    remainingSeconds <=
-    60
+    remainingSeconds <= 60
   ) {
 
     timer.classList.add(
@@ -2010,14 +1919,8 @@ function updateTimer() {
 
   }
 
-
-  /*
-   * Last 5 minutes.
-   */
-
   else if (
-    remainingSeconds <=
-    300
+    remainingSeconds <= 300
   ) {
 
     timer.classList.add(
@@ -2037,6 +1940,29 @@ submitButton.addEventListener(
   "click",
   function () {
 
+    const unanswered =
+      selectedQuestions.length -
+      Object.keys(answers).length;
+
+
+    if (
+      unanswered > 0
+    ) {
+
+      const confirmSubmit =
+        confirm(
+          `${unanswered} question(s) are unanswered.\n\n` +
+          `Do you want to submit the test?`
+        );
+
+
+      if (!confirmSubmit) {
+        return;
+      }
+
+    }
+
+
     submitTest(
       false
     );
@@ -2050,159 +1976,112 @@ submitButton.addEventListener(
 ===================================================== */
 
 function submitTest(
-  automatic = false
+  automatic
 ) {
 
-  /*
-   * Prevent double submission.
-   */
-
   if (submitted) {
-
     return;
-
   }
 
 
-  /*
-   * Count unanswered.
-   */
-
-  const unanswered =
-    selectedQuestions.filter(
-      function (
-        question,
-        index
-      ) {
-
-        return (
-          answers[index] ===
-            undefined ||
-          answers[index] ===
-            null ||
-          answers[index] ===
-            ""
-        );
-
-      }
-    ).length;
+  submitted = true;
 
 
-  /*
-   * Manual submission warning.
-   */
-
-  if (
-    !automatic &&
-    unanswered > 0
-  ) {
-
-    const proceed =
-      confirm(
-        `${unanswered} question(s) are unanswered.\n\n` +
-        `Do you want to submit the test?`
-      );
+  clearInterval(
+    timerInterval
+  );
 
 
-    if (!proceed) {
+  let correct = 0;
 
-      return;
+  let wrong = 0;
 
-    }
-
-  }
-
-
-  submitted =
-    true;
-
-
-  stopTimer();
-
-
-  /*
-   * Calculate score.
-   *
-   * Correct = +4
-   * Wrong   = -1
-   * Skipped = 0
-   */
-
-  let correct =
-    0;
-
-  let incorrect =
-    0;
-
-  let skipped =
-    0;
-
-  let score =
-    0;
+  let skipped = 0;
 
 
   selectedQuestions.forEach(
-    function (
-      question,
-      index
-    ) {
+    function (question, index) {
 
-      const answer =
+      const userAnswer =
         answers[index];
 
 
-      /*
-       * Skipped.
-       */
-
       if (
-        answer ===
-          undefined ||
-        answer ===
-          null ||
-        answer ===
-          ""
+        userAnswer === undefined
       ) {
 
         skipped++;
 
-
-        return;
-
       }
 
-
-      /*
-       * Correct.
-       */
-
-      if (
-        answer ===
+      else if (
+        userAnswer ===
         question.correctAnswer
       ) {
 
         correct++;
 
-
-        score += 4;
-
       }
-
-
-      /*
-       * Incorrect.
-       */
 
       else {
 
-        incorrect++;
-
-
-        score -= 1;
+        wrong++;
 
       }
 
     }
+  );
+
+
+  /*
+   * CBT scoring:
+   * Correct = +4
+   * Wrong = -1
+   * Skipped = 0
+   */
+
+  const score =
+    (
+      correct * 4
+    ) -
+    (
+      wrong * 1
+    );
+
+
+  showResult(
+    correct,
+    wrong,
+    skipped,
+    score,
+    automatic
+  );
+
+}
+
+
+/* =====================================================
+   SHOW RESULT
+===================================================== */
+
+function showResult(
+  correct,
+  wrong,
+  skipped,
+  score,
+  automatic
+) {
+
+  setupScreen.classList.add(
+    "hidden"
+  );
+
+  cbtScreen.classList.add(
+    "hidden"
+  );
+
+  resultScreen.classList.remove(
+    "hidden"
   );
 
 
@@ -2210,481 +2089,227 @@ function submitTest(
     selectedQuestions.length;
 
 
-  const attempted =
-    correct +
-    incorrect;
-
-
-  const accuracy =
-    attempted > 0
-
+  const percentage =
+    total > 0
       ? (
-          correct /
-          attempted *
-          100
-        ).toFixed(2)
-
-      : "0.00";
+          correct / total
+        ) * 100
+      : 0;
 
 
-  /*
-   * Send result to Part 4.
-   */
+  resultContent.innerHTML = "";
 
-  showResult({
 
-    automatic,
+  const scoreElement =
+    document.createElement(
+      "div"
+    );
 
-    score,
+  scoreElement.className =
+    "score";
 
-    total,
+  scoreElement.textContent =
+    `${score} / ${total * 4}`;
 
-    attempted,
 
-    correct,
+  resultContent.appendChild(
+    scoreElement
+  );
 
-    incorrect,
 
-    skipped,
+  const summary =
+    document.createElement(
+      "div"
+    );
 
-    accuracy
 
-  });
+  summary.innerHTML = `
 
-      }
-  /* =====================================================
-   SHOW RESULT
-===================================================== */
+    <div class="result-row">
+      <strong>Total:</strong>
+      ${total}
+    </div>
 
-function showResult({
-  automatic,
-  score,
-  total,
-  attempted,
-  correct,
-  incorrect,
-  skipped,
-  accuracy
-}) {
+    <div class="result-row">
+      <strong>Correct:</strong>
+      ${correct}
+    </div>
 
-  /*
-   * Hide CBT screen.
-   */
+    <div class="result-row">
+      <strong>Wrong:</strong>
+      ${wrong}
+    </div>
 
-  cbtScreen.classList.add(
-    "hidden"
+    <div class="result-row">
+      <strong>Skipped:</strong>
+      ${skipped}
+    </div>
+
+    <div class="result-row">
+      <strong>Percentage:</strong>
+      ${percentage.toFixed(2)}%
+    </div>
+
+    ${
+      automatic
+        ? `
+          <div class="result-row">
+            ⏰ Test submitted automatically
+            because the time ended.
+          </div>
+        `
+        : ""
+    }
+
+  `;
+
+
+  resultContent.appendChild(
+    summary
   );
 
 
   /*
-   * Show result screen.
+   * Question review
    */
 
-  resultScreen.classList.remove(
-    "hidden"
+  const heading =
+    document.createElement(
+      "h3"
+    );
+
+  heading.textContent =
+    "Question Review";
+
+
+  resultContent.appendChild(
+    heading
   );
-
-
-  /*
-   * Create question review.
-   */
-
-  let reviewHTML =
-    "";
 
 
   selectedQuestions.forEach(
-    function (
-      question,
-      index
-    ) {
+    function (question, index) {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "review-item";
+
 
       const userAnswer =
         answers[index];
 
 
-      let statusHTML =
-        "";
-
+      let status = "";
 
       if (
-        userAnswer ===
-          undefined ||
-        userAnswer ===
-          null ||
-        userAnswer ===
-          ""
+        userAnswer === undefined
       ) {
 
-        statusHTML = `
-          <div
-            style="
-              color:#64748b;
-              font-weight:700;
-            "
-          >
-            Skipped
-          </div>
-        `;
+        status =
+          `<div class="skipped">
+             Skipped
+           </div>`;
 
       }
-
 
       else if (
         userAnswer ===
         question.correctAnswer
       ) {
 
-        statusHTML = `
-          <div
-            style="
-              color:#15803d;
-              font-weight:700;
-            "
-          >
-            ✓ Correct
-          </div>
-        `;
+        status =
+          `<div class="correct">
+             ✓ Correct
+           </div>`;
 
       }
-
 
       else {
 
-        statusHTML = `
-          <div
-            style="
-              color:#dc2626;
-              font-weight:700;
-            "
-          >
-            ✗ Incorrect
-          </div>
-        `;
+        status =
+          `<div class="incorrect">
+             ✗ Wrong
+           </div>`;
 
       }
 
 
-      reviewHTML += `
+      item.innerHTML = `
 
-        <div
-          style="
-            margin-top:12px;
-            padding:15px;
-            border-radius:10px;
-            background:#f8fafc;
-          "
-        >
+        <strong>
+          Q${index + 1}.
+          ${question.text}
+        </strong>
 
-          <strong>
-            Q${index + 1}.
-            ${escapeHTML(
-              question.text
-            )}
-          </strong>
+        ${status}
 
-          <div
-            style="
-              margin-top:8px;
-            "
-          >
-            Your answer:
-            <strong>
-              ${
-                userAnswer
-                  ? escapeHTML(
-                      userAnswer
-                    )
-                  : "Not answered"
-              }
-            </strong>
-          </div>
+        <div class="review-answer">
+          <strong>Your answer:</strong>
+          ${
+            userAnswer ||
+            "Not answered"
+          }
+        </div>
 
-          <div
-            style="
-              margin-top:5px;
-            "
-          >
-            Correct answer:
-            <strong>
-              ${escapeHTML(
-                question.correctAnswer
-              )}
-            </strong>
-          </div>
+        <div class="review-answer">
+          <strong>Correct answer:</strong>
+          ${question.correctAnswer}
+        </div>
 
-          <div
-            style="
-              margin-top:8px;
-            "
-          >
-            ${statusHTML}
-          </div>
-
-          <div
-            style="
-              margin-top:8px;
-              color:#64748b;
-              line-height:1.5;
-            "
-          >
-            ${escapeHTML(
-              question.explanation
-            )}
-          </div>
-
+        <div class="review-answer">
+          <strong>Explanation:</strong>
+          ${question.explanation}
         </div>
 
       `;
+
+
+      resultContent.appendChild(
+        item
+      );
 
     }
   );
 
 
   /*
-   * Result HTML.
-   */
-
-  resultContent.innerHTML = `
-
-    ${
-      automatic
-        ? `
-          <div class="info">
-            ⏰ Time expired.
-            The test was submitted automatically.
-          </div>
-        `
-        : ""
-    }
-
-
-    <div
-      style="
-        margin-top:15px;
-      "
-    >
-
-      <div class="score">
-        ${score}
-      </div>
-
-      <div
-        style="
-          color:#64748b;
-        "
-      >
-        Final Score
-      </div>
-
-    </div>
-
-
-    <div class="result-row">
-      Total Questions:
-      <strong>
-        ${total}
-      </strong>
-    </div>
-
-
-    <div class="result-row">
-      Attempted:
-      <strong>
-        ${attempted}
-      </strong>
-    </div>
-
-
-    <div class="result-row">
-      Correct:
-      <strong>
-        ${correct}
-      </strong>
-    </div>
-
-
-    <div class="result-row">
-      Incorrect:
-      <strong>
-        ${incorrect}
-      </strong>
-    </div>
-
-
-    <div class="result-row">
-      Skipped:
-      <strong>
-        ${skipped}
-      </strong>
-    </div>
-
-
-    <div class="result-row">
-      Accuracy:
-      <strong>
-        ${accuracy}%
-      </strong>
-    </div>
-
-
-    <div class="result-row">
-      Marking:
-      <strong>
-        +4 / -1
-      </strong>
-    </div>
-
-
-    <h3
-      style="
-        margin-top:25px;
-      "
-    >
-      Question Review
-    </h3>
-
-
-    <div>
-      ${reviewHTML}
-    </div>
-
-
-    <button
-      id="restartButton"
-      class="primary"
-      type="button"
-    >
-      Start Another Test
-    </button>
-
-  `;
-
-
-  /*
-   * Restart button.
+   * Restart button
    */
 
   const restartButton =
-    document.getElementById(
-      "restartButton"
+    document.createElement(
+      "button"
     );
+
+
+  restartButton.type =
+    "button";
+
+  restartButton.className =
+    "primary";
+
+  restartButton.textContent =
+    "Take Test Again";
 
 
   restartButton.addEventListener(
     "click",
     function () {
 
-      stopTimer();
-
-
-      /*
-       * Return to test selection.
-       */
-
-      resultScreen.classList.add(
-        "hidden"
-      );
-
-
-      setupScreen.classList.remove(
-        "hidden"
-      );
-
-
-      /*
-       * Reset state.
-       */
-
-      selectedTest =
-        null;
-
-      selectedQuestions =
-        [];
-
-      currentIndex =
-        0;
-
-      answers =
-        {};
-
-      visitedQuestions =
-        new Set();
-
-      reviewQuestions =
-        new Set();
-
-      submitted =
-        false;
-
-      remainingSeconds =
-        0;
-
-
-      /*
-       * Reset controls.
-       */
-
-      testSelect.value =
-        "";
-
-      questionCount.value =
-        "all";
-
-
-      testInfo.textContent =
-        "Select a test to continue.";
-
-
-      startButton.disabled =
-        true;
-
-
-      timer.textContent =
-        "30:00";
+      location.reload();
 
     }
   );
 
-}
 
-
-/* =====================================================
-   SAFE HTML ESCAPE
-===================================================== */
-
-function escapeHTML(
-  value
-) {
-
-  return String(
-    value
-  )
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+  resultContent.appendChild(
+    restartButton
+  );
 
 }
 
@@ -2693,20 +2318,9 @@ function escapeHTML(
    INITIAL STATE
 ===================================================== */
 
-testInfo.textContent =
-  "Select Demo CBT Test to continue.";
-
-startButton.disabled =
-  true;
-
-
-/* =====================================================
-   END JAVASCRIPT
-===================================================== */
+updateTestInfo();
 
 </script>
 
-
 </body>
-
 </html>
