@@ -1,618 +1,585 @@
 <!DOCTYPE html>
 <html lang="en">
+<script src="./test180-questions.js"></script>
 <head>
 
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width,initial-scale=1">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-<title>CBT Analyzer Pro — CBT Test</title>
+  <title>PDF → CBT | CBT Analyzer Pro</title>
 
-<style>
+  <style>
 
-*{
-  box-sizing:border-box;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f1f5f9;
-  color:#0f172a;
-}
+    body {
+      margin: 0;
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 
-header{
-  background:#fff;
-  border-bottom:1px solid #e2e8f0;
-  padding:16px 20px;
-}
+      background: #f1f5f9;
+      color: #0f172a;
+    }
 
-.header{
-  max-width:1100px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-}
+    button,
+    input,
+    select {
+      font: inherit;
+    }
 
-.logo{
-  font-size:20px;
-  font-weight:800;
-}
+    button {
+      cursor: pointer;
+    }
 
-.logo span{
-  color:#4f46e5;
-}
+    .hidden {
+      display: none !important;
+    }
 
-.timer{
-  background:#eef2ff;
-  color:#3730a3;
-  padding:9px 14px;
-  border-radius:9px;
-  font-weight:800;
-  min-width:78px;
-  text-align:center;
-}
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
 
-.timer.warning{
-  background:#fef3c7;
-  color:#92400e;
-}
+    .header {
+      max-width: 1200px;
+      margin: auto;
+      padding: 15px 20px;
 
-.timer.danger{
-  background:#fee2e2;
-  color:#991b1b;
-}
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
 
-.container{
-  max-width:1100px;
-  margin:20px auto;
-  padding:0 15px;
-  display:grid;
-  grid-template-columns:1fr 280px;
-  gap:20px;
-}
+    .logo {
+      font-size: 21px;
+      font-weight: 800;
+    }
 
-.card{
-  background:#fff;
-  border-radius:16px;
-  padding:22px;
-  box-shadow:0 3px 14px rgba(0,0,0,.07);
-}
+    .logo span {
+      color: #4f46e5;
+    }
 
-.question-number{
-  color:#64748b;
-  font-weight:700;
-  margin-bottom:12px;
-}
+    .container {
+      max-width: 1200px;
+      margin: 25px auto;
+      padding: 0 15px;
+    }
 
-.question{
-  font-size:21px;
-  font-weight:800;
-  line-height:1.55;
-  margin-bottom:20px;
-  white-space:pre-wrap;
-}
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
 
-.option{
-  display:block;
-  width:100%;
-  padding:15px;
-  margin:10px 0;
-  background:#fff;
-  border:2px solid #e2e8f0;
-  border-radius:11px;
-  text-align:left;
-  font-size:16px;
-  font-weight:600;
-  cursor:pointer;
-}
+      box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.07);
+    }
 
-.option:hover{
-  border-color:#818cf8;
-}
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+    }
 
-.option.selected{
-  border-color:#4f46e5;
-  background:#eef2ff;
-}
+    .subtitle {
+      color: #64748b;
+      line-height: 1.6;
+    }
 
-.buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:20px;
-}
+    .upload-box {
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 30px 20px;
+      text-align: center;
+    }
 
-button{
-  font-family:inherit;
-  border:0;
-  border-radius:10px;
-  padding:13px;
-  font-weight:700;
-  cursor:pointer;
-}
+    .upload-box:hover {
+      border-color: #818cf8;
+    }
 
-button:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
 
-.primary{
-  background:#4f46e5;
-  color:#fff;
-}
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
 
-.secondary{
-  background:#e2e8f0;
-  color:#0f172a;
-}
+      background: #ffffff;
+    }
 
-.warning{
-  background:#f59e0b;
-  color:#fff;
-}
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
 
-.danger{
-  background:#dc2626;
-  color:#fff;
-}
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+    }
 
-.palette{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:8px;
-  margin-top:15px;
-}
+    .field {
+      margin-top: 18px;
+    }
 
-.palette button{
-  background:#e2e8f0;
-  padding:10px 5px;
-}
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
 
-.palette button.answered{
-  background:#bbf7d0;
-}
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
 
-.palette button.review{
-  background:#fde68a;
-}
+    .primary,
+    .secondary,
+    .danger {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-weight: 800;
+    }
 
-.palette button.answered.review{
-  background:#86efac;
-}
+    .primary {
+      background: #4f46e5;
+      color: #ffffff;
+    }
 
-.palette button.current{
-  outline:3px solid #4f46e5;
-}
+    .secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
 
-#result{
-  display:none;
-}
+    .danger {
+      background: #dc2626;
+      color: #ffffff;
+    }
 
-.score{
-  font-size:38px;
-  font-weight:800;
-  text-align:center;
-  margin:15px 0;
-}
+    .primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
 
-.summary-box{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin:20px 0;
-}
+    .status {
+      margin-top: 18px;
+      padding: 14px;
 
-.stat{
-  padding:15px;
-  background:#f8fafc;
-  border-radius:10px;
-  text-align:center;
-}
+      border-radius: 10px;
 
-.stat strong{
-  display:block;
-  font-size:22px;
-}
+      background: #eef2ff;
+      color: #3730a3;
 
-.stat small{
-  color:#64748b;
-}
+      white-space: pre-wrap;
+    }
 
-.result-actions button{
-  width:100%;
-  margin-top:8px;
-}
+    .stats {
+      display: grid;
 
-.review-item{
-  margin-top:15px;
-  padding:15px;
-  background:#f8fafc;
-  border-radius:10px;
-}
+      grid-template-columns:
+        repeat(4, 1fr);
 
-.review-item.correct{
-  border-left:5px solid #16a34a;
-}
+      gap: 10px;
 
-.review-item.incorrect{
-  border-left:5px solid #dc2626;
-}
+      margin-top: 18px;
+    }
 
-.review-item.skipped{
-  border-left:5px solid #f59e0b;
-}
+    .stat {
+      padding: 15px;
+      border-radius: 12px;
+      background: #f8fafc;
+      text-align: center;
+    }
 
-.analysis{
-  margin-top:10px;
-  padding:14px;
-  background:#eef2ff;
-  border-radius:10px;
-  line-height:1.6;
-}
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      margin-bottom: 4px;
+    }
 
-.error-box{
-  background:#fee2e2;
-  color:#991b1b;
-  padding:15px;
-  border-radius:10px;
-  line-height:1.5;
-}
+    .stat span {
+      color: #64748b;
+      font-size: 13px;
+    }
 
-.success-box{
-  background:#dcfce7;
-  color:#166534;
-  padding:14px;
-  border-radius:10px;
-  line-height:1.5;
-  margin-bottom:15px;
-}
+    @media (max-width: 700px) {
 
-.info-box{
-  background:#eef2ff;
-  color:#3730a3;
-  padding:14px;
-  border-radius:10px;
-  line-height:1.5;
-  margin-bottom:15px;
-}
+      .stats {
+        grid-template-columns:
+          1fr 1fr;
+      }
 
-.loading{
-  text-align:center;
-  padding:30px 10px;
-  color:#64748b;
-}
+      .header {
+        padding: 13px 15px;
+      }
 
-.small{
-  font-size:13px;
-  color:#64748b;
-}
+      .container {
+        margin-top: 12px;
+      }
 
-@media(max-width:800px){
+      .card {
+        padding: 16px;
+      }
 
-  .container{
-    grid-template-columns:1fr;
-  }
+    }
 
-  .question{
-    font-size:19px;
-  }
-
-  .summary-box{
-    grid-template-columns:1fr 1fr;
-  }
-
-  aside.card{
-    order:2;
-  }
-
-}
-
-@media(max-width:500px){
-
-  header{
-    padding:13px 15px;
-  }
-
-  .logo{
-    font-size:17px;
-  }
-
-  .card{
-    padding:17px;
-  }
-
-  .buttons{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .summary-box{
-    grid-template-columns:1fr 1fr;
-  }
-
-}
-
-</style>
+  </style>
 
 </head>
+
 
 <body>
 
 <header>
 
-<div class="header">
+  <div class="header">
 
-<div class="logo">
-CBT Analyzer <span>Pro</span>
-</div>
+    <div class="logo">
+      CBT Analyzer <span>Pro</span>
+    </div>
 
-<div id="timer" class="timer">
-30:00
-</div>
+    <div>
+      PDF → CBT
+    </div>
 
-</div>
+  </div>
 
 </header>
 
 
 <div class="container">
 
-<main class="card">
+  <!-- =================================================
+       PDF UPLOAD
+  ================================================== -->
 
-<section id="testScreen">
+  <section class="card">
 
-<div
-id="sourceBadge"
-class="info-box">
-⏳ Loading PDF-to-CBT questions...
+    <h1>
+      📄 PDF → CBT Converter
+    </h1>
+
+    <p class="subtitle">
+      Upload a question-bank module and add its
+      questions to your Topper Test Pro CBT pool.
+    </p>
+
+
+    <div class="upload-box">
+
+      <strong>
+        Select Question Bank PDF
+      </strong>
+
+      <p class="subtitle">
+        The extracted questions will be added to the
+        existing question pool.
+      </p>
+
+      <input
+        id="pdfInput"
+        type="file"
+        accept=".pdf,application/pdf"
+      >
+
+    </div>
+
+
+    <!-- =================================================
+         MODULE NAME
+    ================================================== -->
+
+    <div class="field">
+
+      <label for="moduleName">
+        Module Name
+      </label>
+
+      <input
+        id="moduleName"
+        type="text"
+        placeholder="Example: Momentum Booster Physics Class XI Part-1"
+      >
+
+    </div>
+
+
+    <!-- =================================================
+         BUTTONS
+    ================================================== -->
+
+    <div class="button-row">
+
+      <button
+        id="convertButton"
+        class="primary"
+        type="button"
+        disabled
+      >
+        📄 Convert PDF → CBT
+      </button>
+
+
+      <button
+        id="clearPoolButton"
+        class="danger"
+        type="button"
+      >
+        🗑️ Clear PDF Pool
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         STATUS
+    ================================================== -->
+
+    <div
+      id="status"
+      class="status"
+    >
+      Select a PDF to begin.
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       QUESTION POOL
+  ================================================== -->
+
+  <section class="card">
+
+    <h2>
+      📚 Current CBT Question Pool
+    </h2>
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <strong id="totalQuestions">
+          0
+        </strong>
+
+        <span>
+          Total
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="physicsQuestions">
+          0
+        </strong>
+
+        <span>
+          Physics
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="chemistryQuestions">
+          0
+        </strong>
+
+        <span>
+          Chemistry
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="biologyQuestions">
+          0
+        </strong>
+
+        <span>
+          Biology
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
 </div>
 
 
-<div
-id="questionNumber"
-class="question-number">
-Loading...
-</div>
-
-
-<div
-id="question"
-class="question">
-Loading question...
-</div>
-
-
-<div id="options"></div>
-
-
-<div class="buttons">
-
-<button
-id="previousButton"
-class="secondary"
-onclick="previousQuestion()">
-Previous
-</button>
-
-<button
-class="warning"
-onclick="markReview()">
-Mark Review
-</button>
-
-<button
-class="secondary"
-onclick="clearAnswer()">
-Clear
-</button>
-
-<button
-id="nextButton"
-class="primary"
-onclick="nextQuestion()">
-Next
-</button>
-
-</div>
-
-</section>
-
-
-<section id="result">
-
-<h2>🎯 Test Completed</h2>
-
-<div
-id="score"
-class="score">
-</div>
-
-<div id="summary"></div>
-
-<div
-id="resultStats"
-class="summary-box">
-</div>
-
-
-<div class="result-actions">
-
-<button
-id="retryButton"
-class="primary"
-style="display:none"
-onclick="openRetry()">
-🔄 Retry Mistakes
-</button>
-
-<button
-class="secondary"
-onclick="location.href='mistake.html'">
-🧠 Mistake Bank
-</button>
-
-<button
-class="secondary"
-onclick="location.href='index.html'">
-🏠 Dashboard
-</button>
-
-</div>
-
-
-<div id="review"></div>
-
-</section>
-
-</main>
-
-
-<aside class="card">
-
-<h3>Question Palette</h3>
-
-<div
-id="palette"
-class="palette">
-</div>
-
-
-<button
-id="submitButton"
-class="danger"
-style="width:100%;margin-top:20px"
-onclick="confirmSubmit()">
-Submit Test
-</button>
-
-</aside>
-
-</div>
-
+<!-- =====================================================
+     PART 1 JAVASCRIPT START
+===================================================== -->
 
 <script>
 
-"use strict";
-
-
 /* =====================================================
-   CBT ANALYZER PRO
-   PDF → CBT ENGINE
+   TOPPER TEST PRO
+   PDF → CBT QUESTION POOL
 ===================================================== */
 
 
 /* =====================================================
-   GLOBAL STATE
+   STORAGE KEY
 ===================================================== */
 
-let questions = [];
-
-let current = 0;
-
-let answers = [];
-
-let marked = [];
-
-let submitted = false;
-
-let timeLeft = 1800;
-
-let timerInterval = null;
-
-let initialized = false;
+const PDF_CBT_STORAGE_KEY =
+  "pdfCbtQuestions";
 
 
 /* =====================================================
-   STORAGE KEYS
+   DOM REFERENCES
 ===================================================== */
 
-const PDF_KEYS = [
-
-  "pdfCbtQuestions",
-
-  "pdfQuestions",
-
-  "cbtQuestions",
-
-  "importedQuestions",
-
-  "pdfQuestionBank",
-
-  "questionBank"
-
-];
-
-
-const HISTORY_KEY = "cbtHistory";
-
-const RETRY_QUEUE_KEY =
-  "cbtAnalyzer.retryQueue";
-
-const RETRY_QUESTION_KEY =
-  "cbtRetryQuestion";
-
-const RETRY_STARTED_KEY =
-  "cbtRetryStartedAt";
-
-
-/* =====================================================
-   LOGGING
-===================================================== */
-
-function log(){
-
-  console.log(
-    "[CBT Analyzer]",
-    ...arguments
+const pdfInput =
+  document.getElementById(
+    "pdfInput"
   );
 
-}
+const moduleNameInput =
+  document.getElementById(
+    "moduleName"
+  );
+
+const convertButton =
+  document.getElementById(
+    "convertButton"
+  );
+
+const clearPoolButton =
+  document.getElementById(
+    "clearPoolButton"
+  );
+
+const statusBox =
+  document.getElementById(
+    "status"
+  );
+
+const totalQuestions =
+  document.getElementById(
+    "totalQuestions"
+  );
+
+const physicsQuestions =
+  document.getElementById(
+    "physicsQuestions"
+  );
+
+const chemistryQuestions =
+  document.getElementById(
+    "chemistryQuestions"
+  );
+
+const biologyQuestions =
+  document.getElementById(
+    "biologyQuestions"
+  );
 
 
 /* =====================================================
-   SAFE LOCAL STORAGE
+   READ QUESTION POOL
 ===================================================== */
 
-function getStorage(key){
+function getPDFQuestionPool() {
 
-  try{
+  try {
 
-    return localStorage.getItem(key);
+    const saved =
+      localStorage.getItem(
+        PDF_CBT_STORAGE_KEY
+      );
 
-  }catch(error){
+
+    if (!saved) {
+      return [];
+    }
+
+
+    const parsed =
+      JSON.parse(saved);
+
+
+    return Array.isArray(parsed)
+      ? parsed
+      : [];
+
+  }
+
+  catch (error) {
 
     console.error(
-      "Cannot read localStorage:",
+      "❌ Question pool read error:",
       error
     );
 
-    return null;
+    return [];
 
   }
 
 }
 
 
-function setStorage(key,value){
+/* =====================================================
+   SAVE QUESTION POOL
+===================================================== */
 
-  try{
+function savePDFQuestionPool(
+  questions
+) {
+
+  try {
 
     localStorage.setItem(
-      key,
-      value
+      PDF_CBT_STORAGE_KEY,
+      JSON.stringify(
+        questions
+      )
     );
+
+
+    console.log(
+      "✅ Question pool saved:",
+      questions.length
+    );
+
 
     return true;
 
-  }catch(error){
+  }
+
+  catch (error) {
 
     console.error(
-      "Cannot write localStorage:",
+      "❌ Question pool save error:",
       error
     );
+
+
+    statusBox.textContent =
+      "❌ Could not save question pool.";
+
 
     return false;
 
@@ -622,204 +589,288 @@ function setStorage(key,value){
 
 
 /* =====================================================
-   JSON PARSER
+   UPDATE POOL STATISTICS
 ===================================================== */
 
-function parseJSON(value){
+function updatePoolStats() {
 
-  try{
-
-    return JSON.parse(value);
-
-  }catch(error){
-
-    console.error(
-      "JSON parse error:",
-      error
-    );
-
-    return null;
-
-  }
-
-}
+  const pool =
+    getPDFQuestionPool();
 
 
-/* =====================================================
-   NEXT PART
-===================================================== */
-   /* =====================================================
-   EXTRACT QUESTION ARRAY
-===================================================== */
-
-function extractQuestionArray(data){
-
-  if(Array.isArray(data)){
-    return data;
-  }
-
-  if(
-    data &&
-    Array.isArray(data.questions)
-  ){
-    return data.questions;
-  }
-
-  if(
-    data &&
-    Array.isArray(data.data)
-  ){
-    return data.data;
-  }
-
-  if(
-    data &&
-    Array.isArray(data.items)
-  ){
-    return data.items;
-  }
-
-  if(
-    data &&
-    Array.isArray(data.questionBank)
-  ){
-    return data.questionBank;
-  }
-
-  return [];
-}
+  let physics = 0;
+  let chemistry = 0;
+  let biology = 0;
 
 
-/* =====================================================
-   CONVERT ANSWER
-===================================================== */
+  pool.forEach(
+    function(question) {
 
-function normalizeAnswer(answer,options){
-
-  if(
-    answer === null ||
-    answer === undefined ||
-    answer === ""
-  ){
-    return null;
-  }
+      const subject =
+        String(
+          question.subject ||
+          ""
+        ).toLowerCase();
 
 
-  /* Number */
+      if (
+        subject.includes("physics")
+      ) {
 
-  if(typeof answer === "number"){
-
-    if(
-      Number.isInteger(answer) &&
-      answer >= 0 &&
-      answer < options.length
-    ){
-
-      return answer;
-
-    }
-
-    /*
-      Some PDF importers store:
-      1 = A
-      2 = B
-      3 = C
-      4 = D
-    */
-
-    if(
-      Number.isInteger(answer) &&
-      answer >= 1 &&
-      answer <= options.length
-    ){
-
-      return answer - 1;
-
-    }
-
-  }
-
-
-  const value =
-    String(answer).trim();
-
-
-  /* A / B / C / D */
-
-  if(
-    /^[A-Da-d]$/.test(value)
-  ){
-
-    const index =
-      value
-      .toUpperCase()
-      .charCodeAt(0) - 65;
-
-    if(
-      index >= 0 &&
-      index < options.length
-    ){
-
-      return index;
-
-    }
-
-  }
-
-
-  /* Numeric string */
-
-  if(
-    /^\d+$/.test(value)
-  ){
-
-    const number =
-      Number(value);
-
-
-    if(
-      number >= 1 &&
-      number <= options.length
-    ){
-
-      return number - 1;
-
-    }
-
-
-    if(
-      number >= 0 &&
-      number < options.length
-    ){
-
-      return number;
-
-    }
-
-  }
-
-
-  /* Exact option text */
-
-  const lower =
-    value.toLowerCase();
-
-
-  const found =
-    options.findIndex(
-      function(option){
-
-        return String(option)
-          .trim()
-          .toLowerCase()
-          === lower;
+        physics++;
 
       }
+
+      else if (
+        subject.includes("chem")
+      ) {
+
+        chemistry++;
+
+      }
+
+      else if (
+        subject.includes("bio")
+      ) {
+
+        biology++;
+
+      }
+
+    }
+  );
+
+
+  totalQuestions.textContent =
+    pool.length;
+
+  physicsQuestions.textContent =
+    physics;
+
+  chemistryQuestions.textContent =
+    chemistry;
+
+  biologyQuestions.textContent =
+    biology;
+
+}
+
+
+/* =====================================================
+   ENABLE CONVERT BUTTON
+===================================================== */
+
+pdfInput.addEventListener(
+  "change",
+  function() {
+
+    const file =
+      pdfInput.files[0];
+
+
+    convertButton.disabled =
+      !file;
+
+
+    if (file) {
+
+      statusBox.textContent =
+        `📄 Selected:\n${file.name}`;
+
+    }
+
+    else {
+
+      statusBox.textContent =
+        "Select a PDF to begin.";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+updatePoolStats();
+
+
+console.log(
+  "✅ PDF → CBT Part 1 loaded."
+);
+
+console.log(
+  "📚 Existing PDF questions:",
+  getPDFQuestionPool().length
+);
+
+</script>
+<script>
+
+/* =====================================================
+   PART 2
+   PDF TEXT → CBT QUESTIONS
+===================================================== */
+
+
+/* =====================================================
+   PDF TEXT EXTRACTION
+===================================================== */
+
+async function extractPDFText(file) {
+
+  if (!file) {
+    throw new Error(
+      "No PDF file selected."
+    );
+  }
+
+
+  if (
+    typeof pdfjsLib ===
+    "undefined"
+  ) {
+
+    throw new Error(
+      "PDF.js is not loaded."
     );
 
+  }
 
-  if(found >= 0){
-    return found;
+
+  const arrayBuffer =
+    await file.arrayBuffer();
+
+
+  const pdf =
+    await pdfjsLib.getDocument({
+      data: arrayBuffer
+    }).promise;
+
+
+  let fullText = "";
+
+
+  for (
+    let pageNumber = 1;
+    pageNumber <= pdf.numPages;
+    pageNumber++
+  ) {
+
+    const page =
+      await pdf.getPage(
+        pageNumber
+      );
+
+
+    const content =
+      await page.getTextContent();
+
+
+    const pageText =
+      content.items
+        .map(
+          function(item) {
+            return item.str;
+          }
+        )
+        .join(" ");
+
+
+    fullText +=
+      "\n" +
+      pageText +
+      "\n";
+
+  }
+
+
+  return fullText.trim();
+
+}
+
+
+/* =====================================================
+   CLEAN PDF TEXT
+===================================================== */
+
+function cleanPDFText(
+  text
+) {
+
+  if (!text) {
+    return "";
+  }
+
+
+  return String(text)
+
+    .replace(
+      /\r/g,
+      ""
+    )
+
+    .replace(
+      /[ \t]+/g,
+      " "
+    )
+
+    .replace(
+      /\n{3,}/g,
+      "\n\n"
+    )
+
+    .trim();
+
+}
+
+
+/* =====================================================
+   OPTION LETTER NORMALIZER
+===================================================== */
+
+function normalizeOptionLetter(
+  value
+) {
+
+  if (
+    value === undefined ||
+    value === null
+  ) {
+
+    return null;
+
+  }
+
+
+  const text =
+    String(value)
+      .trim()
+      .toUpperCase();
+
+
+  if (
+    /^[A-D]$/.test(text)
+  ) {
+
+    return (
+      text.charCodeAt(0) -
+      65
+    );
+
+  }
+
+
+  if (
+    /^[1-4]$/.test(text)
+  ) {
+
+    return (
+      Number(text) - 1
+    );
+
   }
 
 
@@ -829,214 +880,863 @@ function normalizeAnswer(answer,options){
 
 
 /* =====================================================
-   NORMALIZE OPTIONS
+   GET CORRECT ANSWER
 ===================================================== */
 
-function normalizeOptions(q){
+function getCorrectAnswer(
+  question
+) {
 
-  let options = [];
+  if (
+    Array.isArray(
+      question.options
+    ) === false
+  ) {
 
-
-  if(
-    Array.isArray(q.options)
-  ){
-
-    options = q.options;
-
-  }
-  else if(
-    Array.isArray(q.choices)
-  ){
-
-    options = q.choices;
-
-  }
-  else if(
-    Array.isArray(q.answers)
-  ){
-
-    options = q.answers;
-
-  }
-  else{
-
-    options = [
-
-      q.optionA,
-
-      q.optionB,
-
-      q.optionC,
-
-      q.optionD
-
-    ];
+    return "";
 
   }
 
 
-  return options
+  /* -----------------------------------------------
+     correctIndex
+  ------------------------------------------------ */
 
-    .filter(function(option){
+  if (
+    Number.isInteger(
+      question.correctIndex
+    ) &&
+    question.options[
+      question.correctIndex
+    ] !== undefined
+  ) {
 
-      return (
-        option !== undefined &&
-        option !== null &&
-        String(option).trim() !== ""
-      );
+    return String(
+      question.options[
+        question.correctIndex
+      ]
+    );
 
-    })
+  }
 
-    .map(function(option){
 
-      if(
-        typeof option === "object" &&
-        option.text !== undefined
-      ){
+  /* -----------------------------------------------
+     correctAnswer
+  ------------------------------------------------ */
 
-        return String(
-          option.text
-        ).trim();
+  if (
+    question.correctAnswer !==
+    undefined
+  ) {
 
-      }
-
-      return String(
-        option
+    const answer =
+      String(
+        question.correctAnswer
       ).trim();
 
-    });
+
+    const index =
+      normalizeOptionLetter(
+        answer
+      );
+
+
+    if (
+      index !== null &&
+      question.options[index] !==
+        undefined
+    ) {
+
+      return String(
+        question.options[index]
+      );
+
+    }
+
+
+    /*
+     * It may already contain
+     * the complete option text.
+     */
+
+    const matchingOption =
+      question.options.find(
+        function(option) {
+
+          return (
+            String(option)
+              .trim()
+              .toLowerCase() ===
+            answer.toLowerCase()
+          );
+
+        }
+      );
+
+
+    if (
+      matchingOption !==
+      undefined
+    ) {
+
+      return String(
+        matchingOption
+      );
+
+    }
+
+  }
+
+
+  return "";
 
 }
 
 
 /* =====================================================
-   NORMALIZE QUESTION
+   NORMALIZE ONE QUESTION
 ===================================================== */
 
-function normalizeQuestion(q,index){
+function normalizeQuestion(
+  question,
+  index,
+  moduleName
+) {
 
-  if(
-    !q ||
-    typeof q !== "object"
-  ){
-
+  if (!question) {
     return null;
-
   }
 
 
-  /* Question text */
-
-  const questionText =
-    String(
-
-      q.question ??
-      q.questionText ??
-      q.text ??
-      q.question_text ??
-      ""
-
-    ).trim();
+  const text =
+    question.text ||
+    question.question ||
+    question.questionText ||
+    "";
 
 
-  if(!questionText){
+  const rawOptions =
+    Array.isArray(
+      question.options
+    )
+      ? question.options
+      : [];
 
-    console.warn(
-      "Question has no text:",
-      index
-    );
-
-    return null;
-
-  }
-
-
-  /* Options */
 
   const options =
-    normalizeOptions(q);
+    rawOptions
+      .map(
+        function(option) {
+
+          return String(
+            option
+          )
+            .replace(
+              /^[A-D][.)]\s*/i,
+              ""
+            )
+            .trim();
+
+        }
+      )
+      .filter(Boolean);
 
 
-  if(options.length < 2){
-
-    console.warn(
-      "Question has fewer than 2 options:",
-      index
-    );
+  if (
+    text.trim().length < 5 ||
+    options.length < 2
+  ) {
 
     return null;
 
   }
 
 
-  /* Answer */
+  const correctAnswer =
+    getCorrectAnswer({
+      ...question,
+      options: options
+    });
 
-  let rawAnswer =
-    q.answer;
+
+  const generatedId =
+    `PDF-${Date.now()}-${index + 1}`;
 
 
-  if(
-    rawAnswer === undefined ||
-    rawAnswer === null ||
-    rawAnswer === ""
-  ){
+  return {
 
-    rawAnswer =
-      q.correctAnswer;
+    id:
+      question.id ||
+      generatedId,
+
+
+    text:
+      text.trim(),
+
+
+    options:
+      options,
+
+
+    correctAnswer:
+      correctAnswer,
+
+
+    subject:
+      question.subject ||
+      "Unknown",
+
+
+    chapter:
+      question.chapter ||
+      "",
+
+
+    topic:
+      question.topic ||
+      "",
+
+
+    difficulty:
+      question.difficulty ||
+      "Medium",
+
+
+    marks:
+      Number(
+        question.marks
+      ) || 4,
+
+
+    negativeMarks:
+      Number(
+        question.negativeMarks
+      ) || 1,
+
+
+    explanation:
+      question.explanation ||
+      question.solution ||
+      "",
+
+
+    source:
+      question.source ||
+      moduleName ||
+      "PDF Module"
+
+  };
+
+}
+
+
+/* =====================================================
+   NORMALIZE QUESTION ARRAY
+===================================================== */
+
+function normalizeQuestions(
+  questions,
+  moduleName
+) {
+
+  if (
+    !Array.isArray(
+      questions
+    )
+  ) {
+
+    return [];
 
   }
 
 
-  if(
-    rawAnswer === undefined ||
-    rawAnswer === null ||
-    rawAnswer === ""
-  ){
-
-    rawAnswer =
-      q.correctIndex;
-
-  }
+  const result = [];
 
 
-  if(
-    rawAnswer === undefined ||
-    rawAnswer === null ||
-    rawAnswer === ""
-  ){
+  questions.forEach(
+    function(question, index) {
 
-    rawAnswer =
-      q.answerIndex;
-
-  }
-
-
-  if(
-    rawAnswer === undefined ||
-    rawAnswer === null ||
-    rawAnswer === ""
-  ){
-
-    rawAnswer =
-      q.correct;
-
-  }
+      const normalized =
+        normalizeQuestion(
+          question,
+          index,
+          moduleName
+        );
 
 
-  const answer =
-    normalizeAnswer(
-      rawAnswer,
-      options
+      if (normalized) {
+
+        result.push(
+          normalized
+        );
+
+      }
+
+    }
+  );
+
+
+  return result;
+
+}
+
+
+/* =====================================================
+   ADD QUESTIONS TO EXISTING POOL
+===================================================== */
+
+function addQuestionsToPool(
+  questions
+) {
+
+  const existing =
+    getPDFQuestionPool();
+
+
+  const existingIds =
+    new Set(
+      existing.map(
+        function(question) {
+          return question.id;
+        }
+      )
     );
 
 
-  if(answer === null){
+  const newQuestions = [];
 
-    console.warn(
-      "Question has invalid answer:",
-      index,
-      questionText
+
+  let duplicates = 0;
+
+
+  questions.forEach(
+    function(question) {
+
+      if (
+        existingIds.has(
+          question.id
+        )
+      ) {
+
+        duplicates++;
+
+        return;
+
+      }
+
+
+      existingIds.add(
+        question.id
+      );
+
+
+      newQuestions.push(
+        question
+      );
+
+    }
+  );
+
+
+  const updatedPool =
+    existing.concat(
+      newQuestions
     );
+
+
+  savePDFQuestionPool(
+    updatedPool
+  );
+
+
+  updatePoolStats();
+
+
+  return {
+
+    added:
+      newQuestions.length,
+
+    duplicates:
+      duplicates,
+
+    total:
+      updatedPool.length
+
+  };
+
+}
+
+
+/* =====================================================
+   EXTRACT QUESTIONS FROM JSON
+===================================================== */
+
+function parseQuestionJSON(
+  text
+) {
+
+  try {
+
+    const parsed =
+      JSON.parse(text);
+
+
+    if (
+      Array.isArray(parsed)
+    ) {
+
+      return parsed;
+
+    }
+
+
+    if (
+      Array.isArray(
+        parsed.questions
+      )
+    ) {
+
+      return parsed.questions;
+
+    }
+
+
+    return [];
+
+  }
+
+  catch (error) {
+
+    return [];
+
+  }
+
+}
+
+
+/* =====================================================
+   OPTIONAL TEXT QUESTION PARSER
+===================================================== */
+
+function parsePlainTextQuestions(
+  text
+) {
+
+  const questions = [];
+
+
+  const cleaned =
+    cleanPDFText(
+      text
+    );
+
+
+  /*
+   * Expected pattern:
+   *
+   * 1. Question text
+   * A. Option
+   * B. Option
+   * C. Option
+   * D. Option
+   *
+   * The answer can be supplied separately
+   * by the converter/answer-key parser.
+   */
+
+  const blocks =
+    cleaned.split(
+      /(?=\b\d+\s*[.)]\s*)/g
+    );
+
+
+  blocks.forEach(
+    function(block) {
+
+      const lines =
+        block
+          .split("\n")
+          .map(
+            function(line) {
+              return line.trim();
+            }
+          )
+          .filter(Boolean);
+
+
+      if (
+        lines.length < 5
+      ) {
+
+        return;
+
+      }
+
+
+      const questionLine =
+        lines.shift();
+
+
+      const questionText =
+        questionLine.replace(
+          /^\d+\s*[.)]\s*/,
+          ""
+        ).trim();
+
+
+      const optionList = [];
+
+
+      lines.forEach(
+        function(line) {
+
+          const match =
+            line.match(
+              /^([A-D])\s*[.)]\s*(.+)$/i
+            );
+
+
+          if (match) {
+
+            optionList.push(
+              match[2].trim()
+            );
+
+          }
+
+        }
+      );
+
+
+      if (
+        questionText &&
+        optionList.length >= 2
+      ) {
+
+        questions.push({
+
+          text:
+            questionText,
+
+          options:
+            optionList,
+
+          subject:
+            "Unknown",
+
+          difficulty:
+            "Medium"
+
+        });
+
+      }
+
+    }
+  );
+
+
+  return questions;
+
+}
+
+
+/* =====================================================
+   CONVERT SELECTED PDF
+===================================================== */
+
+async function convertSelectedPDF() {
+
+  const file =
+    pdfInput.files[0];
+
+
+  if (!file) {
+
+    alert(
+      "Please select a PDF first."
+    );
+
+    return;
+
+  }
+
+
+  const moduleName =
+    moduleNameInput.value.trim() ||
+    file.name;
+
+
+  convertButton.disabled =
+    true;
+
+
+  statusBox.textContent =
+    "⏳ Reading PDF...\nPlease wait.";
+
+
+  try {
+
+    const pdfText =
+      await extractPDFText(
+        file
+      );
+
+
+    if (!pdfText) {
+
+      throw new Error(
+        "No readable text was found in this PDF."
+      );
+
+    }
+
+
+    statusBox.textContent =
+      "🔎 PDF text extracted.\n" +
+      "Preparing questions...";
+
+
+    /*
+     * First try JSON.
+     *
+     * This is useful when your existing
+     * PDF converter already creates structured
+     * question data.
+     */
+
+    let extractedQuestions =
+      parseQuestionJSON(
+        pdfText
+      );
+
+
+    /*
+     * Otherwise use the basic text parser.
+     */
+
+    if (
+      extractedQuestions.length === 0
+    ) {
+
+      extractedQuestions =
+        parsePlainTextQuestions(
+          pdfText
+        );
+
+    }
+
+
+    const normalizedQuestions =
+      normalizeQuestions(
+        extractedQuestions,
+        moduleName
+      );
+
+
+    if (
+      normalizedQuestions.length === 0
+    ) {
+
+      throw new Error(
+        "Questions could not be detected automatically. " +
+        "The PDF may require the existing specialized parser."
+      );
+
+    }
+
+
+    const result =
+      addQuestionsToPool(
+        normalizedQuestions
+      );
+
+
+    statusBox.textContent =
+      `✅ Module processed.\n\n` +
+      `Module: ${moduleName}\n` +
+      `Questions detected: ${normalizedQuestions.length}\n` +
+      `New questions added: ${result.added}\n` +
+      `Duplicates skipped: ${result.duplicates}\n` +
+      `Total PDF pool: ${result.total}`;
+
+
+    console.log(
+      "📚 Module result:",
+      result
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ PDF conversion error:",
+      error
+    );
+
+
+    statusBox.textContent =
+      "❌ Conversion failed.\n\n" +
+      error.message;
+
+  }
+
+  finally {
+
+    convertButton.disabled =
+      false;
+
+  }
+
+}
+
+
+/* =====================================================
+   CONVERT BUTTON
+===================================================== */
+
+convertButton.addEventListener(
+  "click",
+  function() {
+
+    convertSelectedPDF();
+
+  }
+);
+
+
+/* =====================================================
+   CLEAR PDF POOL
+===================================================== */
+
+clearPoolButton.addEventListener(
+  "click",
+  function() {
+
+    const confirmed =
+      confirm(
+        "Delete all PDF-generated CBT questions?\n\n" +
+        "Your test180-questions.js file will NOT be deleted."
+      );
+
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    localStorage.removeItem(
+      PDF_CBT_STORAGE_KEY
+    );
+
+
+    updatePoolStats();
+
+
+    statusBox.textContent =
+      "🗑️ PDF question pool cleared.";
+
+  }
+);
+
+
+/* =====================================================
+   PART 2 READY
+===================================================== */
+
+console.log(
+  "✅ PDF → CBT Part 2 loaded."
+);
+
+          </script>
+          <script>
+
+/* =====================================================
+   PART 3
+   CONNECT PDF QUESTION POOL → CBT
+===================================================== */
+
+
+/* =====================================================
+   GET QUESTIONS FOR CBT
+===================================================== */
+
+function getQuestionsForCBT() {
+
+  const pool =
+    getPDFQuestionPool();
+
+
+  if (
+    !Array.isArray(pool)
+  ) {
+
+    return [];
+
+  }
+
+
+  return pool.filter(
+    function(question) {
+
+      return (
+        question &&
+        typeof question.text === "string" &&
+        question.text.trim().length > 0 &&
+        Array.isArray(question.options) &&
+        question.options.length >= 2
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   EXPORT QUESTIONS TO WINDOW
+===================================================== */
+
+function exportPDFQuestionsToCBT() {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  /*
+   * Make the complete PDF pool
+   * available to other pages.
+   */
+
+  window.PDF_CBT_QUESTIONS =
+    questions;
+
+
+  console.log(
+    "✅ PDF CBT questions available:",
+    questions.length
+  );
+
+
+  return questions;
+
+}
+
+
+/* =====================================================
+   CREATE CBT TEST OBJECT
+===================================================== */
+
+function createPDFCBTTest() {
+
+  const questions =
+    exportPDFQuestionsToCBT();
+
+
+  if (
+    questions.length === 0
+  ) {
 
     return null;
 
@@ -1046,81 +1746,24 @@ function normalizeQuestion(q,index){
   return {
 
     id:
-      q.id ||
-      "pdf-" +
-      Date.now() +
-      "-" +
-      index,
+      "pdf-cbt-test",
 
-    subject:
-      q.subject ||
-      q.subjectName ||
-      "PDF",
+    title:
+      "PDF Module CBT",
 
-    topic:
-      q.topic ||
-      q.chapter ||
-      q.section ||
-      "PDF Import",
+    duration:
+      180,
 
-    question:
-      questionText,
+    questions:
+      questions,
 
-    options:
-      options,
+    questionIds:
+      questions.map(
+        function(question) {
 
-    answer:
-      answer,
+          return question.id;
 
-    solution:
-      String(
-        q.solution ??
-        q.explanation ??
-        q.detailedSolution ??
-        ""
-      ),
-
-    explanation:
-      String(
-        q.explanation ??
-        q.solution ??
-        ""
-      ),
-
-    pdfPage:
-      q.pdfPage ??
-      q.page ??
-      "",
-
-    pdfPageEnd:
-      q.pdfPageEnd ??
-      q.pageEnd ??
-      q.pdfPage ??
-      q.page ??
-      "",
-
-    chapter:
-      q.chapter ||
-      "",
-
-    section:
-      q.section ||
-      "",
-
-    answerSource:
-      q.answerSource ||
-      "PDF",
-
-    source:
-      q.source ||
-      "PDF Import",
-
-    sourceType:
-      "PDF",
-
-    bookmarked:
-      Boolean(
-        q.bookmarked
+        }
       )
 
   };
@@ -1129,1018 +1772,205 @@ function normalizeQuestion(q,index){
 
 
 /* =====================================================
-   LOAD QUESTIONS
+   GET SUBJECT QUESTIONS
 ===================================================== */
 
-function loadPDFQuestions(){
+function getPDFQuestionsBySubject(
+  subject
+) {
 
-  log(
-    "Searching for PDF CBT questions..."
+  const questions =
+    getQuestionsForCBT();
+
+
+  if (!subject) {
+
+    return questions;
+
+  }
+
+
+  const wanted =
+    String(subject)
+      .trim()
+      .toLowerCase();
+
+
+  return questions.filter(
+    function(question) {
+
+      return String(
+        question.subject || ""
+      )
+        .trim()
+        .toLowerCase()
+        .includes(wanted);
+
+    }
   );
 
-
-  for(
-    const key of PDF_KEYS
-  ){
-
-    const saved =
-      getStorage(key);
+}
 
 
-    if(!saved){
+/* =====================================================
+   GET MODULE QUESTIONS
+===================================================== */
 
-      continue;
+function getPDFQuestionsByModule(
+  moduleName
+) {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  if (!moduleName) {
+
+    return questions;
+
+  }
+
+
+  const wanted =
+    String(moduleName)
+      .trim()
+      .toLowerCase();
+
+
+  return questions.filter(
+    function(question) {
+
+      return String(
+        question.source || ""
+      )
+        .trim()
+        .toLowerCase()
+        .includes(wanted);
 
     }
+  );
+
+}
 
 
-    log(
-      "Found storage key:",
-      key
+/* =====================================================
+   GET RANDOM QUESTIONS
+===================================================== */
+
+function getRandomPDFQuestions(
+  count
+) {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  const shuffled =
+    [...questions];
+
+
+  for (
+    let i =
+      shuffled.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+
+    [
+      shuffled[i],
+      shuffled[j]
+    ] =
+    [
+      shuffled[j],
+      shuffled[i]
+    ];
+
+  }
+
+
+  return shuffled.slice(
+    0,
+    Math.max(
+      0,
+      Number(count) || 0
+    )
+  );
+
+}
+
+
+/* =====================================================
+   CREATE TEST FROM MODULE
+===================================================== */
+
+function createModuleTest(
+  moduleName,
+  questionCount = "all"
+) {
+
+  let questions =
+    getPDFQuestionsByModule(
+      moduleName
     );
 
 
-    const data =
-      parseJSON(saved);
+  if (
+    questions.length === 0
+  ) {
 
-
-    if(data === null){
-
-      continue;
-
-    }
-
-
-    const rawQuestions =
-      extractQuestionArray(
-        data
-      );
-
-
-    if(
-      !Array.isArray(rawQuestions) ||
-      rawQuestions.length === 0
-    ){
-
-      console.warn(
-        "Storage key contains no questions:",
-        key
-      );
-
-      continue;
-
-    }
-
-
-    log(
-      "Raw question count:",
-      rawQuestions.length
+    console.warn(
+      "⚠️ No questions found for module:",
+      moduleName
     );
 
+    return null;
 
-    const normalized =
-      rawQuestions
-
-        .map(
-          function(q,index){
-
-            return normalizeQuestion(
-              q,
-              index
-            );
-
-          }
-        )
-
-        .filter(Boolean);
+  }
 
 
-    if(normalized.length === 0){
-
-      console.error(
-        "Questions were found but none could be normalized."
-      );
-
-      continue;
-
-    }
-
+  if (
+    questionCount !== "all"
+  ) {
 
     questions =
-      normalized;
-
-
-    log(
-      "PDF CBT LOADED:",
-      questions.length,
-      "questions"
-    );
-
-
-    log(
-      "First question:",
-      questions[0].question
-    );
-
-
-    return true;
-
-  }
-
-
-  console.warn(
-    "No PDF questions found in any supported storage key."
-  );
-
-
-  return false;
-
-}
-
-
-/* =====================================================
-   SHOW LOADING
-===================================================== */
-
-function showLoading(){
-
-  const badge =
-    document.getElementById(
-      "sourceBadge"
-    );
-
-
-  if(badge){
-
-    badge.className =
-      "info-box";
-
-    badge.textContent =
-      "⏳ Loading PDF-to-CBT questions...";
-
-  }
-
-
-  const number =
-    document.getElementById(
-      "questionNumber"
-    );
-
-
-  if(number){
-
-    number.textContent =
-      "Please wait...";
-
-  }
-
-
-  const question =
-    document.getElementById(
-      "question"
-    );
-
-
-  if(question){
-
-    question.textContent =
-      "Reading your imported PDF questions...";
-
-  }
-
-}
-
-
-/* =====================================================
-   SHOW PDF ERROR
-===================================================== */
-
-function showPDFError(){
-
-  const badge =
-    document.getElementById(
-      "sourceBadge"
-    );
-
-
-  if(badge){
-
-    badge.className =
-      "error-box";
-
-    badge.innerHTML =
-      "<b>⚠️ PDF QUESTIONS NOT FOUND</b><br><br>" +
-      "The CBT page cannot find the imported question bank.";
-
-
-  }
-
-
-  const number =
-    document.getElementById(
-      "questionNumber"
-    );
-
-
-  if(number){
-
-    number.textContent =
-      "PDF CBT unavailable";
-
-  }
-
-
-  const question =
-    document.getElementById(
-      "question"
-    );
-
-
-  if(question){
-
-    question.innerHTML =
-      "Your PDF questions are not available in this browser.";
-
-  }
-
-
-  const options =
-    document.getElementById(
-      "options"
-    );
-
-
-  if(options){
-
-    options.innerHTML =
-
-      '<div class="error-box">' +
-
-      "<b>Why?</b><br><br>" +
-
-      "The PDF importer and CBT page must use the same browser storage.<br><br>" +
-
-      "Import the PDF again from the PDF → CBT page, then open CBT without clearing browser data." +
-
-      "</div>";
-
-  }
-
-
-  const palette =
-    document.getElementById(
-      "palette"
-    );
-
-
-  if(palette){
-
-    palette.innerHTML = "";
-
-  }
-
-
-  const submit =
-    document.getElementById(
-      "submitButton"
-    );
-
-
-  if(submit){
-
-    submit.disabled = true;
-
-  }
-
-}
-
-
-/* =====================================================
-   INITIALIZE
-===================================================== */
-
-function initialize(){
-
-  if(initialized){
-
-    return;
-
-  }
-
-
-  initialized = true;
-
-
-  showLoading();
-
-
-  log(
-    "CBT initialization started."
-  );
-
-
-  const loaded =
-    loadPDFQuestions();
-
-
-  if(!loaded){
-
-    showPDFError();
-
-    return;
-
-  }
-
-
-  if(
-    !Array.isArray(questions) ||
-    questions.length === 0
-  ){
-
-    showPDFError();
-
-    return;
-
-  }
-
-
-  current = 0;
-
-  submitted = false;
-
-
-  answers =
-    new Array(
-      questions.length
-    ).fill(null);
-
-
-  marked =
-    new Array(
-      questions.length
-    ).fill(false);
-
-
-  const badge =
-    document.getElementById(
-      "sourceBadge"
-    );
-
-
-  if(badge){
-
-    badge.className =
-      "success-box";
-
-    badge.textContent =
-      "📄 PDF CBT • " +
-      questions.length +
-      " Questions Loaded";
-
-  }
-
-
-  renderQuestion();
-
-  renderPalette();
-
-  startTimer();
-
-
-  log(
-    "CBT READY"
-  );
-
-}
-
-
-/* =====================================================
-   NEXT PART
-===================================================== */
-   /* =====================================================
-   TIMER
-===================================================== */
-
-function updateTimer(){
-
-  const timer =
-    document.getElementById(
-      "timer"
-    );
-
-  if(!timer){
-    return;
-  }
-
-
-  const minutes =
-    Math.floor(
-      timeLeft / 60
-    );
-
-
-  const seconds =
-    timeLeft % 60;
-
-
-  timer.textContent =
-    String(minutes).padStart(2,"0") +
-    ":" +
-    String(seconds).padStart(2,"0");
-
-
-  timer.classList.remove(
-    "warning",
-    "danger"
-  );
-
-
-  if(timeLeft <= 300){
-
-    timer.classList.add(
-      "warning"
-    );
-
-  }
-
-
-  if(timeLeft <= 60){
-
-    timer.classList.remove(
-      "warning"
-    );
-
-    timer.classList.add(
-      "danger"
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   START TIMER
-===================================================== */
-
-function startTimer(){
-
-  clearInterval(
-    timerInterval
-  );
-
-
-  timeLeft = 1800;
-
-
-  updateTimer();
-
-
-  timerInterval =
-    setInterval(function(){
-
-      if(submitted){
-
-        clearInterval(
-          timerInterval
-        );
-
-        return;
-
-      }
-
-
-      timeLeft--;
-
-
-      updateTimer();
-
-
-      if(timeLeft <= 0){
-
-        clearInterval(
-          timerInterval
-        );
-
-        submitTest();
-
-      }
-
-    },1000);
-
-}
-
-
-/* =====================================================
-   RENDER QUESTION
-===================================================== */
-
-function renderQuestion(){
-
-  if(submitted){
-    return;
-  }
-
-
-  const q =
-    questions[current];
-
-
-  if(!q){
-
-    console.error(
-      "Question not found:",
-      current
-    );
-
-    return;
-
-  }
-
-
-  /* Question number */
-
-  const number =
-    document.getElementById(
-      "questionNumber"
-    );
-
-
-  if(number){
-
-    number.textContent =
-      "Question " +
-      (current + 1) +
-      " of " +
-      questions.length +
-      " • " +
-      (
-        q.subject ||
-        "PDF"
+      questions.slice(
+        0,
+        Number(questionCount)
       );
 
   }
 
-
-  /* Question */
-
-  const question =
-    document.getElementById(
-      "question"
-    );
-
-
-  if(question){
-
-    question.textContent =
-      q.question;
-
-  }
-
-
-  /* Options */
-
-  const box =
-    document.getElementById(
-      "options"
-    );
-
-
-  if(!box){
-    return;
-  }
-
-
-  box.innerHTML = "";
-
-
-  q.options.forEach(
-    function(option,index){
-
-      const button =
-        document.createElement(
-          "button"
-        );
-
-
-      button.type =
-        "button";
-
-
-      button.className =
-        "option";
-
-
-      if(
-        answers[current] === index
-      ){
-
-        button.classList.add(
-          "selected"
-        );
-
-      }
-
-
-      button.textContent =
-        String.fromCharCode(
-          65 + index
-        ) +
-        ". " +
-        option;
-
-
-      button.onclick =
-        function(){
-
-          if(submitted){
-            return;
-          }
-
-
-          answers[current] =
-            index;
-
-
-          renderQuestion();
-
-        };
-
-
-      box.appendChild(
-        button
-      );
-
-    }
-  );
-
-
-  /* Previous */
-
-  const previous =
-    document.getElementById(
-      "previousButton"
-    );
-
-
-  if(previous){
-
-    previous.disabled =
-      current === 0;
-
-  }
-
-
-  /* Next */
-
-  const next =
-    document.getElementById(
-      "nextButton"
-    );
-
-
-  if(next){
-
-    next.textContent =
-      current ===
-      questions.length - 1
-      ? "Finish"
-      : "Next";
-
-  }
-
-
-  renderPalette();
-
-}
-
-
-/* =====================================================
-   QUESTION PALETTE
-===================================================== */
-
-function renderPalette(){
-
-  const palette =
-    document.getElementById(
-      "palette"
-    );
-
-
-  if(!palette){
-    return;
-  }
-
-
-  palette.innerHTML = "";
-
-
-  questions.forEach(
-    function(q,index){
-
-      const button =
-        document.createElement(
-          "button"
-        );
-
-
-      button.type =
-        "button";
-
-
-      button.textContent =
-        index + 1;
-
-
-      if(
-        answers[index] !== null
-      ){
-
-        button.classList.add(
-          "answered"
-        );
-
-      }
-
-
-      if(
-        marked[index]
-      ){
-
-        button.classList.add(
-          "review"
-        );
-
-      }
-
-
-      if(
-        index === current
-      ){
-
-        button.classList.add(
-          "current"
-        );
-
-      }
-
-
-      button.onclick =
-        function(){
-
-          if(submitted){
-            return;
-          }
-
-
-          current =
-            index;
-
-
-          renderQuestion();
-
-        };
-
-
-      palette.appendChild(
-        button
-      );
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   NEXT QUESTION
-===================================================== */
-
-function nextQuestion(){
-
-  if(submitted){
-    return;
-  }
-
-
-  if(
-    current <
-    questions.length - 1
-  ){
-
-    current++;
-
-    renderQuestion();
-
-  }else{
-
-    confirmSubmit();
-
-  }
-
-}
-
-
-/* =====================================================
-   PREVIOUS QUESTION
-===================================================== */
-
-function previousQuestion(){
-
-  if(submitted){
-    return;
-  }
-
-
-  if(current > 0){
-
-    current--;
-
-    renderQuestion();
-
-  }
-
-}
-
-
-/* =====================================================
-   CLEAR ANSWER
-===================================================== */
-
-function clearAnswer(){
-
-  if(submitted){
-    return;
-  }
-
-
-  answers[current] =
-    null;
-
-
-  renderQuestion();
-
-}
-
-
-/* =====================================================
-   MARK FOR REVIEW
-===================================================== */
-
-function markReview(){
-
-  if(submitted){
-    return;
-  }
-
-
-  marked[current] =
-    !marked[current];
-
-
-  renderPalette();
-
-}
-
-
-/* =====================================================
-   CONFIRM SUBMIT
-===================================================== */
-
-function confirmSubmit(){
-
-  if(submitted){
-    return;
-  }
-
-
-  let unanswered = 0;
-
-
-  answers.forEach(
-    function(answer){
-
-      if(answer === null){
-
-        unanswered++;
-
-      }
-
-    }
-  );
-
-
-  if(unanswered > 0){
-
-    const message =
-      "You have " +
-      unanswered +
-      " unanswered question" +
-      (
-        unanswered === 1
-        ? ""
-        : "s"
-      ) +
-      ".\n\n" +
-      "Do you really want to submit?";
-
-
-    if(
-      !confirm(message)
-    ){
-
-      return;
-
-    }
-
-  }
-
-
-  submitTest();
-
-}
-
-
-/* =====================================================
-   MISTAKE CLASSIFICATION
-===================================================== */
-
-function classifyMistake(
-  q,
-  selectedIndex
-){
-
-  const text =
-    String(
-      q.question || ""
-    ).toLowerCase();
-
-
-  /* Calculation */
-
-  if(
-
-    text.includes("calculate") ||
-    text.includes("numerical") ||
-    text.includes("find the") ||
-    text.includes("value of") ||
-    text.includes("velocity") ||
-    text.includes("acceleration") ||
-    text.includes("force") ||
-    text.includes("mass") ||
-    text.includes("energy") ||
-    text.includes("work done")
-
-  ){
-
-    return {
-
-      type:
-        "🔢 Calculation Error",
-
-      reason:
-        "Recheck the formula, units and calculation steps."
-
-    };
-
-  }
-
-
-  /* Memory */
-
-  if(
-
-    text.includes("which") ||
-    text.includes("what is") ||
-    text.includes("symbol") ||
-    text.includes("unit") ||
-    text.includes("known as") ||
-    text.includes("called")
-
-  ){
-
-    return {
-
-      type:
-        "📚 Memory / Recall Gap",
-
-      reason:
-        "Revise the relevant factual information and test recall again."
-
-    };
-
-  }
-
-
-  /* Default */
 
   return {
 
-    type:
-      "🧠 Concept Gap",
+    id:
+      "module-" +
+      Date.now(),
 
-    reason:
-      "Review the underlying concept and retry the question."
+    title:
+      moduleName,
+
+    duration:
+      180,
+
+    questions:
+      questions,
+
+    questionIds:
+      questions.map(
+        function(question) {
+
+          return question.id;
+
+        }
+      )
 
   };
 
@@ -2148,319 +1978,105 @@ function classifyMistake(
 
 
 /* =====================================================
-   SAVE TEST HISTORY
+   CREATE MIXED TEST
 ===================================================== */
 
-function saveHistory(
-  correct,
-  incorrect,
-  skipped,
-  score
-){
+function createMixedPDFTest(
+  questionCount = 180
+) {
 
-  let history = [];
-
-
-  try{
-
-    const stored =
-      getStorage(
-        HISTORY_KEY
-      );
-
-
-    if(stored){
-
-      const parsed =
-        parseJSON(stored);
-
-
-      if(Array.isArray(parsed)){
-
-        history =
-          parsed;
-
-      }
-
-    }
-
-  }catch(error){
-
-    console.error(
-      "History read error:",
-      error
+  const questions =
+    getRandomPDFQuestions(
+      questionCount
     );
+
+
+  if (
+    questions.length === 0
+  ) {
+
+    return null;
 
   }
 
 
-  const testQuestions =
-    questions.map(
-      function(q,index){
+  return {
 
-        let status;
-
-
-        if(
-          answers[index] === null
-        ){
-
-          status =
-            "skipped";
-
-        }
-        else if(
-          answers[index] ===
-          q.answer
-        ){
-
-          status =
-            "correct";
-
-        }
-        else{
-
-          status =
-            "wrong";
-
-        }
-
-
-        let intelligence =
-          null;
-
-
-        if(
-          status === "wrong"
-        ){
-
-          intelligence =
-            classifyMistake(
-              q,
-              answers[index]
-            );
-
-        }
-
-
-        return {
-
-          question:
-            q.question,
-
-          options:
-            q.options,
-
-          subject:
-            q.subject,
-
-          topic:
-            q.topic,
-
-          status:
-            status,
-
-          selectedIndex:
-            answers[index],
-
-          selectedAnswer:
-            answers[index] === null
-            ? "Not answered"
-            : q.options[
-                answers[index]
-              ],
-
-          correctIndex:
-            q.answer,
-
-          correctAnswer:
-            q.options[
-              q.answer
-            ],
-
-          mistakeType:
-            intelligence
-            ? intelligence.type
-            : null,
-
-          mistakeReason:
-            intelligence
-            ? intelligence.reason
-            : null,
-
-          solution:
-            q.solution || "",
-
-          bookmarked:
-            Boolean(
-              marked[index]
-            ),
-
-          markedForReview:
-            Boolean(
-              marked[index]
-            ),
-
-          pdfPage:
-            q.pdfPage || "",
-
-          chapter:
-            q.chapter || "",
-
-          section:
-            q.section || ""
-
-        };
-
-      }
-    );
-
-
-  history.push({
-
-    date:
-      new Date().toLocaleString(),
-
-    timestamp:
+    id:
+      "mixed-pdf-test-" +
       Date.now(),
 
-    score:
-      score,
+    title:
+      "Topper Test Pro — PDF Module Test",
 
-    correct:
-      correct,
-
-    incorrect:
-      incorrect,
-
-    wrong:
-      incorrect,
-
-    skipped:
-      skipped,
-
-    total:
-      questions.length,
-
-    source:
-      "PDF CBT",
+    duration:
+      180,
 
     questions:
-      testQuestions
+      questions,
 
-  });
+    questionIds:
+      questions.map(
+        function(question) {
 
+          return question.id;
 
-  setStorage(
-    HISTORY_KEY,
-    JSON.stringify(history)
-  );
+        }
+      )
 
-
-  log(
-    "Test history saved."
-  );
+  };
 
 }
 
 
 /* =====================================================
-   RETRY MISTAKES
+   EXPORT TEST DATA
 ===================================================== */
 
-function openRetry(){
+function exportPDFTestData() {
 
-  const wrong = [];
-
-
-  questions.forEach(
-    function(q,index){
-
-      if(
-
-        answers[index] !== null &&
-
-        answers[index] !==
-        q.answer
-
-      ){
-
-        const intelligence =
-          classifyMistake(
-            q,
-            answers[index]
-          );
+  const questions =
+    getQuestionsForCBT();
 
 
-        wrong.push({
-
-          id:
-            "retry-" +
-            Date.now() +
-            "-" +
-            index,
-
-          question:
-            q.question,
-
-          options:
-            q.options,
-
-          subject:
-            q.subject,
-
-          topic:
-            q.topic,
-
-          correctIndex:
-            q.answer,
-
-          correctAnswer:
-            q.options[
-              q.answer
-            ],
-
-          solution:
-            q.solution || "",
-
-          selectedIndex:
-            answers[index],
-
-          selectedAnswer:
-            q.options[
-              answers[index]
-            ],
-
-          mistakeType:
-            intelligence.type,
-
-          mistakeReason:
-            intelligence.reason,
-
-          source:
-            "CBT",
-
-          pdfPage:
-            q.pdfPage || "",
-
-          chapter:
-            q.chapter || "",
-
-          section:
-            q.section || ""
-
-        });
-
-      }
-
-    }
-  );
+  const test =
+    createPDFCBTTest();
 
 
-  if(!wrong.length){
+  window.PDF_CBT_TEST =
+    test;
+
+
+  return {
+
+    questions:
+      questions,
+
+    test:
+      test
+
+  };
+
+}
+
+
+/* =====================================================
+   OPEN CBT
+===================================================== */
+
+function openCBTWithPDFQuestions() {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  if (
+    questions.length === 0
+  ) {
 
     alert(
-      "There are no mistakes to retry."
+      "No PDF questions are available yet.\n\n" +
+      "Convert a PDF module first."
     );
 
     return;
@@ -2468,1244 +2084,1170 @@ function openRetry(){
   }
 
 
-  setStorage(
-    RETRY_QUEUE_KEY,
-    JSON.stringify(wrong)
+  /*
+   * Store the selected pool
+   * for cbt.html.
+   */
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_SOURCE",
+    "PDF"
   );
 
 
-  setStorage(
-    RETRY_QUESTION_KEY,
-    JSON.stringify(wrong[0])
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(
+      questions
+    )
   );
 
 
-  setStorage(
-    RETRY_STARTED_KEY,
-    String(Date.now())
+  window.location.href =
+    "./cbt.html";
+
+}
+
+
+/* =====================================================
+   CREATE OPEN CBT BUTTON
+===================================================== */
+
+const openCBTButton =
+  document.createElement(
+    "button"
   );
 
 
-  location.href =
-    "retry.html";
+openCBTButton.type =
+  "button";
+
+openCBTButton.className =
+  "primary";
+
+openCBTButton.textContent =
+  "🚀 Open PDF Questions in CBT";
+
+
+openCBTButton.style.marginTop =
+  "10px";
+
+
+openCBTButton.addEventListener(
+  "click",
+  function() {
+
+    openCBTWithPDFQuestions();
+
+  }
+);
+
+
+/* =====================================================
+   ADD BUTTON TO PAGE
+===================================================== */
+
+const buttonContainer =
+  document.querySelector(
+    ".button-row"
+  );
+
+
+if (
+  buttonContainer
+) {
+
+  buttonContainer.appendChild(
+    openCBTButton
+  );
 
 }
 
 
 /* =====================================================
-   NEXT PART
+   REFRESH EXPORT
 ===================================================== */
-       q.options.forEach(function(option,index){
 
-        const button =
-            document.createElement("button");
+exportPDFQuestionsToCBT();
 
-        button.type = "button";
-
-        button.className = "option";
+exportPDFTestData();
 
 
-        if(
-            answers[current] === index
-        ){
+/* =====================================================
+   DEBUG
+===================================================== */
 
-            button.classList.add("selected");
+console.log(
+  "===================================="
+);
 
-        }
+console.log(
+  "✅ PDF → CBT Part 3 loaded"
+);
 
+console.log(
+  "📚 PDF questions:",
+  getQuestionsForCBT().length
+);
 
-        button.textContent =
-            String.fromCharCode(65 + index) +
-            ". " +
-            String(option);
+console.log(
+  "🚀 PDF CBT test:",
+  window.PDF_CBT_TEST
+);
 
+console.log(
+  "===================================="
+);
 
-        button.onclick = function(){
+          </script>
+          <script>
 
-            if(submitted){
-                return;
-            }
-
-            answers[current] = index;
-
-            renderQuestion();
-
-        };
-
-
-        box.appendChild(button);
-
-    });
-
-
-    /* NEXT BUTTON */
-
-    const nextButton =
-        document.getElementById(
-            "nextButton"
-        );
+/* =====================================================
+   PART 4
+   PDF MODULE → TEST BUILDER
+===================================================== */
 
 
-    if(nextButton){
+/* =====================================================
+   GET CURRENT PDF QUESTION POOL
+===================================================== */
 
-        nextButton.textContent =
-            current === questions.length - 1
-            ? "Finish"
-            : "Next";
+function getCurrentPDFPool() {
 
-    }
+  const questions =
+    getPDFQuestionPool();
 
+  if (!Array.isArray(questions)) {
+    return [];
+  }
 
-    /* PREVIOUS BUTTON */
+  return questions.filter(
+    function(question) {
 
-    const previousButton =
-        document.getElementById(
-            "previousButton"
-        );
-
-
-    if(previousButton){
-
-        previousButton.disabled =
-            current === 0;
+      return (
+        question &&
+        typeof question.text === "string" &&
+        question.text.trim().length > 0 &&
+        Array.isArray(question.options) &&
+        question.options.length >= 2
+      );
 
     }
-
-
-    /* PALETTE */
-
-    renderPalette();
+  );
 
 }
 
 
 /* =====================================================
-   QUESTION PALETTE
+   BUILD 180 QUESTION TEST
 ===================================================== */
 
-function renderPalette(){
+function build180QuestionTest() {
 
-    const palette =
-        document.getElementById(
-            "palette"
-        );
+  const pool =
+    getCurrentPDFPool();
 
 
-    if(!palette){
-        return;
-    }
-
-
-    palette.innerHTML = "";
-
-
-    questions.forEach(function(q,index){
-
-        const button =
-            document.createElement("button");
-
-
-        button.type = "button";
-
-
-        button.textContent =
-            index + 1;
-
-
-        /* ANSWERED */
-
-        if(
-            answers[index] !== null
-        ){
-
-            button.classList.add(
-                "answered"
-            );
-
-        }
-
-
-        /* MARKED */
-
-        if(
-            marked[index]
-        ){
-
-            button.classList.add(
-                "review"
-            );
-
-        }
-
-
-        /* CURRENT */
-
-        if(
-            index === current
-        ){
-
-            button.classList.add(
-                "current"
-            );
-
-        }
-
-
-        button.onclick =
-            function(){
-
-                if(submitted){
-                    return;
-                }
-
-                current = index;
-
-                renderQuestion();
-
-            };
-
-
-        palette.appendChild(
-            button
-        );
-
-    });
-
-}
-
-
-/* =====================================================
-   NEXT QUESTION
-===================================================== */
-
-function nextQuestion(){
-
-    if(submitted){
-        return;
-    }
-
-
-    if(
-        current <
-        questions.length - 1
-    ){
-
-        current++;
-
-        renderQuestion();
-
-    }else{
-
-        confirmSubmit();
-
-    }
-
-}
-
-
-/* =====================================================
-   PREVIOUS QUESTION
-===================================================== */
-
-function previousQuestion(){
-
-    if(submitted){
-        return;
-    }
-
-
-    if(current > 0){
-
-        current--;
-
-        renderQuestion();
-
-    }
-
-}
-
-
-/* =====================================================
-   CLEAR ANSWER
-===================================================== */
-
-function clearAnswer(){
-
-    if(submitted){
-        return;
-    }
-
-
-    answers[current] = null;
-
-    renderQuestion();
-
-}
-
-
-/* =====================================================
-   MARK FOR REVIEW
-===================================================== */
-
-function markReview(){
-
-    if(submitted){
-        return;
-    }
-
-
-    marked[current] =
-        !marked[current];
-
-
-    renderPalette();
-
-}
-
-
-/* =====================================================
-   CONFIRM SUBMIT
-===================================================== */
-
-function confirmSubmit(){
-
-    if(submitted){
-        return;
-    }
-
-
-    const unanswered =
-        answers.filter(function(answer){
-
-            return answer === null;
-
-        }).length;
-
-
-    if(unanswered > 0){
-
-        const message =
-            "You have " +
-            unanswered +
-            " unanswered question" +
-            (unanswered === 1 ? "" : "s") +
-            ".\n\n" +
-            "Do you want to submit the test?";
-
-
-        if(
-            !window.confirm(message)
-        ){
-
-            return;
-
-        }
-
-    }
-
-
-    submitTest();
-
-}
-
-
-/* =====================================================
-   MISTAKE CLASSIFICATION
-===================================================== */
-
-function classifyMistake(q,selectedIndex){
-
-    const text =
-        String(
-            q.question || ""
-        ).toLowerCase();
-
-
-    if(
-        text.includes("calculate") ||
-        text.includes("numerical") ||
-        text.includes("find the") ||
-        text.includes("value of") ||
-        text.includes("velocity") ||
-        text.includes("acceleration") ||
-        text.includes("force") ||
-        text.includes("mass") ||
-        text.includes("energy")
-    ){
-
-        return {
-
-            type:
-                "🔢 Calculation Error",
-
-            reason:
-                "Recheck the formula, units and calculation steps."
-
-        };
-
-    }
-
-
-    if(
-        text.includes("which") ||
-        text.includes("what is") ||
-        text.includes("symbol") ||
-        text.includes("unit") ||
-        text.includes("known as") ||
-        text.includes("called")
-    ){
-
-        return {
-
-            type:
-                "📚 Memory / Recall Gap",
-
-            reason:
-                "Revise the relevant factual information and test recall again."
-
-        };
-
-    }
-
+  if (pool.length < 180) {
 
     return {
 
-        type:
-            "🧠 Concept Gap",
+      success: false,
 
-        reason:
-            "Review the underlying concept and retry the question."
+      message:
+        `Only ${pool.length} questions are available.\n\n` +
+        `180 questions are required for Test 180.`
 
     };
 
-}
+  }
 
 
-/* =====================================================
-   SAVE TEST HISTORY
-===================================================== */
+  /*
+   * Take first 180 questions.
+   *
+   * Part 5 will add proper random/module
+   * selection controls.
+   */
 
-function saveHistory(
-    correct,
-    incorrect,
-    skipped,
-    score
-){
-
-    let history = [];
-
-
-    try{
-
-        history =
-            JSON.parse(
-                localStorage.getItem(
-                    "cbtHistory"
-                ) || "[]"
-            );
+  const questions =
+    pool.slice(
+      0,
+      180
+    );
 
 
-        if(
-            !Array.isArray(history)
-        ){
+  return {
 
-            history = [];
+    success: true,
 
-        }
+    test: {
 
-    }catch(error){
+      id:
+        "topper-test-180-" +
+        Date.now(),
 
-        console.error(
-            "History read error:",
-            error
-        );
+      title:
+        "🔥 Topper Test Pro — Test 180",
 
-        history = [];
+      duration:
+        180,
+
+      totalQuestions:
+        180,
+
+      questions:
+        questions,
+
+      questionIds:
+        questions.map(
+          function(question) {
+
+            return question.id;
+
+          }
+        )
 
     }
 
-
-    const testQuestions =
-        questions.map(function(q,index){
-
-            let status;
-
-
-            if(
-                answers[index] === null
-            ){
-
-                status = "skipped";
-
-            }
-            else if(
-                answers[index] === q.answer
-            ){
-
-                status = "correct";
-
-            }
-            else{
-
-                status = "wrong";
-
-            }
-
-
-            let intelligence = null;
-
-
-            if(
-                status === "wrong"
-            ){
-
-                intelligence =
-                    classifyMistake(
-                        q,
-                        answers[index]
-                    );
-
-            }
-
-
-            return {
-
-                question:
-                    q.question,
-
-                options:
-                    q.options,
-
-                subject:
-                    q.subject,
-
-                topic:
-                    q.topic,
-
-                status:
-                    status,
-
-                selectedIndex:
-                    answers[index],
-
-                selectedAnswer:
-                    answers[index] === null
-                    ? "Not answered"
-                    : q.options[
-                        answers[index]
-                      ],
-
-                correctIndex:
-                    q.answer,
-
-                correctAnswer:
-                    q.options[q.answer],
-
-                mistakeType:
-                    intelligence
-                    ? intelligence.type
-                    : null,
-
-                mistakeReason:
-                    intelligence
-                    ? intelligence.reason
-                    : null,
-
-                solution:
-                    q.solution || "",
-
-                bookmarked:
-                    Boolean(
-                        marked[index]
-                    ),
-
-                markedForReview:
-                    Boolean(
-                        marked[index]
-                    ),
-
-                pdfPage:
-                    q.pdfPage || "",
-
-                chapter:
-                    q.chapter || "",
-
-                section:
-                    q.section || ""
-
-            };
-
-        });
-
-
-    history.push({
-
-        date:
-            new Date().toLocaleString(),
-
-        timestamp:
-            Date.now(),
-
-        score:
-            score,
-
-        correct:
-            correct,
-
-        incorrect:
-            incorrect,
-
-        wrong:
-            incorrect,
-
-        skipped:
-            skipped,
-
-        total:
-            questions.length,
-
-        source:
-            testSource,
-
-        questions:
-            testQuestions
-
-    });
-
-
-    try{
-
-        localStorage.setItem(
-            "cbtHistory",
-            JSON.stringify(history)
-        );
-
-        console.log(
-            "CBT history saved."
-        );
-
-    }catch(error){
-
-        console.error(
-            "Could not save history:",
-            error
-        );
-
-    }
+  };
 
 }
 
 
 /* =====================================================
-   RETRY MISTAKES
+   SAVE TEST 180
 ===================================================== */
 
-function openRetry(){
+function saveTest180() {
 
-    const wrong = [];
-
-
-    questions.forEach(function(q,index){
-
-        if(
-            answers[index] !== null &&
-            answers[index] !== q.answer
-        ){
-
-            const intelligence =
-                classifyMistake(
-                    q,
-                    answers[index]
-                );
+  const result =
+    build180QuestionTest();
 
 
-            wrong.push({
+  if (!result.success) {
 
-                id:
-                    "retry-" +
-                    Date.now() +
-                    "-" +
-                    index,
+    statusBox.textContent =
+      "⚠️ " +
+      result.message;
 
-                question:
-                    q.question,
+    return null;
 
-                options:
-                    q.options,
-
-                subject:
-                    q.subject,
-
-                topic:
-                    q.topic,
-
-                correctIndex:
-                    q.answer,
-
-                correctAnswer:
-                    q.options[q.answer],
-
-                solution:
-                    q.solution || "",
-
-                selectedIndex:
-                    answers[index],
-
-                selectedAnswer:
-                    q.options[
-                        answers[index]
-                    ],
-
-                mistakeType:
-                    intelligence.type,
-
-                mistakeReason:
-                    intelligence.reason,
-
-                source:
-                    "CBT",
-
-                pdfPage:
-                    q.pdfPage || "",
-
-                chapter:
-                    q.chapter || "",
-
-                section:
-                    q.section || ""
-
-            });
-
-        }
-
-    });
+  }
 
 
-    if(!wrong.length){
-
-        alert(
-            "There are no mistakes to retry."
-        );
-
-        return;
-
-    }
-
+  try {
 
     localStorage.setItem(
-        "cbtAnalyzer.retryQueue",
-        JSON.stringify(wrong)
+      "TOPPER_TEST_180",
+      JSON.stringify(
+        result.test
+      )
     );
 
 
-    localStorage.setItem(
-        "cbtRetryQuestion",
-        JSON.stringify(wrong[0])
+    console.log(
+      "✅ Test 180 saved:",
+      result.test
     );
 
 
-    localStorage.setItem(
-        "cbtRetryStartedAt",
-        String(Date.now())
+    statusBox.textContent =
+      "🔥 Test 180 created successfully.\n\n" +
+      "Questions: 180\n" +
+      "Duration: 180 minutes";
+
+
+    return result.test;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Test 180 save error:",
+      error
     );
 
 
-    location.href =
-        "retry.html";
+    statusBox.textContent =
+      "❌ Could not save Test 180.";
+
+    return null;
+
+  }
 
 }
 
 
 /* =====================================================
-   SUBMIT TEST
+   LOAD SAVED TEST 180
 ===================================================== */
 
-function submitTest(){
+function loadTest180() {
 
-    if(submitted){
-        return;
+  try {
+
+    const saved =
+      localStorage.getItem(
+        "TOPPER_TEST_180"
+      );
+
+
+    if (!saved) {
+      return null;
     }
 
 
-    if(
-        !questions.length
-    ){
+    const test =
+      JSON.parse(saved);
 
-        return;
+
+    if (
+      !test ||
+      !Array.isArray(
+        test.questions
+      )
+    ) {
+
+      return null;
 
     }
 
 
-    let correct = 0;
+    return test;
 
-    let incorrect = 0;
+  }
 
-    let skipped = 0;
+  catch (error) {
 
-
-    questions.forEach(function(q,index){
-
-        if(
-            answers[index] === null
-        ){
-
-            skipped++;
-
-        }
-        else if(
-            answers[index] === q.answer
-        ){
-
-            correct++;
-
-        }
-        else{
-
-            incorrect++;
-
-        }
-
-    });
-
-
-    const score =
-        (correct * 4) -
-        incorrect;
-
-
-    saveHistory(
-        correct,
-        incorrect,
-        skipped,
-        score
+    console.error(
+      "❌ Test 180 loading error:",
+      error
     );
 
+    return null;
 
-    submitted = true;
-
-
-    clearInterval(
-        timerInterval
-    );
-
-
-    const testScreen =
-        document.getElementById(
-            "testScreen"
-        );
-
-
-    const result =
-        document.getElementById(
-            "result"
-        );
-
-
-    const aside =
-        document.querySelector(
-            "aside"
-        );
-
-
-    if(testScreen){
-
-        testScreen.style.display =
-            "none";
-
-    }
-
-
-    if(aside){
-
-        aside.style.display =
-            "none";
-
-    }
-
-
-    if(result){
-
-        result.style.display =
-            "block";
-
-    }
-
-
-    const scoreBox =
-        document.getElementById(
-            "score"
-        );
-
-
-    if(scoreBox){
-
-        scoreBox.textContent =
-            score +
-            " / " +
-            (questions.length * 4);
-
-    }
-
-
-    const summary =
-        document.getElementById(
-            "summary"
-        );
-
-
-    if(summary){
-
-        summary.innerHTML =
-            "<b>Correct:</b> " +
-            correct +
-            " &nbsp; | &nbsp; " +
-
-            "<b>Incorrect:</b> " +
-            incorrect +
-            " &nbsp; | &nbsp; " +
-
-            "<b>Skipped:</b> " +
-            skipped;
-
-    }
-
-
-    /* RESULT STATS */
-
-    const stats =
-        document.getElementById(
-            "resultStats"
-        );
-
-
-    if(stats){
-
-        stats.innerHTML =
-
-            '<div class="stat">' +
-                '<strong>' +
-                    correct +
-                '</strong>' +
-                '<small>Correct</small>' +
-            '</div>' +
-
-            '<div class="stat">' +
-                '<strong>' +
-                    incorrect +
-                '</strong>' +
-                '<small>Incorrect</small>' +
-            '</div>' +
-
-            '<div class="stat">' +
-                '<strong>' +
-                    skipped +
-                '</strong>' +
-                '<small>Skipped</small>' +
-            '</div>';
-
-    }
-
-
-    /* RETRY BUTTON */
-
-    const retry =
-        document.getElementById(
-            "retryButton"
-        );
-
-
-    if(retry){
-
-        if(incorrect > 0){
-
-            retry.style.display =
-                "block";
-
-            retry.textContent =
-                "🔄 Retry " +
-                incorrect +
-                " Mistake" +
-                (
-                    incorrect === 1
-                    ? ""
-                    : "s"
-                );
-
-        }
-        else{
-
-            retry.style.display =
-                "none";
-
-        }
-
-    }
-
-
-    generateReview();
+  }
 
 }
 
 
 /* =====================================================
-   GENERATE REVIEW
+   SHOW TEST 180 STATUS
 ===================================================== */
 
-function generateReview(){
+function updateTest180Status() {
 
-    const box =
-        document.getElementById(
-            "review"
-        );
+  const pool =
+    getCurrentPDFPool();
 
 
-    if(!box){
-        return;
-    }
+  const savedTest =
+    loadTest180();
 
 
-    box.innerHTML =
-        "<h3>🧠 Question Analysis</h3>";
+  if (savedTest) {
+
+    statusBox.textContent =
+      `🔥 Test 180 ready.\n\n` +
+      `Questions: ${savedTest.questions.length}\n` +
+      `Duration: ${savedTest.duration} minutes`;
+
+    return;
+
+  }
 
 
-    questions.forEach(function(q,index){
+  if (pool.length >= 180) {
 
-        let status;
+    statusBox.textContent =
+      `📚 ${pool.length} PDF questions available.\n\n` +
+      `You can now create Test 180.`;
 
+    return;
 
-        if(
-            answers[index] === null
-        ){
-
-            status =
-                "skipped";
-
-        }
-        else if(
-            answers[index] === q.answer
-        ){
-
-            status =
-                "correct";
-
-        }
-        else{
-
-            status =
-                "incorrect";
-
-        }
+  }
 
 
-        const item =
-            document.createElement(
-                "div"
-            );
-
-
-        item.className =
-            "review-item " +
-            status;
-
-
-        item.innerHTML =
-            "<strong>Q" +
-            (index + 1) +
-            ". " +
-            escapeHTML(
-                q.question
-            ) +
-            "</strong>";
-
-
-        item.innerHTML +=
-            "<p>" +
-
-            "<b>Your answer:</b> " +
-
-            escapeHTML(
-
-                answers[index] === null
-                ? "Not answered"
-                : q.options[
-                    answers[index]
-                  ]
-
-            ) +
-
-            "<br>" +
-
-            "<b>Correct answer:</b> " +
-
-            escapeHTML(
-                q.options[q.answer]
-            ) +
-
-            "</p>";
-
-
-        if(q.solution){
-
-            item.innerHTML +=
-
-                '<div class="analysis">' +
-
-                "<b>💡 Solution</b><br>" +
-
-                escapeHTML(
-                    q.solution
-                ) +
-
-                "</div>";
-
-        }
-
-
-        if(
-            status === "incorrect"
-        ){
-
-            const intelligence =
-                classifyMistake(
-                    q,
-                    answers[index]
-                );
-
-
-            item.innerHTML +=
-
-                '<div class="analysis">' +
-
-                "<b>" +
-
-                escapeHTML(
-                    intelligence.type
-                ) +
-
-                "</b><br>" +
-
-                escapeHTML(
-                    intelligence.reason
-                ) +
-
-                "</div>";
-
-        }
-
-
-        if(q.pdfPage){
-
-            item.innerHTML +=
-
-                '<div class="analysis">' +
-
-                "📄 PDF Page: " +
-
-                escapeHTML(
-                    q.pdfPage
-                ) +
-
-                "</div>";
-
-        }
-
-
-        box.appendChild(
-            item
-        );
-
-    });
+  statusBox.textContent =
+    `📚 Current PDF question pool: ${pool.length}\n\n` +
+    `Need ${180 - pool.length} more questions ` +
+    `to create Test 180.`;
 
 }
 
 
 /* =====================================================
-   ESCAPE HTML
+   CREATE TEST 180 BUTTON
 ===================================================== */
 
-function escapeHTML(value){
-
-    return String(
-        value ?? ""
-    )
-
-    .replace(
-        /&/g,
-        "&amp;"
-    )
-
-    .replace(
-        /</g,
-        "&lt;"
-    )
-
-    .replace(
-        />/g,
-        "&gt;"
-    )
-
-    .replace(
-        /"/g,
-        "&quot;"
-    )
-
-    .replace(
-        /'/g,
-        "&#039;"
-    );
-
-}
+const create180Button =
+  document.createElement(
+    "button"
+  );
 
 
-/* =====================================================
-   GLOBAL ERROR HANDLER
-===================================================== */
+create180Button.type =
+  "button";
 
-window.addEventListener(
-    "error",
-    function(event){
+create180Button.className =
+  "primary";
 
-        console.error(
-            "CBT runtime error:",
-            event.error ||
-            event.message
-        );
+create180Button.textContent =
+  "🔥 Create Test 180";
 
-    }
+create180Button.style.marginTop =
+  "10px";
+
+
+create180Button.addEventListener(
+  "click",
+  function() {
+
+    saveTest180();
+
+  }
 );
 
 
 /* =====================================================
-   START APPLICATION
+   ADD BUTTON TO PAGE
 ===================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function(){
+if (
+  buttonContainer
+) {
 
-        console.log(
-            "DOM loaded."
+  buttonContainer.appendChild(
+    create180Button
+  );
+
+}
+
+
+/* =====================================================
+   TEST 180 → CBT
+===================================================== */
+
+function openTest180InCBT() {
+
+  const test =
+    loadTest180();
+
+
+  if (!test) {
+
+    alert(
+      "Test 180 has not been created yet."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !Array.isArray(
+      test.questions
+    ) ||
+    test.questions.length === 0
+  ) {
+
+    alert(
+      "Test 180 contains no questions."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Send Test 180 questions
+   * to cbt.html.
+   */
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_SOURCE",
+    "TEST180"
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_TEST",
+    JSON.stringify(
+      test
+    )
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(
+      test.questions
+    )
+  );
+
+
+  window.location.href =
+    "./cbt.html";
+
+}
+
+
+/* =====================================================
+   OPEN TEST 180 BUTTON
+===================================================== */
+
+const open180Button =
+  document.createElement(
+    "button"
+  );
+
+
+open180Button.type =
+  "button";
+
+open180Button.className =
+  "primary";
+
+open180Button.textContent =
+  "🚀 Start Test 180";
+
+
+open180Button.style.marginTop =
+  "10px";
+
+
+open180Button.addEventListener(
+  "click",
+  function() {
+
+    openTest180InCBT();
+
+  }
+);
+
+
+/* =====================================================
+   ADD START BUTTON
+===================================================== */
+
+if (
+  buttonContainer
+) {
+
+  buttonContainer.appendChild(
+    open180Button
+  );
+
+}
+
+
+/* =====================================================
+   INITIAL STATUS
+===================================================== */
+
+updateTest180Status();
+
+
+console.log(
+  "===================================="
+);
+
+console.log(
+  "🔥 PART 4 READY"
+);
+
+console.log(
+  "PDF pool:",
+  getCurrentPDFPool().length
+);
+
+console.log(
+  "Saved Test 180:",
+  loadTest180()
+);
+
+console.log(
+  "===================================="
+);
+
+          </script>
+          <!-- =====================================================
+     PART 4
+     BUILD TEST 180 FROM PDF QUESTION POOL
+===================================================== -->
+
+<script>
+
+function getCurrentPDFPool() {
+
+  /*
+   * Part 3 should provide getPDFQuestionPool().
+   */
+
+  if (
+    typeof getPDFQuestionPool !== "function"
+  ) {
+
+    console.error(
+      "❌ getPDFQuestionPool() not found."
+    );
+
+    return [];
+
+  }
+
+
+  const pool =
+    getPDFQuestionPool();
+
+
+  if (!Array.isArray(pool)) {
+    return [];
+  }
+
+
+  return pool.filter(function(question) {
+
+    return (
+      question &&
+      typeof question.text === "string" &&
+      question.text.trim() !== "" &&
+      Array.isArray(question.options) &&
+      question.options.length >= 2
+    );
+
+  });
+
+}
+
+
+/* =====================================================
+   BUILD TEST 180
+===================================================== */
+
+function buildTest180() {
+
+  const pool =
+    getCurrentPDFPool();
+
+
+  console.log(
+    "📚 Available PDF questions:",
+    pool.length
+  );
+
+
+  if (pool.length < 180) {
+
+    alert(
+      "Only " +
+      pool.length +
+      " questions are available.\n\n" +
+      "Need " +
+      (180 - pool.length) +
+      " more questions for Test 180."
+    );
+
+    return null;
+
+  }
+
+
+  /*
+   * Select exactly 180 questions.
+   */
+
+  const questions =
+    pool.slice(0, 180);
+
+
+  const test = {
+
+    id:
+      "topper-test-180",
+
+    title:
+      "Topper Test Pro — Test 180",
+
+    duration:
+      180,
+
+    totalQuestions:
+      180,
+
+    questions:
+      questions,
+
+    questionIds:
+      questions.map(function(question) {
+
+        return (
+          question.id ||
+          ""
         );
 
-        try{
+      }),
 
-            initialize();
+    createdAt:
+      new Date().toISOString()
 
-        }catch(error){
+  };
 
-            console.error(
-                "CBT initialization failed:",
-                error
-            );
 
-            showPDFError();
+  console.log(
+    "✅ Test 180 built:",
+    test
+  );
 
-        }
+
+  return test;
+
+}
+
+
+/* =====================================================
+   SAVE TEST 180
+===================================================== */
+
+function saveTest180() {
+
+  const test =
+    buildTest180();
+
+
+  if (!test) {
+    return;
+  }
+
+
+  try {
+
+    localStorage.setItem(
+      "TOPPER_TEST_180",
+      JSON.stringify(test)
+    );
+
+
+    /*
+     * Also keep the questions ready
+     * for CBT.
+     */
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "TEST180"
+    );
+
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_TEST",
+      JSON.stringify(test)
+    );
+
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      JSON.stringify(
+        test.questions
+      )
+    );
+
+
+    alert(
+      "✅ Test 180 created successfully!\n\n" +
+      "Questions: 180\n" +
+      "Duration: 180 minutes"
+    );
+
+
+    updateTest180Status();
+
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Error saving Test 180:",
+      error
+    );
+
+
+    alert(
+      "❌ Could not save Test 180."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   LOAD SAVED TEST 180
+===================================================== */
+
+function loadTest180() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(
+        "TOPPER_TEST_180"
+      );
+
+
+    if (!saved) {
+      return null;
+    }
+
+
+    const test =
+      JSON.parse(saved);
+
+
+    if (
+      !test ||
+      !Array.isArray(
+        test.questions
+      )
+    ) {
+
+      return null;
 
     }
+
+
+    return test;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Error loading Test 180:",
+      error
+    );
+
+    return null;
+
+  }
+
+}
+
+
+/* =====================================================
+   TEST 180 STATUS
+===================================================== */
+
+function updateTest180Status() {
+
+  const pool =
+    getCurrentPDFPool();
+
+
+  const saved =
+    loadTest180();
+
+
+  const oldStatus =
+    document.getElementById(
+      "test180Status"
+    );
+
+
+  if (!oldStatus) {
+    return;
+  }
+
+
+  if (
+    saved &&
+    saved.questions &&
+    saved.questions.length === 180
+  ) {
+
+    oldStatus.innerHTML =
+      "🔥 <strong>Test 180 Ready</strong><br>" +
+      "Questions: 180<br>" +
+      "Duration: 180 minutes";
+
+    return;
+
+  }
+
+
+  if (pool.length >= 180) {
+
+    oldStatus.innerHTML =
+      "📚 <strong>180+ questions available</strong><br>" +
+      "Ready to create Test 180.";
+
+    return;
+
+  }
+
+
+  oldStatus.innerHTML =
+    "📚 Questions available: " +
+    pool.length +
+    "<br>Need " +
+    (180 - pool.length) +
+    " more questions.";
+
+}
+
+
+/* =====================================================
+   CREATE TEST 180 BUTTON
+===================================================== */
+
+function createTest180Button() {
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+
+  button.type =
+    "button";
+
+  button.textContent =
+    "🔥 Create Test 180";
+
+  button.className =
+    "primary";
+
+
+  button.style.marginTop =
+    "10px";
+
+
+  button.addEventListener(
+    "click",
+    function() {
+
+      saveTest180();
+
+    }
+  );
+
+
+  return button;
+
+}
+
+
+/* =====================================================
+   START TEST 180
+===================================================== */
+
+function startTest180() {
+
+  const test =
+    loadTest180();
+
+
+  if (
+    !test ||
+    !Array.isArray(
+      test.questions
+    ) ||
+    test.questions.length !== 180
+  ) {
+
+    alert(
+      "Please create Test 180 first."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Send the complete test to cbt.html.
+   */
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_SOURCE",
+    "TEST180"
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_TEST",
+    JSON.stringify(test)
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(
+      test.questions
+    )
+  );
+
+
+  console.log(
+    "🚀 Sending Test 180 to CBT:",
+    test.questions.length
+  );
+
+
+  window.location.href =
+    "./cbt.html";
+
+}
+
+
+/* =====================================================
+   START TEST 180 BUTTON
+===================================================== */
+
+function createStartTest180Button() {
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+
+  button.type =
+    "button";
+
+  button.textContent =
+    "🚀 Start Test 180";
+
+  button.className =
+    "primary";
+
+
+  button.style.marginTop =
+    "10px";
+
+
+  button.addEventListener(
+    "click",
+    function() {
+
+      startTest180();
+
+    }
+  );
+
+
+  return button;
+
+}
+
+
+/* =====================================================
+   ADD TEST 180 CONTROLS
+===================================================== */
+
+(function addTest180Controls() {
+
+  /*
+   * Create a dedicated container.
+   */
+
+  const box =
+    document.createElement(
+      "div"
+    );
+
+
+  box.id =
+    "test180Box";
+
+
+  box.className =
+    "card";
+
+
+  box.style.marginTop =
+    "20px";
+
+
+  box.innerHTML = `
+
+    <h2>
+      🔥 Topper Test Pro — Test 180
+    </h2>
+
+    <p>
+      Build a 180-question CBT from the
+      questions extracted from your PDF modules.
+    </p>
+
+    <div
+      id="test180Status"
+      class="info"
+    >
+      Checking question pool...
+    </div>
+
+  `;
+
+
+  const createButton =
+    createTest180Button();
+
+
+  const startButton =
+    createStartTest180Button();
+
+
+  box.appendChild(
+    createButton
+  );
+
+
+  box.appendChild(
+    startButton
+  );
+
+
+  /*
+   * Add to existing page.
+   */
+
+  const container =
+    document.querySelector(
+      ".container"
+    );
+
+
+  if (container) {
+
+    container.appendChild(
+      box
+    );
+
+  }
+
+  else {
+
+    document.body.appendChild(
+      box
+    );
+
+  }
+
+
+  updateTest180Status();
+
+
+})();
+
+
+console.log(
+  "✅ PDF → CBT Part 4 loaded."
 );
 
 </script>
-
-</body>
-</html>
