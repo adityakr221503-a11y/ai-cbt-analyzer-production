@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -8,7 +10,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>CBT Analyzer Pro</title>
+  <title>Topper Test Pro — CBT Analyzer</title>
 
   <style>
 
@@ -18,6 +20,7 @@
 
     body {
       margin: 0;
+
       font-family:
         system-ui,
         -apple-system,
@@ -250,7 +253,6 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-
       margin-top: 20px;
     }
 
@@ -296,10 +298,8 @@
     .legend {
       display: grid;
       grid-template-columns: 1fr 1fr;
-
       gap: 9px;
       margin-bottom: 18px;
-
       font-size: 12px;
     }
 
@@ -312,7 +312,6 @@
     .legend-dot {
       width: 17px;
       height: 17px;
-
       border-radius: 5px;
       flex-shrink: 0;
     }
@@ -346,9 +345,7 @@
     .palette-notanswered {
       background: #f8fafc;
       color: #475569;
-
-      border:
-        2px solid #cbd5e1 !important;
+      border: 2px solid #cbd5e1 !important;
     }
 
     .palette-notvisited {
@@ -404,6 +401,26 @@
       background: #f8fafc;
     }
 
+    .correct {
+      color: #16a34a;
+      font-weight: 800;
+    }
+
+    .incorrect {
+      color: #dc2626;
+      font-weight: 800;
+    }
+
+    .skipped {
+      color: #64748b;
+      font-weight: 800;
+    }
+
+    .review-answer {
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
     @media (max-width: 800px) {
 
       .cbt-layout {
@@ -435,7 +452,6 @@
   </style>
 
 </head>
-
 <body>
 
 <header>
@@ -443,16 +459,17 @@
   <div class="header">
 
     <div class="logo">
-      CBT Analyzer <span>Pro</span>
+      Topper Test <span>Pro</span>
     </div>
 
     <div>
-      Test Series
+      CBT Test Series
     </div>
 
   </div>
 
 </header>
+
 
 <div class="container">
 
@@ -465,12 +482,10 @@
     class="card setup"
   >
 
-    <h1>
-      🎯 Select Test
-    </h1>
+    <h1>🎯 Select Test</h1>
 
     <p class="subtitle">
-      Select a test and configure it before starting.
+      Select your test and configure it before starting.
     </p>
 
 
@@ -486,8 +501,8 @@
           Select Test
         </option>
 
-        <option value="demo-test">
-          Demo CBT Test — 10 Questions
+        <option value="test180">
+          Topper Test Pro — 180 Question Starter Test
         </option>
 
       </select>
@@ -504,15 +519,39 @@
       <select id="questionCount">
 
         <option value="all">
-          All Questions
+          All Questions — 180
         </option>
 
         <option value="10">
           10 Questions
         </option>
 
-        <option value="5">
-          5 Questions
+        <option value="20">
+          20 Questions
+        </option>
+
+        <option value="30">
+          30 Questions
+        </option>
+
+        <option value="45">
+          45 Questions
+        </option>
+
+        <option value="60">
+          60 Questions
+        </option>
+
+        <option value="90">
+          90 Questions
+        </option>
+
+        <option value="120">
+          120 Questions
+        </option>
+
+        <option value="180">
+          180 Questions
         </option>
 
       </select>
@@ -531,6 +570,8 @@
         <div
           id="sequentialMode"
           class="mode selected"
+          role="button"
+          tabindex="0"
         >
 
           <strong>
@@ -538,7 +579,7 @@
           </strong>
 
           <small>
-            Questions appear in order.
+            Questions appear in original order.
           </small>
 
         </div>
@@ -547,6 +588,8 @@
         <div
           id="randomMode"
           class="mode"
+          role="button"
+          tabindex="0"
         >
 
           <strong>
@@ -578,11 +621,14 @@
       type="button"
       disabled
     >
-      Start Test
+      🚀 Start Test
     </button>
 
   </section>
-    <!-- =================================================
+
+
+
+  <!-- =================================================
        CBT SCREEN
   ================================================== -->
 
@@ -594,21 +640,23 @@
     <div class="cbt-layout">
 
 
-      <!-- ================= MAIN QUESTION ================= -->
+      <!-- =================================================
+           MAIN QUESTION AREA
+      ================================================== -->
 
       <main class="card">
 
         <div class="test-header">
 
           <h2 id="testTitle">
-            CBT Test
+            Topper Test Pro
           </h2>
 
           <div
             id="timer"
             class="timer"
           >
-            30:00
+            180:00
           </div>
 
         </div>
@@ -642,15 +690,14 @@
             id="previousButton"
             type="button"
           >
-            Previous
+            ← Previous
           </button>
-
 
           <button
             id="nextButton"
             type="button"
           >
-            Next
+            Next →
           </button>
 
         </div>
@@ -663,7 +710,7 @@
           class="review-button"
           type="button"
         >
-          Mark for Review
+          ⭐ Mark for Review
         </button>
 
 
@@ -680,7 +727,10 @@
       </main>
 
 
-      <!-- ================= QUESTION PALETTE ================= -->
+
+      <!-- =================================================
+           QUESTION PALETTE
+      ================================================== -->
 
       <aside class="card">
 
@@ -688,8 +738,6 @@
           Question Palette
         </div>
 
-
-        <!-- LEGEND -->
 
         <div class="legend">
 
@@ -724,7 +772,7 @@
               class="legend-dot"
               style="
                 background:#f8fafc;
-                border:2px solid #cbd5e1
+                border:2px solid #cbd5e1;
               "
             ></span>
 
@@ -757,10 +805,20 @@
           </div>
 
 
+          <div class="legend-item">
+
+            <span
+              class="legend-dot"
+              style="background:#ea580c"
+            ></span>
+
+            Answered + Review
+
+          </div>
+
+
         </div>
 
-
-        <!-- PALETTE -->
 
         <div
           id="palette"
@@ -770,11 +828,13 @@
 
       </aside>
 
-
     </div>
 
   </section>
-    <!-- =================================================
+
+
+
+  <!-- =================================================
        RESULT SCREEN
   ================================================== -->
 
@@ -791,269 +851,153 @@
 
   </section>
 
-
 </div>
+<!-- =====================================================
+     TOPPER TEST PRO — 180 QUESTION BANK
+===================================================== -->
+
+<script src="./test180-questions.js"></script>
 
 
 <script>
 
 /* =====================================================
-   QUESTION BANK — 10 QUESTIONS
+   180 QUESTION BANK
 ===================================================== */
 
-const QUESTION_BANK = [
-
-  {
-    id: "check-bio-1",
-
-    text:
-      "A plant cell is placed in a hypertonic solution. What is most likely to occur?",
-
-    options: [
-      "Water enters the cell and it becomes turgid",
-      "Water leaves the cell and plasmolysis may occur",
-      "No movement of water occurs",
-      "The cell immediately undergoes mitosis"
-    ],
-
-    correctAnswer:
-      "Water leaves the cell and plasmolysis may occur",
-
-    subject: "Biology",
-
-    explanation:
-      "Water moves out of the plant cell by osmosis in a hypertonic solution, which may cause plasmolysis."
-  },
-
-
-  {
-    id: "check-bio-2",
-
-    text:
-      "Which feature of mitochondria is most directly associated with efficient ATP production?",
-
-    options: [
-      "Presence of a single membrane",
-      "Extensive inner membrane folds",
-      "Absence of DNA",
-      "Storage of cellulose"
-    ],
-
-    correctAnswer:
-      "Extensive inner membrane folds",
-
-    subject: "Biology",
-
-    explanation:
-      "The folds of the inner mitochondrial membrane increase surface area for oxidative phosphorylation."
-  },
-
-
-  {
-    id: "check-bio-3",
-
-    text:
-      "If both alleles of a gene are identical in an individual, the individual is described as:",
-
-    options: [
-      "Heterozygous",
-      "Homozygous",
-      "Hemizygous",
-      "Polyploid"
-    ],
-
-    correctAnswer:
-      "Homozygous",
-
-    subject: "Biology",
-
-    explanation:
-      "An individual carrying two identical alleles is homozygous for that gene."
-  },
-
-
-  {
-    id: "check-bio-4",
-
-    text:
-      "Which process converts information present in mRNA into a sequence of amino acids?",
-
-    options: [
-      "Replication",
-      "Transcription",
-      "Translation",
-      "Mutation"
-    ],
-
-    correctAnswer:
-      "Translation",
-
-    subject: "Biology",
-
-    explanation:
-      "During translation, ribosomes read mRNA codons and assemble the corresponding amino acids."
-  },
-
-
-  {
-    id: "check-phy-1",
-
-    text:
-      "A body initially at rest accelerates uniformly at 2 m/s² for 5 seconds. What is its final velocity?",
-
-    options: [
-      "5 m/s",
-      "10 m/s",
-      "15 m/s",
-      "20 m/s"
-    ],
-
-    correctAnswer:
-      "10 m/s",
-
-    subject: "Physics",
-
-    explanation:
-      "Using v = u + at, v = 0 + (2 × 5) = 10 m/s."
-  },
-
-
-  {
-    id: "check-phy-2",
-
-    text:
-      "Two resistors of 6 Ω and 3 Ω are connected in parallel. What is their equivalent resistance?",
-
-    options: [
-      "1 Ω",
-      "2 Ω",
-      "3 Ω",
-      "9 Ω"
-    ],
-
-    correctAnswer:
-      "2 Ω",
-
-    subject: "Physics",
-
-    explanation:
-      "For parallel resistors, 1/R = 1/6 + 1/3 = 1/2. Therefore R = 2 Ω."
-  },
-
-
-  {
-    id: "check-phy-3",
-
-    text:
-      "A particle moves in a circular path with constant speed. Which quantity continuously changes its direction?",
-
-    options: [
-      "Speed",
-      "Mass",
-      "Velocity",
-      "Time"
-    ],
-
-    correctAnswer:
-      "Velocity",
-
-    subject: "Physics",
-
-    explanation:
-      "The speed remains constant, but the direction of velocity continuously changes."
-  },
-
-
-  {
-    id: "check-chem-1",
-
-    text:
-      "Which type of bond is formed primarily by transfer of electrons from one atom to another?",
-
-    options: [
-      "Ionic bond",
-      "Covalent bond",
-      "Hydrogen bond",
-      "Metallic bond"
-    ],
-
-    correctAnswer:
-      "Ionic bond",
-
-    subject: "Chemistry",
-
-    explanation:
-      "An ionic bond results from electrostatic attraction between oppositely charged ions."
-  },
-
-
-  {
-    id: "check-chem-2",
-
-    text:
-      "At constant temperature, if the volume of an ideal gas is doubled, what happens to its pressure?",
-
-    options: [
-      "It doubles",
-      "It becomes four times larger",
-      "It becomes half",
-      "It remains unchanged"
-    ],
-
-    correctAnswer:
-      "It becomes half",
-
-    subject: "Chemistry",
-
-    explanation:
-      "Boyle's law states that pressure is inversely proportional to volume at constant temperature."
-  },
-
-
-  {
-    id: "check-chem-3",
-
-    text:
-      "Which particle determines the atomic number of an element?",
-
-    options: [
-      "Electron",
-      "Neutron",
-      "Proton",
-      "Nucleon"
-    ],
-
-    correctAnswer:
-      "Proton",
-
-    subject: "Chemistry",
-
-    explanation:
-      "The atomic number of an element equals the number of protons in its nucleus."
-  }
-
-];
+const QUESTION_BANK =
+  Array.isArray(window.TEST180_QUESTIONS)
+    ? window.TEST180_QUESTIONS
+    : [];
 
 
 /* =====================================================
-   TEST LIST
+   QUESTION NORMALIZER
+===================================================== */
+
+function normalizeQuestion(question, index) {
+
+  if (!question) {
+    return null;
+  }
+
+
+  const normalized = {
+
+    id:
+      question.id ||
+      `test180-q${index + 1}`,
+
+    text:
+      question.text ||
+      question.question ||
+      "",
+
+    options:
+      Array.isArray(question.options)
+        ? question.options
+        : [],
+
+    correctAnswer:
+      question.correctAnswer ??
+      question.answer ??
+      "",
+
+    subject:
+      question.subject ||
+      "",
+
+    chapter:
+      question.chapter ||
+      "",
+
+    topic:
+      question.topic ||
+      "",
+
+    concept:
+      question.concept ||
+      "",
+
+    difficulty:
+      question.difficulty ||
+      "Medium",
+
+    marks:
+      Number(question.marks ?? 4),
+
+    negativeMarks:
+      Number(question.negativeMarks ?? 1),
+
+    explanation:
+      question.explanation ||
+      "Explanation not available.",
+
+    source:
+      question.source ||
+      "Topper Test Pro"
+
+  };
+
+
+  return normalized;
+
+}
+
+
+/* =====================================================
+   NORMALIZE ALL 180 QUESTIONS
+===================================================== */
+
+const NORMALIZED_QUESTION_BANK =
+  QUESTION_BANK
+    .map(
+      function(question, index) {
+
+        return normalizeQuestion(
+          question,
+          index
+        );
+
+      }
+    )
+    .filter(
+      function(question) {
+
+        return (
+          question &&
+          question.text &&
+          Array.isArray(question.options) &&
+          question.options.length >= 2
+        );
+
+      }
+    );
+
+
+/* =====================================================
+   TEST CONFIGURATION
 ===================================================== */
 
 const TESTS = [
 
   {
-    id: "demo-test",
+
+    id:
+      "test180",
 
     title:
-      "Demo CBT Test",
+      "Topper Test Pro — 180 Question Starter Test",
 
     duration:
-      30,
+      180,
 
     questionIds:
-      QUESTION_BANK.map(
-        function (question) {
+      NORMALIZED_QUESTION_BANK.map(
+        function(question) {
+
           return question.id;
+
         }
       )
 
@@ -1061,6 +1005,116 @@ const TESTS = [
 
 ];
 
+
+/* =====================================================
+   BANK STATUS
+===================================================== */
+
+console.log(
+  "📚 TEST180_QUESTIONS:",
+  QUESTION_BANK.length
+);
+
+console.log(
+  "📚 Valid questions:",
+  NORMALIZED_QUESTION_BANK.length
+);
+
+
+/* =====================================================
+   VALIDATION
+===================================================== */
+
+if (
+  QUESTION_BANK.length === 180 &&
+  NORMALIZED_QUESTION_BANK.length === 180
+) {
+
+  console.log(
+    "✅ All 180 questions loaded successfully."
+  );
+
+}
+
+else {
+
+  console.warn(
+    "⚠️ 180-question bank check failed."
+  );
+
+  console.warn(
+    "Expected: 180"
+  );
+
+  console.warn(
+    "Loaded:",
+    QUESTION_BANK.length
+  );
+
+  console.warn(
+    "Valid:",
+    NORMALIZED_QUESTION_BANK.length
+  );
+
+}
+
+
+/* =====================================================
+   QUESTION VALIDATION DETAILS
+===================================================== */
+
+NORMALIZED_QUESTION_BANK.forEach(
+  function(question, index) {
+
+    if (
+      !question.text
+    ) {
+
+      console.warn(
+        `Question ${index + 1}: missing question text`
+      );
+
+    }
+
+
+    if (
+      !Array.isArray(question.options) ||
+      question.options.length < 4
+    ) {
+
+      console.warn(
+        `Question ${index + 1}: expected 4 options`
+      );
+
+    }
+
+
+    if (
+      !question.correctAnswer
+    ) {
+
+      console.warn(
+        `Question ${index + 1}: missing correct answer`
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   MAKE BANK AVAILABLE TO EXISTING CBT
+===================================================== */
+
+window.QUESTION_BANK =
+  NORMALIZED_QUESTION_BANK;
+
+window.TOPPER_TESTS =
+  TESTS;
+
+</script>
+<script>
 
 /* =====================================================
    APPLICATION STATE
@@ -1092,108 +1146,106 @@ let submitted = false;
 ===================================================== */
 
 const setupScreen =
-  document.getElementById(
-    "setupScreen"
-  );
+  document.getElementById("setupScreen");
 
 const cbtScreen =
-  document.getElementById(
-    "cbtScreen"
-  );
+  document.getElementById("cbtScreen");
 
 const resultScreen =
-  document.getElementById(
-    "resultScreen"
-  );
+  document.getElementById("resultScreen");
 
 const testSelect =
-  document.getElementById(
-    "testSelect"
-  );
+  document.getElementById("testSelect");
 
 const questionCount =
-  document.getElementById(
-    "questionCount"
-  );
+  document.getElementById("questionCount");
 
 const testInfo =
-  document.getElementById(
-    "testInfo"
-  );
+  document.getElementById("testInfo");
 
 const startButton =
-  document.getElementById(
-    "startButton"
-  );
+  document.getElementById("startButton");
 
 const sequentialMode =
-  document.getElementById(
-    "sequentialMode"
-  );
+  document.getElementById("sequentialMode");
 
 const randomMode =
-  document.getElementById(
-    "randomMode"
-  );
+  document.getElementById("randomMode");
 
 const testTitle =
-  document.getElementById(
-    "testTitle"
-  );
+  document.getElementById("testTitle");
 
 const timer =
-  document.getElementById(
-    "timer"
-  );
+  document.getElementById("timer");
 
 const questionNumber =
-  document.getElementById(
-    "questionNumber"
-  );
+  document.getElementById("questionNumber");
 
 const questionText =
-  document.getElementById(
-    "questionText"
-  );
+  document.getElementById("questionText");
 
 const options =
-  document.getElementById(
-    "options"
-  );
+  document.getElementById("options");
 
 const previousButton =
-  document.getElementById(
-    "previousButton"
-  );
+  document.getElementById("previousButton");
 
 const nextButton =
-  document.getElementById(
-    "nextButton"
-  );
+  document.getElementById("nextButton");
 
 const reviewButton =
-  document.getElementById(
-    "reviewButton"
-  );
+  document.getElementById("reviewButton");
 
 const submitButton =
-  document.getElementById(
-    "submitButton"
-  );
+  document.getElementById("submitButton");
 
 const palette =
-  document.getElementById(
-    "palette"
-  );
+  document.getElementById("palette");
 
 const resultContent =
-  document.getElementById(
-    "resultContent"
-  );
+  document.getElementById("resultContent");
 
 
 /* =====================================================
-   TEST INFORMATION
+   SAFETY CHECK
+===================================================== */
+
+if (
+  !Array.isArray(window.QUESTION_BANK) ||
+  window.QUESTION_BANK.length === 0
+) {
+
+  console.error(
+    "❌ No valid question bank found."
+  );
+
+  testInfo.textContent =
+    "❌ Question bank not loaded. Check test180-questions.js.";
+
+  startButton.disabled = true;
+
+}
+
+
+/* =====================================================
+   GET TEST
+===================================================== */
+
+function getTestById(id) {
+
+  return window.TOPPER_TESTS.find(
+    function(test) {
+
+      return test.id === id;
+
+    }
+  ) || null;
+
+}
+
+
+/* =====================================================
+   UPDATE TEST INFORMATION
 ===================================================== */
 
 function updateTestInfo() {
@@ -1206,26 +1258,31 @@ function updateTestInfo() {
     startButton.disabled = true;
 
     return;
+
   }
 
 
+  const available =
+    selectedTest.questionIds.length;
+
+
   let count;
+
 
   if (
     questionCount.value === "all"
   ) {
 
-    count =
-      selectedTest.questionIds.length;
+    count = available;
 
-  } else {
+  }
+
+  else {
 
     count =
       Math.min(
-        Number(
-          questionCount.value
-        ),
-        selectedTest.questionIds.length
+        Number(questionCount.value),
+        available
       );
 
   }
@@ -1244,25 +1301,17 @@ function updateTestInfo() {
 
 
 /* =====================================================
-   TEST SELECTOR
+   TEST SELECT
 ===================================================== */
 
 testSelect.addEventListener(
   "change",
-  function () {
+  function() {
 
     selectedTest =
-      TESTS.find(
-        function (test) {
-
-          return (
-            test.id ===
-            testSelect.value
-          );
-
-        }
-      ) || null;
-
+      getTestById(
+        testSelect.value
+      );
 
     updateTestInfo();
 
@@ -1276,7 +1325,7 @@ testSelect.addEventListener(
 
 questionCount.addEventListener(
   "change",
-  function () {
+  function() {
 
     updateTestInfo();
 
@@ -1285,48 +1334,54 @@ questionCount.addEventListener(
 
 
 /* =====================================================
-   SEQUENTIAL
+   SEQUENTIAL MODE
 ===================================================== */
 
-sequentialMode.addEventListener(
-  "click",
-  function () {
+function setSequentialMode() {
 
-    selectionMode =
-      "sequential";
+  selectionMode =
+    "sequential";
 
-    sequentialMode.classList.add(
-      "selected"
-    );
+  sequentialMode.classList.add(
+    "selected"
+  );
 
-    randomMode.classList.remove(
-      "selected"
-    );
+  randomMode.classList.remove(
+    "selected"
+  );
 
-  }
-);
+}
 
 
 /* =====================================================
-   RANDOM
+   RANDOM MODE
 ===================================================== */
+
+function setRandomMode() {
+
+  selectionMode =
+    "random";
+
+  randomMode.classList.add(
+    "selected"
+  );
+
+  sequentialMode.classList.remove(
+    "selected"
+  );
+
+}
+
+
+sequentialMode.addEventListener(
+  "click",
+  setSequentialMode
+);
+
 
 randomMode.addEventListener(
   "click",
-  function () {
-
-    selectionMode =
-      "random";
-
-    randomMode.classList.add(
-      "selected"
-    );
-
-    sequentialMode.classList.remove(
-      "selected"
-    );
-
-  }
+  setRandomMode
 );
 
 
@@ -1343,27 +1398,25 @@ function shuffleQuestions(
 
 
   for (
-    let i =
-      result.length - 1;
+    let i = result.length - 1;
     i > 0;
     i--
   ) {
 
     const j =
       Math.floor(
-        Math.random() *
-        (i + 1)
+        Math.random() * (i + 1)
       );
 
 
-    [
-      result[i],
-      result[j]
-    ] =
-    [
-      result[j],
-      result[i]
-    ];
+    const temp =
+      result[i];
+
+    result[i] =
+      result[j];
+
+    result[j] =
+      temp;
 
   }
 
@@ -1374,12 +1427,108 @@ function shuffleQuestions(
 
 
 /* =====================================================
+   GET QUESTIONS FOR TEST
+===================================================== */
+
+function getQuestionsForTest(
+  test
+) {
+
+  let questions =
+    test.questionIds
+      .map(
+        function(id) {
+
+          return window.QUESTION_BANK.find(
+            function(question) {
+
+              return question.id === id;
+
+            }
+          );
+
+        }
+      )
+      .filter(Boolean);
+
+
+  if (
+    selectionMode === "random"
+  ) {
+
+    questions =
+      shuffleQuestions(
+        questions
+      );
+
+  }
+
+
+  let requestedCount;
+
+
+  if (
+    questionCount.value === "all"
+  ) {
+
+    requestedCount =
+      questions.length;
+
+  }
+
+  else {
+
+    requestedCount =
+      Number(
+        questionCount.value
+      );
+
+  }
+
+
+  requestedCount =
+    Math.min(
+      requestedCount,
+      questions.length
+    );
+
+
+  return questions.slice(
+    0,
+    requestedCount
+  );
+
+}
+
+
+/* =====================================================
+   RESET TEST STATE
+===================================================== */
+
+function resetTestState() {
+
+  currentIndex = 0;
+
+  answers = {};
+
+  visitedQuestions =
+    new Set();
+
+  reviewQuestions =
+    new Set();
+
+  submitted = false;
+
+}
+
+
+/* =====================================================
    START TEST
 ===================================================== */
 
 startButton.addEventListener(
   "click",
-  function () {
+  function() {
 
     if (!selectedTest) {
 
@@ -1392,70 +1541,18 @@ startButton.addEventListener(
     }
 
 
-    let questions =
-      selectedTest.questionIds
-        .map(
-          function (id) {
-
-            return QUESTION_BANK.find(
-              function (question) {
-
-                return (
-                  question.id ===
-                  id
-                );
-
-              }
-            );
-
-          }
-        )
-        .filter(Boolean);
-
-
-    /*
-     * Randomize entire question pool.
-     */
-
-    if (
-      selectionMode ===
-      "random"
-    ) {
-
-      questions =
-        shuffleQuestions(
-          questions
-        );
-
-    }
-
-
-    /*
-     * Select requested number.
-     */
-
-    if (
-      questionCount.value !==
-      "all"
-    ) {
-
-      questions =
-        questions.slice(
-          0,
-          Number(
-            questionCount.value
-          )
-        );
-
-    }
+    selectedQuestions =
+      getQuestionsForTest(
+        selectedTest
+      );
 
 
     if (
-      questions.length === 0
+      selectedQuestions.length === 0
     ) {
 
       alert(
-        "No questions available."
+        "No questions are available for this test."
       );
 
       return;
@@ -1463,36 +1560,22 @@ startButton.addEventListener(
     }
 
 
-    selectedQuestions =
-      questions;
-
-    currentIndex = 0;
-
-    answers = {};
-
-    visitedQuestions =
-      new Set();
-
-    reviewQuestions =
-      new Set();
-
-    submitted = false;
+    resetTestState();
 
 
     remainingSeconds =
-      selectedTest.duration *
-      60;
+      selectedTest.duration * 60;
 
 
     setupScreen.classList.add(
       "hidden"
     );
 
-    cbtScreen.classList.remove(
+    resultScreen.classList.add(
       "hidden"
     );
 
-    resultScreen.classList.add(
+    cbtScreen.classList.remove(
       "hidden"
     );
 
@@ -1509,8 +1592,19 @@ startButton.addEventListener(
 
   }
 );
-  /* =====================================================
-   RENDER QUESTION
+
+
+/* =====================================================
+   INITIAL SETUP
+===================================================== */
+
+updateTestInfo();
+
+  </script>
+  <script>
+
+/* =====================================================
+   RENDER CURRENT QUESTION
 ===================================================== */
 
 function renderQuestion() {
@@ -1518,35 +1612,77 @@ function renderQuestion() {
   const question =
     selectedQuestions[currentIndex];
 
+
   if (!question) {
+
+    console.error(
+      "❌ Question not found:",
+      currentIndex
+    );
+
     return;
+
   }
+
+
+  /* -----------------------------------------------
+     Mark question as visited
+  ------------------------------------------------ */
 
   visitedQuestions.add(
     currentIndex
   );
 
+
+  /* -----------------------------------------------
+     Question number
+  ------------------------------------------------ */
+
   questionNumber.textContent =
     `Question ${currentIndex + 1} of ${selectedQuestions.length}`;
+
+
+  /* -----------------------------------------------
+     Question text
+  ------------------------------------------------ */
 
   questionText.textContent =
     question.text;
 
+
+  /* -----------------------------------------------
+     Clear previous options
+  ------------------------------------------------ */
+
   options.innerHTML = "";
 
 
+  /* -----------------------------------------------
+     Create options
+  ------------------------------------------------ */
+
   question.options.forEach(
-    function (option, index) {
+    function(option, index) {
 
       const button =
         document.createElement("button");
 
-      button.type = "button";
-      button.className = "option";
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "option";
+
 
       button.textContent =
         `${String.fromCharCode(65 + index)}. ${option}`;
 
+
+      /* ---------------------------------------------
+         Selected answer
+      --------------------------------------------- */
 
       if (
         answers[currentIndex] === option
@@ -1559,11 +1695,17 @@ function renderQuestion() {
       }
 
 
+      /* ---------------------------------------------
+         Answer click
+      --------------------------------------------- */
+
       button.addEventListener(
         "click",
-        function () {
+        function() {
 
-          selectAnswer(option);
+          selectAnswer(
+            option
+          );
 
         }
       );
@@ -1577,19 +1719,49 @@ function renderQuestion() {
   );
 
 
+  /* -----------------------------------------------
+     Previous button
+  ------------------------------------------------ */
+
   previousButton.disabled =
     currentIndex === 0;
+
+
+  /* -----------------------------------------------
+     Next button
+  ------------------------------------------------ */
 
   nextButton.disabled =
     currentIndex ===
     selectedQuestions.length - 1;
 
 
-  reviewButton.textContent =
-    reviewQuestions.has(currentIndex)
-      ? "Remove Review"
-      : "Mark for Review";
+  /* -----------------------------------------------
+     Review button
+  ------------------------------------------------ */
 
+  if (
+    reviewQuestions.has(
+      currentIndex
+    )
+  ) {
+
+    reviewButton.textContent =
+      "❌ Remove Review";
+
+  }
+
+  else {
+
+    reviewButton.textContent =
+      "⭐ Mark for Review";
+
+  }
+
+
+  /* -----------------------------------------------
+     Update palette
+  ------------------------------------------------ */
 
   renderPalette();
 
@@ -1600,14 +1772,20 @@ function renderQuestion() {
    SELECT ANSWER
 ===================================================== */
 
-function selectAnswer(answer) {
+function selectAnswer(
+  answer
+) {
+
+  if (submitted) {
+    return;
+  }
+
 
   answers[currentIndex] =
     answer;
 
-  renderQuestion();
 
-  renderPalette();
+  renderQuestion();
 
 }
 
@@ -1618,150 +1796,26 @@ function selectAnswer(answer) {
 
 function clearAnswer() {
 
+  if (submitted) {
+    return;
+  }
+
+
   delete answers[currentIndex];
+
 
   renderQuestion();
 
-  renderPalette();
-
 }
 
 
 /* =====================================================
-   QUESTION PALETTE
-===================================================== */
-
-function renderPalette() {
-
-  palette.innerHTML = "";
-
-
-  selectedQuestions.forEach(
-    function (question, index) {
-
-      const button =
-        document.createElement("button");
-
-
-      button.type = "button";
-
-      button.textContent =
-        index + 1;
-
-
-      /*
-       * Current question
-       */
-
-      if (
-        index === currentIndex
-      ) {
-
-        button.className =
-          "palette-current";
-
-      }
-
-
-      /*
-       * Answered
-       */
-
-      else if (
-        answers[index] !== undefined &&
-        reviewQuestions.has(index)
-      ) {
-
-        button.className =
-          "palette-answered-review";
-
-      }
-
-
-      /*
-       * Review
-       */
-
-      else if (
-        reviewQuestions.has(index)
-      ) {
-
-        button.className =
-          "palette-review";
-
-      }
-
-
-      /*
-       * Answered
-       */
-
-      else if (
-        answers[index] !== undefined
-      ) {
-
-        button.className =
-          "palette-answered";
-
-      }
-
-
-      /*
-       * Visited but not answered
-       */
-
-      else if (
-        visitedQuestions.has(index)
-      ) {
-
-        button.className =
-          "palette-notanswered";
-
-      }
-
-
-      /*
-       * Not visited
-       */
-
-      else {
-
-        button.className =
-          "palette-notvisited";
-
-      }
-
-
-      button.addEventListener(
-        "click",
-        function () {
-
-          currentIndex =
-            index;
-
-          renderQuestion();
-
-        }
-      );
-
-
-      palette.appendChild(
-        button
-      );
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   PREVIOUS
+   PREVIOUS QUESTION
 ===================================================== */
 
 previousButton.addEventListener(
   "click",
-  function () {
+  function() {
 
     if (
       currentIndex > 0
@@ -1778,12 +1832,12 @@ previousButton.addEventListener(
 
 
 /* =====================================================
-   NEXT
+   NEXT QUESTION
 ===================================================== */
 
 nextButton.addEventListener(
   "click",
-  function () {
+  function() {
 
     if (
       currentIndex <
@@ -1801,12 +1855,17 @@ nextButton.addEventListener(
 
 
 /* =====================================================
-   REVIEW
+   MARK / REMOVE REVIEW
 ===================================================== */
 
 reviewButton.addEventListener(
   "click",
-  function () {
+  function() {
+
+    if (submitted) {
+      return;
+    }
+
 
     if (
       reviewQuestions.has(
@@ -1831,106 +1890,172 @@ reviewButton.addEventListener(
 
     renderQuestion();
 
-    renderPalette();
-
   }
 );
 
 
 /* =====================================================
-   TIMER
+   RENDER QUESTION PALETTE
 ===================================================== */
 
-function startTimer() {
+function renderPalette() {
 
-  clearInterval(
-    timerInterval
-  );
+  palette.innerHTML = "";
 
 
-  updateTimer();
+  selectedQuestions.forEach(
+    function(question, index) {
+
+      const button =
+        document.createElement(
+          "button"
+        );
 
 
-  timerInterval =
-    setInterval(
-      function () {
+      button.type =
+        "button";
 
-        if (
-          remainingSeconds <= 0
-        ) {
 
-          clearInterval(
-            timerInterval
-          );
+      button.textContent =
+        index + 1;
 
-          submitTest(
-            true
-          );
 
-          return;
+      /* ---------------------------------------------
+         CURRENT QUESTION
+      --------------------------------------------- */
+
+      if (
+        index === currentIndex
+      ) {
+
+        button.className =
+          "palette-current";
+
+      }
+
+
+      /* ---------------------------------------------
+         ANSWERED + REVIEW
+      --------------------------------------------- */
+
+      else if (
+        answers[index] !== undefined &&
+        reviewQuestions.has(index)
+      ) {
+
+        button.className =
+          "palette-answered-review";
+
+      }
+
+
+      /* ---------------------------------------------
+         REVIEW
+      --------------------------------------------- */
+
+      else if (
+        reviewQuestions.has(index)
+      ) {
+
+        button.className =
+          "palette-review";
+
+      }
+
+
+      /* ---------------------------------------------
+         ANSWERED
+      --------------------------------------------- */
+
+      else if (
+        answers[index] !== undefined
+      ) {
+
+        button.className =
+          "palette-answered";
+
+      }
+
+
+      /* ---------------------------------------------
+         VISITED BUT NOT ANSWERED
+      --------------------------------------------- */
+
+      else if (
+        visitedQuestions.has(index)
+      ) {
+
+        button.className =
+          "palette-notanswered";
+
+      }
+
+
+      /* ---------------------------------------------
+         NOT VISITED
+      --------------------------------------------- */
+
+      else {
+
+        button.className =
+          "palette-notvisited";
+
+      }
+
+
+      /* ---------------------------------------------
+         JUMP TO QUESTION
+      --------------------------------------------- */
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          if (submitted) {
+            return;
+          }
+
+
+          currentIndex =
+            index;
+
+
+          renderQuestion();
 
         }
+      );
 
 
-        remainingSeconds--;
+      palette.appendChild(
+        button
+      );
 
-        updateTimer();
-
-      },
-      1000
-    );
+    }
+  );
 
 }
 
 
 /* =====================================================
-   UPDATE TIMER
+   PALETTE SAFETY
 ===================================================== */
 
-function updateTimer() {
-
-  const minutes =
-    Math.floor(
-      remainingSeconds / 60
-    );
-
-  const seconds =
-    remainingSeconds % 60;
-
-
-  timer.textContent =
-    `${String(minutes).padStart(2, "0")}:` +
-    `${String(seconds).padStart(2, "0")}`;
-
-
-  timer.classList.remove(
-    "warning",
-    "danger"
-  );
-
+function refreshPalette() {
 
   if (
-    remainingSeconds <= 60
+    Array.isArray(
+      selectedQuestions
+    )
   ) {
 
-    timer.classList.add(
-      "danger"
-    );
-
-  }
-
-  else if (
-    remainingSeconds <= 300
-  ) {
-
-    timer.classList.add(
-      "warning"
-    );
+    renderPalette();
 
   }
 
 }
 
+  </script>
+  <script>
 
 /* =====================================================
    SUBMIT BUTTON
@@ -1940,14 +2065,15 @@ submitButton.addEventListener(
   "click",
   function () {
 
+    if (submitted) {
+      return;
+    }
+
     const unanswered =
       selectedQuestions.length -
       Object.keys(answers).length;
 
-
-    if (
-      unanswered > 0
-    ) {
+    if (unanswered > 0) {
 
       const confirmSubmit =
         confirm(
@@ -1955,17 +2081,12 @@ submitButton.addEventListener(
           `Do you want to submit the test?`
         );
 
-
       if (!confirmSubmit) {
         return;
       }
-
     }
 
-
-    submitTest(
-      false
-    );
+    submitTest(false);
 
   }
 );
@@ -1975,29 +2096,25 @@ submitButton.addEventListener(
    SUBMIT TEST
 ===================================================== */
 
-function submitTest(
-  automatic
-) {
+function submitTest(automatic = false) {
 
   if (submitted) {
     return;
   }
 
-
   submitted = true;
 
-
-  clearInterval(
-    timerInterval
-  );
+  clearInterval(timerInterval);
 
 
   let correct = 0;
-
   let wrong = 0;
-
   let skipped = 0;
 
+
+  /* -----------------------------------------------
+     CHECK ALL QUESTIONS
+  ------------------------------------------------ */
 
   selectedQuestions.forEach(
     function (question, index) {
@@ -2033,20 +2150,17 @@ function submitTest(
   );
 
 
-  /*
-   * CBT scoring:
-   * Correct = +4
-   * Wrong = -1
-   * Skipped = 0
-   */
+  /* -----------------------------------------------
+     TOPPER TEST PRO SCORING
+
+     Correct  = +4
+     Wrong    = -1
+     Skipped  = 0
+  ------------------------------------------------ */
 
   const score =
-    (
-      correct * 4
-    ) -
-    (
-      wrong * 1
-    );
+    (correct * 4) -
+    (wrong * 1);
 
 
   showResult(
@@ -2089,13 +2203,19 @@ function showResult(
     selectedQuestions.length;
 
 
+  const maximumScore =
+    total * 4;
+
+
   const percentage =
     total > 0
-      ? (
-          correct / total
-        ) * 100
+      ? (correct / total) * 100
       : 0;
 
+
+  /* -----------------------------------------------
+     RESULT HEADER
+  ------------------------------------------------ */
 
   resultContent.innerHTML = "";
 
@@ -2109,13 +2229,17 @@ function showResult(
     "score";
 
   scoreElement.textContent =
-    `${score} / ${total * 4}`;
+    `${score} / ${maximumScore}`;
 
 
   resultContent.appendChild(
     scoreElement
   );
 
+
+  /* -----------------------------------------------
+     SUMMARY
+  ------------------------------------------------ */
 
   const summary =
     document.createElement(
@@ -2126,7 +2250,7 @@ function showResult(
   summary.innerHTML = `
 
     <div class="result-row">
-      <strong>Total:</strong>
+      <strong>Total Questions:</strong>
       ${total}
     </div>
 
@@ -2146,7 +2270,17 @@ function showResult(
     </div>
 
     <div class="result-row">
-      <strong>Percentage:</strong>
+      <strong>Marks Obtained:</strong>
+      ${score}
+    </div>
+
+    <div class="result-row">
+      <strong>Maximum Marks:</strong>
+      ${maximumScore}
+    </div>
+
+    <div class="result-row">
+      <strong>Accuracy:</strong>
       ${percentage.toFixed(2)}%
     </div>
 
@@ -2154,8 +2288,8 @@ function showResult(
       automatic
         ? `
           <div class="result-row">
-            ⏰ Test submitted automatically
-            because the time ended.
+            ⏰ Time expired.
+            Test submitted automatically.
           </div>
         `
         : ""
@@ -2169,9 +2303,57 @@ function showResult(
   );
 
 
-  /*
-   * Question review
-   */
+  /* -----------------------------------------------
+     PERFORMANCE MESSAGE
+  ------------------------------------------------ */
+
+  const performance =
+    document.createElement(
+      "div"
+    );
+
+
+  performance.className =
+    "info";
+
+
+  if (percentage >= 90) {
+
+    performance.textContent =
+      "🏆 Excellent performance. Topper-level accuracy.";
+
+  }
+
+  else if (percentage >= 75) {
+
+    performance.textContent =
+      "🔥 Strong performance. Keep pushing toward mastery.";
+
+  }
+
+  else if (percentage >= 60) {
+
+    performance.textContent =
+      "📈 Good attempt. Target your mistakes for the next test.";
+
+  }
+
+  else {
+
+    performance.textContent =
+      "🎯 Analysis required. Focus on your weak concepts before the next attempt.";
+
+  }
+
+
+  resultContent.appendChild(
+    performance
+  );
+
+
+  /* -----------------------------------------------
+     QUESTION REVIEW HEADING
+  ------------------------------------------------ */
 
   const heading =
     document.createElement(
@@ -2179,13 +2361,17 @@ function showResult(
     );
 
   heading.textContent =
-    "Question Review";
+    "📋 Question Review";
 
 
   resultContent.appendChild(
     heading
   );
 
+
+  /* -----------------------------------------------
+     QUESTION-WISE REVIEW
+  ------------------------------------------------ */
 
   selectedQuestions.forEach(
     function (question, index) {
@@ -2204,7 +2390,8 @@ function showResult(
         answers[index];
 
 
-      let status = "";
+      let status;
+
 
       if (
         userAnswer === undefined
@@ -2243,27 +2430,44 @@ function showResult(
 
         <strong>
           Q${index + 1}.
-          ${question.text}
+          ${escapeHTML(question.text)}
         </strong>
 
         ${status}
 
         <div class="review-answer">
+
           <strong>Your answer:</strong>
+
           ${
-            userAnswer ||
-            "Not answered"
+            userAnswer !== undefined
+              ? escapeHTML(userAnswer)
+              : "Not answered"
           }
+
         </div>
 
+
         <div class="review-answer">
+
           <strong>Correct answer:</strong>
-          ${question.correctAnswer}
+
+          ${escapeHTML(
+            question.correctAnswer
+          )}
+
         </div>
 
+
         <div class="review-answer">
+
           <strong>Explanation:</strong>
-          ${question.explanation}
+
+          ${escapeHTML(
+            question.explanation ||
+            "Explanation not available."
+          )}
+
         </div>
 
       `;
@@ -2277,9 +2481,9 @@ function showResult(
   );
 
 
-  /*
-   * Restart button
-   */
+  /* -----------------------------------------------
+     RESTART
+  ------------------------------------------------ */
 
   const restartButton =
     document.createElement(
@@ -2294,7 +2498,7 @@ function showResult(
     "primary";
 
   restartButton.textContent =
-    "Take Test Again";
+    "🔄 Take Test Again";
 
 
   restartButton.addEventListener(
@@ -2315,12 +2519,539 @@ function showResult(
 
 
 /* =====================================================
-   INITIAL STATE
+   HTML SAFETY
 ===================================================== */
 
-updateTestInfo();
+function escapeHTML(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
 
 
-<script src="./test180-questions.js"></script>
-</body>
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =====================================================
+   FINAL DEBUG INFORMATION
+===================================================== */
+
+console.log(
+  "✅ Part 7 loaded."
+);
+
+console.log(
+  "📚 Available questions:",
+  window.QUESTION_BANK.length
+);
+
+console.log(
+  "🎯 Available tests:",
+  window.TOPPER_TESTS.length
+);
+
+  </script>
+  <script>
+
+/* =====================================================
+   SUBMIT BUTTON
+===================================================== */
+
+submitButton.addEventListener(
+  "click",
+  function () {
+
+    if (submitted) {
+      return;
+    }
+
+    const unanswered =
+      selectedQuestions.length -
+      Object.keys(answers).length;
+
+    if (unanswered > 0) {
+
+      const confirmSubmit = confirm(
+        `${unanswered} question(s) are unanswered.\n\n` +
+        `Do you want to submit the test?`
+      );
+
+      if (!confirmSubmit) {
+        return;
+      }
+    }
+
+    submitTest(false);
+
+  }
+);
+
+
+/* =====================================================
+   SUBMIT TEST
+===================================================== */
+
+function submitTest(automatic) {
+
+  if (submitted) {
+    return;
+  }
+
+  submitted = true;
+
+  clearInterval(timerInterval);
+
+  let correct = 0;
+  let wrong = 0;
+  let skipped = 0;
+
+
+  selectedQuestions.forEach(
+    function (question, index) {
+
+      const userAnswer =
+        answers[index];
+
+      if (userAnswer === undefined) {
+
+        skipped++;
+
+      }
+
+      else if (
+        userAnswer === question.correctAnswer
+      ) {
+
+        correct++;
+
+      }
+
+      else {
+
+        wrong++;
+
+      }
+
+    }
+  );
+
+
+  /* =================================================
+     SCORING
+
+     Correct  = +4
+     Wrong    = -1
+     Skipped  = 0
+  ================================================= */
+
+  const score =
+    (correct * 4) -
+    (wrong * 1);
+
+
+  showResult(
+    correct,
+    wrong,
+    skipped,
+    score,
+    automatic
+  );
+
+}
+
+
+/* =====================================================
+   SHOW RESULT
+===================================================== */
+
+function showResult(
+  correct,
+  wrong,
+  skipped,
+  score,
+  automatic
+) {
+
+  setupScreen.classList.add(
+    "hidden"
+  );
+
+  cbtScreen.classList.add(
+    "hidden"
+  );
+
+  resultScreen.classList.remove(
+    "hidden"
+  );
+
+
+  const total =
+    selectedQuestions.length;
+
+  const maximumScore =
+    total * 4;
+
+  const accuracy =
+    total > 0
+      ? (correct / total) * 100
+      : 0;
+
+
+  resultContent.innerHTML = "";
+
+
+  /* =================================================
+     SCORE
+  ================================================= */
+
+  const scoreElement =
+    document.createElement("div");
+
+  scoreElement.className =
+    "score";
+
+  scoreElement.textContent =
+    `${score} / ${maximumScore}`;
+
+  resultContent.appendChild(
+    scoreElement
+  );
+
+
+  /* =================================================
+     SUMMARY
+  ================================================= */
+
+  const summary =
+    document.createElement("div");
+
+  summary.innerHTML = `
+
+    <div class="result-row">
+      <strong>Total Questions:</strong>
+      ${total}
+    </div>
+
+    <div class="result-row">
+      <strong>Correct:</strong>
+      ${correct}
+    </div>
+
+    <div class="result-row">
+      <strong>Wrong:</strong>
+      ${wrong}
+    </div>
+
+    <div class="result-row">
+      <strong>Skipped:</strong>
+      ${skipped}
+    </div>
+
+    <div class="result-row">
+      <strong>Marks Obtained:</strong>
+      ${score}
+    </div>
+
+    <div class="result-row">
+      <strong>Maximum Marks:</strong>
+      ${maximumScore}
+    </div>
+
+    <div class="result-row">
+      <strong>Accuracy:</strong>
+      ${accuracy.toFixed(2)}%
+    </div>
+
+    ${
+      automatic
+        ? `
+          <div class="result-row">
+            ⏰ Time expired.
+            Test submitted automatically.
+          </div>
+        `
+        : ""
+    }
+
+  `;
+
+  resultContent.appendChild(
+    summary
+  );
+
+
+  /* =================================================
+     PERFORMANCE MESSAGE
+  ================================================= */
+
+  const performance =
+    document.createElement("div");
+
+  performance.className =
+    "info";
+
+
+  if (accuracy >= 90) {
+
+    performance.textContent =
+      "🏆 Excellent performance. Topper-level accuracy.";
+
+  }
+
+  else if (accuracy >= 75) {
+
+    performance.textContent =
+      "🔥 Strong performance. Keep pushing toward mastery.";
+
+  }
+
+  else if (accuracy >= 60) {
+
+    performance.textContent =
+      "📈 Good attempt. Target your mistakes for the next test.";
+
+  }
+
+  else {
+
+    performance.textContent =
+      "🎯 Analysis required. Focus on weak concepts before the next test.";
+
+  }
+
+
+  resultContent.appendChild(
+    performance
+  );
+
+
+  /* =================================================
+     QUESTION REVIEW
+  ================================================= */
+
+  const heading =
+    document.createElement("h3");
+
+  heading.textContent =
+    "📋 Question Review";
+
+  resultContent.appendChild(
+    heading
+  );
+
+
+  selectedQuestions.forEach(
+    function (question, index) {
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "review-item";
+
+
+      const userAnswer =
+        answers[index];
+
+
+      let status;
+
+
+      if (
+        userAnswer === undefined
+      ) {
+
+        status = `
+          <div class="skipped">
+            Skipped
+          </div>
+        `;
+
+      }
+
+      else if (
+        userAnswer ===
+        question.correctAnswer
+      ) {
+
+        status = `
+          <div class="correct">
+            ✓ Correct
+          </div>
+        `;
+
+      }
+
+      else {
+
+        status = `
+          <div class="incorrect">
+            ✗ Wrong
+          </div>
+        `;
+
+      }
+
+
+      item.innerHTML = `
+
+        <strong>
+          Q${index + 1}.
+          ${escapeHTML(question.text)}
+        </strong>
+
+        ${status}
+
+        <div class="review-answer">
+
+          <strong>Your answer:</strong>
+
+          ${
+            userAnswer !== undefined
+              ? escapeHTML(userAnswer)
+              : "Not answered"
+          }
+
+        </div>
+
+
+        <div class="review-answer">
+
+          <strong>Correct answer:</strong>
+
+          ${escapeHTML(
+            question.correctAnswer
+          )}
+
+        </div>
+
+
+        <div class="review-answer">
+
+          <strong>Explanation:</strong>
+
+          ${escapeHTML(
+            question.explanation ||
+            "Explanation not available."
+          )}
+
+        </div>
+
+      `;
+
+      resultContent.appendChild(
+        item
+      );
+
+    }
+  );
+
+
+  /* =================================================
+     RESTART BUTTON
+  ================================================= */
+
+  const restartButton =
+    document.createElement("button");
+
+  restartButton.type =
+    "button";
+
+  restartButton.className =
+    "primary";
+
+  restartButton.textContent =
+    "🔄 Take Test Again";
+
+
+  restartButton.addEventListener(
+    "click",
+    function () {
+
+      location.reload();
+
+    }
+  );
+
+
+  resultContent.appendChild(
+    restartButton
+  );
+
+}
+
+
+/* =====================================================
+   HTML SAFETY
+===================================================== */
+
+function escapeHTML(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+/* =====================================================
+   DEBUG
+===================================================== */
+
+console.log(
+  "✅ Part 7 loaded"
+);
+
+console.log(
+  "📚 Questions available:",
+  window.QUESTION_BANK.length
+);
+
+console.log(
+  "🎯 Tests available:",
+  window.TOPPER_TESTS.length
+);
+
+  </script>
+  </body>
 </html>
