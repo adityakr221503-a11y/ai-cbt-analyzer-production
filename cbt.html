@@ -948,7 +948,110 @@ function normalizeQuestion(question, index) {
 /* =====================================================
    NORMALIZE ALL 180 QUESTIONS
 ===================================================== */
+/* =====================================================
+   PART 5 — TEST 180 LOADER
+===================================================== */
 
+let TEST180_ACTIVE = false;
+let TEST180_QUESTIONS = [];
+
+
+try {
+
+  const source =
+    sessionStorage.getItem(
+      "CBT_ACTIVE_SOURCE"
+    );
+
+  const rawQuestions =
+    sessionStorage.getItem(
+      "CBT_ACTIVE_QUESTIONS"
+    );
+
+
+  if (
+    source === "TEST180" &&
+    rawQuestions
+  ) {
+
+    const incoming =
+      JSON.parse(rawQuestions);
+
+
+    if (
+      Array.isArray(incoming)
+    ) {
+
+      TEST180_QUESTIONS =
+        incoming
+          .map(
+            function(question, index) {
+
+              return normalizeQuestion(
+                question,
+                index
+              );
+
+            }
+          )
+          .filter(
+            function(question) {
+
+              return (
+                question &&
+                question.text &&
+                Array.isArray(
+                  question.options
+                ) &&
+                question.options.length >= 2
+              );
+
+            }
+          );
+
+
+      if (
+        TEST180_QUESTIONS.length > 0
+      ) {
+
+        TEST180_ACTIVE = true;
+
+        console.log(
+          "🔥 TEST 180 LOADED:",
+          TEST180_QUESTIONS.length
+        );
+
+      }
+
+    }
+
+  }
+
+}
+catch (error) {
+
+  console.error(
+    "❌ Test 180 loading error:",
+    error
+  );
+
+}
+
+
+/* =====================================================
+   ACTIVE QUESTION BANK
+===================================================== */
+
+const ACTIVE_QUESTION_BANK =
+  TEST180_ACTIVE
+    ? TEST180_QUESTIONS
+    : NORMALIZED_QUESTION_BANK;
+
+
+console.log(
+  "🎯 ACTIVE QUESTION BANK:",
+  ACTIVE_QUESTION_BANK.length
+);
 const NORMALIZED_QUESTION_BANK =
   QUESTION_BANK
     .map(
