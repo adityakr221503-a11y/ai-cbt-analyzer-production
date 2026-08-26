@@ -855,7 +855,46 @@
 <!-- =====================================================
      TOPPER TEST PRO — 180 QUESTION BANK
 ===================================================== -->
+<script src="./test180-questions.js"></script>
 
+<script>
+
+  /* =====================================================
+     TEST 180 QUESTION BANK
+  ===================================================== */
+
+  if (
+    Array.isArray(window.TEST180_QUESTIONS)
+  ) {
+
+    console.log(
+      "✅ Test 180 loaded:",
+      window.TEST180_QUESTIONS.length,
+      "questions"
+    );
+
+  } else {
+
+    console.error(
+      "❌ test180-questions.js not loaded"
+    );
+
+    window.TEST180_QUESTIONS = [];
+
+  }
+
+
+  /* =====================================================
+     QUESTION BANK
+  ===================================================== */
+
+  const QUESTION_BANK =
+    window.TEST180_QUESTIONS;
+
+
+  /* =====================================================
+     REST OF YOUR EXISTING CBT JAVASCRIPT
+  ===================================================== */
 <script src="./test180-questions.js"></script>
 
 
