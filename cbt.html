@@ -1647,11 +1647,9 @@ function buildTestQuestions() {
       requested > 0
     ) {
 
-      questions =
-        questions.slice(
-          0,
-          requested
-        );
+      if (requested < questions.length) {
+        questions = questions.slice(0, requested);
+      }
 
     }
 
