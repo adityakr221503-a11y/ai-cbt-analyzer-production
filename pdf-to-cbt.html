@@ -2,7 +2,38 @@
 <html lang="en">
 <script src="./test180-questions.js"></script>
 <head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(function () {
+  function loadPDFJS(src, worker) {
+    return new Promise(function(resolve, reject) {
+      var script = document.createElement("script");
+      script.src = src;
+      script.onload = function() {
+        if (window.pdfjsLib) {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
+          resolve();
+        } else {
+          reject(new Error("PDF.js loaded but unavailable."));
+        }
+      };
+      script.onerror = function() {
+        reject(new Error("Could not load PDF.js."));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  window.pdfjsReady = loadPDFJS(
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js?v=180",
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js?v=180"
+  ).catch(function() {
+    return loadPDFJS(
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js?v=180",
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js?v=180"
+    );
+  });
+})();
+</script>
 <script>
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -735,15 +766,17 @@ async function extractPDFText(file) {
   }
 
 
+  if (window.pdfjsReady) {
+    await window.pdfjsReady;
+  }
+
   if (
-    typeof pdfjsLib ===
+    typeof window.pdfjsLib ===
     "undefined"
   ) {
-
     throw new Error(
-      "PDF.js is not loaded."
+      "PDF.js could not be loaded."
     );
-
   }
 
 
