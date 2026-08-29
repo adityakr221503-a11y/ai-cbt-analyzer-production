@@ -1332,26 +1332,21 @@ function parseQuestionJSON(
 
 function parsePlainTextQuestions(text) {
   const questions = [];
-  const cleaned = cleanPDFText(text).replace(/\s+/g, " ").trim();
-
-  const blocks = cleaned.split(/(?=\d+\s*[.)]\s*)/g);
+  const cleaned = cleanPDFText(text).replace(//g, "
+").replace(/[ 	]+/g, " ").trim();
+  const blocks = cleaned.split(/(?=(?:^|
+)\s*\d+\s*[.)]\s*)/gm);
 
   blocks.forEach(function(block) {
     block = block.trim();
-
-    const qm = block.match(/^\d+\s*[.)]\s*(.*?)(?=\s+[A-D]\s*[.)]\s+)/i);
+    const qm = block.match(/^\s*\d+\s*[.)]\s*([\s\S]*?)(?=\s+(?:A|B|C|D)\s*[.)]\s+)/i);
     if (!qm) return;
 
-    const questionText = qm[1].trim();
-
-    const matches = [
-      ...block.matchAll(
-        /(?:^|\s)([A-D])\s*[.)]\s+(.+?)(?=\s+[A-D]\s*[.)]\s+|$)/gi
-      )
-    ];
+    const questionText = qm[1].replace(/\s+/g, " ").trim();
+    const matches = [...block.matchAll(/(?:^|\s)([A-D])\s*[.)]\s+([\s\S]*?)(?=\s+(?:[A-D])\s*[.)]\s+|$)/gi)];
 
     const options = matches.map(function(m) {
-      return m[2].trim();
+      return m[2].replace(/\s+/g, " ").trim();
     }).filter(Boolean);
 
     if (questionText.length >= 5 && options.length >= 2) {
