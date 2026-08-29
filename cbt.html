@@ -1076,21 +1076,7 @@ const NORMALIZED_QUESTION_BANK =
 
       }
     )
-    .filter(
-      function(question) {
-
-        return (
-          question &&
-          question.text &&
-          Array.isArray(
-            question.options
-          ) &&
-          question.options.length >= 2 &&
-          question.correctAnswer
-        );
-
-      }
-    );
+;
 
 
 /* =====================================================
