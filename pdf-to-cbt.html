@@ -1330,125 +1330,42 @@ function parseQuestionJSON(
    OPTIONAL TEXT QUESTION PARSER
 ===================================================== */
 
-function parsePlainTextQuestions(
-  text
-) {
-
+function parsePlainTextQuestions(text) {
   const questions = [];
+  const cleaned = cleanPDFText(text).replace(/\s+/g, " ").trim();
 
+  const blocks = cleaned.split(/(?=\d+\s*[.)]\s*)/g);
 
-  const cleaned =
-    cleanPDFText(
-      text
-    );
+  blocks.forEach(function(block) {
+    block = block.trim();
 
+    const qm = block.match(/^\d+\s*[.)]\s*(.*?)(?=\s+[A-D]\s*[.)]\s+)/i);
+    if (!qm) return;
 
-  /*
-   * Expected pattern:
-   *
-   * 1. Question text
-   * A. Option
-   * B. Option
-   * C. Option
-   * D. Option
-   *
-   * The answer can be supplied separately
-   * by the converter/answer-key parser.
-   */
+    const questionText = qm[1].trim();
 
-  const blocks =
-    cleaned.split(
-      /(?=\b\d+\s*[.)]\s*)/g
-    );
+    const matches = [
+      ...block.matchAll(
+        /(?:^|\s)([A-D])\s*[.)]\s+(.+?)(?=\s+[A-D]\s*[.)]\s+|$)/gi
+      )
+    ];
 
+    const options = matches.map(function(m) {
+      return m[2].trim();
+    }).filter(Boolean);
 
-  blocks.forEach(
-    function(block) {
-
-      const lines =
-        block
-          .split("\n")
-          .map(
-            function(line) {
-              return line.trim();
-            }
-          )
-          .filter(Boolean);
-
-
-      if (
-        lines.length < 5
-      ) {
-
-        return;
-
-      }
-
-
-      const questionLine =
-        lines.shift();
-
-
-      const questionText =
-        questionLine.replace(
-          /^\d+\s*[.)]\s*/,
-          ""
-        ).trim();
-
-
-      const optionList = [];
-
-
-      lines.forEach(
-        function(line) {
-
-          const match =
-            line.match(
-              /^([A-D])\s*[.)]\s*(.+)$/i
-            );
-
-
-          if (match) {
-
-            optionList.push(
-              match[2].trim()
-            );
-
-          }
-
-        }
-      );
-
-
-      if (
-        questionText &&
-        optionList.length >= 2
-      ) {
-
-        questions.push({
-
-          text:
-            questionText,
-
-          options:
-            optionList,
-
-          subject:
-            "Unknown",
-
-          difficulty:
-            "Medium"
-
-        });
-
-      }
-
+    if (questionText.length >= 5 && options.length >= 2) {
+      questions.push({
+        text: questionText,
+        options: options,
+        subject: "Unknown",
+        difficulty: "Medium"
+      });
     }
-  );
+  });
 
-
+  console.log("PDF parser detected:", questions.length);
   return questions;
-
 }
 
 
