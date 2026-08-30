@@ -1106,8 +1106,8 @@ function addQuestionsToPool(
   questions
 ) {
 
-  const existing =
-    getPDFQuestionPool();
+  // Every PDF import creates a completely fresh question pool.
+  const existing = [];
 
 
   const existingIds =
