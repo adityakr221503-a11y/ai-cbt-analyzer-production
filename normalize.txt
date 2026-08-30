@@ -1,0 +1,235 @@
+function normalizeQuestion(
+  question,
+  index
+) {
+
+  if (!question) {
+    return null;
+  }
+
+
+  /*
+   * Question text
+   */
+
+  const text =
+    question.text ||
+    question.question ||
+    "";
+
+
+  /*
+   * Options
+   */
+
+  let questionOptions =
+    Array.isArray(question.options)
+      ? question.options
+      : [];
+
+
+  questionOptions =
+    questionOptions.map(
+      function(option) {
+
+        return String(
+          option ?? ""
+        ).trim();
+
+      }
+    );
+
+
+  /*
+   * Correct answer
+   */
+
+  let correctAnswer =
+    question.correctAnswer;
+
+
+  /*
+   * If source uses correctIndex,
+   * convert it to actual option text.
+   */
+
+  if (
+    (
+      correctAnswer === undefined ||
+      correctAnswer === null ||
+      correctAnswer === ""
+    ) &&
+    Number.isInteger(
+      question.correctIndex
+    )
+  ) {
+
+    correctAnswer =
+      questionOptions[
+        question.correctIndex
+      ];
+
+  }
+
+
+  /*
+   * If source uses A/B/C/D,
+   * convert it to option text.
+   */
+
+  if (
+    typeof correctAnswer === "string"
+  ) {
+
+    const answer =
+      correctAnswer
+        .trim()
+        .toUpperCase();
+
+
+    const letters = [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ];
+
+
+    const answerIndex =
+      letters.indexOf(
+        answer
+      );
+
+
+    if (
+      answerIndex >= 0 &&
+      questionOptions[
+        answerIndex
+      ] !== undefined
+    ) {
+
+      correctAnswer =
+        questionOptions[
+          answerIndex
+        ];
+
+    }
+
+  }
+
+
+  /*
+   * Return normalized format
+   */
+
+  return {
+
+    id:
+      question.id ||
+      `test180-q${index + 1}`,
+
+    text:
+      text,
+
+    options:
+      questionOptions,
+
+    correctAnswer:
+      correctAnswer || "",
+
+    subject:
+      question.subject ||
+      "",
+
+    chapter:
+      question.chapter ||
+      "",
+
+    topic:
+      question.topic ||
+      "",
+
+    concept:
+      question.concept ||
+      "",
+
+    difficulty:
+      question.difficulty ||
+      "Medium",
+
+    marks:
+      Number(
+        question.marks ?? 4
+      ),
+
+    negativeMarks:
+      Number(
+        question.negativeMarks ?? 1
+      ),
+
+    explanation:
+      question.explanation ||
+      question.solution ||
+      "",
+
+    source:
+      question.source ||
+      "Topper Test Pro — Test 180"
+
+  };
+
+}
+
+
+/* =====================================================
+   BUILD NORMALIZED 180 BANK
+===================================================== */
+
+const NORMALIZED_QUESTION_BANK =
+  window.TEST180_QUESTIONS
+    .map(
+      function(
+        question,
+        index
+      ) {
+
+        return normalizeQuestion(
+          question,
+          index
+        );
+
+      }
+    )
+    .filter(
+      function(question) {
+
+        return (
+          question &&
+          question.text &&
+          Array.isArray(
+            question.options
+          ) &&
+          question.options.length >= 2 &&
+          question.correctAnswer
+        );
+
+      }
+    );
+
+
+/* =====================================================
+   ACTIVE QUESTION BANK
+===================================================== */
+
+const ACTIVE_QUESTION_BANK =
+  NORMALIZED_QUESTION_BANK;
+
+
+console.log(
+  "✅ TEST 180 VALID QUESTIONS:",
+  ACTIVE_QUESTION_BANK.length
+);
+
+
+/* =====================================================
