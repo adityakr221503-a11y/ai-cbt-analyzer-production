@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <script src="./test180-questions.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<head>
+<script src="./vendor/pdf.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "./vendor/pdf.worker.min.js";
+  }
+</script>
 <script>
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
   }
 </script>
-<head>
 
   <meta charset="UTF-8">
 
@@ -303,16 +309,6 @@
 
     </div>
 
-    <div class="field">
-      <label for="answerKeyInput">Optional Answer Key PDF</label>
-      <input
-        id="answerKeyInput"
-        type="file"
-        accept=".pdf,application/pdf"
-      >
-      <small>Upload the separate answer-key PDF when available. The key stays hidden during CBT.</small>
-    </div>
-
 
     <!-- =================================================
          MODULE NAME
@@ -472,11 +468,6 @@ const PDF_CBT_STORAGE_KEY =
 const pdfInput =
   document.getElementById(
     "pdfInput"
-  );
-
-const answerKeyInput =
-  document.getElementById(
-    "answerKeyInput"
   );
 
 const moduleNameInput =
@@ -742,186 +733,69 @@ console.log(
 ===================================================== */
 
 async function extractPDFText(file) {
+  if (!file) throw new Error("No PDF file selected.");
+  if (!window.pdfjsLib) throw new Error("PDF.js is not loaded.");
 
-  if (!file) {
-    throw new Error("No PDF file selected.");
-  }
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buffer }.promise;
+  let fullText = "";
 
-  if (typeof pdfjsLib === "undefined") {
-    throw new Error(
-      "PDF.js is not loaded. Open the GitHub Pages version with internet access or bundle PDF.js locally."
-    );
-  }
-
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const pageTexts = [];
-
-  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-
-    const page = await pdf.getPage(pageNumber);
+  // First try the normal PDF text layer.
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const page = await pdf.getPage(n);
     const content = await page.getTextContent();
+    const text = content.items.map(item => String(tem.str || "").trim()).filter(void => !!void).join(" ");
+    fullText += "\n" + text + "\n";
+  }
 
-    const items = content.items
-      .map(function(item) {
-        const t = item.transform || [];
-        return {
-          text: String(item.str || "").trim(),
-          x: Number(t[4] || 0),
-          y: Number(t[5] || 0),
-          width: Number(item.width || 0)
-        };
-      })
-      .filter(function(item) {
-        return item.text.length > 0;
-      });
+  if (fullText.replace(/\s/+/g, " ").trim().length >= 80) {
+    return fullText.trim();
+  }
 
-    if (items.length === 0) continue;
+  // OCR fallback for scanned/image PDFs.
+  if (!window.Tesseract) throw new Error("OCR engine is not loaded.");
 
-    const xs = items.map(function(item) { return item.x; });
-    const minX = Math.min.apply(null, xs);
-    const maxX = Math.max.apply(null, xs);
-    const midpoint = (minX + maxX) / 2;
+  statusBox.textContent =
+    "🎧 Scanned PDF detected. Starting OCR...";
 
-    function buildColumn(columnItems) {
-      const rows = [];
-      const tolerance = 3.5;
+  const worker = await Tesseract.createWorker("eng");
 
-      columnItems
-        .slice()
-        .sort(function(a, b) {
-          if (Math.abs(a.y - b.y) > tolerance) return b.y - a.y;
-          return a.x - b.x;
-        })
-        .forEach(function(item) {
-          let row = rows.find(function(r) {
-            return Math.abs(r.y - item.y) <= tolerance;
-          });
+  try {
+    let ocrText = "";
 
-          if (!row) {
-            row = { y: item.y, items: [] };
-            rows.push(row);
-          }
+    for (let n = 1; n <= pdf.numPages; n++) {
+      statusBox.textContent =
+        "⟎' OCR processing...\nPage " + n +"  of " + pdf.numPages;
 
-          row.items.push(item);
-        });
+      const page = await pdf.getPage(n);
+      const viewport = page.getViewport({ scale: 2.0 });
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("renter", { willReadfrequently: true });
 
-      rows.sort(function(a, b) { return b.y - a.y; });
+      canvas.width = Math.ceil(viewport.width);
+      canvas.height = Math.ceil(viewport.height);
 
-      return rows.map(function(row) {
-        row.items.sort(function(a, b) { return a.x - b.x; });
-        return row.items.map(function(item) { return item.text; }).join(" ").trim();
-      }).filter(Boolean);
+      await page.render( {
+        canvasContext: ctx,
+        viewport: viewport
+      }).promise;
+
+      const result = await worker.recognize(canvas);
+      ocrText += "\n" + String(result?.data?.text || "") + "\n";
+      canvas.width = 1;
+      canvas.height = 1;
     }
 
-    /*
-     * Most coaching PDFs are two-column. Keeping each column separate
-     * prevents Q1/Q4, Q2/Q5 etc. from being merged on the same line.
-     */
-    const left = items.filter(function(item) { return item.x <= midpoint; });
-    const right = items.filter(function(item) { return item.x > midpoint; });
+    ocrText = ocrText.trim();
 
-    let lines;
-    if (left.length >= 5 && right.length >= 5) {
-      lines = buildColumn(left).concat(buildColumn(right));
-    } else {
-      lines = buildColumn(items);
-    }
+    if (ocrText.replace(/\s/+/g, " ").length < 20) throw new Error("No readable text was found even after OCR.");
 
-    pageTexts.push(lines.join("\n"));
+
+    return ocrText;
+  } finally {
+    await worker.terminate();
   }
-
-  return pageTexts.join("\n\n").trim();
 }
-
-
-/* =====================================================
-   CLEAN PDF TEXT
-===================================================== */
-
-function cleanPDFText(
-  text
-) {
-
-  if (!text) {
-    return "";
-  }
-
-
-  return String(text)
-
-    .replace(
-      /\r/g,
-      ""
-    )
-
-    .replace(
-      /[ \t]+/g,
-      " "
-    )
-
-    .replace(
-      /\n{3,}/g,
-      "\n\n"
-    )
-
-    .trim();
-
-}
-
-
-/* =====================================================
-   OPTION LETTER NORMALIZER
-===================================================== */
-
-function normalizeOptionLetter(
-  value
-) {
-
-  if (
-    value === undefined ||
-    value === null
-  ) {
-
-    return null;
-
-  }
-
-
-  const text =
-    String(value)
-      .trim()
-      .toUpperCase();
-
-
-  if (
-    /^[A-D]$/.test(text)
-  ) {
-
-    return (
-      text.charCodeAt(0) -
-      65
-    );
-
-  }
-
-
-  if (
-    /^[1-4]$/.test(text)
-  ) {
-
-    return (
-      Number(text) - 1
-    );
-
-  }
-
-
-  return null;
-
-}
-
-
 /* =====================================================
    GET CORRECT ANSWER
 ===================================================== */
@@ -1240,20 +1114,9 @@ function addQuestionsToPool(
     new Set(
       existing.map(
         function(question) {
-          return String(question.id || "");
+          return question.id;
         }
       )
-    );
-
-  const existingContent =
-    new Set(
-      existing.map(function(question) {
-        return (
-          String(question.text || "").trim().toLowerCase() +
-          "|" +
-          (Array.isArray(question.options) ? question.options.join("|") : "")
-        );
-      })
     );
 
 
@@ -1266,14 +1129,10 @@ function addQuestionsToPool(
   questions.forEach(
     function(question) {
 
-      const contentKey =
-        String(question.text || "").trim().toLowerCase() +
-        "|" +
-        (Array.isArray(question.options) ? question.options.join("|") : "");
-
       if (
-        existingIds.has(question.id) ||
-        existingContent.has(contentKey)
+        existingIds.has(
+          question.id
+        )
       ) {
 
         duplicates++;
@@ -1286,7 +1145,6 @@ function addQuestionsToPool(
       existingIds.add(
         question.id
       );
-      existingContent.add(contentKey);
 
 
       newQuestions.push(
@@ -1379,169 +1237,37 @@ function parseQuestionJSON(
 ===================================================== */
 
 function parsePlainTextQuestions(text) {
-
   const questions = [];
-  const cleaned = cleanPDFText(text)
-    .replace(/\f/g, "\n")
-    .replace(/\s+\n/g, "\n")
-    .replace(/\n\s+/g, "\n");
+  const cleaned = cleanPDFText(text).replace(/
+/g, "
+").replace(/[ 	]+/g, " ").trim();
+  const blocks = cleaned.split(/(?=(?:^|
+)\s*\d+\s*[.)]\s*)/gm);
 
-  const matches = [];
-  const numberRegex = /(?:^|\n)\s*(\d{1,3})\s*[.)]\s+/g;
-  let match;
+  blocks.forEach(function(block) {
+    block = block.trim();
+    const qm = block.match(/^\s*\d+\s*[.)]\s*([\s\S]*?)(?=\s+(?:A|B|C|D)\s*[.)]\s+)/i);
+    if (!qm) return;
 
-  while ((match = numberRegex.exec(cleaned)) !== null) {
-    const number = Number(match[1]);
-    if (number >= 1 && number <= 999) {
-      matches.push({ number: number, start: match.index + match[0].lastIndexOf(match[1]) });
-    }
-  }
+    const questionText = qm[1].replace(/\s+/g, " ").trim();
+    const matches = [...block.matchAll(/(?:^|\s)([A-D])\s*[.)]\s+([\s\S]*?)(?=\s+(?:[A-D])\s*[.)]\s+|$)/gi)];
 
-  for (let i = 0; i < matches.length; i++) {
+    const options = matches.map(function(m) {
+      return m[2].replace(/\s+/g, " ").trim();
+    }).filter(Boolean);
 
-    const current = matches[i];
-    const next = matches[i + 1];
-    const block = cleaned.slice(current.start, next ? next.start : cleaned.length);
-
-    const first = block.match(/^\s*\d{1,3}\s*[.)]\s*(.*?)(?:\n|$)/);
-    if (!first) continue;
-
-    const questionTextParts = [first[1].trim()];
-    const optionList = [];
-    let currentOption = null;
-
-    const lines = block.split("\n").map(function(line) {
-      return line.trim();
-    }).filter(Boolean).slice(1);
-
-    lines.forEach(function(line) {
-
-      const optionMatch = line.match(/^\(?([A-D])\)?\s*[.)\-:]\s*(.*)$/i);
-      const numberedOption = line.match(/^\(([1-4])\)\s*(.*)$/);
-
-      if (optionMatch) {
-        currentOption = optionMatch[2].trim();
-        optionList.push(currentOption);
-        return;
-      }
-
-      if (numberedOption && optionList.length < 4) {
-        currentOption = numberedOption[2].trim();
-        optionList.push(currentOption);
-        return;
-      }
-
-      /* If options are not explicitly lettered, collect text before the next option. */
-      if (optionList.length === 0 && questionTextParts.length < 12) {
-        questionTextParts.push(line);
-      } else if (currentOption && line.length > 0) {
-        currentOption += " " + line;
-        optionList[optionList.length - 1] = currentOption.trim();
-      } else if (questionTextParts.length < 12) {
-        questionTextParts.push(line);
-      }
-    });
-
-    const questionText = questionTextParts.join(" ").replace(/\s+/g, " ").trim();
-
-    if (questionText.length >= 5 && optionList.length >= 2) {
-      let subject = "Unknown";
-      if (current.number >= 1 && current.number <= 45) subject = "Physics";
-      else if (current.number >= 46 && current.number <= 90) subject = "Chemistry";
-      else if (current.number >= 91 && current.number <= 180) subject = "Biology";
-
+    if (questionText.length >= 5 && options.length >= 2) {
       questions.push({
-        number: current.number,
         text: questionText,
-        options: optionList.slice(0, 5),
-        subject: subject,
+        options: options,
+        subject: "Unknown",
         difficulty: "Medium"
       });
     }
-  }
-
-  /* De-duplicate repeated page/column detections by question number + text. */
-  const seen = new Set();
-  return questions.filter(function(q) {
-    const key = q.number + "|" + q.text.toLowerCase().replace(/\s+/g, " ");
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-
-/* =====================================================
-   ANSWER KEY PARSER
-===================================================== */
-
-function parseAnswerKey(text) {
-
-  const answers = {};
-  const cleaned = String(text || "")
-    .replace(/\r/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  /* Supports: 1-A, 1 A, Q1 A, 1. A, 1) A and 1 : A */
-  const pairRegex = /(?:Q\s*)?(\d{1,3})\s*(?:[.):-]|\s)\s*([A-D])\b/gi;
-  let match;
-
-  while ((match = pairRegex.exec(cleaned)) !== null) {
-    const number = Number(match[1]);
-    const letter = match[2].toUpperCase();
-    if (number >= 1 && number <= 999) {
-      answers[number] = letter.charCodeAt(0) - 65;
-    }
-  }
-
-  /* Supports compact key rows such as: 1 2 3 4 5 / B C A D ... */
-  const rows = String(text || "").split(/\n+/).map(function(line) {
-    return line.trim();
-  }).filter(Boolean);
-
-  rows.forEach(function(row) {
-    const tokens = row.match(/\b([A-D])\b/g);
-    const nums = row.match(/\b\d{1,3}\b/g);
-    if (!tokens || !nums || nums.length < 2 || tokens.length < 2) return;
-    const count = Math.min(nums.length, tokens.length);
-    for (let i = 0; i < count; i++) {
-      const n = Number(nums[i]);
-      if (!answers[n]) answers[n] = tokens[i].charCodeAt(0) - 65;
-    }
   });
 
-  /* Fallback for a compact two-row key: question numbers followed by A/B/C/D. */
-  if (Object.keys(answers).length === 0) {
-    const nums = cleaned.match(/\b(?:1[0-9]{0,2}|[1-9][0-9]?)\b/g) || [];
-    const letters = cleaned.match(/\b[A-D]\b/gi) || [];
-    const orderedNums = nums.map(Number).filter(function(n) { return n >= 1 && n <= 180; });
-    if (orderedNums.length >= 10 && letters.length >= 10) {
-      const count = Math.min(orderedNums.length, letters.length);
-      for (let i = 0; i < count; i++) {
-        if (!answers[orderedNums[i]]) {
-          answers[orderedNums[i]] = letters[i].toUpperCase().charCodeAt(0) - 65;
-        }
-      }
-    }
-  }
-
-  return answers;
-}
-
-function applyAnswerKey(questions, answerMap) {
-  let matched = 0;
-
-  questions.forEach(function(question) {
-    const index = answerMap[question.number];
-    if (Number.isInteger(index) && question.options[index] !== undefined) {
-      question.correctIndex = index;
-      question.correctAnswer = question.options[index];
-      matched++;
-    }
-  });
-
-  return matched;
+  console.log("PDF parser detected:", questions.length);
+  return questions;
 }
 
 
@@ -1631,22 +1357,6 @@ async function convertSelectedPDF() {
     }
 
 
-    let answerMatched = 0;
-
-    if (answerKeyInput && answerKeyInput.files[0]) {
-      statusBox.textContent =
-        "🔑 Reading answer key...\nPlease wait.";
-
-      const answerText =
-        await extractPDFText(answerKeyInput.files[0]);
-
-      const answerMap =
-        parseAnswerKey(answerText);
-
-      answerMatched =
-        applyAnswerKey(extractedQuestions, answerMap);
-    }
-
     const normalizedQuestions =
       normalizeQuestions(
         extractedQuestions,
@@ -1676,7 +1386,6 @@ async function convertSelectedPDF() {
       `✅ Module processed.\n\n` +
       `Module: ${moduleName}\n` +
       `Questions detected: ${normalizedQuestions.length}\n` +
-      `Answer key matched: ${answerMatched}\n` +
       `New questions added: ${result.added}\n` +
       `Duplicates skipped: ${result.duplicates}\n` +
       `Total PDF pool: ${result.total}`;
@@ -1751,11 +1460,6 @@ clearPoolButton.addEventListener(
       PDF_CBT_STORAGE_KEY
     );
 
-    localStorage.removeItem("TOPPER_TEST_180");
-    sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
-    sessionStorage.removeItem("CBT_ACTIVE_TEST");
-    sessionStorage.removeItem("CBT_ACTIVE_QUESTIONS");
-
 
     updatePoolStats();
 
@@ -1811,9 +1515,7 @@ function getQuestionsForCBT() {
         typeof question.text === "string" &&
         question.text.trim().length > 0 &&
         Array.isArray(question.options) &&
-        question.options.length >= 2 &&
-        typeof question.correctAnswer === "string" &&
-        question.correctAnswer.trim().length > 0
+        question.options.length >= 2
       );
 
     }
@@ -2357,9 +2059,7 @@ function getCurrentPDFPool() {
         typeof question.text === "string" &&
         question.text.trim().length > 0 &&
         Array.isArray(question.options) &&
-        question.options.length >= 2 &&
-        typeof question.correctAnswer === "string" &&
-        question.correctAnswer.trim().length > 0
+        question.options.length >= 2
       );
 
     }
