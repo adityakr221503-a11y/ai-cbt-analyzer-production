@@ -1300,6 +1300,9 @@ async function convertSelectedPDF() {
   convertButton.disabled =
     true;
 
+  // Always start a fresh conversion for the newly selected PDF.
+  localStorage.removeItem(PDF_CBT_STORAGE_KEY);
+  console.log("🧹 Cleared previous PDF question pool.");
 
   statusBox.textContent =
     "⏳ Reading PDF...\nPlease wait.";
