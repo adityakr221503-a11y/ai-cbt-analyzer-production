@@ -1301,7 +1301,10 @@ async function convertSelectedPDF() {
 
   // Always start a fresh conversion for the newly selected PDF.
   localStorage.removeItem(PDF_CBT_STORAGE_KEY);
-  console.log("🧹 Cleared previous PDF question pool.");
+  sessionStorage.removeItem("CBT_ACTIVE_QUESTIONS");
+  sessionStorage.removeItem("CBT_ACTIVE_TEST");
+  sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
+  console.log("🧹 Cleared previous PDF pool and CBT session.");
 
   statusBox.textContent =
     "⏳ Reading PDF...\nPlease wait.";
