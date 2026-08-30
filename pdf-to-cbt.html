@@ -1155,10 +1155,9 @@ function addQuestionsToPool(
   );
 
 
+  // New PDF replaces the previous PDF question pool.
   const updatedPool =
-    existing.concat(
-      newQuestions
-    );
+    newQuestions;
 
 
   savePDFQuestionPool(
