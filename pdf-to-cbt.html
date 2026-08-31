@@ -731,71 +731,140 @@ console.log(
 /* =====================================================
    PDF TEXT EXTRACTION
 ===================================================== */
-
 async function extractPDFText(file) {
-  if (!file) throw new Error("No PDF file selected.");
-  if (!window.pdfjsLib) throw new Error("PDF.js is not loaded.");
 
-  const buffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-  let fullText = "";
-
-  // First try the normal PDF text layer.
-  for (let n = 1; n <= pdf.numPages; n++) {
-    const page = await pdf.getPage(n);
-    const content = await page.getTextContent();
-    const text = content.items.map(item => String(tem.str || "").trim()).filter(void => !!void).join(" ");
-    fullText += "\n" + text + "\n";
+  if (!file) {
+    throw new Error("No PDF file selected.");
   }
 
-  if (fullText.replace(/\s/+/g, " ").trim().length >= 80) {
+  if (!window.pdfjsLib) {
+    throw new Error("PDF.js is not loaded.");
+  }
+
+  const buffer = await file.arrayBuffer();
+
+  const pdf = await pdfjsLib.getDocument({
+    data: buffer
+  }).promise;
+
+  let fullText = "";
+
+  // 1️⃣ Normal PDF text extraction
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+
+    statusBox.textContent =
+      `📖 Reading PDF...\nPage ${pageNumber} of ${pdf.numPages}`;
+
+    const page =
+      await pdf.getPage(pageNumber);
+
+    const content =
+      await page.getTextContent();
+
+    const pageText =
+      content.items
+        .map(item => String(item.str || ""))
+        .filter(text => text.trim())
+        .join(" ");
+
+    fullText += "\n" + pageText + "\n";
+  }
+
+  const cleanedText =
+    fullText
+      .replace(/\s+/g, " ")
+      .trim();
+
+  // 2️⃣ Text-based PDF successful
+  if (cleanedText.length >= 80) {
     return fullText.trim();
   }
 
-  // OCR fallback for scanned/image PDFs.
-  if (!window.Tesseract) throw new Error("OCR engine is not loaded.");
+  // 3️⃣ OCR fallback
+  if (!window.Tesseract) {
+    throw new Error(
+      "No readable text was found in this PDF. OCR engine is not loaded."
+    );
+  }
 
   statusBox.textContent =
-    "🎧 Scanned PDF detected. Starting OCR...";
+    "🔎 Scanned PDF detected.\nStarting OCR...";
 
-  const worker = await Tesseract.createWorker("eng");
+  const worker =
+    await Tesseract.createWorker("eng");
 
   try {
+
     let ocrText = "";
 
-    for (let n = 1; n <= pdf.numPages; n++) {
+    for (
+      let pageNumber = 1;
+      pageNumber <= pdf.numPages;
+      pageNumber++
+    ) {
+
       statusBox.textContent =
-        "⟎' OCR processing...\nPage " + n +"  of " + pdf.numPages;
+        `🔎 OCR processing...\nPage ${pageNumber} of ${pdf.numPages}`;
 
-      const page = await pdf.getPage(n);
-      const viewport = page.getViewport({ scale: 2.0 });
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("renter", { willReadfrequently: true });
+      const page =
+        await pdf.getPage(pageNumber);
 
-      canvas.width = Math.ceil(viewport.width);
-      canvas.height = Math.ceil(viewport.height);
+      const viewport =
+        page.getViewport({
+          scale: 2
+        });
 
-      await page.render( {
+      const canvas =
+        document.createElement("canvas");
+
+      const ctx =
+        canvas.getContext("2d", {
+          willReadFrequently: true
+        });
+
+      canvas.width =
+        Math.ceil(viewport.width);
+
+      canvas.height =
+        Math.ceil(viewport.height);
+
+      await page.render({
         canvasContext: ctx,
         viewport: viewport
       }).promise;
 
-      const result = await worker.recognize(canvas);
-      ocrText += "\n" + String(result?.data?.text || "") + "\n";
+      const result =
+        await worker.recognize(canvas);
+
+      ocrText +=
+        "\n" +
+        String(result?.data?.text || "") +
+        "\n";
+
       canvas.width = 1;
       canvas.height = 1;
     }
 
-    ocrText = ocrText.trim();
+    const cleanedOCR =
+      ocrText
+        .replace(/\s+/g, " ")
+        .trim();
 
-    if (ocrText.replace(/\s/+/g, " ").length < 20) throw new Error("No readable text was found even after OCR.");
+    if (cleanedOCR.length < 20) {
+      throw new Error(
+        "No readable text was found in this PDF."
+      );
+    }
 
+    return ocrText.trim();
 
-    return ocrText;
   } finally {
+
     await worker.terminate();
+
   }
 }
+
 /* =====================================================
    GET CORRECT ANSWER
 ===================================================== */
