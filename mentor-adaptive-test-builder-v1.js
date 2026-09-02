@@ -1,0 +1,9 @@
+/* Ranker Pro V316 — Mentor Adaptive Test Builder */
+(function(){ "use strict";
+const KEY="rankerProMentorAdaptiveTestBuilderV1", TARGET="rankerProMentorNextTestTargetingV1", HIST="cbtHistory";
+function read(k,f){try{return JSON.parse(localStorage.getItem(k)||"null")??f}catch(e){return f}}
+function score(x){if(!x||typeof x!=="object")return null;for(const v of [x.accuracy,x.percentage,x.percent,x.scorePercent]){let n=Number(v);if(Number.isFinite(n))return n<=1?n*100:n}let c=Number(x.correct??x.correctAnswers),t=Number(x.total??x.totalQuestions);return Number.isFinite(c)&&Number.isFinite(t)&&t>0?c/t*100:null}
+function getPlan(){const t=read(TARGET,{}),h=read(HIST,[]),a=Array.isArray(h)&&h.length?score(h[h.length-1]):null;let d="MEDIUM";if(Number.isFinite(a)){if(a<55)d="REPAIR";else if(a<70)d="EASY-MEDIUM";else if(a<85)d="MEDIUM";else d="HARD-MIX"}const p={mode:t.mode==="REPLAN"?"REPLAN":t.mode==="TARGETED_REPAIR"?"TARGETED_REPAIR":"BASELINE",subject:t.subject||"Mixed",difficulty:d,questionCount:d==="REPAIR"?30:45,mix:t.recommendedMix||["balanced baseline"],reason:Number.isFinite(a)?`Last accuracy ${a.toFixed(1)}%; difficulty adjusted automatically.`:"No reliable recent accuracy; balanced baseline.",generatedAt:Date.now()};localStorage.setItem(KEY,JSON.stringify(p));return p}
+function render(){const p=getPlan(),d=document.getElementById("mentorAdaptiveTestBuilderDetail"),b=document.getElementById("mentorAdaptiveTestBuilderStatus");if(b)b.textContent=p.difficulty;if(d)d.textContent=`${p.subject} • ${p.questionCount} Q • ${p.difficulty}. ${p.reason} Mix: ${p.mix.join(" → ")}.`}
+window.RankerProMentorAdaptiveTestBuilderV1={getPlan,render};document.addEventListener("DOMContentLoaded",render);
+})();
