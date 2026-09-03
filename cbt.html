@@ -1065,6 +1065,45 @@ function normalizeQuestion(
  * Test 180 is permanently isolated from imported PDF questions.
  * Only Q1-Q180 from test180-questions.js are eligible here.
  */
+/* =====================================================
+   RANKER PRO — PDF CBT SOURCE PRIORITY
+===================================================== */
+
+const CBT_PDF_MODE =
+  sessionStorage.getItem("CBT_ACTIVE_SOURCE") === "PDF";
+
+const CBT_PDF_QUESTIONS =
+  CBT_PDF_MODE
+    ? (function () {
+        try {
+          const raw =
+            sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+
+          const data = raw ? JSON.parse(raw) : [];
+
+          return Array.isArray(data)
+            ? data.filter(function (q) {
+                return (
+                  q &&
+                  typeof q.question === "string" &&
+                  q.question.trim() &&
+                  Array.isArray(q.options) &&
+                  q.options.length === 4 &&
+                  q.options.every(function (o) {
+                    return String(o || "").trim();
+                  })
+                );
+              })
+            : [];
+        } catch (e) {
+          console.error("PDF CBT source load failed:", e);
+          return [];
+        }
+      })()
+    : [];
+
+/* ===================================================== */
+
 const TEST180_CANONICAL_SOURCE =
   Array.isArray(window.TEST180_QUESTIONS)
     ? window.TEST180_QUESTIONS
@@ -1089,8 +1128,13 @@ const TEST180_CANONICAL_SOURCE =
     : [];
 
 
+const ACTIVE_QUESTION_SOURCE =
+  CBT_PDF_MODE && CBT_PDF_QUESTIONS.length
+    ? CBT_PDF_QUESTIONS
+    : TEST180_CANONICAL_SOURCE;
+
 const NORMALIZED_QUESTION_BANK =
-  TEST180_CANONICAL_SOURCE
+  ACTIVE_QUESTION_SOURCE
     .map(
       function(
         question,
