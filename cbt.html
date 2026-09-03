@@ -3796,6 +3796,73 @@ console.log(
 
 </script>
 
-<script>(function(){function f(){try{if(sessionStorage.getItem("CBT_ACTIVE_SOURCE")!=="PDF")return;var q=JSON.parse(sessionStorage.getItem("CBT_ACTIVE_QUESTIONS")||"[]");if(!q.length)return;var z=document.getElementById("testSelect"),b=document.getElementById("startButton");if(z&&!z.value){z.value="test180";z.dispatchEvent(new Event("change",{bubbles:true}))}if(b&&!b.disabled){b.click();return}setTimeout(f,300)}catch(e){console.error(e)}}setTimeout(f,500)})();</script></body>
+</body>
 
 </html>
+
+<script>
+/* =====================================================
+   RANKER PRO — PDF CBT FINAL START FIX
+   Runs AFTER cbt.html initialization
+===================================================== */
+(function () {
+  function startPdfCBT() {
+    try {
+      if (sessionStorage.getItem("CBT_ACTIVE_SOURCE") !== "PDF") {
+        return;
+      }
+
+      const raw = sessionStorage.getItem("CBT_ACTIVE_QUESTIONS") || "[]";
+      const questions = JSON.parse(raw);
+
+      if (!Array.isArray(questions) || questions.length === 0) {
+        console.warn("PDF CBT: no active questions");
+        return;
+      }
+
+      const testSelect = document.getElementById("testSelect");
+      const startButton = document.getElementById("startButton");
+
+      if (!testSelect || !startButton) {
+        setTimeout(startPdfCBT, 300);
+        return;
+      }
+
+      /* Let the EXISTING test-selection handler initialize selectedTest */
+      if (testSelect.value !== "test180") {
+        testSelect.value = "test180";
+        testSelect.dispatchEvent(
+          new Event("change", { bubbles: true })
+        );
+      } else {
+        testSelect.dispatchEvent(
+          new Event("change", { bubbles: true })
+        );
+      }
+
+      /* Existing start handler will now use PDF mode */
+      setTimeout(function () {
+        if (sessionStorage.getItem("CBT_ACTIVE_SOURCE") !== "PDF") {
+          return;
+        }
+
+        startButton.disabled = false;
+        startButton.click();
+
+        console.log(
+          "🚀 PDF CBT FINAL START:",
+          questions.length,
+          "questions"
+        );
+      }, 700);
+
+    } catch (e) {
+      console.error("PDF CBT FINAL START ERROR:", e);
+    }
+  }
+
+  window.addEventListener("load", function () {
+    setTimeout(startPdfCBT, 800);
+  });
+})();
+</script>
