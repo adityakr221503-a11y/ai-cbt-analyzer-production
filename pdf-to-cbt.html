@@ -1586,10 +1586,10 @@ function getQuestionsForCBT() {
 
       return (
         question &&
-        typeof question.text === "string" &&
-        question.text.trim().length > 0 &&
+        typeof (question.text || question.question) === "string" &&
+        String(question.text || question.question).trim().length > 0 &&
         Array.isArray(question.options) &&
-        question.options.length >= 2
+        question.options.length === 4
       );
 
     }
@@ -2130,10 +2130,10 @@ function getCurrentPDFPool() {
 
       return (
         question &&
-        typeof question.text === "string" &&
-        question.text.trim().length > 0 &&
+        typeof (question.text || question.question) === "string" &&
+        String(question.text || question.question).trim().length > 0 &&
         Array.isArray(question.options) &&
-        question.options.length >= 2
+        question.options.length === 4
       );
 
     }
@@ -2618,10 +2618,10 @@ function getCurrentPDFPool() {
 
     return (
       question &&
-      typeof question.text === "string" &&
+      typeof (question.text || question.question) === "string" &&
       question.text.trim() !== "" &&
       Array.isArray(question.options) &&
-      question.options.length >= 2
+      question.options.length === 4
     );
 
   });

@@ -1083,10 +1083,13 @@ const CBT_PDF_QUESTIONS =
 
           return Array.isArray(data)
             ? data.filter(function (q) {
+                const text = String(
+                  q && (q.question || q.text || "")
+                ).trim();
+
                 return (
                   q &&
-                  typeof q.question === "string" &&
-                  q.question.trim() &&
+                  text &&
                   Array.isArray(q.options) &&
                   q.options.length === 4 &&
                   q.options.every(function (o) {
@@ -1102,34 +1105,11 @@ const CBT_PDF_QUESTIONS =
       })()
     : [];
 
-/* ===================================================== */
 
-const TEST180_CANONICAL_SOURCE =
-  Array.isArray(window.TEST180_QUESTIONS)
-    ? window.TEST180_QUESTIONS
-        .filter(function(question) {
-          const n = Number(
-            question && question.questionNumber
-          );
-
-          return (
-            Number.isInteger(n) &&
-            n >= 1 &&
-            n <= 180
-          );
-        })
-        .sort(function(a, b) {
-          return (
-            Number(a.questionNumber) -
-            Number(b.questionNumber)
-          );
-        })
-        .slice(0, 180)
-    : [];
 
 
 const ACTIVE_QUESTION_SOURCE =
-  CBT_PDF_MODE && CBT_PDF_QUESTIONS.length
+  CBT_PDF_MODE
     ? CBT_PDF_QUESTIONS
     : TEST180_CANONICAL_SOURCE;
 
@@ -1158,7 +1138,7 @@ const NORMALIZED_QUESTION_BANK =
             question.options
           ) &&
           question.options.length === 4 &&
-          question.correctAnswer
+      (CBT_PDF_MODE || question.correctAnswer)
         );
 
       }
@@ -1170,7 +1150,9 @@ const NORMALIZED_QUESTION_BANK =
 ===================================================== */
 
 const ACTIVE_QUESTION_BANK =
-  NORMALIZED_QUESTION_BANK.slice(0, 180);
+  CBT_PDF_MODE
+    ? NORMALIZED_QUESTION_BANK
+    : NORMALIZED_QUESTION_BANK.slice(0, 180);
 
 
 console.log(
