@@ -1857,6 +1857,63 @@ startButton.addEventListener(
 );
 
 
+
+/* =====================================================
+   RANKER PRO — PDF DIRECT CBT START FIX
+===================================================== */
+
+if (
+  CBT_PDF_MODE &&
+  Array.isArray(CBT_PDF_QUESTIONS) &&
+  CBT_PDF_QUESTIONS.length > 0
+) {
+  try {
+    selectedTest = {
+      id: "pdf-import",
+      title: "PDF Imported CBT",
+      duration: 180,
+      questionIds: ACTIVE_QUESTION_BANK.map(q => q.id)
+    };
+
+    questionCount.value = "all";
+
+    selectedQuestions = buildTestQuestions();
+
+    if (selectedQuestions.length > 0) {
+      currentIndex = 0;
+      answers = {};
+      visitedQuestions = new Set();
+      reviewQuestions = new Set();
+      submitted = false;
+
+      remainingSeconds = selectedTest.duration * 60;
+
+      setupScreen.classList.add("hidden");
+      cbtScreen.classList.remove("hidden");
+      resultScreen.classList.add("hidden");
+
+      testTitle.textContent =
+        "PDF Imported CBT — " + selectedQuestions.length + " Questions";
+
+      renderQuestion();
+      renderPalette();
+      startTimer();
+
+      /* Stop the old auto-click patch from restarting Test 180 */
+      sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
+
+      console.log(
+        "🚀 PDF CBT DIRECT START:",
+        selectedQuestions.length,
+        "questions"
+      );
+    }
+  } catch (e) {
+    console.error("❌ PDF direct CBT start failed:", e);
+  }
+}
+
+
 /* =====================================================
    INITIAL SETUP
 ===================================================== */
