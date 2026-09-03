@@ -1859,62 +1859,6 @@ startButton.addEventListener(
 
 
 /* =====================================================
-   RANKER PRO — PDF DIRECT CBT START FIX
-===================================================== */
-
-if (
-  CBT_PDF_MODE &&
-  Array.isArray(CBT_PDF_QUESTIONS) &&
-  CBT_PDF_QUESTIONS.length > 0
-) {
-  try {
-    selectedTest = {
-      id: "pdf-import",
-      title: "PDF Imported CBT",
-      duration: 180,
-      questionIds: ACTIVE_QUESTION_BANK.map(q => q.id)
-    };
-
-    questionCount.value = "all";
-
-    selectedQuestions = buildTestQuestions();
-
-    if (selectedQuestions.length > 0) {
-      currentIndex = 0;
-      answers = {};
-      visitedQuestions = new Set();
-      reviewQuestions = new Set();
-      submitted = false;
-
-      remainingSeconds = selectedTest.duration * 60;
-
-      setupScreen.classList.add("hidden");
-      cbtScreen.classList.remove("hidden");
-      resultScreen.classList.add("hidden");
-
-      testTitle.textContent =
-        "PDF Imported CBT — " + selectedQuestions.length + " Questions";
-
-      renderQuestion();
-      renderPalette();
-      startTimer();
-
-      /* Stop the old auto-click patch from restarting Test 180 */
-      sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
-
-      console.log(
-        "🚀 PDF CBT DIRECT START:",
-        selectedQuestions.length,
-        "questions"
-      );
-    }
-  } catch (e) {
-    console.error("❌ PDF direct CBT start failed:", e);
-  }
-}
-
-
-/* =====================================================
    INITIAL SETUP
 ===================================================== */
 
@@ -3736,7 +3680,7 @@ console.log(
 
   console.log(
     "📚 Raw Test 180:",
-    count
+    rawCount
   );
 
   console.log(
@@ -3796,73 +3740,140 @@ console.log(
 
 </script>
 
-</body>
-
-</html>
 
 <script>
 /* =====================================================
-   RANKER PRO — PDF CBT FINAL START FIX
-   Runs AFTER cbt.html initialization
+   RANKER PRO — PDF CBT FINAL BOOTSTRAP
 ===================================================== */
 (function () {
-  function startPdfCBT() {
+
+  function bootPDF() {
+
     try {
-      if (sessionStorage.getItem("CBT_ACTIVE_SOURCE") !== "PDF") {
+
+      if (
+        sessionStorage.getItem("CBT_ACTIVE_SOURCE") !== "PDF"
+      ) {
         return;
       }
 
-      const raw = sessionStorage.getItem("CBT_ACTIVE_QUESTIONS") || "[]";
-      const questions = JSON.parse(raw);
+      const raw =
+        sessionStorage.getItem(
+          "CBT_ACTIVE_QUESTIONS"
+        ) || "[]";
 
-      if (!Array.isArray(questions) || questions.length === 0) {
-        console.warn("PDF CBT: no active questions");
+      const source =
+        JSON.parse(raw);
+
+      if (
+        !Array.isArray(source) ||
+        source.length === 0
+      ) {
+        console.warn(
+          "PDF CBT: no imported questions found"
+        );
         return;
       }
 
-      const testSelect = document.getElementById("testSelect");
-      const startButton = document.getElementById("startButton");
+      selectedQuestions =
+        source
+          .map(function (q, i) {
+            return normalizeQuestion(q, i);
+          })
+          .filter(function (q) {
+            return (
+              q &&
+              q.text &&
+              Array.isArray(q.options) &&
+              q.options.length === 4
+            );
+          });
 
-      if (!testSelect || !startButton) {
-        setTimeout(startPdfCBT, 300);
+      if (selectedQuestions.length === 0) {
+        console.warn(
+          "PDF CBT: no valid questions after normalization"
+        );
         return;
       }
 
-      /* Let the EXISTING test-selection handler initialize selectedTest */
-      if (testSelect.value !== "test180") {
-        testSelect.value = "test180";
-        testSelect.dispatchEvent(
-          new Event("change", { bubbles: true })
-        );
-      } else {
-        testSelect.dispatchEvent(
-          new Event("change", { bubbles: true })
-        );
-      }
+      selectedTest = {
+        id: "pdf-import",
+        title:
+          "PDF Imported CBT",
+        duration: 180,
+        questionIds:
+          selectedQuestions.map(function (q) {
+            return q.id;
+          })
+      };
 
-      /* Existing start handler will now use PDF mode */
-      setTimeout(function () {
-        if (sessionStorage.getItem("CBT_ACTIVE_SOURCE") !== "PDF") {
-          return;
-        }
+      questionCount.value = "all";
 
-        startButton.disabled = false;
-        startButton.click();
+      currentIndex = 0;
+      answers = {};
+      visitedQuestions = new Set();
+      reviewQuestions = new Set();
+      submitted = false;
 
-        console.log(
-          "🚀 PDF CBT FINAL START:",
-          questions.length,
-          "questions"
-        );
-      }, 700);
+      remainingSeconds =
+        selectedTest.duration * 60;
 
-    } catch (e) {
-      console.error("PDF CBT FINAL START ERROR:", e);
+      setupScreen.classList.add(
+        "hidden"
+      );
+
+      resultScreen.classList.add(
+        "hidden"
+      );
+
+      cbtScreen.classList.remove(
+        "hidden"
+      );
+
+      testTitle.textContent =
+        "PDF Imported CBT — " +
+        selectedQuestions.length +
+        " Questions";
+
+      renderQuestion();
+      renderPalette();
+      startTimer();
+
+      console.log(
+        "🚀 PDF CBT STARTED:",
+        selectedQuestions.length,
+        "questions"
+      );
+
+      /*
+       * Keep source until test finishes.
+       * Do NOT remove CBT_ACTIVE_SOURCE here.
+       */
+
+    } catch (error) {
+
+      console.error(
+        "❌ PDF CBT bootstrap failed:",
+        error
+      );
+
     }
+
   }
 
-  window.addEventListener("load", function () {
-    setTimeout(startPdfCBT, 800);
-  });
+  window.addEventListener(
+    "load",
+    function () {
+      setTimeout(
+        bootPDF,
+        300
+      );
+    }
+  );
+
 })();
 </script>
+
+</body>
+
+</html>
