@@ -838,7 +838,7 @@
      TEST180 QUESTION BANK MUST BE LOADED FIRST
 ===================================================== -->
 
-<script src="./test180-questions.js"></script>
+<script src="./test180-questions.js?v=180"></script>
 
 <script>
   /* =====================================================
@@ -921,28 +921,6 @@ function normalizeQuestion(
 
   let correctAnswer =
     question.correctAnswer;
-
-
-  /*
-   * Some PDF/HTML converters store the answer as
-   * 1, 2, 3 or 4. Convert that to option text.
-   */
-
-  if (
-    (
-      correctAnswer === undefined ||
-      correctAnswer === null ||
-      correctAnswer === ""
-    ) &&
-    Number.isInteger(question.answer) &&
-    question.answer >= 1 &&
-    question.answer <= questionOptions.length
-  ) {
-
-    correctAnswer =
-      questionOptions[question.answer - 1];
-
-  }
 
 
   /*
@@ -1072,7 +1050,6 @@ function normalizeQuestion(
 
     source:
       question.source ||
-      window.CBT_IMPORTED_SOURCE ||
       "Topper Test Pro — Test 180"
 
   };
@@ -1081,72 +1058,39 @@ function normalizeQuestion(
 
 
 /* =====================================================
-   BUILD NORMALIZED 180 BANK
+   BUILD ISOLATED CANONICAL TEST 180 BANK
 ===================================================== */
 
-/* =====================================================
-   LOAD IMPORTED / SAVED CBT SOURCE
-===================================================== */
+/*
+ * Test 180 is permanently isolated from imported PDF questions.
+ * Only Q1-Q180 from test180-questions.js are eligible here.
+ */
+const TEST180_CANONICAL_SOURCE =
+  Array.isArray(window.TEST180_QUESTIONS)
+    ? window.TEST180_QUESTIONS
+        .filter(function(question) {
+          const n = Number(
+            question && question.questionNumber
+          );
 
-(function loadCBTSource() {
-
-  try {
-
-    const activeQuestions =
-      sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
-
-    const savedTest =
-      sessionStorage.getItem("CBT_ACTIVE_TEST");
-
-    let questions = [];
-
-    if (activeQuestions) {
-      const parsed = JSON.parse(activeQuestions);
-      if (Array.isArray(parsed)) questions = parsed;
-    }
-
-    if (questions.length === 0 && savedTest) {
-      const parsedTest = JSON.parse(savedTest);
-      if (Array.isArray(parsedTest.questions)) questions = parsedTest.questions;
-    }
-
-    // Direct PDF → CBT bridge. pdf.html stores the latest imported pool here.
-    if (questions.length === 0) {
-      const pdfQuestions = localStorage.getItem("pdfCbtQuestions");
-      if (pdfQuestions) {
-        const parsedPdf = JSON.parse(pdfQuestions);
-        if (Array.isArray(parsedPdf) && parsedPdf.length > 0) {
-          questions = parsedPdf;
-          window.CBT_IMPORTED_SOURCE = "PDF Import";
-          console.log("📄 Direct PDF → CBT questions loaded:", questions.length);
-        }
-      }
-    }
-
-    if (questions.length === 0) {
-      const saved180 = localStorage.getItem("TOPPER_TEST_180");
-      if (saved180) {
-        const parsed180 = JSON.parse(saved180);
-        if (Array.isArray(parsed180.questions)) questions = parsed180.questions;
-      }
-    }
-
-    if (questions.length > 0) {
-      window.TEST180_QUESTIONS = questions;
-      window.CBT_IMPORTED_SOURCE =
-        sessionStorage.getItem("CBT_ACTIVE_SOURCE") || "PDF";
-      console.log("📥 Imported CBT source loaded:", questions.length);
-    }
-
-  } catch (error) {
-    console.warn("⚠️ Could not load imported CBT source:", error);
-  }
-
-})();
+          return (
+            Number.isInteger(n) &&
+            n >= 1 &&
+            n <= 180
+          );
+        })
+        .sort(function(a, b) {
+          return (
+            Number(a.questionNumber) -
+            Number(b.questionNumber)
+          );
+        })
+        .slice(0, 180)
+    : [];
 
 
 const NORMALIZED_QUESTION_BANK =
-  window.TEST180_QUESTIONS
+  TEST180_CANONICAL_SOURCE
     .map(
       function(
         question,
@@ -1169,7 +1113,8 @@ const NORMALIZED_QUESTION_BANK =
           Array.isArray(
             question.options
           ) &&
-          question.options.length >= 2
+          question.options.length === 4 &&
+          question.correctAnswer
         );
 
       }
@@ -1181,8 +1126,13 @@ const NORMALIZED_QUESTION_BANK =
 ===================================================== */
 
 const ACTIVE_QUESTION_BANK =
-  NORMALIZED_QUESTION_BANK;
+  NORMALIZED_QUESTION_BANK.slice(0, 180);
 
+
+console.log(
+  "🔒 TEST 180 CANONICAL QUESTIONS:",
+  TEST180_CANONICAL_SOURCE.length
+);
 
 console.log(
   "✅ TEST 180 VALID QUESTIONS:",
@@ -1193,6 +1143,7 @@ console.log(
 /* =====================================================
    TEST 180 VALIDATION
 ===================================================== */
+
 
 if (
   ACTIVE_QUESTION_BANK.length === 180
@@ -1225,9 +1176,7 @@ const TESTS = [
       "test180",
 
     title:
-      window.CBT_IMPORTED_SOURCE === "PDF Import"
-        ? "Imported PDF Test"
-        : "Topper Test Pro — 180 Question Starter Test",
+      "Topper Test Pro — 180 Question Starter Test",
 
     duration:
       180,
@@ -1316,6 +1265,15 @@ else {
 
 window.TOPPER_TEST_180 =
   ACTIVE_QUESTION_BANK;
+
+window.TOPPER_TEST_180_COUNT =
+  ACTIVE_QUESTION_BANK.length;
+
+console.log(
+  "🔒 TEST 180 ISOLATED:",
+  ACTIVE_QUESTION_BANK.length,
+  "questions"
+);
 
 window.TOPPER_TESTS =
   TESTS;
@@ -3645,11 +3603,18 @@ console.log(
 
 (function() {
 
-  const count =
+  const rawCount =
     Array.isArray(
       window.TEST180_QUESTIONS
     )
       ? window.TEST180_QUESTIONS.length
+      : 0;
+
+  const canonicalCount =
+    Array.isArray(
+      TEST180_CANONICAL_SOURCE
+    )
+      ? TEST180_CANONICAL_SOURCE.length
       : 0;
 
 
