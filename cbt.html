@@ -3739,6 +3739,6 @@ console.log(
 
 </script>
 
-</body>
+<script>(function(){function f(){try{if(sessionStorage.getItem("CBT_ACTIVE_SOURCE")!=="PDF")return;var q=JSON.parse(sessionStorage.getItem("CBT_ACTIVE_QUESTIONS")||"[]");if(!q.length)return;var z=document.getElementById("testSelect"),b=document.getElementById("startButton");if(z&&!z.value){z.value="test180";z.dispatchEvent(new Event("change",{bubbles:true}))}if(b&&!b.disabled){b.click();return}setTimeout(f,300)}catch(e){console.error(e)}}setTimeout(f,500)})();</script></body>
 
 </html>
