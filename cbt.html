@@ -1660,6 +1660,23 @@ function shuffleQuestions(
 
 function buildTestQuestions() {
 
+  if (
+    typeof CBT_PDF_MODE !== "undefined" &&
+    CBT_PDF_MODE &&
+    Array.isArray(CBT_PDF_QUESTIONS) &&
+    CBT_PDF_QUESTIONS.length
+  ) {
+    return CBT_PDF_QUESTIONS
+      .map(function(question, index) {
+        return normalizeQuestion(question, index);
+      })
+      .filter(function(question) {
+        return Boolean(question);
+      });
+  }
+
+
+
   if (!selectedTest) {
 
     return [];
