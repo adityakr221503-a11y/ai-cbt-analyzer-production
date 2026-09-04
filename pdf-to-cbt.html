@@ -2007,8 +2007,9 @@ function openCBTWithPDFQuestions() {
   );
 
 
+  localStorage.setItem("CBT_ACTIVE_SOURCE", "PDF");
   window.location.href =
-    "./cbt.html";
+    "./cbt.html?pdf=1&cb=" + Date.now();
 
 }
 
