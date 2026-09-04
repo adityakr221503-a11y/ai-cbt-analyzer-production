@@ -1,3 +1,30 @@
+const RB_QUESTION_BANK_KEY = "rankBoosterQuestionBankV1";
+
+function loadRBQuestionBank() {
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem(RB_QUESTION_BANK_KEY) || "[]"
+        );
+        return Array.isArray(saved) ? saved : [];
+    } catch (e) {
+        console.warn("Rank Booster: failed to load question bank.", e);
+        return [];
+    }
+}
+
+function saveRBQuestionBank(questions) {
+    try {
+        localStorage.setItem(
+            RB_QUESTION_BANK_KEY,
+            JSON.stringify(questions)
+        );
+        return true;
+    } catch (e) {
+        console.error("Rank Booster: failed to save question bank.", e);
+        return false;
+    }
+}
+
 /* =====================================================
    RANK BOOSTER — QUESTION BANK v1
    ===================================================== */
@@ -6,7 +33,7 @@ const RankBoosterQuestionBank = {
 
     version: "1.0.0",
 
-    questions: [],
+    questions: loadRBQuestionBank(),
 
     add(question) {
 
@@ -27,6 +54,7 @@ const RankBoosterQuestionBank = {
         }
 
         this.questions.push(question);
+        saveRBQuestionBank(this.questions);
 
         return true;
     },
