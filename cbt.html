@@ -1108,6 +1108,11 @@ const CBT_PDF_QUESTIONS =
 
 
 
+const TEST180_CANONICAL_SOURCE =
+  Array.isArray(window.TEST180_QUESTIONS)
+    ? window.TEST180_QUESTIONS.slice(0, 180)
+    : [];
+
 const ACTIVE_QUESTION_SOURCE =
   CBT_PDF_MODE
     ? CBT_PDF_QUESTIONS
