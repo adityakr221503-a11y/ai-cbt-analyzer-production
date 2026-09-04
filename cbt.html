@@ -3868,8 +3868,7 @@ console.log(
 
   
 /* =====================================================
-   RANK_BOOSTER_CBT_BRIDGE
-   Loads questions selected by question-bank.html
+   RANKERS TEST SERIES → CBT BRIDGE
 ===================================================== */
 (function () {
   try {
@@ -3881,30 +3880,87 @@ console.log(
     if (!Array.isArray(selected) || !selected.length) return;
 
     console.log(
-      "🏆 Rank Booster → CBT:",
+      "🏆 Rankers Test Series → CBT:",
       selected.length,
       "questions"
     );
 
-    /*
-     * Preserve the selected bank for the existing CBT
-     * bootstrap to consume.
-     */
-    localStorage.setItem(
-      "pdfCbtQuestions",
+    sessionStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "Rankers Test Series"
+    );
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
       JSON.stringify(selected)
     );
 
-    localStorage.setItem(
-      "CBT_ACTIVE_SOURCE",
-      "Rank Booster"
-    );
+    window.RANKERS_TEST_SERIES_CBT = true;
 
-    window.RANK_BOOSTER_CBT = true;
+    selectedQuestions =
+      selected
+        .map(function (q, i) {
+          return normalizeQuestion(q, i);
+        })
+        .filter(function (q) {
+          return (
+            q &&
+            q.text &&
+            Array.isArray(q.options) &&
+            q.options.length === 4
+          );
+        });
+
+    if (!selectedQuestions.length) {
+      console.warn(
+        "🏆 Rankers Test Series: no valid questions after normalization"
+      );
+      return;
+    }
+
+    selectedTest = {
+      id: "rankers-test-series",
+      title: "Rankers Test Series",
+      duration: 180,
+      questionIds:
+        selectedQuestions.map(function (q) {
+          return q.id;
+        })
+    };
+
+    questionCount.value = "all";
+
+    currentIndex = 0;
+    answers = {};
+    visitedQuestions = new Set();
+    reviewQuestions = new Set();
+    submitted = false;
+
+    remainingSeconds =
+      selectedTest.duration * 60;
+
+    setupScreen.classList.add("hidden");
+    resultScreen.classList.add("hidden");
+    cbtScreen.classList.remove("hidden");
+
+    testTitle.textContent =
+      "Rankers Test Series — " +
+      selectedQuestions.length +
+      " Questions";
+
+    renderQuestion();
+    renderPalette();
+    startTimer();
+
+    console.log(
+      "🚀 RANKERS TEST SERIES STARTED:",
+      selectedQuestions.length,
+      "questions"
+    );
 
   } catch (e) {
     console.error(
-      "❌ Rank Booster CBT bridge failed:",
+      "❌ Rankers Test Series CBT bridge failed:",
       e
     );
   }
