@@ -904,12 +904,9 @@ function generateAdaptiveRankBoosterTest(
         chapters.length > 0
     ) {
 
-        pool = pool.filter(
-            q =>
-                chapters.includes
-                 q.chapter
-                )
-        );
+          pool = pool.filter(
+              q => chapters.includes(q.chapter)
+          );
 
     }
 
