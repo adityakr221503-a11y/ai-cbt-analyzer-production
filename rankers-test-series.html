@@ -62,6 +62,7 @@ button{cursor:pointer;font-weight:700;background:#172033;color:#fff;border:0}
 <script src="rank-booster/question-bank.js"></script>
 <script src="rank-booster/import-test180.js?v=2eca0b1"></script>
 <button id="importTest180Btn" type="button" onclick="importTest180Questions().then(r => alert(JSON.stringify(r)))">IMPORT TEST 180</button>
+<button type="button" onclick="alert("BANK="+RankBoosterQuestionBank.getAll().length+" ADD="+(typeof window.addRankBoosterQuestion))">CHECK BANK COUNT</button>
 <script>
 (function(){
  const $=id=>document.getElementById(id);
