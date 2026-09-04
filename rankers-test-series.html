@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rankers Test Series</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#f5f7fb;color:#172033}
+.wrap{max-width:1000px;margin:auto;padding:22px}.hero,.card{background:#fff;border:1px solid #e4e8f0;border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 5px 18px #00000009}
+h1{margin:0 0 8px}.muted{color:#687386}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+button,select{width:100%;padding:12px;border-radius:11px;border:1px solid #d8deea;background:#fff;font-size:15px}
+button{cursor:pointer;font-weight:700;background:#172033;color:#fff;border:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{padding:15px;border-radius:14px;background:#f1f4f9}.num{font-size:25px;font-weight:800}
+.test{padding:16px;border:1px solid #e3e7ef;border-radius:14px}.test h3{margin:0 0 6px}
+@media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<h1>Rankers Test Series</h1>
+<div class="muted">Coverage-first tests using the existing Rank Booster question bank. No fixed question count.</div>
+</section>
+<section class="card">
+<div class="stats">
+<div class="stat"><div class="num" id="qCount">0</div><div class="muted">Bank questions</div></div>
+<div class="stat"><div class="num" id="attempts">0</div><div class="muted">Attempts</div></div>
+<div class="stat"><div class="num" id="mastered">0</div><div class="muted">Mastered</div></div>
+<div class="stat"><div class="num" id="subjects">0</div><div class="muted">Subjects</div></div>
+</div>
+</section>
+<section class="card">
+<h2>Build a Ranker Test</h2>
+<div class="grid">
+<div><label>Subject</label><select id="subject"><option value="">All subjects</option></select></div>
+<div><label>Chapter</label><select id="chapter"><option value="">All chapters</option></select></div>
+<div><label>Test type</label><select id="type">
+<option value="chapter">Chapter / Topic Mastery</option>
+<option value="multi">Multi-Chapter Ranker</option>
+<option value="full">Full Syllabus Ranker</option>
+<option value="challenge">Ranker Challenge</option>
+</select></div>
+<div><label>Selection</label><select id="mode">
+<option value="new">Prioritize new patterns</option>
+<option value="weak">Prioritize weak topics</option>
+<option value="mixed">Balanced coverage</option>
+</select></div>
+</div><br>
+<button id="start">Start Ranker Test</button>
+<p id="status" class="muted"></p>
+</section>
+<section class="card">
+<h2>Test Series Rules</h2>
+<div class="grid">
+<div class="test"><h3>Coverage First</h3><div class="muted">Concept and pattern coverage comes before arbitrary question counts.</div></div>
+<div class="test"><h3>Adaptive</h3><div class="muted">Weak and unseen areas can be prioritized from attempt history.</div></div>
+<div class="test"><h3>Mastery</h3><div class="muted">Mistakes flow into retry and mastery tracking through the existing CBT system.</div></div>
+<div class="test"><h3>Source Separation</h3><div class="muted">Ranker tests remain distinguishable from imported PDF tests.</div></div>
+</div>
+</section>
+</div>
+<script src="rank-booster/question-bank.js"></script>
+<script>
+(function(){
+ const $=id=>document.getElementById(id);
+ let bank=[];
+ try{if(window.RankBoosterQuestionBank&&typeof RankBoosterQuestionBank.getAll==="function")bank=RankBoosterQuestionBank.getAll()||[];}catch(e){console.error(e)}
+ let attempts=[];let mastered=[];
+ try{attempts=JSON.parse(localStorage.getItem("rankBoosterAttemptHistory")||"[]")}catch(e){}
+ try{mastered=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]")}catch(e){}
+ $("qCount").textContent=bank.length;$("attempts").textContent=Array.isArray(attempts)?attempts.length:0;
+ $("mastered").textContent=Array.isArray(mastered)?mastered.length:0;
+ $("subjects").textContent=new Set(bank.map(q=>q.subject).filter(Boolean)).size;
+ const subjects=[...new Set(bank.map(q=>q.subject).filter(Boolean))].sort();
+ subjects.forEach(x=>$("subject").insertAdjacentHTML("beforeend","<option>"+esc(x)+"</option>"));
+ function updateChapters(){const s=$("subject").value;const vals=[...new Set(bank.filter(q=>!s||q.subject===s).map(q=>q.chapter).filter(Boolean))].sort();$("chapter").innerHTML='<option value="">All chapters</option>'+vals.map(x=>"<option>"+esc(x)+"</option>").join("")}
+ $("subject").onchange=updateChapters;updateChapters();
+ $("start").onclick=function(){
+   let pool=bank.filter(q=>(!$("subject").value||q.subject===$("subject").value)&&(!$("chapter").value||q.chapter===$("chapter").value));
+   if(!pool.length){$("status").textContent="No verified Ranker questions are loaded for this selection yet.";return}
+   const mode=$("mode").value;const attemptedIds=new Set((Array.isArray(attempts)?attempts:[]).flatMap(a=>Array.isArray(a.questionIds)?a.questionIds:[]));
+   if(mode==="new"){const fresh=pool.filter(q=>!attemptedIds.has(q.id));if(fresh.length)pool=fresh}
+   if(mode==="weak"){const weak=new Set((Array.isArray(attempts)?attempts:[]).flatMap(a=>Array.isArray(a.weakTopics)?a.weakTopics:[]));const wp=pool.filter(q=>weak.has(q.topic));if(wp.length)pool=wp}
+   pool.sort(()=>Math.random()-.5);
+   localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
+   localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
+   $("status").textContent=pool.length+" eligible questions selected. Opening CBT...";
+   setTimeout(()=>location.href="cbt.html?source=rankers-test-series",250);
+ };
+ function esc(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+})();
+</script>
+</body></html>
