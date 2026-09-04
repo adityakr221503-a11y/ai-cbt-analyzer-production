@@ -3866,7 +3866,51 @@ console.log(
 
   }
 
-  window.addEventListener(
+  
+/* =====================================================
+   RANK_BOOSTER_CBT_BRIDGE
+   Loads questions selected by question-bank.html
+===================================================== */
+(function () {
+  try {
+    const raw = localStorage.getItem("rbSelectedQuestions");
+    if (!raw) return;
+
+    const selected = JSON.parse(raw);
+
+    if (!Array.isArray(selected) || !selected.length) return;
+
+    console.log(
+      "🏆 Rank Booster → CBT:",
+      selected.length,
+      "questions"
+    );
+
+    /*
+     * Preserve the selected bank for the existing CBT
+     * bootstrap to consume.
+     */
+    localStorage.setItem(
+      "pdfCbtQuestions",
+      JSON.stringify(selected)
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "Rank Booster"
+    );
+
+    window.RANK_BOOSTER_CBT = true;
+
+  } catch (e) {
+    console.error(
+      "❌ Rank Booster CBT bridge failed:",
+      e
+    );
+  }
+})();
+
+window.addEventListener(
     "load",
     function () {
       setTimeout(
