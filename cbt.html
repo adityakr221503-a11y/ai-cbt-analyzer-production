@@ -940,6 +940,7 @@ function normalizeQuestion(
   ) {
 
     correctAnswer =
+      question.answer ||
       questionOptions[
         question.correctIndex
       ];
