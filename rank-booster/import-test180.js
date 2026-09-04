@@ -61,7 +61,7 @@
         return;
       }
 
-      if (typeof window.addRankBoosterQuestion !== "function") {
+      if (typeof window.addRankBoosterQuestion !== "function") { console.error("IMPORT DEBUG: addRankBoosterQuestion missing");
         rejected++;
         return;
       }
