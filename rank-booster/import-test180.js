@@ -3,7 +3,7 @@
     let questions;
 
     try {
-      const response = await fetch("../test180-questions.json");
+      const response = await fetch("./test180-questions.json");
 
       if (!response.ok) {
         throw new Error("HTTP " + response.status);
