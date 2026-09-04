@@ -3,6 +3,7 @@
 <script src="./test180-questions.js"></script>
 <head>
 <script src="./vendor/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -435,6 +436,13 @@
 
     </div>
 
+  <section class="card">
+    <h2>👀 Question Preview</h2>
+    <div id="questionPreview" class="subtitle">
+      No questions in the PDF pool yet.
+    </div>
+  </section>
+
   </section>
 
 
@@ -665,6 +673,29 @@ function updatePoolStats() {
 
   biologyQuestions.textContent =
     biology;
+  const preview = document.getElementById("questionPreview");
+  if (preview) {
+    if (pool.length === 0) {
+      preview.textContent = "No questions in the PDF pool yet.";
+    } else {
+      preview.innerHTML = pool.slice(0, 5).map(function(q, i) {
+        return (
+          "<div style=\"margin:10px 0;padding:12px;border:1px solid #e2e8f0;border-radius:10px\">" +
+          "<strong>Q" + (i + 1) + ".</strong> " +
+          String(q.text).replace(/</g, "&lt;") +
+          "<br><small>" +
+          q.options.map(function(o, j) {
+            return String.fromCharCode(65 + j) + ") " +
+              String(o).replace(/</g, "&lt;");
+          }).join(" &nbsp; ") +
+          "</small></div>"
+        );
+      }).join("") +
+      (pool.length > 5
+        ? "<div>Showing first 5 of " + pool.length + " questions.</div>"
+        : "");
+    }
+  }
 
 }
 
@@ -731,139 +762,164 @@ console.log(
 /* =====================================================
    PDF TEXT EXTRACTION
 ===================================================== */
+
 async function extractPDFText(file) {
 
   if (!file) {
-    throw new Error("No PDF file selected.");
+    throw new Error(
+      "No PDF file selected."
+    );
   }
 
-  if (!window.pdfjsLib) {
-    throw new Error("PDF.js is not loaded.");
+
+  if (
+    typeof window.pdfjsLib ===
+    "undefined"
+  ) {
+    throw new Error(
+      "Local PDF.js failed to load."
+    );
   }
 
-  const buffer = await file.arrayBuffer();
 
-  const pdf = await pdfjsLib.getDocument({
-    data: buffer
-  }).promise;
+  const arrayBuffer =
+    await file.arrayBuffer();
+
+
+  const pdf =
+    await pdfjsLib.getDocument({
+      data: arrayBuffer
+    }).promise;
+
 
   let fullText = "";
 
-  // 1️⃣ Normal PDF text extraction
-  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
 
-    statusBox.textContent =
-      `📖 Reading PDF...\nPage ${pageNumber} of ${pdf.numPages}`;
+  for (
+    let pageNumber = 1;
+    pageNumber <= pdf.numPages;
+    pageNumber++
+  ) {
 
     const page =
-      await pdf.getPage(pageNumber);
+      await pdf.getPage(
+        pageNumber
+      );
+
 
     const content =
       await page.getTextContent();
 
+
     const pageText =
       content.items
-        .map(item => String(item.str || ""))
-        .filter(text => text.trim())
+        .map(
+          function(item) {
+            return item.str;
+          }
+        )
         .join(" ");
 
-    fullText += "\n" + pageText + "\n";
-  }
 
-  const cleanedText =
-    fullText
-      .replace(/\s+/g, " ")
-      .trim();
-
-  // 2️⃣ Text-based PDF successful
-  if (cleanedText.length >= 80) {
-    return fullText.trim();
-  }
-
-  // 3️⃣ OCR fallback
-  if (!window.Tesseract) {
-    throw new Error(
-      "No readable text was found in this PDF. OCR engine is not loaded."
-    );
-  }
-
-  statusBox.textContent =
-    "🔎 Scanned PDF detected.\nStarting OCR...";
-
-  const worker =
-    await Tesseract.createWorker("eng");
-
-  try {
-
-    let ocrText = "";
-
-    for (
-      let pageNumber = 1;
-      pageNumber <= pdf.numPages;
-      pageNumber++
-    ) {
-
-      statusBox.textContent =
-        `🔎 OCR processing...\nPage ${pageNumber} of ${pdf.numPages}`;
-
-      const page =
-        await pdf.getPage(pageNumber);
-
-      const viewport =
-        page.getViewport({
-          scale: 2
-        });
-
-      const canvas =
-        document.createElement("canvas");
-
-      const ctx =
-        canvas.getContext("2d", {
-          willReadFrequently: true
-        });
-
-      canvas.width =
-        Math.ceil(viewport.width);
-
-      canvas.height =
-        Math.ceil(viewport.height);
-
-      await page.render({
-        canvasContext: ctx,
-        viewport: viewport
-      }).promise;
-
-      const result =
-        await worker.recognize(canvas);
-
-      ocrText +=
-        "\n" +
-        String(result?.data?.text || "") +
-        "\n";
-
-      canvas.width = 1;
-      canvas.height = 1;
-    }
-
-    const cleanedOCR =
-      ocrText
-        .replace(/\s+/g, " ")
-        .trim();
-
-    if (cleanedOCR.length < 20) {
-      throw new Error(
-        "No readable text was found in this PDF."
-      );
-    }
-
-    return ocrText.trim();
-
-  } finally {
-
-    await worker.terminate();
+    fullText +=
+      "\n" +
+      pageText +
+      "\n";
 
   }
+
+
+  return fullText.trim();
+
 }
+
+
+/* =====================================================
+   CLEAN PDF TEXT
+===================================================== */
+
+function cleanPDFText(
+  text
+) {
+
+  if (!text) {
+    return "";
+  }
+
+
+  return String(text)
+
+    .replace(
+      /\r/g,
+      ""
+    )
+
+    .replace(
+      /[ \t]+/g,
+      " "
+    )
+
+    .replace(
+      /\n{3,}/g,
+      "\n\n"
+    )
+
+    .trim();
+
+}
+
+
+/* =====================================================
+   OPTION LETTER NORMALIZER
+===================================================== */
+
+function normalizeOptionLetter(
+  value
+) {
+
+  if (
+    value === undefined ||
+    value === null
+  ) {
+
+    return null;
+
+  }
+
+
+  const text =
+    String(value)
+      .trim()
+      .toUpperCase();
+
+
+  if (
+    /^[A-D]$/.test(text)
+  ) {
+
+    return (
+      text.charCodeAt(0) -
+      65
+    );
+
+  }
+
+
+  if (
+    /^[1-4]$/.test(text)
+  ) {
+
+    return (
+      Number(text) - 1
+    );
+
+  }
+
+
+  return null;
+
+}
+
 
 /* =====================================================
    GET CORRECT ANSWER
@@ -1175,8 +1231,8 @@ function addQuestionsToPool(
   questions
 ) {
 
-  // Every PDF import creates a completely fresh question pool.
-  const existing = [];
+  const existing =
+    getPDFQuestionPool();
 
 
   const existingIds =
@@ -1224,9 +1280,10 @@ function addQuestionsToPool(
   );
 
 
-  // New PDF replaces the previous PDF question pool.
   const updatedPool =
-    newQuestions;
+    existing.concat(
+      newQuestions
+    );
 
 
   savePDFQuestionPool(
@@ -1306,32 +1363,66 @@ function parseQuestionJSON(
 
 function parsePlainTextQuestions(text) {
   const questions = [];
-  const cleaned = cleanPDFText(text).replace(/
-/g, "
-").replace(/[ 	]+/g, " ").trim();
-  const blocks = cleaned.split(/(?=(?:^|
-)\s*\d+\s*[.)]\s*)/gm);
+  const cleaned = cleanPDFText(text)
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
-  blocks.forEach(function(block) {
-    block = block.trim();
-    const qm = block.match(/^\s*\d+\s*[.)]\s*([\s\S]*?)(?=\s+(?:A|B|C|D)\s*[.)]\s+)/i);
-    if (!qm) return;
+  if (!cleaned) return questions;
 
-    const questionText = qm[1].replace(/\s+/g, " ").trim();
-    const matches = [...block.matchAll(/(?:^|\s)([A-D])\s*[.)]\s+([\s\S]*?)(?=\s+(?:[A-D])\s*[.)]\s+|$)/gi)];
+  // IMPORTANT: PDF.js often returns a page as ONE continuous line.
+  // So question numbers must be detected anywhere, not only after \n.
+  const starts = [];
+  const qRe = /(?:^|\s)(?:Q(?:uestion)?\s*)?(\d{1,3})\s*[.)-]\s+/gi;
+  let m;
+  while ((m = qRe.exec(cleaned)) !== null) {
+    starts.push({
+      index: m.index + (m[0].startsWith(" ") ? 1 : 0),
+      contentStart: qRe.lastIndex,
+      number: Number(m[1])
+    });
+  }
 
-    const options = matches.map(function(m) {
-      return m[2].replace(/\s+/g, " ").trim();
-    }).filter(Boolean);
-
-    if (questionText.length >= 5 && options.length >= 2) {
-      questions.push({
-        text: questionText,
-        options: options,
-        subject: "Unknown",
-        difficulty: "Medium"
-      });
+  // Keep plausible question starts and remove repeated numbering noise.
+  const good = [];
+  let lastNumber = 0;
+  starts.forEach(function(x) {
+    if (x.number >= 1 && x.number <= 1000 &&
+        (good.length === 0 || x.number >= lastNumber)) {
+      good.push(x);
+      lastNumber = x.number;
     }
+  });
+
+  good.forEach(function(start, i) {
+    const end = i + 1 < good.length ? good[i + 1].index : cleaned.length;
+    const block = cleaned.slice(start.contentStart, end).trim();
+    if (!block) return;
+
+    // Supports A. A) A- and (A), through D.
+    const optRe = /(?:^|\s)(?:\(([A-D])\)|([A-D]))\s*[.)-]?\s+([\s\S]*?)(?=\s+(?:\([A-D]\)|[A-D])\s*[.)-]?\s+|\s+(?:Answer|Ans(?:wer)?|Correct\s*Answer)\s*[:.-]?\s*[A-D1-4]|\s*$)/gi;
+    const matches = [...block.matchAll(optRe)];
+    const options = matches.map(function(x) {
+      return x[3].replace(/\s+/g, " ").trim();
+    }).filter(Boolean).slice(0, 4);
+
+    if (options.length < 2 || !matches.length) return;
+
+    const questionText = block.slice(0, matches[0].index)
+      .replace(/\s+/g, " ")
+      .trim();
+    if (questionText.length < 5) return;
+
+    const ans = block.match(/(?:Answer|Ans(?:wer)?|Correct\s*Answer)\s*[:.-]?\s*([A-D1-4])/i);
+
+    questions.push({
+      id: "PDF-Q-" + Date.now() + "-" + i,
+      text: questionText,
+      options: options,
+      correctAnswer: ans ? ans[1].toUpperCase() : "",
+      subject: "Unknown",
+      difficulty: "Medium"
+    });
   });
 
   console.log("PDF parser detected:", questions.length);
@@ -1360,6 +1451,13 @@ async function convertSelectedPDF() {
   }
 
 
+  if (
+    !file.type.includes("pdf") &&
+    !file.name.toLowerCase().endsWith(".pdf")
+  ) {
+    throw new Error("Please select a valid PDF file.");
+  }
+
   const moduleName =
     moduleNameInput.value.trim() ||
     file.name;
@@ -1368,12 +1466,6 @@ async function convertSelectedPDF() {
   convertButton.disabled =
     true;
 
-  // Always start a fresh conversion for the newly selected PDF.
-  localStorage.removeItem(PDF_CBT_STORAGE_KEY);
-  sessionStorage.removeItem("CBT_ACTIVE_QUESTIONS");
-  sessionStorage.removeItem("CBT_ACTIVE_TEST");
-  sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
-  console.log("🧹 Cleared previous PDF pool and CBT session.");
 
   statusBox.textContent =
     "⏳ Reading PDF...\nPlease wait.";
@@ -1386,11 +1478,13 @@ async function convertSelectedPDF() {
         file
       );
 
+    console.log("📄 Extracted PDF text length:", pdfText.length);
+
 
     if (!pdfText) {
 
       throw new Error(
-        "No readable text was found in this PDF."
+        "No readable text was found in this PDF. If it is a scanned/image-only PDF, OCR is required."
       );
 
     }
@@ -1541,6 +1635,10 @@ clearPoolButton.addEventListener(
     statusBox.textContent =
       "🗑️ PDF question pool cleared.";
 
+    // Reset the native file input so the same PDF can be selected again.
+    pdfInput.value = "";
+    convertButton.disabled = true;
+
   }
 );
 
@@ -1586,10 +1684,10 @@ function getQuestionsForCBT() {
 
       return (
         question &&
-        typeof (question.text || question.question) === "string" &&
-        String(question.text || question.question).trim().length > 0 &&
+        typeof question.text === "string" &&
+        question.text.trim().length > 0 &&
         Array.isArray(question.options) &&
-        question.options.length === 4
+        question.options.length >= 2
       );
 
     }
@@ -2007,9 +2105,8 @@ function openCBTWithPDFQuestions() {
   );
 
 
-  localStorage.setItem("CBT_ACTIVE_SOURCE", "PDF");
   window.location.href =
-    "./cbt.html?pdf=1&cb=" + Date.now();
+    "./cbt.html";
 
 }
 
@@ -2131,10 +2228,10 @@ function getCurrentPDFPool() {
 
       return (
         question &&
-        typeof (question.text || question.question) === "string" &&
-        String(question.text || question.question).trim().length > 0 &&
+        typeof question.text === "string" &&
+        question.text.trim().length > 0 &&
         Array.isArray(question.options) &&
-        question.options.length === 4
+        question.options.length >= 2
       );
 
     }
@@ -2619,10 +2716,10 @@ function getCurrentPDFPool() {
 
     return (
       question &&
-      typeof (question.text || question.question) === "string" &&
+      typeof question.text === "string" &&
       question.text.trim() !== "" &&
       Array.isArray(question.options) &&
-      question.options.length === 4
+      question.options.length >= 2
     );
 
   });
@@ -3156,5 +3253,3 @@ console.log(
 );
 
 </script>
-
-<script src="ranker-strong-pdf-cbt-v2.js"></script>
