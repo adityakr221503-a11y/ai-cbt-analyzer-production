@@ -3143,6 +3143,23 @@ function showResult(
     resultData
   );
 
+  if (
+    typeof window.recordRBAttempt === "function" &&
+    selectedQuestions &&
+    selectedQuestions.length
+  ) {
+    selectedQuestions.forEach(function(question, index) {
+      const userAnswer = answers[index];
+      if (userAnswer !== undefined) {
+        window.recordRBAttempt(
+          question.id,
+          userAnswer,
+          question.answer || question.correctAnswer || ""
+        );
+      }
+    });
+  }
+
 
   /*
    * Hide CBT
