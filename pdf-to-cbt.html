@@ -1400,7 +1400,7 @@ function parsePlainTextQuestions(text) {
     if (!block) return;
 
     // Supports A. A) A- and (A), through D.
-    const optRe = /(?:^|\s)(?:\(([A-D])\)|([A-D]))\s*[.)-]?\s+([\s\S]*?)(?=\s+(?:\([A-D]\)|[A-D])\s*[.)-]?\s+|\s+(?:Answer|Ans(?:wer)?|Correct\s*Answer)\s*[:.-]?\s*[A-D1-4]|\s*$)/gi;
+    const optRe = /(?:^|\s)(?:\(([A-D1-4])\)|([A-D1-4]))\s*[.)-]?\s+([\s\S]*?)(?=\s+(?:\([A-D1-4]\)|[A-D1-4])\s*[.)-]?\s+|\s+(?:Answer|Ans(?:wer)?|Correct\s*Answer)\s*[:.-]?\s*[A-D1-4]|\s*$)/gi;
     const matches = [...block.matchAll(optRe)];
     const options = matches.map(function(x) {
       return x[3].replace(/\s+/g, " ").trim();
