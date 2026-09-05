@@ -3063,6 +3063,29 @@ function createResultData(
 
 
 /* =====================================================
+   SAVE RANKER MISTAKE TYPE
+===================================================== */
+
+window.setRBRMistakeType = function(questionId, mistakeType) {
+  try {
+    const key = "rankBoosterAttemptHistory";
+    const history = JSON.parse(localStorage.getItem(key) || "[]");
+
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].questionId === questionId) {
+        history[i].mistakeType = mistakeType;
+        break;
+      }
+    }
+
+    localStorage.setItem(key, JSON.stringify(history));
+  } catch (e) {
+    console.error("Mistake type save failed:", e);
+  }
+};
+
+
+/* =====================================================
    SAVE LAST RESULT
 ===================================================== */
 
@@ -3504,6 +3527,27 @@ function showResult(
             question.correctAnswer
           )}
         </div>
+
+        ${
+          userAnswer !== undefined &&
+          userAnswer !== question.correctAnswer
+            ? `
+              <div class="review-answer">
+                <strong>Mistake Reason:</strong>
+                <select
+                  onchange="window.setRBRMistakeType('${String(question.id || ("CBT-" + index)).replace("'", "\\'")}', this.value)"
+                >
+                  <option value="">Select reason</option>
+                  <option value="Concept Gap">Concept Gap</option>
+                  <option value="Calculation Error">Calculation Error</option>
+                  <option value="Misread Question">Misread Question</option>
+                  <option value="Guessing">Guessing</option>
+                  <option value="Time Pressure">Time Pressure</option>
+                </select>
+              </div>
+            `
+            : ""
+        }
 
         <div class="review-answer">
           <strong>Explanation:</strong>
