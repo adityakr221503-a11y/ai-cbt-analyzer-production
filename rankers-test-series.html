@@ -76,7 +76,7 @@ function checkBankCount() {
  let bank=[];
  try{if(window.RankBoosterQuestionBank&&typeof RankBoosterQuestionBank.getAll==="function")bank=RankBoosterQuestionBank.getAll()||[];}catch(e){console.error(e)}
  let attempts=[];let mastered=[];
- try{attempts=JSON.parse(localStorage.getItem("rankBoosterAttemptHistory") || "[]")}catch(e){}
+ try{attempts=typeof getRBHistory==="function"?getRBHistory():JSON.parse(localStorage.getItem("rankBoosterAttemptHistory") || "[]")}catch(e){attempts=[]}
  try{mastered=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]")}catch(e){}
  $("qCount").textContent=bank.length;$("attempts").textContent=Array.isArray(attempts)?attempts.length:0;
  $("mastered").textContent=Array.isArray(mastered)?mastered.length:0;
