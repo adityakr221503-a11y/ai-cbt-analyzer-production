@@ -3906,6 +3906,26 @@ function showResult(
     heading
   );
 
+  <!-- CBT_ORBIT_RESULT_POSITION_V1 -->
+  try {
+    const orbitV1 = document.getElementById("cbtOrbitResultPanel");
+    const orbitV2 = document.getElementById("cbtOrbitResultV2");
+
+    if (orbitV1) {
+      orbitV1.classList.remove("hidden");
+      resultContent.insertBefore(orbitV1, heading);
+    }
+
+    if (orbitV2) {
+      orbitV2.classList.remove("hidden");
+      resultContent.insertBefore(orbitV2, heading);
+    }
+
+    console.log("✅ ORBIT PANELS MOVED ABOVE QUESTION REVIEW");
+  } catch (e) {
+    console.warn("Orbit result positioning failed:", e);
+  }
+
 
   /* ===================================================
      QUESTION-BY-QUESTION REVIEW
