@@ -3076,6 +3076,32 @@ submitButton.addEventListener(
 function submitTest(
   automatic
 ) {
+  /* CBT_SPEED_START_MARKER_V1 */
+  try {
+    if (!sessionStorage.getItem("CBT_ACTIVE_STARTED_AT") &&
+        !localStorage.getItem("CBT_ACTIVE_STARTED_AT")) {
+      const activeStart =
+        Number(window.CBT_ACTIVE_STARTED_AT || 0);
+
+      if (activeStart) {
+        sessionStorage.setItem(
+          "CBT_ACTIVE_STARTED_AT",
+          String(activeStart)
+        );
+        localStorage.setItem(
+          "CBT_ACTIVE_STARTED_AT",
+          String(activeStart)
+        );
+      }
+    }
+  } catch (speedStartError) {
+    console.warn(
+      "CBT speed timestamp sync failed:",
+      speedStartError
+    );
+  }
+
+
 
   /*
    * Prevent duplicate submission
@@ -3428,6 +3454,12 @@ function showResult(
           localStorage.getItem("CBT_ACTIVE_STARTED_AT") ||
           0
         );
+
+      // Use the actual CBT start timestamp only.
+      if (!orbitStarted) {
+        orbitStarted =
+          Number(window.CBT_ACTIVE_STARTED_AT || 0);
+      }
 
       var orbitSpeed = 0;
 
@@ -4520,7 +4552,26 @@ console.log(
       "questions"
     );
 
-    sessionStorage.setItem(
+    /* CBT_SPEED_START_ON_TEST_V1 */
+try {
+  const speedStartNow = Date.now();
+  sessionStorage.setItem(
+    "CBT_ACTIVE_STARTED_AT",
+    String(speedStartNow)
+  );
+  localStorage.setItem(
+    "CBT_ACTIVE_STARTED_AT",
+    String(speedStartNow)
+  );
+  window.CBT_ACTIVE_STARTED_AT = speedStartNow;
+} catch (speedStartError) {
+  console.warn(
+    "CBT speed start timestamp failed:",
+    speedStartError
+  );
+}
+
+sessionStorage.setItem(
       "CBT_ACTIVE_SOURCE",
       "Rankers Test Series"
     );
