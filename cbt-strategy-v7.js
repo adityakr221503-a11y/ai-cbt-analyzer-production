@@ -579,6 +579,12 @@ function route(action,target){
 
 function mount(){
 
+ if(window.CBT_MAIN_DASHBOARD === true){
+  return;
+}
+
+
+
  if(
   document.getElementById(
    "cbtStrategyV7"

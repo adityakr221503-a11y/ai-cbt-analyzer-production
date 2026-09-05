@@ -359,6 +359,11 @@ function continueTesting(){
 --------------------------------------------------------- */
 
 function render(){
+ /* MAIN_DASHBOARD_MENTOR_GATE_FINAL */
+ if(window.CBT_MAIN_DASHBOARD === true){
+  return;
+ }
+
   if(!document.body)return;
 
   let box=document.getElementById(
