@@ -31,7 +31,7 @@ function n(v){
     .trim();
 }
 function esc(v){
-  return String(v==null?"")
+  return String(v==null?"":v)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;")
