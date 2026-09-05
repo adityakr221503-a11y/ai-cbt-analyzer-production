@@ -102,6 +102,8 @@
 
 </script>
 <script src="rank-booster/question-bank.js"></script>
+<script src="ranker-common-engine.js"></script>
+<script src="orbit-engine.js"></script>
 
   <meta charset="UTF-8">
 
@@ -598,7 +600,152 @@
 
     }
 
-  </style>
+
+/* CBT_ORBIT_RESULT_PANEL_V1 */
+.orbit-result-panel{
+  margin-top:20px;
+  padding:18px;
+  border:1px solid #dbeafe;
+  border-radius:16px;
+  background:linear-gradient(180deg,#eff6ff,#ffffff);
+}
+.orbit-result-panel h3{
+  margin:0 0 6px;
+  font-size:19px;
+}
+.orbit-result-sub{
+  color:#64748b;
+  font-size:13px;
+  margin-bottom:14px;
+}
+.orbit-result-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.orbit-result-card{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  padding:12px;
+}
+.orbit-result-card small{
+  display:block;
+  color:#64748b;
+  margin-bottom:4px;
+}
+.orbit-result-card strong{
+  font-size:19px;
+}
+.orbit-result-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:14px;
+}
+.orbit-result-actions button{
+  border:0;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:800;
+  background:#4f46e5;
+  color:#fff;
+}
+.orbit-result-actions button.secondary{
+  background:#e2e8f0;
+  color:#0f172a;
+}
+@media(max-width:700px){
+  .orbit-result-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+/* END CBT_ORBIT_RESULT_PANEL_V1 */
+
+
+/* CBT_ORBIT_RESULT_V2_CSS */
+
+.cbt-orbit-result-v2{
+  margin-top:20px;
+  padding:18px;
+  border-radius:16px;
+  border:1px solid #dbeafe;
+  background:#f8fbff;
+}
+
+.cbt-orbit-result-v2.hidden{
+  display:none !important;
+}
+
+.cbt-orbit-result-v2 h3{
+  margin:0 0 5px;
+  font-size:20px;
+}
+
+.cbt-orbit-result-v2 .orbit-subtitle{
+  color:#64748b;
+  font-size:13px;
+  margin-bottom:15px;
+}
+
+.cbt-orbit-grid-v2{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+
+.cbt-orbit-card-v2{
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  padding:13px;
+}
+
+.cbt-orbit-card-v2 span{
+  display:block;
+  color:#64748b;
+  font-size:12px;
+  margin-bottom:5px;
+}
+
+.cbt-orbit-card-v2 strong{
+  font-size:19px;
+}
+
+.cbt-orbit-actions-v2{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:15px;
+}
+
+.cbt-orbit-actions-v2 button{
+  border:0;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.cbt-orbit-primary-v2{
+  background:#4f46e5;
+  color:#fff;
+}
+
+.cbt-orbit-secondary-v2{
+  background:#e2e8f0;
+  color:#0f172a;
+}
+
+@media(max-width:700px){
+  .cbt-orbit-grid-v2{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+/* END CBT_ORBIT_RESULT_V2_CSS */
+
+</style>
 
 </head>
 
@@ -3052,7 +3199,7 @@ function submitTest(
 
   /* ===================================================
      CBT SCORING
-     
+
      Correct  = +4
      Wrong    = -1
      Skipped  =  0
@@ -4240,7 +4387,7 @@ console.log(
 
   }
 
-  
+
 /* =====================================================
    RANKERS TEST SERIES → CBT BRIDGE
 ===================================================== */
@@ -4543,6 +4690,437 @@ window.addEventListener(
 
 
 
+
+
+<!-- CBT_ORBIT_RESULT_PANEL_HTML_V1 -->
+<section id="cbtOrbitResultPanel"
+         class="orbit-result-panel hidden">
+  <h3>🌐 Orbit Test Analysis</h3>
+  <div class="orbit-result-sub">
+    Your test result is now connected to the common analysis engine.
+  </div>
+
+  <div class="orbit-result-grid">
+    <div class="orbit-result-card">
+      <small>Score</small>
+      <strong id="orbitResultScore">—</strong>
+    </div>
+
+    <div class="orbit-result-card">
+      <small>Accuracy</small>
+      <strong id="orbitResultAccuracy">—</strong>
+    </div>
+
+    <div class="orbit-result-card">
+      <small>Speed</small>
+      <strong id="orbitResultSpeed">—</strong>
+    </div>
+
+    <div class="orbit-result-card">
+      <small>Classification</small>
+      <strong id="orbitResultClass">—</strong>
+    </div>
+  </div>
+
+  <div class="orbit-result-actions">
+    <button type="button" onclick="openCBTOrbitAnalysis()">
+      🌐 Open Orbit Analysis
+    </button>
+
+    <button type="button"
+            class="secondary"
+            onclick="openCBTMistakeBank()">
+      🧠 Mistake Bank
+    </button>
+
+    <button type="button"
+            class="secondary"
+            onclick="openCBTRetry()">
+      🔁 Retry
+    </button>
+  </div>
+</section>
+<!-- END CBT_ORBIT_RESULT_PANEL_HTML_V1 -->
+
+
+/* CBT_ORBIT_SUBMIT_HOOK_V1 */
+(function(){
+
+  function getNumber(name){
+    try{
+      return Number(
+        window[name] ??
+        0
+      );
+    }catch(e){
+      return 0;
+    }
+  }
+
+  window.CBTOrbitAfterSubmit = function(){
+
+    try{
+
+      var correctCount =
+        Number(
+          typeof correct !== "undefined"
+            ? correct
+            : 0
+        );
+
+      var wrongCount =
+        Number(
+          typeof wrong !== "undefined"
+            ? wrong
+            : 0
+        );
+
+      var skippedCount =
+        Number(
+          typeof skipped !== "undefined"
+            ? skipped
+            : 0
+        );
+
+      var total =
+        correctCount +
+        wrongCount +
+        skippedCount;
+
+      var scoreValue =
+        Number(
+          typeof score !== "undefined"
+            ? score
+            : correctCount
+        );
+
+      var accuracyValue =
+        total > 0
+          ? (correctCount / total) * 100
+          : 0;
+
+      var speedValue = 0;
+
+      var started =
+        Number(
+          localStorage.getItem(
+            "CBT_ACTIVE_STARTED_AT"
+          ) || 0
+        );
+
+      if(started){
+        var minutes =
+          Math.max(
+            0.01,
+            (Date.now() - started) / 60000
+          );
+
+        speedValue =
+          total / minutes;
+      }
+
+      if(typeof window.renderCBTOrbitResult === "function"){
+        window.renderCBTOrbitResult({
+          score: scoreValue,
+          accuracy: accuracyValue,
+          speed: speedValue,
+          classification:
+            accuracyValue >= 90
+              ? "Strong"
+              : accuracyValue >= 75
+                ? "Good"
+                : accuracyValue >= 50
+                  ? "Needs Work"
+                  : "Recovery Required"
+        });
+      }
+
+    }catch(err){
+      console.warn(
+        "CBT Orbit result bridge:",
+        err
+      );
+    }
+
+  };
+
+})();
+
+
+<!-- CBT_ORBIT_RESULT_V2_HTML -->
+
+<section
+  id="cbtOrbitResultV2"
+  class="cbt-orbit-result-v2 hidden"
+>
+
+  <h3>🌐 Orbit Test Analysis</h3>
+
+  <div class="orbit-subtitle">
+    Your completed CBT has been connected to the common
+    performance, mistake, retry and mastery pipeline.
+  </div>
+
+  <div class="cbt-orbit-grid-v2">
+
+    <div class="cbt-orbit-card-v2">
+      <span>Score</span>
+      <strong id="cbtOrbitScoreV2">—</strong>
+    </div>
+
+    <div class="cbt-orbit-card-v2">
+      <span>Accuracy</span>
+      <strong id="cbtOrbitAccuracyV2">—</strong>
+    </div>
+
+    <div class="cbt-orbit-card-v2">
+      <span>Speed</span>
+      <strong id="cbtOrbitSpeedV2">—</strong>
+    </div>
+
+    <div class="cbt-orbit-card-v2">
+      <span>Result Signal</span>
+      <strong id="cbtOrbitSignalV2">—</strong>
+    </div>
+
+  </div>
+
+  <div class="cbt-orbit-actions-v2">
+
+    <button
+      type="button"
+      class="cbt-orbit-primary-v2"
+      onclick="window.location.href='./orbit-test-analysis.html'"
+    >
+      🌐 Full Orbit Analysis
+    </button>
+
+    <button
+      type="button"
+      class="cbt-orbit-secondary-v2"
+      onclick="window.location.href='./mistake.html'"
+    >
+      🧠 Mistake Bank
+    </button>
+
+    <button
+      type="button"
+      class="cbt-orbit-secondary-v2"
+      onclick="window.location.href='./retry.html'"
+    >
+      🔁 Retry
+    </button>
+
+  </div>
+
+</section>
+
+<!-- END CBT_ORBIT_RESULT_V2_HTML -->
+
+
+<script>
+/* CBT_ORBIT_SHOWRESULT_BRIDGE_V2 */
+
+(function(){
+
+  function number(v){
+    var n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function signal(accuracy){
+    if(accuracy >= 90) return "Strong";
+    if(accuracy >= 75) return "Good";
+    if(accuracy >= 50) return "Needs Work";
+    return "Recovery";
+  }
+
+  function render(correct, wrong, skipped, score){
+
+    var panel =
+      document.getElementById(
+        "cbtOrbitResultV2"
+      );
+
+    if(!panel) return;
+
+    correct = number(correct);
+    wrong = number(wrong);
+    skipped = number(skipped);
+    score = number(score);
+
+    var total =
+      correct +
+      wrong +
+      skipped;
+
+    var accuracy =
+      total > 0
+        ? (correct / total) * 100
+        : 0;
+
+    var speed = 0;
+
+    var started =
+      Number(
+        localStorage.getItem(
+          "CBT_ACTIVE_STARTED_AT"
+        ) || 0
+      );
+
+    if(started){
+
+      var elapsed =
+        Math.max(
+          0.01,
+          (Date.now() - started) / 60000
+        );
+
+      speed =
+        total / elapsed;
+    }
+
+    var scoreEl =
+      document.getElementById(
+        "cbtOrbitScoreV2"
+      );
+
+    var accuracyEl =
+      document.getElementById(
+        "cbtOrbitAccuracyV2"
+      );
+
+    var speedEl =
+      document.getElementById(
+        "cbtOrbitSpeedV2"
+      );
+
+    var signalEl =
+      document.getElementById(
+        "cbtOrbitSignalV2"
+      );
+
+    if(scoreEl)
+      scoreEl.textContent =
+        String(score);
+
+    if(accuracyEl)
+      accuracyEl.textContent =
+        accuracy.toFixed(1) + "%";
+
+    if(speedEl)
+      speedEl.textContent =
+        speed.toFixed(2) + " Q/min";
+
+    if(signalEl)
+      signalEl.textContent =
+        signal(accuracy);
+
+    panel.classList.remove("hidden");
+  }
+
+  function install(){
+
+    if(
+      typeof window.showResult !== "function"
+    ){
+      return false;
+    }
+
+    if(
+      window.showResult.__orbitResultV2
+    ){
+      return true;
+    }
+
+    var original =
+      window.showResult;
+
+    function wrappedShowResult(){
+
+      var args =
+        Array.prototype.slice.call(
+          arguments
+        );
+
+      var result;
+
+      try{
+        result =
+          original.apply(
+            this,
+            arguments
+          );
+      }finally{
+
+        try{
+
+          render(
+            args[0],
+            args[1],
+            args[2],
+            args[3]
+          );
+
+        }catch(error){
+
+          console.warn(
+            "Orbit result bridge:",
+            error
+          );
+
+        }
+
+      }
+
+      return result;
+    }
+
+    wrappedShowResult.__orbitResultV2 = true;
+    wrappedShowResult.__originalShowResult = original;
+
+    window.showResult =
+      wrappedShowResult;
+
+    return true;
+  }
+
+  function boot(){
+
+    if(install()) return;
+
+    var tries = 0;
+
+    var timer =
+      setInterval(function(){
+
+        tries++;
+
+        if(install() || tries >= 100){
+          clearInterval(timer);
+        }
+
+      },100);
+
+  }
+
+  if(
+    document.readyState === "loading"
+  ){
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot
+    );
+
+  }else{
+
+    boot();
+
+  }
+
+})();
+</script>
 
 </body>
 
