@@ -63,6 +63,24 @@
   }
 
   function getResult() {
+    try {
+      if (
+        window.RankerV11Lifecycle &&
+        typeof window.RankerV11Lifecycle.getCompletedResult ===
+          "function"
+      ) {
+        const completed =
+          window.RankerV11Lifecycle.getCompletedResult();
+
+        if (
+          completed &&
+          typeof completed === "object"
+        ) {
+          return completed;
+        }
+      }
+    } catch (_) {}
+
     const candidates = [
       read("cbtCoreResultV6", null),
       read("cbtCoreResultV5", null),
@@ -72,9 +90,21 @@
 
     for (const candidate of candidates) {
       if (Array.isArray(candidate)) {
-        const x = candidate[candidate.length - 1];
-        if (x && typeof x === "object") {
-          return x;
+        for (let i = candidate.length - 1; i >= 0; i--) {
+          const x = candidate[i];
+
+          if (
+            x &&
+            typeof x === "object" &&
+            (
+              x.submittedAt ||
+              x.completedAt ||
+              x.resultId ||
+              x.score != null
+            )
+          ) {
+            return x;
+          }
         }
       }
 
@@ -101,6 +131,34 @@
   ===================================================== */
 
   function authoritativeDurationSeconds(session) {
+    /* Prefer the real CBT countdown state.
+       cbt.html initializes remainingSeconds from selectedTest.duration. */
+    try {
+      if (
+        typeof selectedTest !== "undefined" &&
+        selectedTest &&
+        Number.isFinite(Number(selectedTest.duration)) &&
+        typeof remainingSeconds !== "undefined" &&
+        Number.isFinite(Number(remainingSeconds))
+      ) {
+        const total =
+          Number(selectedTest.duration) * 60;
+
+        const remaining =
+          Number(remainingSeconds);
+
+        const elapsed =
+          total - remaining;
+
+        if (elapsed > 0) {
+          return Math.max(
+            1,
+            Math.round(elapsed)
+          );
+        }
+      }
+    } catch (_) {}
+
     const started = activeStartedAt();
 
     if (started > 0) {
@@ -121,17 +179,6 @@
           1,
           Math.round(
             (submitted - started) / 1000
-          )
-        );
-      }
-
-      const now = Date.now();
-
-      if (now >= started) {
-        return Math.max(
-          1,
-          Math.round(
-            (now - started) / 1000
           )
         );
       }
@@ -381,28 +428,30 @@
   }
 
   function renderAction(action) {
-    if (
-      !action ||
+    if (!action) return;
+
+    let box =
       document.getElementById(
         "rankerV11PostAction"
-      )
-    ) {
-      return;
-    }
-
-    const box =
-      document.createElement(
-        "section"
       );
 
-    box.id =
-      "rankerV11PostAction";
+    if (!box) {
+      box =
+        document.createElement(
+          "section"
+        );
 
-    box.style.cssText =
-      "margin:16px 0;padding:18px;" +
-      "border:1px solid #dfe4ec;" +
-      "border-radius:16px;" +
-      "background:#fff;";
+      box.id =
+        "rankerV11PostAction";
+
+      box.style.cssText =
+        "margin:16px 0;padding:18px;" +
+        "border:1px solid #dfe4ec;" +
+        "border-radius:16px;" +
+        "background:#fff;" +
+        "position:relative;" +
+        "z-index:5;";
+    }
 
     const button =
       action.route
@@ -428,17 +477,18 @@
       "</p>" +
       button;
 
-    const anchors = [
-      "#questionReview",
-      ".question-review",
+    const selectors = [
       "#orbitAnalysis",
       "#orbit",
+      "#metrics",
+      "#questionReview",
+      ".question-review",
       "main"
     ];
 
     let anchor = null;
 
-    for (const selector of anchors) {
+    for (const selector of selectors) {
       anchor =
         document.querySelector(
           selector
@@ -451,11 +501,19 @@
       anchor &&
       anchor.parentNode
     ) {
-      anchor.parentNode.insertBefore(
-        box,
-        anchor
-      );
-    } else {
+      if (
+        box.parentNode !==
+        anchor.parentNode ||
+        box.nextElementSibling !== anchor
+      ) {
+        anchor.parentNode.insertBefore(
+          box,
+          anchor
+        );
+      }
+    } else if (
+      !box.parentNode
+    ) {
       document.body.appendChild(
         box
       );
@@ -511,6 +569,36 @@
 
   function boot() {
     refresh();
+
+    try {
+      const observer =
+        new MutationObserver(
+          function () {
+            const action =
+              read(
+                POST_KEY,
+                null
+              );
+
+            if (
+              action &&
+              action.action
+            ) {
+              renderAction(
+                action.action
+              );
+            }
+          }
+        );
+
+      observer.observe(
+        document.body,
+        {
+          childList: true,
+          subtree: true
+        }
+      );
+    } catch (_) {}
 
     [250, 750, 1500, 2500, 4000, 6000].forEach(
       function (delay) {
