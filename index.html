@@ -674,5 +674,248 @@ back.addEventListener("click",function(){
 
 
 
+
+<!-- REVISION_WEAK_ENGINE_V1 -->
+<style id="REVISION_WEAK_ENGINE_CSS">
+.revision-weak-engine{
+  margin:12px 0 18px;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(127,127,127,.08);
+}
+.revision-weak-engine h3{
+  margin:0 0 8px;
+}
+.revision-weak-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(127,127,127,.15);
+}
+.revision-weak-row:last-child{
+  border-bottom:0;
+}
+.revision-weak-row small{
+  display:block;
+  opacity:.7;
+  margin-top:3px;
+}
+.revision-weak-empty{
+  padding:10px;
+  text-align:center;
+  opacity:.75;
+}
+</style>
+
+<script>
+(function(){
+  const KEY="cbtRevisionWeakV1";
+
+  function read(key,fallback){
+    try{
+      const x=JSON.parse(localStorage.getItem(key)||"null");
+      return x==null?fallback:x;
+    }catch(e){
+      return fallback;
+    }
+  }
+
+  function history(){
+    const h=read("cbtHistory",[]);
+    return Array.isArray(h)?h:[];
+  }
+
+  function questionsFromTest(test){
+    if(Array.isArray(test?.questions)) return test.questions;
+    if(Array.isArray(test?.questionResults)) return test.questionResults;
+    if(Array.isArray(test?.results)) return test.results;
+    return [];
+  }
+
+  function analyse(){
+    const map={};
+
+    history().forEach(test=>{
+      questionsFromTest(test).forEach(q=>{
+        const subject=String(q.subject||"").trim();
+        const chapter=String(q.chapter||"").trim();
+
+        if(!subject || !chapter) return;
+
+        const key=subject+"::"+chapter;
+
+        if(!map[key]){
+          map[key]={
+            subject,
+            chapter,
+            attempts:0,
+            wrong:0,
+            last:0
+          };
+        }
+
+        const x=map[key];
+        x.attempts++;
+
+        const selected=
+          q.userAnswer ??
+          q.selectedAnswer ??
+          q.selected ??
+          q.user_answer;
+
+        const correct=
+          q.correctAnswer ??
+          q.answer ??
+          q.correct;
+
+        if(
+          selected!==undefined &&
+          correct!==undefined &&
+          String(selected).trim()!==String(correct).trim()
+        ){
+          x.wrong++;
+        }
+
+        const t=Date.parse(
+          test.timestamp ||
+          test.createdAt ||
+          test.date ||
+          ""
+        );
+
+        if(Number.isFinite(t) && t>x.last)
+          x.last=t;
+      });
+    });
+
+    return Object.values(map).map(x=>{
+      x.accuracy=x.attempts
+        ? Math.round(((x.attempts-x.wrong)/x.attempts)*100)
+        : 100;
+
+      const days=x.last
+        ? (Date.now()-x.last)/86400000
+        : 999;
+
+      x.due=days>=3;
+      x.priority=
+        (x.wrong*5)+
+        (x.accuracy<75?8:0)+
+        (x.accuracy<50?8:0)+
+        (x.due?4:0);
+
+      return x;
+    }).sort((a,b)=>b.priority-a.priority);
+  }
+
+  function openChapter(subject,chapter){
+    if(window.revisionRB &&
+       typeof window.revisionRB.render==="function"){
+      window.revisionRB.search="";
+      window.revisionRB.render(subject,chapter);
+      return;
+    }
+
+    const buttons=document.querySelectorAll(
+      "#revisionSheet [data-subject]"
+    );
+
+    for(const b of buttons){
+      if(
+        b.dataset.subject===subject &&
+        b.textContent.includes(chapter)
+      ){
+        b.click();
+        return;
+      }
+    }
+
+    alert("Revision chapter is not available yet.");
+  }
+
+  function render(){
+    const sheet=document.querySelector("#revisionSheet");
+    if(!sheet)return;
+
+    let box=document.querySelector("#revisionWeakEngine");
+
+    if(!box){
+      box=document.createElement("div");
+      box.id="revisionWeakEngine";
+      box.className="revision-weak-engine";
+
+      sheet.prepend(box);
+    }
+
+    const data=analyse();
+
+    localStorage.setItem(KEY,JSON.stringify({
+      updatedAt:Date.now(),
+      chapters:data
+    }));
+
+    const weak=data
+      .filter(x=>x.wrong>0 || x.accuracy<75 || x.due)
+      .slice(0,8);
+
+    box.innerHTML=`
+      <h3>🎯 Weak & Due Revision</h3>
+      <div style="opacity:.75;margin-bottom:10px">
+        CBT mistakes ke basis par priority chapters
+      </div>
+
+      ${
+        weak.length
+        ? weak.map((x,i)=>`
+          <div class="revision-weak-row">
+            <div>
+              <b>${i+1}. ${x.chapter}</b>
+              <small>
+                ${x.subject} •
+                ${x.accuracy}% accuracy •
+                ${x.wrong} mistakes
+                ${x.due?" • 🔔 Due":""}
+              </small>
+            </div>
+
+            <button
+              type="button"
+              onclick='revisionWeak.open(${JSON.stringify(x.subject)},${JSON.stringify(x.chapter)})'>
+              📖 Revise
+            </button>
+          </div>
+        `).join("")
+        : `
+          <div class="revision-weak-empty">
+            🎉 Abhi koi urgent weak/due chapter nahi mila.
+          </div>
+        `
+      }
+
+      <button
+        type="button"
+        onclick="revisionWeak.refresh()"
+        style="margin-top:10px">
+        🔄 Recalculate
+      </button>
+    `;
+  }
+
+  window.revisionWeak={
+    open:openChapter,
+    refresh:render,
+    analyse:analyse
+  };
+
+  document.addEventListener("DOMContentLoaded",render);
+  window.addEventListener("storage",render);
+
+  setTimeout(render,500);
+  setTimeout(render,1500);
+})();
+</script>
+
 </body>
 </html>
