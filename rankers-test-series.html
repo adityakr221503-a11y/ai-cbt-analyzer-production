@@ -98,7 +98,7 @@ if(perf.length){
    if(!pool.length){$("status").textContent="No verified Ranker questions are loaded for this selection yet.";return}
    const mode=$("mode").value;const attemptedIds=new Set((Array.isArray(attempts)?attempts:[]).flatMap(a=>Array.isArray(a.questionIds)?a.questionIds:(a.questionId?[a.questionId]:[])));
    if(mode==="new"){const fresh=pool.filter(q=>!attemptedIds.has(q.id));if(fresh.length)pool=fresh}
-   if(mode==="weak"){const stats={};(Array.isArray(attempts)?attempts:[]).forEach(a=>{if(!a.topic)return;stats[a.topic]=stats[a.topic]||{w:0,t:0};stats[a.topic].t++;if(a.correct===false)stats[a.topic].w++});pool.sort((a,b)=>((stats[b.topic]?.w||0)/(stats[b.topic]?.t||1))-((stats[a.topic]?.w||0)/(stats[a.topic]?.t||1)))}
+   if(mode==="weak"){const stats={};(Array.isArray(attempts)?attempts:[]).forEach(a=>{if(!a.topic)return;stats[a.topic]=stats[a.topic]||{w:0,t:0};stats[a.topic].t++;if(a.correct===false)stats[a.topic].w++});pool.sort((a,b)=>{const ar=stats[a.topic]?stats[a.topic].w/stats[a.topic].t:0;const br=stats[b.topic]?stats[b.topic].w/stats[b.topic].t:0;return br-ar||(stats[a.topic]?1:0)-(stats[b.topic]?1:0)})}
    pool.sort(()=>Math.random()-.5);
    localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
    localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
