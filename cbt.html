@@ -3389,6 +3389,106 @@ function showResult(
   automatic
 ) {
 
+  /* CBT_ORBIT_DIRECT_SHOWRESULT_HOOK_V1 */
+  try {
+    var orbitPanel =
+      document.getElementById("cbtOrbitResultV2");
+
+    if (orbitPanel) {
+      var orbitTotal =
+        Number(correct || 0) +
+        Number(wrong || 0) +
+        Number(skipped || 0);
+
+      var orbitAccuracy =
+        orbitTotal > 0
+          ? (Number(correct || 0) / orbitTotal) * 100
+          : 0;
+
+      var orbitScoreEl =
+        document.getElementById("cbtOrbitScoreV2");
+
+      var orbitAccuracyEl =
+        document.getElementById("cbtOrbitAccuracyV2");
+
+      var orbitSpeedEl =
+        document.getElementById("cbtOrbitSpeedV2");
+
+      var orbitSignalEl =
+        document.getElementById("cbtOrbitSignalV2");
+
+      if (orbitScoreEl) {
+        orbitScoreEl.textContent = String(Number(score || 0));
+      }
+
+      if (orbitAccuracyEl) {
+        orbitAccuracyEl.textContent =
+          orbitAccuracy.toFixed(1) + "%";
+      }
+
+      var orbitStarted =
+        Number(
+          sessionStorage.getItem("CBT_ACTIVE_STARTED_AT") ||
+          localStorage.getItem("CBT_ACTIVE_STARTED_AT") ||
+          0
+        );
+
+      var orbitSpeed = 0;
+
+      if (orbitStarted && orbitTotal > 0) {
+        var orbitElapsed =
+          Math.max(
+            0.01,
+            (Date.now() - orbitStarted) / 60000
+          );
+
+        orbitSpeed =
+          orbitTotal / orbitElapsed;
+      }
+
+      if (orbitSpeedEl) {
+        orbitSpeedEl.textContent =
+          orbitSpeed.toFixed(2) + " Q/min";
+      }
+
+      if (orbitSignalEl) {
+        orbitSignalEl.textContent =
+          orbitAccuracy >= 90
+            ? "Strong"
+            : orbitAccuracy >= 75
+              ? "Good"
+              : orbitAccuracy >= 50
+                ? "Needs Work"
+                : "Recovery";
+      }
+
+      orbitPanel.classList.remove("hidden");
+
+      console.log(
+        "✅ ORBIT RESULT PANEL RENDERED",
+        {
+          total: orbitTotal,
+          correct: Number(correct || 0),
+          wrong: Number(wrong || 0),
+          skipped: Number(skipped || 0),
+          score: Number(score || 0),
+          accuracy: orbitAccuracy
+        }
+      );
+    } else {
+      console.warn(
+        "Orbit panel element not found."
+      );
+    }
+  } catch (orbitError) {
+    console.warn(
+      "Orbit direct result hook failed:",
+      orbitError
+    );
+  }
+
+
+
   /*
    * Create result object
    */
