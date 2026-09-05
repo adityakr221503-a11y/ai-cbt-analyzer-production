@@ -223,7 +223,61 @@ if(perf.length){
  subjects.forEach(x=>$("subject").insertAdjacentHTML("beforeend","<option>"+esc(x)+"</option>"));
  function updateChapters(){const s=$("subject").value;const vals=[...new Set(bank.filter(q=>!s||q.subject===s).map(q=>q.chapter).filter(Boolean))].sort();$("chapter").innerHTML='<option value="">All chapters</option>'+vals.map(x=>"<option>"+esc(x)+"</option>").join("")}
  $("subject").onchange=updateChapters;updateChapters();
+
+ /* WAIT FOR DIRECT TEST180 SOURCE BEFORE START */
+ var rbTest180Ready = false;
+ var rbOriginalStart = null;
+ $("start").disabled = true;
+ $("status").textContent = "Loading complete TEST180 question bank...";
+
+ fetch("./test180-questions.json")
+   .then(function(res){ return res.json(); })
+   .then(function(data){
+     var src=Array.isArray(data)?data:
+       (Array.isArray(data.questions)?data.questions:
+       (Array.isArray(data.data)?data.data:
+       (Array.isArray(data.items)?data.items:[])));
+
+     if(src.length){
+       bank=src.map(function(q,i){
+         return Object.assign({},q,{
+           id:q.id||("TEST180-"+(i+1)),
+           question:q.question||q.text||"",
+           text:q.text||q.question||"",
+           options:Array.isArray(q.options)?q.options:[],
+           answer:q.answer!==undefined?q.answer:
+             (q.correctAnswer!==undefined?q.correctAnswer:""),
+           correctAnswer:q.correctAnswer!==undefined?q.correctAnswer:
+             (q.answer!==undefined?q.answer:""),
+           chapter:q.chapter||"Test 180",
+           topic:q.topic||"",
+           concept:q.concept||"",
+           source:q.source||"TEST180"
+         });
+       }).filter(function(q){
+         return q.options.length>=2 &&
+           (q.question||q.text||q.image||q.imageUrl||q.data||q.dataUrl);
+       });
+     }
+
+     rbTest180Ready = bank.length === 180;
+     $("start").disabled = !rbTest180Ready;
+     updateChapters();
+     $("status").textContent = rbTest180Ready
+       ? "180/180 TEST180 questions loaded. Ready to start."
+       : bank.length + "/180 questions loaded.";
+     console.log("FINAL TEST180 BANK:",bank.length);
+   })
+   .catch(function(e){
+     console.error(e);
+     $("status").textContent="TEST180 loading failed.";
+   });
+
  $("start").onclick=function(){
+   if(!rbTest180Ready){
+     $("status").textContent="Please wait — complete 180-question bank is still loading.";
+     return;
+   }
    let pool=bank.filter(q=>(!$("subject").value||q.subject===$("subject").value)&&(!$("chapter").value||q.chapter===$("chapter").value));
    if(!pool.length){$("status").textContent="No verified Ranker questions are loaded for this selection yet.";return}
    const mode=$("mode").value;const attemptedIds=new Set((Array.isArray(attempts)?attempts:[]).flatMap(a=>Array.isArray(a.questionIds)?a.questionIds:(a.questionId?[a.questionId]:[])));
