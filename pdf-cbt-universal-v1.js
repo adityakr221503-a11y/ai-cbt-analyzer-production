@@ -23,10 +23,120 @@ function dedupe(qs){const seen=new Set();return qs.filter(q=>{const k=norm(q.que
 function mapAnswerKey(pages,questions){const answers=new Map();for(const pg of pages)for(const line of pg.lines){const m=clean(line).match(/(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\):\-]?\s*(?:answer|ans|correct)?\s*[:=\-]?\s*(?:option\s*)?[\(\[]?\s*([A-D1-4])\s*[\)\]]?/i);if(m)answers.set(+m[1],answerLetter(m[2]))}return questions.map(q=>{if(!q.correctAnswer&&answers.has(q.number)){q.correctAnswer=answers.get(q.number);q.correctIndex="ABCD".indexOf(q.correctAnswer);q.needsReview=false;q.solutionSource="answer-key"}return q})}
 async function resolveAI(q){const apis=[window.CBTAnalyzerAI,window.CBTAnalyzerAIEngine,window.AISolutionEngine,window.RankerAI].filter(Boolean);for(const api of apis)for(const fn of ["solveQuestion","generateSolution","getSolution","solve"])if(typeof api[fn]==="function")try{const r=await api[fn](q);if(r){const a=answerLetter(r.correctAnswer??r.answer??r.option);if(a){q.correctAnswer=a;q.correctIndex="ABCD".indexOf(a)}q.explanation=String(r.explanation??r.solution??r.reason??"");q.solution=q.explanation;if(q.correctAnswer)q.solutionSource="ai";q.needsReview=!q.correctAnswer;return q}}catch(e){console.warn("[PDF3] AI hook failed",e)}return q}
 function normalizeFinal(qs,fileName){return qs.map((q,i)=>({...q,id:q.id||("PDF3-"+Date.now()+"-"+(i+1)),question:repairText(q.question||q.text),text:repairText(q.text||q.question),options:q.options.map(repairText),source:"Institute Test PDF",sourceFile:fileName,sourcePage:q.sourcePage||null,importedAt:new Date().toISOString(),sequence:i+1})).filter(q=>q.question.length>=5&&q.options.length===4&&q.options.every(Boolean))}
-function saveImport(qs,fileName){const meta={version:"pdf-cbt-universal-v1",type:"institute-test",fileName,importedAt:new Date().toISOString(),questionCount:qs.length,reviewCount:qs.filter(q=>q.needsReview).length};if(!safeSet(KEY,qs))throw new Error("Could not save imported questions.");safeSet(META,meta);safeSet(REVIEW,qs.filter(q=>q.needsReview).map(q=>({id:q.id,number:q.number,sourcePage:q.sourcePage,reason:"Correct answer not confidently resolved."})));try{sessionStorage.setItem(ACTIVE,JSON.stringify(qs));sessionStorage.setItem(ACTIVE_TEST,JSON.stringify({id:"pdf-test-"+Date.now(),title:fileName,duration:180,questions:qs,questionIds:qs.map(q=>q.id),totalQuestions:qs.length,source:"Institute Test PDF"}));sessionStorage.setItem(ACTIVE_SOURCE,"PDF")}catch(e){throw new Error("Imported test could not be prepared for CBT.")}}
+function saveImport(qs,fileName){
+  const importedAt=new Date().toISOString();
+  const testId="pdf-test-"+Date.now()+"-"+Math.random().toString(36).slice(2,8);
+
+  const meta={
+    version:"pdf-cbt-universal-v1",
+    type:"institute-test",
+    testId,
+    fileName,
+    importedAt,
+    questionCount:qs.length,
+    reviewCount:qs.filter(q=>q.needsReview).length
+  };
+
+  if(!safeSet(KEY,qs))
+    throw new Error("Could not save imported questions.");
+
+  safeSet(META,meta);
+
+  safeSet(
+    REVIEW,
+    qs.filter(q=>q.needsReview).map(q=>({
+      id:q.id,
+      number:q.number,
+      sourcePage:q.sourcePage,
+      reason:"Correct answer not confidently resolved."
+    }))
+  );
+
+  try{
+    /* FRESH IMPORT ISOLATION:
+       Never allow a previous imported test/session to leak
+       into the newly selected PDF test.
+    */
+    sessionStorage.removeItem(ACTIVE);
+    sessionStorage.removeItem(ACTIVE_TEST);
+    sessionStorage.removeItem(ACTIVE_SOURCE);
+    sessionStorage.removeItem("CBT_ACTIVE_TEST_ID");
+    sessionStorage.removeItem("CBT_ACTIVE_ANSWERS");
+    sessionStorage.removeItem("CBT_ACTIVE_SELECTED");
+    sessionStorage.removeItem("CBT_ACTIVE_CURRENT_INDEX");
+
+    localStorage.removeItem("CBT_ACTIVE_TEST_ID");
+
+    const freshQuestions=qs.map((q,i)=>({
+      ...q,
+      sequence:i+1,
+      importedTestId:testId
+    }));
+
+    const freshTest={
+      id:testId,
+      title:fileName,
+      duration:180,
+      questions:freshQuestions,
+      questionIds:freshQuestions.map(q=>q.id),
+      totalQuestions:freshQuestions.length,
+      source:"Institute Test PDF",
+      sourceFile:fileName,
+      importedAt
+    };
+
+    sessionStorage.setItem(ACTIVE,JSON.stringify(freshQuestions));
+    sessionStorage.setItem(ACTIVE_TEST,JSON.stringify(freshTest));
+    sessionStorage.setItem(ACTIVE_SOURCE,"PDF");
+    sessionStorage.setItem("CBT_ACTIVE_TEST_ID",testId);
+
+  }catch(e){
+    throw new Error("Imported test could not be prepared for CBT.");
+  }
+}
 function preview(qs){const box=$("#questionPreview");if(!box)return;box.innerHTML=qs.slice(0,5).map((q,i)=>"<div style='margin:10px 0;padding:12px;border:1px solid #e2e8f0;border-radius:10px'><strong>Q"+(i+1)+".</strong> "+esc(q.question)+"<br><small>"+q.options.map((o,j)=>String.fromCharCode(65+j)+") "+esc(o)).join(" &nbsp; ")+"</small></div>").join("")+(qs.length>5?"<div>Showing first 5 of "+qs.length+" questions.</div>":"")}
 async function convert(file){const name=($("#moduleName")?.value||file.name).trim()||file.name;status("Reading PDF text layer…");let pages=[];try{pages=await extractTextPages(file)}catch(e){console.warn("[PDF3] text layer failed",e)}let qs=dedupe(parsePages(pages));if(!qs.length){try{const ocr=await ocrPages(file);qs=dedupe(parsePages(ocr));pages=pages.concat(ocr)}catch(e){console.error("[PDF3] OCR failed",e)}}qs=mapAnswerKey(pages,qs);if(!qs.length)throw new Error("No complete 4-option questions could be safely reconstructed.");for(let i=0;i<qs.length;i++)if(!qs[i].correctAnswer){status("Checking unresolved answers — "+(i+1)+" of "+qs.length+"…");qs[i]=await resolveAI(qs[i])}qs=normalizeFinal(qs,name);if(!qs.length)throw new Error("Validation removed all questions because their structure was incomplete.");saveImport(qs,name);preview(qs);const review=qs.filter(q=>q.needsReview).length;status("✅ Test PDF ready\n\nFile: "+name+"\nValid questions: "+qs.length+"\nNeeds answer review: "+review+"\n\nNo fixed question-count limit. Ready for CBT.");document.dispatchEvent(new CustomEvent("pdfCbtPoolUpdated",{detail:{questions:qs}}));return qs}
-function install(){const input=$("#pdfInput"),button=$("#convertButton");if(!input||!button||button.dataset.pdfUniversalV1)return;button.dataset.pdfUniversalV1="1";button.addEventListener("click",async function(ev){ev.preventDefault();ev.stopImmediatePropagation();const file=input.files&&input.files[0];if(!file){status("Select a PDF first.");return}button.disabled=true;try{await convert(file)}catch(e){console.error("[PDF3]",e);status("❌ Conversion failed\n\n"+(e.message||"Unknown error"))}finally{button.disabled=false}},true);const row=button.parentElement;if(row&&!$("#pdfUniversalOpenCBT")){const open=document.createElement("button");open.id="pdfUniversalOpenCBT";open.type="button";open.className="primary";open.textContent="🚀 Open Imported Test in CBT";open.addEventListener("click",function(){const q=safeGet(KEY,[]);if(!Array.isArray(q)||!q.length){status("Convert a test PDF first.");return}sessionStorage.setItem(ACTIVE,JSON.stringify(q));sessionStorage.setItem(ACTIVE_TEST,JSON.stringify({id:"pdf-test-"+Date.now(),title:($("#moduleName")?.value||"Imported NEET Test").trim(),duration:180,questions:q,questionIds:q.map(x=>x.id),totalQuestions:q.length,source:"Institute Test PDF"}));sessionStorage.setItem(ACTIVE_SOURCE,"PDF");location.href="./cbt.html"});row.appendChild(open)}preview(safeGet(KEY,[]))}
+function install(){const input=$("#pdfInput"),button=$("#convertButton");if(!input||!button||button.dataset.pdfUniversalV1)return;button.dataset.pdfUniversalV1="1";button.addEventListener("click",async function(ev){ev.preventDefault();ev.stopImmediatePropagation();const file=input.files&&input.files[0];if(!file){status("Select a PDF first.");return}button.disabled=true;try{await convert(file)}catch(e){console.error("[PDF3]",e);status("❌ Conversion failed\n\n"+(e.message||"Unknown error"))}finally{button.disabled=false}},true);const row=button.parentElement;if(row&&!$("#pdfUniversalOpenCBT")){const open=document.createElement("button");open.id="pdfUniversalOpenCBT";open.type="button";open.className="primary";open.textContent="🚀 Open Imported Test in CBT";open.addEventListener("click",function(){
+  const q=safeGet(KEY,[]);
+  if(!Array.isArray(q)||!q.length){
+    status("Convert a test PDF first.");
+    return;
+  }
+
+  const fileName=($("#moduleName")?.value||"Imported NEET Test").trim();
+  const testId="pdf-test-"+Date.now()+"-"+Math.random().toString(36).slice(2,8);
+  const freshQuestions=q.map((x,i)=>({
+    ...x,
+    sequence:i+1,
+    importedTestId:testId
+  }));
+
+  /* Clear every transient CBT value before opening a NEW imported test. */
+  sessionStorage.removeItem(ACTIVE);
+  sessionStorage.removeItem(ACTIVE_TEST);
+  sessionStorage.removeItem(ACTIVE_SOURCE);
+  sessionStorage.removeItem("CBT_ACTIVE_TEST_ID");
+  sessionStorage.removeItem("CBT_ACTIVE_ANSWERS");
+  sessionStorage.removeItem("CBT_ACTIVE_SELECTED");
+  sessionStorage.removeItem("CBT_ACTIVE_CURRENT_INDEX");
+
+  sessionStorage.setItem(ACTIVE,JSON.stringify(freshQuestions));
+  sessionStorage.setItem(ACTIVE_TEST,JSON.stringify({
+    id:testId,
+    title:fileName,
+    duration:180,
+    questions:freshQuestions,
+    questionIds:freshQuestions.map(x=>x.id),
+    totalQuestions:freshQuestions.length,
+    source:"Institute Test PDF",
+    sourceFile:fileName,
+    importedAt:new Date().toISOString()
+  }));
+  sessionStorage.setItem(ACTIVE_SOURCE,"PDF");
+  sessionStorage.setItem("CBT_ACTIVE_TEST_ID",testId);
+
+  location.href="./cbt.html";
+});row.appendChild(open)}preview(safeGet(KEY,[]))}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install);else install();
 window.PDFCBTUniversalV1={convert,extractTextPages,ocrPages,parsePages,resolveAI};
 })();
