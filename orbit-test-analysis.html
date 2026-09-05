@@ -100,7 +100,59 @@ a{color:inherit;text-decoration:none}
     </div>
   </div>
 
-  <div class="section">
+
+<!-- ORBIT_RECOVERY_UI_V2 -->
+<section
+  class="section"
+  id="orbitRecoverySection"
+>
+  <div class="card">
+
+    <div class="label">
+      POST-TEST RECOVERY
+    </div>
+
+    <h2>
+      🧠 Mistake → 🔁 Retry → 🏆 Mastery
+    </h2>
+
+    <div
+      id="orbitRecoveryMetrics"
+      class="grid"
+    ></div>
+
+    <div
+      id="orbitRecoveryItems"
+      style="margin-top:12px"
+    ></div>
+
+    <div style="margin-top:14px">
+
+      <button
+        onclick="location.href='./mistake.html'"
+      >
+        🧠 Mistake Bank
+      </button>
+
+      <button
+        onclick="location.href='./retry.html'"
+      >
+        🔁 Retry
+      </button>
+
+      <button
+        onclick="location.href='./mastered.html'"
+      >
+        🏆 Mastered
+      </button>
+
+    </div>
+
+  </div>
+</section>
+<!-- /ORBIT_RECOVERY_UI_V2 -->
+
+<div class="section">
     <div class="card">
       <div class="label">Connected CBT Systems</div>
       <p>
@@ -194,5 +246,248 @@ a{color:inherit;text-decoration:none}
   document.addEventListener("DOMContentLoaded", render);
 })();
 </script>
+
+<script src="./orbit-engine.js"></script>
+<script>
+(function(){
+  function renderRecovery(){
+    const R = window.CBTAnalyzerRecovery;
+
+    if(!R) return;
+
+    const queue = R.syncRecovery();
+    const stats = R.getRecoveryStats();
+
+    const metrics = [
+      ["Recovery Items", stats.total],
+      ["Pending Retry", stats.pending],
+      ["Mastered", stats.mastered],
+      ["Concept Gap", stats.conceptGap],
+      ["Calculation", stats.calculationError],
+      ["Time Pressure", stats.timePressure]
+    ];
+
+    const box = document.getElementById("recoveryMetrics");
+
+    if(box){
+      box.innerHTML = metrics.map(function(x){
+        return '<div class="card">' +
+          '<div class="label">' + x[0] + '</div>' +
+          '<div class="value">' + x[1] + '</div>' +
+        '</div>';
+      }).join("");
+    }
+
+    const list = document.getElementById("recoveryList");
+
+    if(!list) return;
+
+    const pending = R.getPendingRecovery().slice(0, 8);
+
+    if(!pending.length){
+      list.innerHTML =
+        '<p class="small">No pending recovery questions. Mastery queue is clear.</p>';
+      return;
+    }
+
+    list.innerHTML = pending.map(function(q){
+      const title =
+        q.question ||
+        q.topic ||
+        q.chapter ||
+        q.questionId;
+
+      return '<div class="signal">' +
+        '<b>' + title + '</b><br>' +
+        '<span class="small">' +
+          (q.subject || "") + " • " +
+          (q.topic || "") + " • " +
+          (q.mistakeType || "Unclassified") +
+        '</span><br>' +
+        '<button onclick="CBTAnalyzerRecovery.sendToRetry(' +
+          JSON.stringify(q.questionId) +
+        ')">Retry this</button>' +
+      '</div>';
+    }).join("");
+  }
+
+  window.addEventListener(
+    "cbt:recovery-ready",
+    renderRecovery
+  );
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    renderRecovery
+  );
+})();
+</script>
+
+
+<script>
+(function(){
+
+  function escapeHTML(value){
+    return String(value == null ? "" : value)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+  }
+
+  function renderRecovery(){
+
+    const R =
+      window.CBTAnalyzerRecovery;
+
+    if(!R) return;
+
+    const stats =
+      R.stats();
+
+    const metrics = [
+      ["Recovery", stats.total],
+      ["Pending", stats.pending],
+      ["Mastered", stats.mastered],
+      ["Concept Gap", stats.conceptGap],
+      ["Calculation", stats.calculationError],
+      ["Time Pressure", stats.timePressure]
+    ];
+
+    const box =
+      document.getElementById(
+        "orbitRecoveryMetrics"
+      );
+
+    if(box){
+
+      box.innerHTML =
+        metrics.map(function(item){
+
+          return (
+            '<div class="card">' +
+              '<div class="label">' +
+                escapeHTML(item[0]) +
+              '</div>' +
+              '<div class="value">' +
+                escapeHTML(item[1]) +
+              '</div>' +
+            '</div>'
+          );
+
+        }).join("");
+
+    }
+
+    const list =
+      document.getElementById(
+        "orbitRecoveryItems"
+      );
+
+    if(!list) return;
+
+    const pending =
+      R.pending().slice(0, 10);
+
+    if(!pending.length){
+
+      list.innerHTML =
+        '<div class="small">' +
+        'No pending recovery questions.' +
+        '</div>';
+
+      return;
+    }
+
+    list.innerHTML =
+      pending.map(function(q){
+
+        const title =
+          q.question ||
+          q.topic ||
+          q.chapter ||
+          q.questionId;
+
+        return (
+          '<div class="signal">' +
+
+            '<b>' +
+              escapeHTML(title) +
+            '</b><br>' +
+
+            '<span class="small">' +
+              escapeHTML(
+                [
+                  q.subject,
+                  q.chapter,
+                  q.topic,
+                  q.mistakeType
+                ].filter(Boolean).join(" • ")
+              ) +
+            '</span><br>' +
+
+            '<button data-retry-id="' +
+              escapeHTML(q.questionId) +
+            '">' +
+              '🔁 Retry this' +
+            '</button>' +
+
+          '</div>'
+        );
+
+      }).join("");
+
+    list
+      .querySelectorAll(
+        "[data-retry-id]"
+      )
+      .forEach(function(button){
+
+        button.addEventListener(
+          "click",
+          function(){
+
+            const id =
+              button.getAttribute(
+                "data-retry-id"
+              );
+
+            const item =
+              R.pending().find(
+                function(x){
+                  return String(x.questionId) ===
+                    String(id);
+                }
+              );
+
+            if(item) {
+              R.retry(item);
+            }
+
+          }
+        );
+
+      });
+  }
+
+  window.addEventListener(
+    "cbt:recovery-ready",
+    renderRecovery
+  );
+
+  window.addEventListener(
+    "cbt:core-ready",
+    renderRecovery
+  );
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    renderRecovery
+  );
+
+})();
+</script>
+
 </body>
 </html>
