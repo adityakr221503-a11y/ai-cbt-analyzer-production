@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CBT Analyzer Pro — Ranker Command Center</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:system-ui,Arial,sans-serif;
+ background:#f1f5f9;
+ color:#0f172a;
+}
+.wrap{max-width:1100px;margin:auto;padding:18px}
+.hero,.card{
+ background:#fff;
+ border-radius:18px;
+ padding:18px;
+ margin-bottom:15px;
+ box-shadow:0 4px 16px rgba(0,0,0,.07);
+}
+.hero h1{margin:0 0 7px;font-size:25px}
+.muted{color:#64748b;line-height:1.5}
+.stats{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:10px;
+}
+.stat{
+ padding:14px;
+ border-radius:14px;
+ background:#f8fafc;
+ text-align:center;
+}
+.num{font-size:25px;font-weight:800}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,1fr);
+ gap:12px;
+}
+.action{
+ display:block;
+ text-decoration:none;
+ color:inherit;
+ border:1px solid #e2e8f0;
+ border-radius:15px;
+ padding:16px;
+ background:#fff;
+ cursor:pointer;
+}
+.action:hover{border-color:#6366f1}
+.action h3{margin:0 0 5px}
+.action p{margin:0;color:#64748b;font-size:14px;line-height:1.45}
+.primary{
+ background:#4f46e5;
+ color:#fff;
+ border-color:#4f46e5;
+}
+.tabs{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:8px;
+ margin-bottom:12px;
+}
+.tab{
+ padding:11px 8px;
+ border:1px solid #cbd5e1;
+ border-radius:10px;
+ background:#fff;
+ font-weight:700;
+ cursor:pointer;
+}
+.tab.active{background:#4f46e5;color:#fff}
+.panel{display:none}
+.panel.active{display:block}
+.row{
+ display:flex;
+ justify-content:space-between;
+ gap:10px;
+ padding:10px 0;
+ border-bottom:1px solid #e2e8f0;
+}
+.row:last-child{border-bottom:0}
+.badge{
+ padding:4px 8px;
+ border-radius:999px;
+ background:#eef2ff;
+ font-size:12px;
+ font-weight:700;
+}
+ul{line-height:1.7}
+@media(max-width:700px){
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .grid{grid-template-columns:1fr}
+ .tabs{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<section class="hero">
+<h1>🧠 Ranker Command Center</h1>
+<div class="muted">
+One connected control layer for 720 Approach, Skip/Attempt Strategy,
+Topic-wise Practice, Ranker Practice, performance and Mentor actions.
+</div>
+</section>
+
+<section class="card stats">
+<div class="stat"><div class="num" id="ccTests">0</div><div class="muted">Tests</div></div>
+<div class="stat"><div class="num" id="ccQuestions">0</div><div class="muted">Ranker Q</div></div>
+<div class="stat"><div class="num" id="ccMistakes">0</div><div class="muted">Mistakes</div></div>
+<div class="stat"><div class="num" id="ccMastered">0</div><div class="muted">Mastered</div></div>
+</section>
+
+<section class="card">
+<div class="tabs">
+<button class="tab active" data-tab="dashboard">Dashboard</button>
+<button class="tab" data-tab="720">🎯 720 Approach</button>
+<button class="tab" data-tab="attempt">🧠 Attempt</button>
+<button class="tab" data-tab="practice">📚 Practice</button>
+</div>
+
+<div id="panel-dashboard" class="panel active">
+<div class="grid">
+<a class="action primary" href="rankers-test-series.html">
+<h3>👑 Rankers Test Series</h3>
+<p>Pre → Actual → Post test ecosystem.</p>
+</a>
+
+<a class="action" href="question-bank.html">
+<h3>🏆 Ranker Question Bank</h3>
+<p>Coverage, new patterns, weak areas and mastery.</p>
+</a>
+
+<a class="action" href="pdf-to-cbt.html">
+<h3>📄 PDF → CBT</h3>
+<p>Import another PDF and send it through the existing CBT flow.</p>
+</a>
+
+<a class="action" href="history.html">
+<h3>📊 Test History</h3>
+<p>Review previous test evidence and performance.</p>
+</a>
+
+<a class="action" href="mistake.html">
+<h3>❌ Mistake Bank</h3>
+<p>Concept gaps, calculation, misread, guessing and time pressure.</p>
+</a>
+
+<a class="action" href="retry.html">
+<h3>🔁 Retry</h3>
+<p>Real retry and mastery verification.</p>
+</a>
+</div>
+</div>
+
+<div id="panel-720" class="panel">
+<h2>🎯 720 Approach</h2>
+<p class="muted">
+720 Approach answers: “What should I improve to move toward 720?”
+It is evidence-driven, not a score guarantee.
+</p>
+<ul>
+<li>Subject-wise target gap: Biology 360 + Chemistry 180 + Physics 180.</li>
+<li>Identify weak chapters/topics from actual attempts.</li>
+<li>Prioritize repeated mistakes and low-accuracy areas.</li>
+<li>Protect strong/mastered areas with spaced revision.</li>
+<li>Use Ranker coverage + Topic-wise Practice + tests as evidence.</li>
+<li>Track accuracy, speed, negative marking and time loss.</li>
+<li>Feed the result into the next-best action.</li>
+</ul>
+<div id="target720" class="row"></div>
+</div>
+
+<div id="panel-attempt" class="panel">
+<h2>🧠 Skip / Attempt Strategy</h2>
+<p class="muted">
+This is separate from 720 Approach. It focuses on paper-attempt behaviour.
+</p>
+<ul>
+<li>Attempt high-confidence questions first.</li>
+<li>Do not spend excessive time on a single uncertain question.</li>
+<li>Mark uncertain questions for revisit instead of forcing them.</li>
+<li>Track question-level time where CBT history provides it.</li>
+<li>Compare attempted accuracy with skipped/revisited behaviour.</li>
+<li>Use post-test evidence to improve future attempt order.</li>
+</ul>
+<div id="attemptAdvice" class="row"></div>
+</div>
+
+<div id="panel-practice" class="panel">
+<h2>📚 Practice Engine</h2>
+<div class="grid">
+
+<a class="action" href="question-bank.html">
+<h3>📚 Topic-wise Practice</h3>
+<p>
+Chapter → Topic → Subtopic → Concept → meaningful varieties → mastery.
+</p>
+</a>
+
+<a class="action" href="question-bank.html">
+<h3>🏆 Ranker Practice</h3>
+<p>
+High-level patterns, traps, exceptions and multi-concept questions.
+</p>
+</a>
+
+<a class="action" href="rankers-test-series.html">
+<h3>👑 Adaptive Test</h3>
+<p>
+Use previous performance to prioritize unseen, weak and high-value areas.
+</p>
+</a>
+
+<a class="action" href="retry.html">
+<h3>🔁 Mastery Retry</h3>
+<p>
+A mistake is not mastered until the real retry is answered correctly.
+</p>
+</a>
+
+</div>
+</div>
+
+</section>
+
+<section class="card">
+<h2>🤖 Mentor Diagnosis</h2>
+<div id="mentor" class="muted">Reading current performance evidence…</div>
+</section>
+
+<section class="card">
+<h2>🔗 Connected System</h2>
+<div class="grid">
+<div class="action">
+<h3>🧬 Biology 360°</h3>
+<p>NCERT → chapter → topic → subtopic → mastery.</p>
+</div>
+<div class="action">
+<h3>🧪 Chemistry 180°</h3>
+<p>Physical + Organic + Inorganic structured coverage.</p>
+</div>
+<div class="action">
+<h3>⚡ Physics 180°</h3>
+<p>Concept + numerical + graph + application coverage.</p>
+</div>
+<div class="action">
+<h3>📄 PDF Tests</h3>
+<p>Kept separately identifiable from Ranker tests.</p>
+</div>
+</div>
+</section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+const safeJSON=(key,fallback)=>{
+ try{
+   const v=JSON.parse(localStorage.getItem(key)||"");
+   return v;
+ }catch(e){return fallback}
+};
+
+const arr=v=>Array.isArray(v)?v:[];
+
+const history=arr(safeJSON("cbtHistory",[]));
+const rbAttempts=arr(safeJSON("rankBoosterAttemptHistory",[]));
+const mistakes=arr(safeJSON("cbtMistakeBank",[]));
+const mastery=arr(safeJSON("cbtMasteryV2",[]));
+const bank=arr(safeJSON("rankBoosterQuestionBankV1",[]));
+
+document.getElementById("ccTests").textContent=history.length;
+document.getElementById("ccQuestions").textContent=bank.length;
+document.getElementById("ccMistakes").textContent=mistakes.length;
+document.getElementById("ccMastered").textContent=mastery.length;
+
+const scores=history.map(x=>{
+ const n=Number(
+   x.score ??
+   x.marks ??
+   x.totalScore ??
+   x.percentage
+ );
+ return Number.isFinite(n)?n:null;
+}).filter(x=>x!==null);
+
+let diagnosis="No enough performance history yet. Start a test and let the system collect evidence.";
+
+if(history.length){
+ const wrong=rbAttempts.filter(a=>
+   a.correct===false ||
+   a.isCorrect===false
+ ).length;
+
+ const weakTopics={};
+ rbAttempts.forEach(a=>{
+   if(a.correct===false && a.topic){
+     weakTopics[a.topic]=(weakTopics[a.topic]||0)+1;
+   }
+ });
+
+ const topWeak=Object.entries(weakTopics)
+   .sort((a,b)=>b[1]-a[1])
+   .slice(0,3)
+   .map(x=>x[0]);
+
+ diagnosis=
+   "Current evidence: "+
+   history.length+" test(s), "+
+   rbAttempts.length+" Ranker attempt record(s), "+
+   mistakes.length+" mistake record(s). ";
+
+ if(topWeak.length){
+   diagnosis+="Priority weak topic(s): "+topWeak.join(", ")+". ";
+ }
+
+ if(mistakes.length){
+   diagnosis+="Next action: revise the highest-frequency mistake pattern, then retry.";
+ }else{
+   diagnosis+="Next action: complete a diagnostic/Ranker test to create useful evidence.";
+ }
+}
+
+document.getElementById("mentor").textContent=diagnosis;
+
+const target=document.getElementById("target720");
+
+if(scores.length){
+ const last=scores[scores.length-1];
+ target.innerHTML=
+   "<span>Latest recorded score</span><b>"+last+"</b>";
+}else{
+ target.innerHTML=
+   "<span>Latest score</span><b>—</b>";
+}
+
+const attemptAdvice=document.getElementById("attemptAdvice");
+
+const wrongAttempts=rbAttempts.filter(a=>
+ a.correct===false ||
+ a.isCorrect===false
+).length;
+
+if(rbAttempts.length){
+ const rate=Math.round(
+   (rbAttempts.filter(a=>a.correct===true||a.isCorrect===true).length /
+   rbAttempts.length)*100
+ );
+ attemptAdvice.innerHTML=
+   "<span>Recorded accuracy</span><b>"+rate+"%</b>";
+}else{
+ attemptAdvice.innerHTML=
+   "<span>Attempt strategy</span><b>Collect CBT evidence first</b>";
+}
+
+document.querySelectorAll(".tab").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+   document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+   btn.classList.add("active");
+   const panel=document.getElementById("panel-"+btn.dataset.tab);
+   if(panel)panel.classList.add("active");
+ });
+});
+
+})();
+</script>
+</body>
+</html>

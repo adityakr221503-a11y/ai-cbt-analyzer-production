@@ -48,6 +48,78 @@ button{font-weight:700;cursor:pointer}.primary{background:#4f46e5;color:#fff;bor
 <button class="primary" style="margin-top:10px" id="start">Start Mastery Test</button>
 </section>
 
+
+<!-- QUESTION_BANK_COMMAND_CENTER_V1 -->
+<section class="card">
+<h2>⚡ Command Center</h2>
+<div class="muted">
+All major Ranker actions use the same existing question-bank and CBT data flow.
+</div>
+
+<div class="qb-tools">
+<a class="qb-tool primary" href="ranker-command-center.html">
+🧠 Open Command Center
+</a>
+
+<button class="qb-tool" id="qbRestore180" type="button">
+📥 Restore TEST180
+</button>
+
+<a class="qb-tool" href="rankers-test-series.html">
+👑 Rankers Test Series
+</a>
+
+<a class="qb-tool" href="pdf-to-cbt.html">
+📄 PDF → CBT
+</a>
+</div>
+
+<div id="qbRestoreStatus" class="qb-import-status">
+Existing importer will be reused; no second question-import engine is created.
+</div>
+</section>
+
+<script id="QUESTION_BANK_COMMAND_CENTER_V1_JS">
+(function(){
+"use strict";
+
+const btn=document.getElementById("qbRestore180");
+const status=document.getElementById("qbRestoreStatus");
+
+if(!btn)return;
+
+btn.addEventListener("click",async function(){
+ btn.disabled=true;
+ status.textContent="Restoring verified TEST180 questions…";
+
+ try{
+   if(typeof window.importTest180Questions==="function"){
+     const result=await window.importTest180Questions();
+     status.textContent=
+       "Restore complete: "+
+       JSON.stringify(result);
+     setTimeout(()=>location.reload(),700);
+     return;
+   }
+
+   status.textContent=
+     "Existing importer is not loaded on this page. Opening Rankers Test Series so the existing TEST180 importer can be used.";
+   setTimeout(()=>{
+     location.href="rankers-test-series.html";
+   },500);
+
+ }catch(err){
+   console.error(err);
+   status.textContent=
+     "Restore failed: "+
+     (err&&err.message?err.message:String(err));
+ }finally{
+   btn.disabled=false;
+ }
+});
+})();
+</script>
+
 <section class="card">
 <h2>Coverage audit</h2>
 <div id="coverage" class="muted">Loading question-bank data…</div>
@@ -55,6 +127,7 @@ button{font-weight:700;cursor:pointer}.primary{background:#4f46e5;color:#fff;bor
 </div>
 
 <script src="rank-booster/question-bank.js"></script>
+<script src="rank-booster/import-test180.js"></script>
 <script>
 (function(){
 "use strict";
