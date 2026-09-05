@@ -271,104 +271,84 @@ header{
 (function(){
 
 const revisionData={
-
-Physics:[
-["Units & Measurements","Units, dimensions, errors and significant figures"],
-["Motion in a Straight Line","Kinematics graphs, equations and common traps"],
-["Motion in a Plane","Vectors, projectile motion and relative motion"],
-["Laws of Motion","Newton's laws, friction and connected bodies"],
-["Work, Energy & Power","Work-energy theorem, power and collisions"],
-["System of Particles & COM","Centre of mass, momentum and impulse"],
-["Rotational Motion","Torque, angular momentum and moment of inertia"],
-["Gravitation","Gravitational field, potential, satellites and escape velocity"],
-["Mechanical Properties of Solids","Stress, strain, elasticity and Young's modulus"],
-["Mechanical Properties of Fluids","Pressure, viscosity, Bernoulli and surface tension"],
-["Thermal Properties of Matter","Heat, expansion, calorimetry and heat transfer"],
-["Thermodynamics","Laws of thermodynamics, processes and PV diagrams"],
-["Kinetic Theory","Gas laws, RMS speed and degrees of freedom"],
-["Oscillations","SHM equations, energy and time period"],
-["Waves","Wave motion, sound and standing waves"],
-["Electrostatics","Charge, electric field, potential and capacitors"],
-["Current Electricity","Resistance, circuits, Kirchhoff and cells"],
-["Moving Charges & Magnetism","Magnetic force, Biot-Savart and Ampere law"],
-["Magnetism & Matter","Magnetic properties, earth magnetism and materials"],
-["Electromagnetic Induction","Faraday law, Lenz law and inductance"],
-["Alternating Current","AC circuits, reactance, impedance and resonance"],
-["Electromagnetic Waves","Spectrum, properties and applications"],
-["Ray Optics","Mirrors, lenses, refraction and optical instruments"],
-["Wave Optics","Interference, diffraction and polarization"],
-["Dual Nature","Photoelectric effect and matter waves"],
-["Atoms","Bohr model and atomic spectra"],
-["Nuclei","Radioactivity, binding energy and nuclear reactions"],
-["Semiconductor Electronics","Diodes, transistors and logic gates"]
-],
-
-Chemistry:[
-["Some Basic Concepts of Chemistry","Mole concept, stoichiometry and concentration"],
-["Structure of Atom","Quantum numbers, orbitals and electronic configuration"],
-["Classification of Elements","Periodic trends and exceptions"],
-["Chemical Bonding","VSEPR, hybridization, MOT and hydrogen bonding"],
-["Thermodynamics","Enthalpy, entropy, Gibbs energy and spontaneity"],
-["Equilibrium","Chemical equilibrium, ionic equilibrium and pH"],
-["Redox Reactions","Oxidation number and balancing redox reactions"],
-["Solutions","Concentration terms, Raoult law and colligative properties"],
-["Electrochemistry","Cells, Nernst equation, conductance and electrolysis"],
-["Chemical Kinetics","Rate law, order, half-life and Arrhenius equation"],
-["Surface Chemistry","Adsorption, colloids and catalysis"],
-["Periodic Table & p-Block","Trends, compounds and NCERT exceptions"],
-["d- and f-Block Elements","Transition metals, colours, oxidation states"],
-["Coordination Compounds","Nomenclature, isomerism, CFT and magnetic properties"],
-["General Organic Chemistry","Electronic effects, acidity/basicity and intermediates"],
-["Hydrocarbons","Alkanes, alkenes, alkynes and aromatic compounds"],
-["Haloalkanes & Haloarenes","SN1, SN2, elimination and reactions"],
-["Alcohols, Phenols & Ethers","Preparation, reactions and acidity"],
-["Aldehydes, Ketones & Carboxylic Acids","Carbonyl chemistry and named reactions"],
-["Amines","Basicity, preparation and diazonium chemistry"],
-["Biomolecules","Carbohydrates, proteins, vitamins and nucleic acids"],
-["Polymers","Classification, monomers and important polymers"],
-["Chemistry in Everyday Life","Drugs, detergents and daily-life chemistry"]
-],
-
-Biology:[
-["The Living World","Taxonomy, nomenclature and biodiversity"],
-["Biological Classification","Kingdoms, major groups and characteristics"],
-["Plant Kingdom","Algae, bryophytes, pteridophytes, gymnosperms and angiosperms"],
-["Animal Kingdom","Animal phyla, symmetry and classification"],
-["Morphology of Flowering Plants","Root, stem, leaf, flower, fruit and seed"],
-["Anatomy of Flowering Plants","Tissues and internal structure"],
-["Structural Organisation in Animals","Animal tissues and cockroach"],
-["Cell: The Unit of Life","Cell organelles, membranes and transport"],
-["Biomolecules","Carbohydrates, proteins, lipids, enzymes and nucleic acids"],
-["Cell Cycle & Cell Division","Mitosis, meiosis and chromosome behaviour"],
-["Transport in Plants","Xylem, phloem, transpiration and pressure flow"],
-["Mineral Nutrition","Essential elements, deficiency and nitrogen metabolism"],
-["Photosynthesis","Light reaction, Calvin cycle and photorespiration"],
-["Respiration in Plants","Glycolysis, Krebs cycle and ETS"],
-["Plant Growth & Development","Hormones, growth movements and photoperiodism"],
-["Digestion & Absorption","Digestive system, enzymes and absorption"],
-["Breathing & Exchange of Gases","Mechanism, transport of gases and regulation"],
-["Body Fluids & Circulation","Blood, heart, cardiac cycle and ECG"],
-["Excretory Products & Elimination","Nephron, urine formation and osmoregulation"],
-["Locomotion & Movement","Muscles, bones and joints"],
-["Neural Control & Coordination","Neuron, CNS, reflexes and sense organs"],
-["Chemical Coordination & Integration","Endocrine glands and hormones"],
-["Reproduction in Organisms","Life cycles and reproductive phases"],
-["Sexual Reproduction in Flowering Plants","Pollination, fertilisation and seed formation"],
-["Human Reproduction","Male/female reproductive systems and gametogenesis"],
-["Reproductive Health","Contraception, STIs and reproductive technologies"],
-["Principles of Inheritance & Variation","Mendelism, linkage, crossing over and pedigree"],
-["Molecular Basis of Inheritance","DNA, replication, transcription, translation"],
-["Evolution","Evidence, theories and Hardy-Weinberg principle"],
-["Human Health & Disease","Pathogens, immunity, vaccines and disorders"],
-["Strategies for Enhancement in Food Production","Plant breeding, animal husbandry and microbes"],
-["Microbes in Human Welfare","Industrial products, antibiotics and sewage treatment"],
-["Biotechnology: Principles & Processes","rDNA technology, vectors and PCR"],
-["Biotechnology & Its Applications","GM crops, insulin, gene therapy and DNA fingerprinting"],
-["Organisms & Populations","Population interactions and adaptations"],
-["Ecosystem","Energy flow, productivity and ecological pyramids"],
-["Biodiversity & Conservation","Levels, hotspots, threats and conservation"],
-["Environmental Issues","Pollution, climate change, ozone depletion and waste"]
-]
+ Physics:{
+  "Units and Measurements":{
+   ncert:["SI base units are metre, kilogram, second, ampere, kelvin, mole and candela.","Dimensions are useful for checking physical equations and converting units.","Significant figures indicate the precision of a measurement."],
+   traps:["Accuracy and precision are different.","A dimensionally correct equation is not necessarily physically correct."],
+   concepts:["SI units","Dimensions","Errors","Significant figures"],
+   formulas:["Percentage error = (absolute error / measured value) × 100"]
+  },
+  "Motion in a Straight Line":{
+   ncert:["Distance is a scalar quantity while displacement is a vector quantity.","Slope of a position-time graph gives velocity.","Slope of a velocity-time graph gives acceleration."],
+   traps:["Distance cannot be negative.","Zero displacement does not mean zero distance."],
+   concepts:["Displacement","Velocity","Acceleration","Graphs"],
+   formulas:["v=u+at","s=ut+½at²","v²=u²+2as"]
+  },
+  "Laws of Motion":{
+   ncert:["Newton's second law relates net force and acceleration.","Action and reaction forces act on different bodies.","Friction opposes relative motion or its tendency."],
+   traps:["Action-reaction forces do not cancel because they act on different bodies.","Normal reaction is not always equal to mg."],
+   concepts:["Newton's laws","Free body diagram","Friction","Normal reaction"],
+   formulas:["F_net=ma","f≤μN","f_limiting=μN"]
+  },
+  "Work, Energy and Power":{
+   ncert:["Work depends on the component of force along displacement.","Kinetic energy depends on the square of velocity.","Power is the rate of doing work."],
+   traps:["Work can be positive, negative or zero.","A force can do zero work even when the object is moving."],
+   concepts:["Work-energy theorem","Kinetic energy","Potential energy","Power"],
+   formulas:["W=Fs cosθ","K=½mv²","P=W/t"]
+  }
+ },
+ Chemistry:{
+  "Some Basic Concepts of Chemistry":{
+   ncert:["One mole contains 6.022×10²³ entities.","Molar mass connects mass with amount of substance.","The limiting reagent determines the maximum amount of product."],
+   traps:["Balance the equation before using mole ratios.","Molarity uses solution volume whereas molality uses solvent mass."],
+   concepts:["Mole concept","Stoichiometry","Limiting reagent","Concentration"],
+   formulas:["n=mass/molar mass","M=moles/volume(L)"]
+  },
+  "Structure of Atom":{
+   ncert:["Electrons occupy quantised energy levels.","Atomic number is the number of protons.","Orbitals are described by quantum numbers."],
+   traps:["Orbit and orbital are different concepts.","No two electrons can have the same four quantum numbers."],
+   concepts:["Quantum numbers","Electronic configuration","Atomic spectra"],
+   formulas:["E_n∝−1/n²"]
+  },
+  "Chemical Bonding and Molecular Structure":{
+   ncert:["Ionic bonding involves electrostatic attraction between oppositely charged ions.","Covalent bonding involves sharing of electron pairs.","VSEPR theory helps predict molecular shape."],
+   traps:["Lone pairs affect molecular geometry.","Lewis structure must satisfy the relevant electron-count rules."],
+   concepts:["Lewis structures","VSEPR","Hybridisation","Molecular orbitals"],
+   formulas:["Formal charge=valence e⁻−nonbonding e⁻−½(bonding e⁻)"]
+  },
+  "Thermodynamics":{
+   ncert:["Internal energy is a state function.","Enthalpy change represents heat change at constant pressure.","Gibbs energy is used to assess spontaneity."],
+   traps:["Exothermic does not automatically mean spontaneous.","State functions do not depend on path."],
+   concepts:["First law","Enthalpy","Entropy","Gibbs energy"],
+   formulas:["ΔG=ΔH−TΔS"]
+  }
+ },
+ Biology:{
+  "The Living World":{
+   ncert:["Species is the basic unit of classification.","Binomial nomenclature gives a scientific name using genus and species.","Taxonomic aids help in identification and classification."],
+   traps:["Genus is written first in a binomial name.","Scientific names follow standard nomenclature rules."],
+   concepts:["Species","Taxonomic hierarchy","Binomial nomenclature","Taxonomic aids"],
+   formulas:[]
+  },
+  "Cell: The Unit of Life":{
+   ncert:["The cell is the basic structural and functional unit of life.","Prokaryotic cells lack a membrane-bound nucleus.","Mitochondria and chloroplasts contain their own genetic material."],
+   traps:["Prokaryotes contain ribosomes.","Cell wall and plasma membrane are different structures."],
+   concepts:["Prokaryotic cells","Eukaryotic cells","Cell organelles","Endomembrane system"],
+   formulas:[]
+  },
+  "Biomolecules":{
+   ncert:["Major biomolecules include carbohydrates, proteins, lipids and nucleic acids.","Proteins are polymers of amino acids.","DNA and RNA are nucleic acids."],
+   traps:["Lipids are generally not considered true polymers.","Protein structure depends on interactions among amino-acid residues."],
+   concepts:["Proteins","Carbohydrates","Lipids","Nucleic acids"],
+   formulas:[]
+  },
+  "Human Reproduction":{
+   ncert:["Spermatogenesis occurs in seminiferous tubules.","Oogenesis begins during fetal life.","Fertilisation normally occurs at the ampullary-isthmic junction of the oviduct."],
+   traps:["Ovulation releases a secondary oocyte.","Implantation occurs in the uterine endometrium."],
+   concepts:["Gametogenesis","Menstrual cycle","Fertilisation","Implantation"],
+   formulas:[]
+  }
+ }
 };
 
 const subjects=document.getElementById("revisionSubjects");
