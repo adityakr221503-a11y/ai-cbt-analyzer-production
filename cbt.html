@@ -3147,7 +3147,9 @@ function showResult(
   if (
     typeof window.recordRBAttempt === "function" &&
     selectedQuestions &&
-    selectedQuestions.length
+    selectedQuestions.length &&
+    selectedTest &&
+    selectedTest.title === "Rankers Test Series"
   ) {
     selectedQuestions.forEach(function(question, index) {
       const userAnswer = answers[index];
