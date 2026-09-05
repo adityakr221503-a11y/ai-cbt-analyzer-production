@@ -136,6 +136,26 @@ if(perf.length){
  }
  pool=balanced;
 }
+if(mode==="adaptive" && pool.length>6){
+ const d={easy:[],medium:[],hard:[],other:[]};
+ pool.forEach(q=>{
+  const x=String(q.difficulty||"").toLowerCase();
+  if(x.includes("easy"))d.easy.push(q);
+  else if(x.includes("hard")||x.includes("difficult"))d.hard.push(q);
+  else if(x.includes("medium")||x.includes("moderate"))d.medium.push(q);
+  else d.other.push(q);
+ });
+ Object.values(d).forEach(a=>a.sort(()=>Math.random()-.5));
+ const balanced=[];
+ const order=["easy","medium","hard","other"];
+ while(balanced.length<pool.length){
+  for(const key of order){
+   if(d[key].length)balanced.push(d[key].shift());
+   if(balanced.length>=pool.length)break;
+  }
+ }
+ pool=balanced;
+}
 localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
    localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
    $("status").textContent=pool.length+" eligible questions selected. Opening CBT...";
