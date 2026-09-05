@@ -3153,7 +3153,7 @@ function showResult(
       const userAnswer = answers[index];
       if (userAnswer !== undefined) {
         window.recordRBAttempt({
-          questionId: question.id,
+          questionId: question.id || ("CBT-" + index),
           subject: question.subject || "",
           chapter: question.chapter || "",
           topic: question.topic || "",
