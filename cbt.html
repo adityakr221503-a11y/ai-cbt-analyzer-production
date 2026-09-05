@@ -4374,6 +4374,34 @@ window.addEventListener(
 })();
 </script>
 
+
+<!-- =====================================================
+     RANKER / QUESTION BANK -> CBT BRIDGE
+     Keeps Ranker tests connected to the existing CBT engine
+===================================================== -->
+<script>
+(function(){
+  try{
+    const raw=localStorage.getItem("rbSelectedQuestions");
+    if(!raw) return;
+
+    const selected=JSON.parse(raw);
+    if(!Array.isArray(selected) || !selected.length) return;
+
+    localStorage.setItem("pdfCbtQuestions",JSON.stringify(selected));
+    localStorage.setItem("CBT_ACTIVE_SOURCE",
+      localStorage.getItem("CBT_ACTIVE_SOURCE") || "Ranker");
+
+    window.RANK_BOOSTER_CBT=true;
+    window.RANKER_CBT_QUESTIONS=selected;
+
+    console.log("🏆 Ranker → CBT bridge:",selected.length,"questions");
+  }catch(e){
+    console.error("Ranker → CBT bridge failed:",e);
+  }
+})();
+</script>
+
 </body>
 
 </html>
