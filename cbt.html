@@ -2,6 +2,105 @@
 <html lang="en">
 
 <head>
+<script>
+
+/* IMAGE_DATA_QUESTION_SUPPORT_V1
+   Keep image/data-based questions in CBT instead of dropping them.
+*/
+(function(){
+  function rbHasContent(v){
+    if(v===null || v===undefined) return false;
+    if(typeof v==="string") return v.trim().length>0;
+    if(Array.isArray(v)) return v.length>0;
+    if(typeof v==="object") return Object.keys(v).length>0;
+    return true;
+  }
+
+  function rbNormalizeImageData(q){
+    if(!q || typeof q!=="object") return q;
+
+    const image =
+      q.image ||
+      q.imageUrl ||
+      q.imageURL ||
+      q.image_url ||
+      q.img ||
+      q.figure ||
+      q.diagram ||
+      q.questionImage ||
+      q.question_image ||
+      null;
+
+    const data =
+      q.data ||
+      q.dataImage ||
+      q.dataUrl ||
+      q.dataURL ||
+      q.data_url ||
+      q.chart ||
+      q.graph ||
+      q.table ||
+      q.passage ||
+      null;
+
+    if(rbHasContent(image)){
+      q.image=image;
+      q.imageUrl=q.imageUrl || (typeof image==="string" ? image : "");
+    }
+
+    if(rbHasContent(data)){
+      q.data=data;
+    }
+
+    q.text =
+      q.text ||
+      q.question ||
+      q.questionText ||
+      q.question_text ||
+      q.statement ||
+      "";
+
+    q.options =
+      Array.isArray(q.options) ? q.options :
+      Array.isArray(q.choices) ? q.choices :
+      Array.isArray(q.answers) ? q.answers :
+      [];
+
+    return q;
+  }
+
+  function rbNormalizePool(pool){
+    if(!Array.isArray(pool)) return [];
+    return pool
+      .map(rbNormalizeImageData)
+      .filter(function(q){
+        if(!q || typeof q!=="object") return false;
+
+        const hasText =
+          typeof q.text==="string" &&
+          q.text.trim().length>0;
+
+        const hasImage =
+          rbHasContent(q.image) ||
+          rbHasContent(q.imageUrl);
+
+        const hasData =
+          rbHasContent(q.data) ||
+          rbHasContent(q.dataUrl);
+
+        const hasOptions =
+          Array.isArray(q.options) &&
+          q.options.length>=2;
+
+        return (hasText || hasImage || hasData) && hasOptions;
+      });
+  }
+
+  window.RBNormalizeImageDataQuestion=rbNormalizeImageData;
+  window.RBNormalizeImageDataPool=rbNormalizePool;
+})();
+
+</script>
 <script src="rank-booster/question-bank.js"></script>
 
   <meta charset="UTF-8">
