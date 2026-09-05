@@ -115,7 +115,28 @@ if(perf.length){
 } else {
  pool.sort(()=>Math.random()-.5);
 }
-   localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
+   if(mode==="adaptive" && pool.length>3){
+ const groups={};
+ pool.forEach(q=>(groups[q.subject]??=[]).push(q));
+ Object.values(groups).forEach(a=>a.sort(()=>Math.random()-.5));
+ const balanced=[];
+ let i=0;
+ while(balanced.length<pool.length){
+  const keys=Object.keys(groups).sort((a,b)=>(groups[b].length-groups[a].length));
+  let added=false;
+  for(const key of keys){
+   if(groups[key]?.length){
+    balanced.push(groups[key].shift());
+    added=true;
+    if(balanced.length>=pool.length)break;
+   }
+  }
+  if(!added)break;
+  i++;
+ }
+ pool=balanced;
+}
+localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
    localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
    $("status").textContent=pool.length+" eligible questions selected. Opening CBT...";
    setTimeout(()=>location.href="cbt.html?source=rankers-test-series",250);
