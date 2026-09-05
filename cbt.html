@@ -3463,15 +3463,63 @@ function showResult(
 
       var orbitSpeed = 0;
 
-      if (orbitStarted && orbitTotal > 0) {
-        var orbitElapsed =
-          Math.max(
-            0.01,
-            (Date.now() - orbitStarted) / 60000
-          );
+      /*
+       * ORBIT_SPEED_TIMER_V1
+       * Use the actual CBT countdown timer as the
+       * authoritative elapsed-time source.
+       * This avoids timestamp resets/bridge reloads.
+       */
+      try {
+        var orbitDurationSeconds =
+          selectedTest &&
+          Number(selectedTest.duration || 0) > 0
+            ? Number(selectedTest.duration) * 60
+            : 0;
 
-        orbitSpeed =
-          orbitTotal / orbitElapsed;
+        var orbitRemainingSeconds =
+          Number(remainingSeconds);
+
+        if (
+          orbitDurationSeconds > 0 &&
+          Number.isFinite(orbitRemainingSeconds) &&
+          orbitTotal > 0
+        ) {
+          var orbitElapsedSeconds =
+            Math.max(
+              1,
+              orbitDurationSeconds -
+              Math.max(
+                0,
+                Math.min(
+                  orbitDurationSeconds,
+                  orbitRemainingSeconds
+                )
+              )
+            );
+
+          var orbitElapsedMinutes =
+            orbitElapsedSeconds / 60;
+
+          orbitSpeed =
+            orbitTotal / orbitElapsedMinutes;
+        } else if (
+          orbitStarted &&
+          orbitTotal > 0
+        ) {
+          var orbitElapsed =
+            Math.max(
+              0.01,
+              (Date.now() - orbitStarted) / 60000
+            );
+
+          orbitSpeed =
+            orbitTotal / orbitElapsed;
+        }
+      } catch (orbitSpeedError) {
+        console.warn(
+          "Orbit timer speed calculation failed:",
+          orbitSpeedError
+        );
       }
 
       if (orbitSpeedEl) {
