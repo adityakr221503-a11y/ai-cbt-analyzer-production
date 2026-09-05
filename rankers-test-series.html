@@ -78,34 +78,13 @@ function checkBankCount() {
  let bank=[];
  try{if(window.RankBoosterQuestionBank&&typeof RankBoosterQuestionBank.getAll==="function")bank=RankBoosterQuestionBank.getAll()||[];}catch(e){console.error(e)}
 
-if(!bank.length){
- fetch("./test180-questions.json")
-  .then(r=>r.json())
-  .then(data=>{
-   if(!Array.isArray(data)||!data.length)return;
-   const mapped=data.map(q=>({
-    id:q.id,
-    question:q.question,
-    text:q.question,
-    options:Array.isArray(q.options)?q.options:[],
-    correctAnswer:q.correctAnswer,
-    answer:q.correctAnswer,
-    correctIndex:q.correctIndex,
-    subject:q.subject||"",
-    chapter:"Test 180",
-    topic:"",
-    concept:"",
-    difficulty:q.difficulty||"medium",
-    explanation:q.solution||"",
-    source:q.source||"TEST180"
-   }));
-   localStorage.setItem(
-    "rankBoosterQuestionBankV1",
-    JSON.stringify(mapped)
-   );
-   location.reload();
-  })
-  .catch(e=>console.error("Ranker bank seed failed:",e));
+if(!bank.length && typeof window.importTest180Questions==="function"){
+ window.importTest180Questions().then(function(r){
+  console.log("Ranker TEST180 import:",r);
+  location.reload();
+ }).catch(function(e){
+  console.error("Ranker TEST180 import failed:",e);
+ });
 }
  let attempts=[];let mastered=[];
  try{attempts=typeof getRBHistory==="function"?getRBHistory():JSON.parse(localStorage.getItem("rankBoosterAttemptHistory") || "[]")}catch(e){attempts=[]}
