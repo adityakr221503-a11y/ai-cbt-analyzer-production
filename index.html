@@ -407,6 +407,86 @@ back.addEventListener("click",function(){
 });
 
 })();
+
+/* REVISION_FULL_NCERT_CONTENT */
+(function(){
+  const extra={
+    Physics:{
+      "Physical World":["Physics deals with basic laws of nature and their quantitative description.","Physical quantities require units and measurements.","Models and approximations are commonly used in physics."],
+      "Motion in a Plane":["Vectors have magnitude and direction.","Projectile motion can be resolved into independent horizontal and vertical motions.","Uniform circular motion has acceleration directed toward the centre."],
+      "System of Particles and Rotational Motion":["Centre of mass describes translational motion of a system.","Torque is the turning effect of a force.","Angular momentum is conserved when external torque is zero."],
+      "Gravitation":["Every mass attracts every other mass gravitationally.","Acceleration due to gravity varies with altitude and depth.","Escape velocity is independent of the mass of the escaping body."],
+      "Properties of Bulk Matter":["Elasticity describes deformation and restoring tendency.","Pressure in a fluid increases with depth.","Surface tension is associated with the surface of liquids."],
+      "Thermodynamics":["Temperature measures thermal equilibrium.","The first law expresses conservation of energy.","Entropy is a state function."],
+      "Kinetic Theory":["Gas molecules are in continuous random motion.","Average translational kinetic energy is proportional to absolute temperature.","Ideal-gas assumptions neglect intermolecular forces and molecular volume."],
+      "Oscillations":["Simple harmonic motion has restoring acceleration proportional to displacement and opposite in direction.","Time period of an ideal simple pendulum depends on length and g.","Energy oscillates between kinetic and potential forms."],
+      "Waves":["Mechanical waves require a material medium.","Frequency is determined by the source.","Wave speed depends on the properties of the medium."]
+    },
+    Chemistry:{
+      "Classification of Elements and Periodicity in Properties":["Modern periodic law relates properties of elements to atomic numbers.","Atomic radius generally decreases across a period and increases down a group.","Ionisation enthalpy and electronegativity show characteristic periodic trends."],
+      "States of Matter":["Gas pressure results from molecular collisions with container walls.","Ideal-gas behaviour is an approximation.","Temperature is related to average kinetic energy."],
+      "Equilibrium":["Chemical equilibrium is dynamic.","At equilibrium, forward and reverse reaction rates are equal.","Le Chatelier's principle predicts response to changes in conditions."],
+      "Redox Reactions":["Oxidation involves increase in oxidation number; reduction involves decrease.","Oxidising agents are themselves reduced.","Electron transfer provides a useful interpretation of redox reactions."],
+      "Hydrogen":["Hydrogen has isotopes protium, deuterium and tritium.","Hydrogen shows similarities and differences with alkali metals and halogens.","Water is an important hydrogen compound."],
+      "The s-Block Elements":["Alkali metals have one valence electron.","Alkaline earth metals generally form M²⁺ ions.","Down-group trends reflect increasing atomic size and shielding."],
+      "Organic Chemistry: Basic Principles and Techniques":["Organic compounds are mainly carbon compounds.","Structural isomerism results from different arrangements of atoms.","Electron displacement effects help explain organic reactivity."],
+      "Hydrocarbons":["Alkanes contain single bonds, alkenes contain double bonds and alkynes contain triple bonds.","Aromatic compounds have special stability associated with delocalised electrons.","Addition reactions are characteristic of many unsaturated hydrocarbons."],
+      "Solutions":["Molarity is based on solution volume.","Molality is based on mass of solvent.","Colligative properties depend on the number of solute particles."],
+      "Electrochemistry":["Oxidation occurs at the anode and reduction at the cathode.","Electrochemical cells convert chemical and electrical energy.","Standard electrode potentials help predict redox feasibility."],
+      "Chemical Kinetics":["Reaction rate measures change in concentration with time.","Temperature generally increases reaction rate.","A catalyst changes reaction rate without being consumed overall."],
+      "Surface Chemistry":["Adsorption is accumulation of particles at a surface.","Catalysts provide an alternative reaction pathway.","Colloids have particle sizes between true solutions and suspensions."]
+    },
+    Biology:{
+      "Biological Classification":["The five-kingdom system uses characteristics such as cell structure and mode of nutrition.","Monera includes prokaryotic organisms.","Fungi are heterotrophic and commonly obtain nutrients by absorption."],
+      "Plant Kingdom":["Algae are simple, mostly aquatic photosynthetic organisms.","Bryophytes require water for fertilisation.","Pteridophytes are vascular plants that reproduce through spores."],
+      "Animal Kingdom":["Animals are multicellular heterotrophs.","Body organisation, symmetry, coelom and segmentation are important classification features.","Chordates possess a notochord at some stage."],
+      "Morphology of Flowering Plants":["Roots generally anchor plants and absorb water and minerals.","Leaves are major sites of photosynthesis.","Flowers are reproductive structures of angiosperms."],
+      "Anatomy of Flowering Plants":["Meristematic tissues actively divide.","Xylem mainly conducts water and minerals.","Phloem transports organic food."],
+      "Structural Organisation in Animals":["Epithelial tissue covers surfaces and lines cavities.","Connective tissue supports and connects body parts.","Muscle tissue is specialised for contraction."],
+      "Plant Physiology":["Photosynthesis converts light energy into chemical energy.","Respiration releases energy from organic molecules.","Plant growth is regulated by intrinsic and environmental factors."],
+      "Photosynthesis in Higher Plants":["Chlorophyll absorbs light energy.","Light reactions generate ATP and reducing power.","Carbon fixation occurs through the Calvin cycle."],
+      "Respiration in Plants":["Glycolysis occurs in the cytoplasm.","Aerobic respiration involves mitochondria.","ATP is the major immediately usable energy currency of cells."],
+      "Plant Growth and Development":["Auxin, gibberellins, cytokinins, ethylene and ABA are major plant hormones.","Growth involves irreversible increase in size.","Photoperiodism relates flowering responses to day/night duration."],
+      "Breathing and Exchange of Gases":["Gas exchange occurs across respiratory surfaces.","Oxygen is transported mainly by haemoglobin.","Carbon dioxide is transported in several forms, mainly as bicarbonate."],
+      "Body Fluids and Circulation":["Blood contains plasma and formed elements.","The human heart has four chambers.","Double circulation keeps oxygenated and deoxygenated blood largely separate."],
+      "Excretory Products and their Elimination":["Kidneys remove nitrogenous wastes and regulate water and ion balance.","The nephron is the functional unit of the kidney.","Urine formation involves filtration, reabsorption and secretion."],
+      "Locomotion and Movement":["Skeletal muscles contract through interactions of actin and myosin.","Bones provide support and attachment for muscles.","Joints permit movement between skeletal elements."],
+      "Neural Control and Coordination":["Neurons transmit electrical and chemical signals.","The central nervous system includes brain and spinal cord.","Reflex actions can occur through reflex arcs."],
+      "Chemical Coordination and Integration":["Endocrine glands release hormones into body fluids.","Hormones act on specific target tissues.","The hypothalamus links nervous and endocrine regulation."],
+      "Reproduction in Organisms":["Reproduction produces new individuals and ensures continuity of species.","Asexual reproduction generally involves a single parent.","Sexual reproduction involves fusion of gametes."],
+      "Sexual Reproduction in Flowering Plants":["Stamen is the male reproductive part and carpel is the female reproductive part.","Pollen grains carry male gametophyte structures.","Double fertilisation is characteristic of angiosperms."],
+      "Reproductive Health":["Reproductive health includes physical, emotional and social well-being related to reproduction.","Awareness and responsible reproductive practices reduce health risks.","Medical advice should be sought for reproductive health concerns."],
+      "Principles of Inheritance and Variation":["Mendel established fundamental principles of inheritance.","Alleles are alternative forms of a gene.","Variation provides the raw material for evolutionary change."],
+      "Molecular Basis of Inheritance":["DNA is the major hereditary material in most organisms.","Genes contain information used to produce functional products.","Replication preserves genetic information across cell generations."],
+      "Evolution":["Evolution involves changes in populations over generations.","Natural selection can favour heritable variations.","Fossils, comparative anatomy and molecular evidence support evolutionary history."],
+      "Human Health and Disease":["Innate immunity provides general defence.","Acquired immunity is specific and has memory.","Vaccination can generate protective immune responses."],
+      "Strategies for Enhancement in Food Production":["Plant breeding develops improved crop varieties.","Animal husbandry includes scientific management of livestock.","Biotechnology can improve production of useful biological products."],
+      "Microbes in Human Welfare":["Microorganisms are used in food production and industrial processes.","Some microbes produce antibiotics and enzymes.","Wastewater treatment uses microbial activity."],
+      "Biotechnology: Principles and Processes":["Recombinant DNA technology combines DNA from different sources.","Restriction enzymes cut DNA at specific sites.","PCR amplifies selected DNA sequences."],
+      "Biotechnology and its Applications":["Biotechnology has applications in medicine, agriculture and industry.","Recombinant products can be produced using engineered organisms.","Biosafety and ethical considerations are important."],
+      "Organisms and Populations":["Populations interact with both biotic and abiotic components.","Adaptations help organisms survive in their environments.","Population size changes through births, deaths, immigration and emigration."],
+      "Ecosystem":["An ecosystem contains living organisms and their physical environment.","Energy flows through trophic levels.","Decomposers recycle nutrients."],
+      "Biodiversity and Conservation":["Biodiversity occurs at genetic, species and ecosystem levels.","Habitat loss is a major threat to biodiversity.","In-situ conservation protects organisms in their natural habitats."],
+      "Environmental Issues":["Air, water and soil pollution can affect ecosystems and human health.","Greenhouse gases contribute to climate change.","Waste management reduces environmental impacts."]
+    }
+  };
+
+  Object.keys(extra).forEach(subject=>{
+    if(!revisionData[subject]) revisionData[subject]={};
+    Object.keys(extra[subject]).forEach(ch=>{
+      if(!revisionData[subject][ch]){
+        revisionData[subject][ch]={
+          ncert:extra[subject][ch],
+          traps:["Read NCERT wording carefully.","Do not confuse closely related terms or exceptions."],
+          concepts:["NCERT core concept","Definitions and key facts","NEET application"],
+          formulas:[]
+        };
+      }
+    });
+  });
+
+  console.log("Full Revision content loaded:",Object.keys(revisionData));
+})();
 </script>
 
 
