@@ -62,6 +62,98 @@ button{cursor:pointer;font-weight:700;background:#172033;color:#fff;border:0}
 </div>
 </section>
 </div>
+
+<script>
+/* IMAGE_DATA_RANKERS_PIPELINE_V2 */
+(function () {
+  function has(v) {
+    return v !== undefined && v !== null &&
+      !(typeof v === "string" && !v.trim());
+  }
+
+  window.RBNormalizeQuestionV2 = function (q, i) {
+    q = q || {};
+
+    var text =
+      q.question ||
+      q.text ||
+      q.questionText ||
+      q.question_text ||
+      q.statement ||
+      "";
+
+    var image =
+      q.image ||
+      q.imageUrl ||
+      q.imageURL ||
+      q.image_url ||
+      q.img ||
+      q.figure ||
+      q.diagram ||
+      q.questionImage ||
+      q.question_image ||
+      "";
+
+    var data =
+      q.data ||
+      q.dataImage ||
+      q.dataUrl ||
+      q.dataURL ||
+      q.data_url ||
+      q.chart ||
+      q.graph ||
+      q.table ||
+      q.passage ||
+      "";
+
+    var options =
+      q.options ||
+      q.choices ||
+      q.answers ||
+      [];
+
+    if (!Array.isArray(options)) {
+      if (typeof options === "object" && options) {
+        options = Object.values(options);
+      } else {
+        options = [];
+      }
+    }
+
+    return Object.assign({}, q, {
+      id: q.id || ("RB-" + i),
+      question: text,
+      text: text,
+      options: options,
+      image: image,
+      data: data,
+      imageUrl: q.imageUrl || image,
+      dataUrl: q.dataUrl || data,
+      correctAnswer:
+        q.correctAnswer !== undefined ? q.correctAnswer :
+        q.answer !== undefined ? q.answer : "",
+      answer:
+        q.answer !== undefined ? q.answer :
+        q.correctAnswer !== undefined ? q.correctAnswer : ""
+    });
+  };
+
+  window.RBNormalizePoolV2 = function (pool) {
+    if (!Array.isArray(pool)) return [];
+
+    return pool.map(function (q, i) {
+      return window.RBNormalizeQuestionV2(q, i);
+    }).filter(function (q) {
+      return (
+        has(q.question) ||
+        has(q.image) ||
+        has(q.data)
+      ) && q.options.length >= 2;
+    });
+  };
+})();
+</script>
+
 <script src="rank-booster/question-bank.js"></script>
 <script>
 function checkBankCount() {
