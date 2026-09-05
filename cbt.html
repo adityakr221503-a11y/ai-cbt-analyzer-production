@@ -3445,7 +3445,7 @@ function showResult(
 
       else if (
         userAnswer ===
-        question.correctAnswer
+        (question.correctAnswer || question.answer)
       ) {
 
         statusHTML = `
@@ -3504,7 +3504,7 @@ function showResult(
         <strong>
           Q${index + 1}.
           ${safeText(
-            question.text
+            question.text || question.question
           )}
         </strong>
 
@@ -3524,13 +3524,13 @@ function showResult(
         <div class="review-answer">
           <strong>Correct answer:</strong>
           ${safeText(
-            question.correctAnswer
+            question.correctAnswer || question.answer
           )}
         </div>
 
         ${
           userAnswer !== undefined &&
-          userAnswer !== question.correctAnswer
+          userAnswer !== (question.correctAnswer || question.answer)
             ? `
               <div class="review-answer">
                 <strong>Mistake Reason:</strong>
