@@ -115,69 +115,18 @@ if(perf.length){
   if(m)mistakeStats[m]=(mistakeStats[m]||0)+1;
  });(Array.isArray(attempts)?attempts:[]).forEach(a=>{if(!a.topic)return;stats[a.topic]=stats[a.topic]||{w:0,t:0};stats[a.topic].t++;if(a.correct===false)stats[a.topic].w++});pool.sort((a,b)=>{const ar=stats[a.topic]?stats[a.topic].w/stats[a.topic].t:0;const br=stats[b.topic]?stats[b.topic].w/stats[b.topic].t:0;return br-ar||(stats[a.topic]?1:0)-(stats[b.topic]?1:0)})}
    if(mode==="adaptive"){
- const stats={};
- const mistakeStats={};
- (Array.isArray(attempts)?attempts:[]).forEach(a=>{const m=a.mistakeType||a.mistakeReason;if(m)mistakeStats[m]=(mistakeStats[m]||0)+1});
- const hardWeight=q=>{const d=String(q.difficulty||"").toLowerCase();return (d.includes("hard")||d.includes("difficult"))?2:0};
- const mistakeWeight=q=>{const m=String(q.mistakeType||q.mistakeReason||"");return mistakeStats[m]||0;};
- (Array.isArray(attempts)?attempts:[]).forEach(a=>{
-  if(!a.subject)return;
-  stats[a.subject]=stats[a.subject]||{w:0,t:0};
-  stats[a.subject].t++;
-  if(a.correct===false)stats[a.subject].w++;
- });
- pool.sort((a,b)=>{
-  const aw=stats[a.subject]?stats[a.subject].w/stats[a.subject].t:0;
-  const bw=stats[b.subject]?stats[b.subject].w/stats[b.subject].t:0;
-  return (bw-aw)
-  || (mistakeWeight(b)-mistakeWeight(a))
-  || (hardWeight(b)-hardWeight(a))
-  || Math.random()-.5;
- });
-} else {
- pool.sort(()=>Math.random()-.5);
-}
-   if(mode==="adaptive" && pool.length>3){
- const groups={};
- pool.forEach(q=>(groups[q.subject]??=[]).push(q));
- Object.values(groups).forEach(a=>a.sort(()=>Math.random()-.5));
- const balanced=[];
- let i=0;
- while(balanced.length<pool.length){
-  const keys=Object.keys(groups).sort((a,b)=>(groups[b].length-groups[a].length));
-  let added=false;
-  for(const key of keys){
-   if(groups[key]?.length){
-    balanced.push(groups[key].shift());
-    added=true;
-    if(balanced.length>=pool.length)break;
+     if(typeof window.getRBQuestionPriority==="function"){
+       pool.sort((a,b)=>{
+         const ap=Number(window.getRBQuestionPriority(a))||0;
+         const bp=Number(window.getRBQuestionPriority(b))||0;
+         return bp-ap || Math.random()-.5;
+       });
+     }else{
+       pool.sort(()=>Math.random()-.5);
+     }
+   }else{
+     pool.sort(()=>Math.random()-.5);
    }
-  }
-  if(!added)break;
-  i++;
- }
- pool=balanced;
-}
-if(mode==="adaptive" && pool.length>6){
- const d={easy:[],medium:[],hard:[],other:[]};
- pool.forEach(q=>{
-  const x=String(q.difficulty||"").toLowerCase();
-  if(x.includes("easy"))d.easy.push(q);
-  else if(x.includes("hard")||x.includes("difficult"))d.hard.push(q);
-  else if(x.includes("medium")||x.includes("moderate"))d.medium.push(q);
-  else d.other.push(q);
- });
- Object.values(d).forEach(a=>a.sort(()=>Math.random()-.5));
- const balanced=[];
- const order=["easy","medium","hard","other"];
- while(balanced.length<pool.length){
-  for(const key of order){
-   if(d[key].length)balanced.push(d[key].shift());
-   if(balanced.length>=pool.length)break;
-  }
- }
- pool=balanced;
-}
 localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
    localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
    $("status").textContent=pool.length+" eligible questions selected. Opening CBT...";
