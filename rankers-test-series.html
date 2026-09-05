@@ -46,6 +46,7 @@ button{cursor:pointer;font-weight:700;background:#172033;color:#fff;border:0}
 <option value="new">Prioritize new patterns</option>
 <option value="weak">Prioritize weak topics</option>
 <option value="mixed">Balanced coverage</option>
+<option value="adaptive">Adaptive Ranker</option>
 </select></div>
 </div><br>
 <button id="start">Start Ranker Test</button>
@@ -114,7 +115,7 @@ if(perf.length){
   if(m)mistakeStats[m]=(mistakeStats[m]||0)+1;
  });(Array.isArray(attempts)?attempts:[]).forEach(a=>{if(!a.topic)return;stats[a.topic]=stats[a.topic]||{w:0,t:0};stats[a.topic].t++;if(a.correct===false)stats[a.topic].w++});pool.sort((a,b)=>{const ar=stats[a.topic]?stats[a.topic].w/stats[a.topic].t:0;const br=stats[b.topic]?stats[b.topic].w/stats[b.topic].t:0;return br-ar||(stats[a.topic]?1:0)-(stats[b.topic]?1:0)})}
    if(mode==="adaptive"){
- const stats={};\n const hardWeight=q=>{const d=String(q.difficulty||"").toLowerCase();return (d.includes("hard")||d.includes("difficult"))?2:0};
+ const stats={};\n const mistakeStats={};\n (Array.isArray(attempts)?attempts:[]).forEach(a=>{const m=a.mistakeType||a.mistakeReason;if(m)mistakeStats[m]=(mistakeStats[m]||0)+1});\n const hardWeight=q=>{const d=String(q.difficulty||"").toLowerCase();return (d.includes("hard")||d.includes("difficult"))?2:0};
  const mistakeWeight=q=>{const m=String(q.mistakeType||q.mistakeReason||"");return mistakeStats[m]||0;};
  (Array.isArray(attempts)?attempts:[]).forEach(a=>{
   if(!a.subject)return;
