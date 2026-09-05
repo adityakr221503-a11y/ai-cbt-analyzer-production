@@ -1561,7 +1561,7 @@ back.addEventListener("click",function(){
 
     const masteredCount=mastered.size;
 
-    const topMistakes=mista keFix(mistakes,mastered);
+    const topMistakes=mistakeFix(mistakes,mastered);
 
     box.innerHTML=`
       <h3>🏆 Ranker Master Loop</h3>
@@ -1673,7 +1673,7 @@ back.addEventListener("click",function(){
     `;
   }
 
-  function mista keFix(list,mastered){
+  function mistakeFix(list,mastered){
     return list.filter(q=>!mastered.has(questionId(q)));
   }
 
