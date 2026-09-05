@@ -25,6 +25,8 @@ button{cursor:pointer;font-weight:700;background:#172033;color:#fff;border:0}
 <div class="stats">
 <div class="stat"><div class="num" id="qCount">0</div><div class="muted">Bank questions</div></div>
 <div class="stat"><div class="num" id="attempts">0</div><div class="muted">Attempts</div></div>
+<div class="stat"><div class="num" id="avgAccuracy">0%</div><div class="muted">Avg Accuracy</div></div>
+<div class="stat"><div class="num" id="bestAccuracy">0%</div><div class="muted">Best Accuracy</div></div>
 <div class="stat"><div class="num" id="mastered">0</div><div class="muted">Mastered</div></div>
 <div class="stat"><div class="num" id="subjects">0</div><div class="muted">Subjects</div></div>
 </div>
@@ -79,6 +81,12 @@ function checkBankCount() {
  try{attempts=typeof getRBHistory==="function"?getRBHistory():JSON.parse(localStorage.getItem("rankBoosterAttemptHistory") || "[]")}catch(e){attempts=[]}
  try{mastered=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]")}catch(e){}
  $("qCount").textContent=bank.length;$("attempts").textContent=Number(localStorage.getItem("rankerTestAttempts")||"0");
+const perf=JSON.parse(localStorage.getItem("rankerTestPerformance")||"[]");
+if(perf.length){
+ const acc=perf.map(x=>Number(x.accuracy)||0);
+ $("avgAccuracy").textContent=Math.round(acc.reduce((a,b)=>a+b,0)/acc.length)+"%";
+ $("bestAccuracy").textContent=Math.max(...acc)+"%";
+}
  $("mastered").textContent=Array.isArray(mastered)?mastered.length:0;
  $("subjects").textContent=new Set(bank.map(q=>q.subject).filter(Boolean)).size;
  const subjects=[...new Set(bank.map(q=>q.subject).filter(Boolean))].sort();
