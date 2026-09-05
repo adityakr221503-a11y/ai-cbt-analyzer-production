@@ -3158,6 +3158,33 @@ function showResult(
       String(testAttempts + 1)
     );
     sessionStorage.setItem("RANKER_ATTEMPT_COUNTED", "1");
+
+    const rankerPerformance = JSON.parse(
+      localStorage.getItem("rankerTestPerformance") || "[]"
+    );
+    const rankerCorrect = selectedQuestions.filter(
+      (q, i) => answers[i] !== undefined &&
+        answers[i] === (q.answer || q.correctAnswer || "")
+    ).length;
+    const rankerAnswered = selectedQuestions.filter(
+      (q, i) => answers[i] !== undefined
+    ).length;
+
+    rankerPerformance.push({
+      timestamp: Date.now(),
+      total: selectedQuestions.length,
+      answered: rankerAnswered,
+      correct: rankerCorrect,
+      wrong: Math.max(0, rankerAnswered - rankerCorrect),
+      accuracy: rankerAnswered
+        ? Math.round((rankerCorrect / rankerAnswered) * 100)
+        : 0
+    });
+
+    localStorage.setItem(
+      "rankerTestPerformance",
+      JSON.stringify(rankerPerformance)
+    );
   }
 
   if (
