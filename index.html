@@ -408,6 +408,188 @@ back.addEventListener("click",function(){
 
 })();
 
+
+/* REVISION_RANK_BOOSTER_V1 */
+(function(){
+  const KEY="cbtRevisionProgressV1";
+
+  function progress(){
+    try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return {}}
+  }
+
+  function saveProgress(x){
+    localStorage.setItem(KEY,JSON.stringify(x));
+  }
+
+  const oldRender=window.renderRevisionChapter;
+
+  window.revisionRB={
+    search:"",
+    subject:"",
+    chapter:"",
+    render:function(subject,chapter){
+      this.subject=subject;
+      this.chapter=chapter;
+
+      const data=revisionData?.[subject]?.[chapter];
+      if(!data)return;
+
+      const box=document.querySelector("#revisionContent");
+      if(!box)return;
+
+      const p=progress();
+      const id=subject+"::"+chapter;
+      const done=!!p[id];
+
+      const all=[
+        ...(data.ncert||[]),
+        ...(data.traps||[]),
+        ...(data.concepts||[]),
+        ...(data.formulas||[])
+      ];
+
+      const q=this.search.trim().toLowerCase();
+      const filtered=q
+        ? all.filter(x=>String(x).toLowerCase().includes(q))
+        : all;
+
+      box.innerHTML=`
+        <div class="revision-rb-head">
+          <div>
+            <h2>📖 ${chapter}</h2>
+            <div style="opacity:.75">${subject} • ${all.length} revision points</div>
+          </div>
+          <div>
+            <button onclick="revisionRB.toggleDone()">
+              ${done?"↩️ Revise Again":"✅ Mark Revised"}
+            </button>
+          </div>
+        </div>
+
+        <input
+          id="revisionSearch"
+          value="${this.search.replace(/"/g,"&quot;")}"
+          placeholder="🔎 Search this chapter..."
+          oninput="revisionRB.search=this.value;revisionRB.render('${subject.replace(/'/g,"\\'")}','${chapter.replace(/'/g,"\\'")}')"
+          style="width:100%;box-sizing:border-box;padding:12px;border-radius:10px;margin:12px 0"
+        >
+
+        ${this.section("⭐ NCERT High-Yield",data.ncert,filtered)}
+        ${this.section("⚠️ NEET Traps & Exceptions",data.traps,filtered)}
+        ${this.section("🧠 Must Remember",data.concepts,filtered)}
+        ${data.formulas?.length?this.section("⚡ Formulas / Facts",data.formulas,filtered):""}
+
+        <button onclick="revisionRB.render('${subject.replace(/'/g,"\\'")}','${chapter.replace(/'/g,"\\'")}')">
+          🔁 Refresh Revision
+        </button>
+      `;
+    },
+
+    section:function(title,items,filtered){
+      if(!items?.length)return"";
+
+      const shown=items.filter(x=>filtered.includes(x));
+      if(!shown.length)return"";
+
+      return `
+        <div class="revision-rb-section">
+          <h3>${title}</h3>
+          ${shown.map((x,i)=>`
+            <div class="revision-point">
+              <span>${i+1}.</span> ${x}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    },
+
+    toggleDone:function(){
+      const p=progress();
+      const id=this.subject+"::"+this.chapter;
+
+      if(p[id]) delete p[id];
+      else p[id]=Date.now();
+
+      saveProgress(p);
+      this.render(this.subject,this.chapter);
+      this.updateProgress();
+    },
+
+    updateProgress:function(){
+      const el=document.querySelector("#revisionProgressRB");
+      if(!el)return;
+
+      const p=progress();
+      const total=Object.values(revisionData)
+        .reduce((n,x)=>n+Object.keys(x).length,0);
+
+      const done=Object.keys(p).length;
+
+      el.innerHTML=`📊 Revision Progress: <b>${done}</b> / ${total} chapters revised`;
+    }
+  };
+
+  const style=document.createElement("style");
+  style.id="REVISION_RANK_BOOSTER_CSS";
+  style.textContent=`
+    .revision-rb-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .revision-rb-section{
+      margin:14px 0;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(127,127,127,.08);
+    }
+    .revision-point{
+      padding:9px 4px;
+      border-bottom:1px solid rgba(127,127,127,.15);
+      line-height:1.5;
+    }
+    .revision-point:last-child{border-bottom:0}
+    #revisionSearch{
+      font-size:15px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  const progressBox=document.createElement("div");
+  progressBox.id="revisionProgressRB";
+  progressBox.style.cssText="margin:8px 0 14px;padding:10px;border-radius:10px;background:rgba(127,127,127,.08)";
+
+  const section=document.querySelector("#revisionSheet");
+  if(section){
+    const first=section.querySelector("h2,h3");
+    if(first) first.parentNode.insertBefore(progressBox,first);
+    else section.prepend(progressBox);
+  }
+
+  revisionRB.updateProgress();
+
+  /*
+    Hook chapter opening buttons.
+    Existing V2 buttons use data-subject/data-index.
+  */
+  document.addEventListener("click",function(e){
+    const btn=e.target.closest("[data-index]");
+    if(!btn)return;
+
+    const subject=btn.dataset.subject;
+    const index=Number(btn.dataset.index);
+
+    if(subject && revisionData[subject]){
+      const chapter=Object.keys(revisionData[subject])[index];
+      if(chapter){
+        setTimeout(()=>revisionRB.render(subject,chapter),0);
+      }
+    }
+  });
+})();
+
 /* REVISION_FULL_NCERT_CONTENT */
 (function(){
   const extra={
