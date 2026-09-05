@@ -19,6 +19,59 @@ async function extractTextPages(file){if(!window.pdfjsLib)throw new Error("PDF.j
 async function loadTesseract(){if(window.Tesseract)return window.Tesseract;await new Promise((resolve,reject)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";s.onload=resolve;s.onerror=()=>reject(new Error("OCR engine could not be loaded."));document.head.appendChild(s)});return window.Tesseract}
 async function ocrPages(file){const T=await loadTesseract(),buf=await file.arrayBuffer(),pdf=await window.pdfjsLib.getDocument({data:buf}).promise,pages=[];for(let p=1;p<=pdf.numPages;p++){status("OCR processing — page "+p+" of "+pdf.numPages+"…");const page=await pdf.getPage(p),viewport=page.getViewport({scale:2.5}),canvas=document.createElement("canvas");canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);const ctx=canvas.getContext("2d",{willReadFrequently:true});await page.render({canvasContext:ctx,viewport}).promise;const img=ctx.getImageData(0,0,canvas.width,canvas.height);for(let i=0;i<img.data.length;i+=4){const g=.299*img.data[i]+.587*img.data[i+1]+.114*img.data[i+2],v=Math.max(0,Math.min(255,(g-128)*1.25+128));img.data[i]=img.data[i+1]=img.data[i+2]=v}ctx.putImageData(img,0,0);const r=await T.recognize(canvas,"eng");pages.push({page:p,lines:String(r?.data?.text||"").split(/\r?\n/)});canvas.width=1;canvas.height=1}return pages}
 function parsePages(pages){const groups=[];let current=null;for(const pg of pages)for(const raw of pg.lines){const line=clean(raw);if(!line)continue;const q=qStart(line);if(q){if(current)groups.push(current);current={number:q.number,lines:q.text?[q.text]:[],page:pg.page}}else if(current)current.lines.push(line)}if(current)groups.push(current);return groups.map(g=>buildQuestion(g,g.page)).filter(Boolean)}
+function englishScore(text){
+  text=String(text||"");
+  if(!text.trim()) return 0;
+
+  const latin=(text.match(/[A-Za-z]/g)||[]).length;
+  const devan=(text.match(/[\\u0900-\\u097F]/g)||[]).length;
+  const total=latin+devan;
+
+  if(!total) return 0;
+  return latin/total;
+}
+
+function isEnglishQuestion(q){
+  const text=[
+    q?.question||"",
+    ...(Array.isArray(q?.options)?q.options:[])
+  ].join(" ");
+
+  const score=englishScore(text);
+
+  /*
+   * Strict rule:
+   * bilingual Hindi+English question -> English only
+   * Hindi-only question -> do NOT silently convert it
+   */
+  return score >= 0.75;
+}
+
+function englishOnlyFilter(qs){
+  const out=[];
+  const seenEnglish=new Set();
+
+  for(const q of Array.isArray(qs)?qs:[]){
+    if(!isEnglishQuestion(q)) continue;
+
+    const key=norm(q.question);
+    if(!key || seenEnglish.has(key)) continue;
+
+    seenEnglish.add(key);
+
+    out.push({
+      ...q,
+      question:repairText(q.question),
+      text:repairText(q.text||q.question),
+      options:(q.options||[]).map(repairText),
+      language:"English",
+      bilingualFiltered:true
+    });
+  }
+
+  return out;
+}
+
 function dedupe(qs){const seen=new Set();return qs.filter(q=>{const k=norm(q.question);if(!k||seen.has(k))return false;seen.add(k);return true})}
 function mapAnswerKey(pages,questions){const answers=new Map();for(const pg of pages)for(const line of pg.lines){const m=clean(line).match(/(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\):\-]?\s*(?:answer|ans|correct)?\s*[:=\-]?\s*(?:option\s*)?[\(\[]?\s*([A-D1-4])\s*[\)\]]?/i);if(m)answers.set(+m[1],answerLetter(m[2]))}return questions.map(q=>{if(!q.correctAnswer&&answers.has(q.number)){q.correctAnswer=answers.get(q.number);q.correctIndex="ABCD".indexOf(q.correctAnswer);q.needsReview=false;q.solutionSource="answer-key"}return q})}
 async function resolveAI(q){const apis=[window.CBTAnalyzerAI,window.CBTAnalyzerAIEngine,window.AISolutionEngine,window.RankerAI].filter(Boolean);for(const api of apis)for(const fn of ["solveQuestion","generateSolution","getSolution","solve"])if(typeof api[fn]==="function")try{const r=await api[fn](q);if(r){const a=answerLetter(r.correctAnswer??r.answer??r.option);if(a){q.correctAnswer=a;q.correctIndex="ABCD".indexOf(a)}q.explanation=String(r.explanation??r.solution??r.reason??"");q.solution=q.explanation;if(q.correctAnswer)q.solutionSource="ai";q.needsReview=!q.correctAnswer;return q}}catch(e){console.warn("[PDF3] AI hook failed",e)}return q}
@@ -95,7 +148,7 @@ function saveImport(qs,fileName){
   }
 }
 function preview(qs){const box=$("#questionPreview");if(!box)return;box.innerHTML=qs.slice(0,5).map((q,i)=>"<div style='margin:10px 0;padding:12px;border:1px solid #e2e8f0;border-radius:10px'><strong>Q"+(i+1)+".</strong> "+esc(q.question)+"<br><small>"+q.options.map((o,j)=>String.fromCharCode(65+j)+") "+esc(o)).join(" &nbsp; ")+"</small></div>").join("")+(qs.length>5?"<div>Showing first 5 of "+qs.length+" questions.</div>":"")}
-async function convert(file){const name=($("#moduleName")?.value||file.name).trim()||file.name;status("Reading PDF text layer…");let pages=[];try{pages=await extractTextPages(file)}catch(e){console.warn("[PDF3] text layer failed",e)}let qs=dedupe(parsePages(pages));if(!qs.length){try{const ocr=await ocrPages(file);qs=dedupe(parsePages(ocr));pages=pages.concat(ocr)}catch(e){console.error("[PDF3] OCR failed",e)}}qs=mapAnswerKey(pages,qs);if(!qs.length)throw new Error("No complete 4-option questions could be safely reconstructed.");for(let i=0;i<qs.length;i++)if(!qs[i].correctAnswer){status("Checking unresolved answers — "+(i+1)+" of "+qs.length+"…");qs[i]=await resolveAI(qs[i])}qs=normalizeFinal(qs,name);if(!qs.length)throw new Error("Validation removed all questions because their structure was incomplete.");saveImport(qs,name);preview(qs);const review=qs.filter(q=>q.needsReview).length;status("✅ Test PDF ready\n\nFile: "+name+"\nValid questions: "+qs.length+"\nNeeds answer review: "+review+"\n\nNo fixed question-count limit. Ready for CBT.");document.dispatchEvent(new CustomEvent("pdfCbtPoolUpdated",{detail:{questions:qs}}));return qs}
+async function convert(file){const name=($("#moduleName")?.value||file.name).trim()||file.name;status("Reading PDF text layer…");let pages=[];try{pages=await extractTextPages(file)}catch(e){console.warn("[PDF3] text layer failed",e)}let qs=englishOnlyFilter(dedupe(parsePages(pages)));if(!qs.length){try{const ocr=await ocrPages(file);qs=englishOnlyFilter(dedupe(parsePages(ocr)));pages=pages.concat(ocr)}catch(e){console.error("[PDF3] OCR failed",e)}}qs=mapAnswerKey(pages,qs);if(!qs.length)throw new Error("No complete 4-option questions could be safely reconstructed.");for(let i=0;i<qs.length;i++)if(!qs[i].correctAnswer){status("Checking unresolved answers — "+(i+1)+" of "+qs.length+"…");qs[i]=await resolveAI(qs[i])}qs=englishOnlyFilter(normalizeFinal(qs,name));if(!qs.length)throw new Error("Validation removed all questions because their structure was incomplete.");saveImport(qs,name);preview(qs);const review=qs.filter(q=>q.needsReview).length;status("✅ Test PDF ready\n\nFile: "+name+"\nValid questions: "+qs.length+"\nNeeds answer review: "+review+"\n\nNo fixed question-count limit. Ready for CBT.");document.dispatchEvent(new CustomEvent("pdfCbtPoolUpdated",{detail:{questions:qs}}));return qs}
 function install(){const input=$("#pdfInput"),button=$("#convertButton");if(!input||!button||button.dataset.pdfUniversalV1)return;button.dataset.pdfUniversalV1="1";button.addEventListener("click",async function(ev){ev.preventDefault();ev.stopImmediatePropagation();const file=input.files&&input.files[0];if(!file){status("Select a PDF first.");return}button.disabled=true;try{await convert(file)}catch(e){console.error("[PDF3]",e);status("❌ Conversion failed\n\n"+(e.message||"Unknown error"))}finally{button.disabled=false}},true);const row=button.parentElement;if(row&&!$("#pdfUniversalOpenCBT")){const open=document.createElement("button");open.id="pdfUniversalOpenCBT";open.type="button";open.className="primary";open.textContent="🚀 Open Imported Test in CBT";open.addEventListener("click",function(){
   const q=safeGet(KEY,[]);
   if(!Array.isArray(q)||!q.length){
