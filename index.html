@@ -1833,9 +1833,9 @@ back.addEventListener("click",function(){
 <script src="./basic-feature-hub.js"></script>
 <script src="./basic-testing-backbone.js"></script>
 
-<script id="MAIN_DASHBOARD_PRESENTATION_CLEANUP_V2">
+<script id="MAIN_DASHBOARD_PRESENTATION_CLEANUP_V3">
 (function(){
-  function clean(){
+  function cleanDashboardDetails(){
     [
       "basicSmartHistoryV1",
       "revisionMistakeLoop",
@@ -1846,19 +1846,36 @@ back.addEventListener("click",function(){
     });
 
     document.querySelectorAll(
-      ".revision-loop-card,.master-loop"
+      ".revision-loop-card, .master-loop"
     ).forEach(function(el){
       el.remove();
     });
   }
 
-  // Run after existing dashboard scripts have rendered.
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",function(){
-      setTimeout(clean,0);
+  function startCleanup(){
+    cleanDashboardDetails();
+
+    var observer=new MutationObserver(function(){
+      cleanDashboardDetails();
     });
+
+    if(document.body){
+      observer.observe(document.body,{
+        childList:true,
+        subtree:true
+      });
+    }
+
+    setTimeout(function(){
+      observer.disconnect();
+      cleanDashboardDetails();
+    },10000);
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",startCleanup,{once:true});
   }else{
-    setTimeout(clean,0);
+    startCleanup();
   }
 })();
 </script>
