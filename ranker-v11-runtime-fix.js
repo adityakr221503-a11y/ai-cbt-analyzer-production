@@ -1,18 +1,20 @@
 /* =========================================================
-   RANKER V11.1 — RUNTIME REPAIR
+   RANKER V11.3 — FINAL RUNTIME STABILITY LAYER
    ADDITIVE ONLY
    Fixes:
-   1. Orbit speed from authoritative CBT start time
-   2. Reliable V11 POST / Next Best Action rendering
+   1. Reliable CBT timer based speed
+   2. Reliable post-test Next Best Action
+   3. Re-render protection
+   Existing CBT/Orbit/Mistake/Retry structure preserved.
 ========================================================= */
 (function () {
   "use strict";
 
-  const ACTIVE_START = "CBT_ACTIVE_STARTED_AT";
   const POST_KEY = "cbtRankerPostActionV11";
   const NEXT_KEY = "cbtNextBestActionV5";
   const RETRY_KEY = "cbtAnalyzer.retryQueue";
   const POST_STATE = "cbtPostTestStateV8";
+  const START_KEY = "CBT_ACTIVE_STARTED_AT";
 
   function read(key, fallback) {
     try {
@@ -27,13 +29,11 @@
 
   function write(key, value) {
     try {
-      localStorage.setItem(key, JSON.stringify(value));
+      localStorage.setItem(
+        key,
+        JSON.stringify(value)
+      );
     } catch (_) {}
-  }
-
-  function arr(key) {
-    const value = read(key, []);
-    return Array.isArray(value) ? value : [];
   }
 
   function num(v, fallback) {
@@ -41,25 +41,37 @@
     return Number.isFinite(n) ? n : fallback;
   }
 
-  function activeStartedAt() {
-    const session =
-      Number(sessionStorage.getItem(ACTIVE_START) || 0);
-
-    const local =
-      Number(localStorage.getItem(ACTIVE_START) || 0);
-
-    return session || local || 0;
+  function arr(key) {
+    const value = read(key, []);
+    return Array.isArray(value) ? value : [];
   }
 
   function getLatestSession() {
-    const sessions =
+    const value =
       read("cbtTestSessions", []);
 
-    if (!Array.isArray(sessions) || !sessions.length) {
+    if (
+      !Array.isArray(value) ||
+      !value.length
+    ) {
       return null;
     }
 
-    return sessions[sessions.length - 1];
+    return value[value.length - 1];
+  }
+
+  function getLatestHistory() {
+    const value =
+      read("cbtHistory", []);
+
+    if (
+      !Array.isArray(value) ||
+      !value.length
+    ) {
+      return null;
+    }
+
+    return value[value.length - 1];
   }
 
   function getResult() {
@@ -69,151 +81,233 @@
         typeof window.RankerV11Lifecycle.getCompletedResult ===
           "function"
       ) {
-        const completed =
+        const r =
           window.RankerV11Lifecycle.getCompletedResult();
 
         if (
-          completed &&
-          typeof completed === "object"
+          r &&
+          typeof r === "object"
         ) {
-          return completed;
+          return r;
         }
       }
     } catch (_) {}
 
-    const candidates = [
-      read("cbtCoreResultV6", null),
-      read("cbtCoreResultV5", null),
-      read("cbtHistory", []),
-      read("cbtTestSessions", [])
+    const keys = [
+      "cbtCoreResultV6",
+      "cbtCoreResultV5"
     ];
 
-    for (const candidate of candidates) {
-      if (Array.isArray(candidate)) {
-        for (let i = candidate.length - 1; i >= 0; i--) {
-          const x = candidate[i];
-
-          if (
-            x &&
-            typeof x === "object" &&
-            (
-              x.submittedAt ||
-              x.completedAt ||
-              x.resultId ||
-              x.score != null
-            )
-          ) {
-            return x;
-          }
-        }
-      }
+    for (const key of keys) {
+      const r = read(key, null);
 
       if (
-        candidate &&
-        typeof candidate === "object"
+        r &&
+        typeof r === "object"
       ) {
-        if (
-          candidate.result &&
-          typeof candidate.result === "object"
-        ) {
-          return candidate.result;
-        }
-
-        return candidate;
+        return r.result &&
+          typeof r.result === "object"
+          ? r.result
+          : r;
       }
     }
 
-    return null;
+    return (
+      getLatestHistory() ||
+      getLatestSession()
+    );
   }
 
-  /* =====================================================
-     AUTHORITATIVE SPEED
-  ===================================================== */
+  function startTimestamp() {
+    let session = 0;
+    let local = 0;
 
-  function authoritativeDurationSeconds(session) {
-    /* Prefer the real CBT countdown state.
-       cbt.html initializes remainingSeconds from selectedTest.duration. */
     try {
-      if (
-        typeof selectedTest !== "undefined" &&
-        selectedTest &&
-        Number.isFinite(Number(selectedTest.duration)) &&
-        typeof remainingSeconds !== "undefined" &&
-        Number.isFinite(Number(remainingSeconds))
-      ) {
-        const total =
-          Number(selectedTest.duration) * 60;
+      session =
+        Number(
+          sessionStorage.getItem(
+            START_KEY
+          ) || 0
+        );
+    } catch (_) {}
 
-        const remaining =
-          Number(remainingSeconds);
+    try {
+      local =
+        Number(
+          localStorage.getItem(
+            START_KEY
+          ) || 0
+        );
+    } catch (_) {}
 
-        const elapsed =
-          total - remaining;
+    return session || local || 0;
+  }
 
-        if (elapsed > 0) {
-          return Math.max(
-            1,
-            Math.round(elapsed)
+  /*
+    Read the actual visible CBT countdown.
+
+    Expected existing CBT display:
+    .timer
+
+    Examples:
+    29:55
+    01:42:10
+  */
+  function visibleTimerSeconds() {
+    const el =
+      document.querySelector(
+        ".timer"
+      );
+
+    if (!el) return 0;
+
+    const text =
+      String(
+        el.textContent || ""
+      ).trim();
+
+    const match =
+      text.match(
+        /(\d{1,3}):(\d{2})(?::(\d{2}))?/
+      );
+
+    if (!match) return 0;
+
+    if (match[3] != null) {
+      return (
+        Number(match[1]) * 3600 +
+        Number(match[2]) * 60 +
+        Number(match[3])
+      );
+    }
+
+    return (
+      Number(match[1]) * 60 +
+      Number(match[2])
+    );
+  }
+
+  function testDurationSeconds() {
+    try {
+      const candidates = [
+        window.selectedTest,
+        window.currentTest,
+        window.activeTest
+      ];
+
+      for (const test of candidates) {
+        if (
+          test &&
+          Number.isFinite(
+            Number(test.duration)
+          ) &&
+          Number(test.duration) > 0
+        ) {
+          return (
+            Number(test.duration) * 60
           );
         }
       }
     } catch (_) {}
 
-    const started = activeStartedAt();
+    const session =
+      getLatestSession();
 
-    if (started > 0) {
-      const submitted =
-        Date.parse(
-          session &&
-          (
-            session.submittedAt ||
-            session.completedAt
-          )
-        );
-
-      if (
-        Number.isFinite(submitted) &&
-        submitted >= started
-      ) {
-        return Math.max(
-          1,
-          Math.round(
-            (submitted - started) / 1000
-          )
-        );
-      }
-    }
-
-    const stored =
+    const duration =
       num(
         session &&
         session.durationSeconds,
         0
       );
 
-    return stored > 0 ? stored : 0;
+    return duration > 0
+      ? duration
+      : 0;
+  }
+
+  function authoritativeDurationSeconds() {
+    /*
+      Best source:
+      actual CBT countdown.
+
+      This avoids trusting a stale/wrong
+      submittedAt/start timestamp pair.
+    */
+    const total =
+      testDurationSeconds();
+
+    const remaining =
+      visibleTimerSeconds();
+
+    if (
+      total > 0 &&
+      remaining >= 0 &&
+      remaining <= total
+    ) {
+      const elapsed =
+        total - remaining;
+
+      if (elapsed > 0) {
+        return Math.max(
+          1,
+          Math.round(elapsed)
+        );
+      }
+    }
+
+    /*
+      Fallback:
+      real start timestamp.
+    */
+    const started =
+      startTimestamp();
+
+    if (started > 0) {
+      const now =
+        Date.now();
+
+      if (now >= started) {
+        return Math.max(
+          1,
+          Math.round(
+            (now - started) / 1000
+          )
+        );
+      }
+    }
+
+    const session =
+      getLatestSession();
+
+    return num(
+      session &&
+      session.durationSeconds,
+      0
+    );
   }
 
   function patchOrbit() {
+    const orbit =
+      window.CBTAnalyzerOrbit;
+
     if (
-      !window.CBTAnalyzerOrbit ||
-      typeof window.CBTAnalyzerOrbit.getOrbitReport !==
+      !orbit ||
+      typeof orbit.getOrbitReport !==
         "function"
     ) {
       return false;
     }
 
     if (
-      window.CBTAnalyzerOrbit
-        .__rankerV11RuntimeFixed
+      orbit.__rankerV11FinalSpeedFix
     ) {
       return true;
     }
 
     const original =
-      window.CBTAnalyzerOrbit.getOrbitReport;
+      orbit.getOrbitReport;
 
-    window.CBTAnalyzerOrbit.getOrbitReport =
+    orbit.getOrbitReport =
       function (session) {
         const report =
           original.call(
@@ -228,14 +322,8 @@
           return report;
         }
 
-        const actualSession =
-          session ||
-          getLatestSession();
-
         const seconds =
-          authoritativeDurationSeconds(
-            actualSession
-          );
+          authoritativeDurationSeconds();
 
         const answered =
           num(
@@ -247,37 +335,34 @@
           seconds > 0 &&
           answered > 0
         ) {
-          report.durationSeconds =
-            seconds;
-
-          report.speedQuestionsPerMinute =
+          const speed =
             answered /
             (seconds / 60);
+
+          report.durationSeconds =
+            seconds;
 
           report.speedQuestionsPerMinute =
             Math.max(
               0,
               Math.min(
                 300,
-                report.speedQuestionsPerMinute
+                speed
               )
             );
         }
 
-        report.v11RuntimeFixed = true;
+        report.v11FinalSpeedFix =
+          true;
 
         return report;
       };
 
-    window.CBTAnalyzerOrbit
-      .__rankerV11RuntimeFixed = true;
+    orbit.__rankerV11FinalSpeedFix =
+      true;
 
     return true;
   }
-
-  /* =====================================================
-     NEXT BEST ACTION
-  ===================================================== */
 
   function deriveAction(result) {
     const retry =
@@ -285,30 +370,42 @@
 
     if (retry.length) {
       return {
-        type: "TARGETED_RETRY",
+        type:
+          "TARGETED_RETRY",
+
         reason:
           "Pending mistakes require verified retry.",
+
         route:
           "./retry.html?source=ranker-v11"
       };
     }
 
     const post =
-      read(POST_STATE, null);
+      read(
+        POST_STATE,
+        null
+      );
 
     if (
       post &&
-      Array.isArray(post.weakTopics) &&
+      Array.isArray(
+        post.weakTopics
+      ) &&
       post.weakTopics.length
     ) {
       const target =
         post.weakTopics[0];
 
       return {
-        type: "TARGETED_PRACTICE",
+        type:
+          "TARGETED_PRACTICE",
+
         reason:
           "Weak topic requires targeted practice.",
+
         target,
+
         route:
           "./rankers-test-series.html?mode=targeted&topic=" +
           encodeURIComponent(
@@ -326,9 +423,12 @@
 
     if (skipped > 0) {
       return {
-        type: "ATTEMPT_STRATEGY",
+        type:
+          "ATTEMPT_STRATEGY",
+
         reason:
           "Skipped questions require attempt-strategy review.",
+
         route:
           "./attempt.html"
       };
@@ -346,75 +446,66 @@
       accuracy < 85
     ) {
       return {
-        type: "REVISION",
+        type:
+          "REVISION",
+
         reason:
           "Accuracy requires revision before the next test.",
+
         route:
           "./question-bank.html?mode=weak"
       };
     }
 
     return {
-      type: "NEXT_TEST",
+      type:
+        "NEXT_TEST",
+
       reason:
         "Performance is ready for the next adaptive test.",
+
       route:
         "./rankers-test-series.html?mode=adaptive"
     };
   }
 
-  function ensurePostAction() {
-    const path =
-      String(
-        location.pathname || ""
-      ).toLowerCase();
-
-    if (!path.endsWith("cbt.html")) {
-      return false;
-    }
-
-    const lifecycle =
-      window.RankerV11Lifecycle;
-
-    if (!lifecycle) {
-      return false;
-    }
-
-    const result =
-      getResult();
-
-    if (!result) {
-      return false;
-    }
-
-    const existing =
+  function getAction() {
+    const saved =
       read(
         POST_KEY,
         null
       );
 
     if (
-      existing &&
-      existing.action
+      saved &&
+      saved.action
     ) {
-      renderAction(existing.action);
-      return true;
+      return saved.action;
+    }
+
+    const result =
+      getResult();
+
+    if (!result) {
+      return null;
     }
 
     const action =
       deriveAction(result);
 
-    const payload = {
-      version: "V11.1",
-      generatedAt:
-        Date.now(),
-      result,
-      action
-    };
-
     write(
       POST_KEY,
-      payload
+      {
+        version:
+          "V11.3",
+
+        generatedAt:
+          Date.now(),
+
+        result,
+
+        action
+      }
     );
 
     write(
@@ -422,13 +513,16 @@
       action
     );
 
-    renderAction(action);
-
-    return true;
+    return action;
   }
 
-  function renderAction(action) {
-    if (!action) return;
+  function renderAction() {
+    const action =
+      getAction();
+
+    if (!action) {
+      return false;
+    }
 
     let box =
       document.getElementById(
@@ -445,21 +539,15 @@
         "rankerV11PostAction";
 
       box.style.cssText =
-        "margin:16px 0;padding:18px;" +
+        "margin:16px 0;" +
+        "padding:18px;" +
         "border:1px solid #dfe4ec;" +
         "border-radius:16px;" +
         "background:#fff;" +
         "position:relative;" +
-        "z-index:5;";
+        "z-index:20;" +
+        "display:block;";
     }
-
-    const button =
-      action.route
-        ? "<button type='button' " +
-          "id='rankerV11NextBtn'>" +
-          "Continue →" +
-          "</button>"
-        : "";
 
     box.innerHTML =
       "<h2>🧠 Next Best Action</h2>" +
@@ -475,42 +563,66 @@
         ""
       ) +
       "</p>" +
-      button;
+      (
+        action.route
+          ? "<button type='button' " +
+            "id='rankerV11NextBtn'>" +
+            "Continue →" +
+            "</button>"
+          : ""
+      );
 
-    const selectors = [
-      "#orbitAnalysis",
-      "#orbit",
-      "#metrics",
-      "#questionReview",
-      ".question-review",
-      "main"
-    ];
+    /*
+      Always place after Orbit/result content
+      when possible. This prevents later result
+      rendering from putting it somewhere hidden.
+    */
+    const orbit =
+      document.querySelector(
+        ".orbit-result-panel"
+      ) ||
+      document.querySelector(
+        ".cbt-orbit-result-v2"
+      ) ||
+      document.querySelector(
+        "[id*='orbit']"
+      );
 
-    let anchor = null;
+    const result =
+      document.querySelector(
+        ".result"
+      );
 
-    for (const selector of selectors) {
-      anchor =
-        document.querySelector(
-          selector
-        );
-
-      if (anchor) break;
-    }
+    const review =
+      document.querySelector(
+        "#questionReview"
+      ) ||
+      document.querySelector(
+        ".question-review"
+      );
 
     if (
-      anchor &&
-      anchor.parentNode
+      orbit &&
+      orbit.parentNode
     ) {
-      if (
-        box.parentNode !==
-        anchor.parentNode ||
-        box.nextElementSibling !== anchor
-      ) {
-        anchor.parentNode.insertBefore(
-          box,
-          anchor
-        );
-      }
+      orbit.parentNode.insertBefore(
+        box,
+        orbit.nextSibling
+      );
+    } else if (
+      review &&
+      review.parentNode
+    ) {
+      review.parentNode.insertBefore(
+        box,
+        review
+      );
+    } else if (
+      result
+    ) {
+      result.appendChild(
+        box
+      );
     } else if (
       !box.parentNode
     ) {
@@ -524,83 +636,104 @@
         "rankerV11NextBtn"
       );
 
-    if (btn && action.route) {
+    if (
+      btn &&
+      action.route
+    ) {
       btn.onclick =
         function () {
           location.href =
             action.route;
         };
     }
+
+    return true;
   }
 
-  function refresh() {
-    patchOrbit();
+  function refreshSpeedText() {
+    const orbit =
+      window.CBTAnalyzerOrbit;
+
+    if (
+      !orbit ||
+      typeof orbit.getOrbitReport !==
+        "function"
+    ) {
+      return;
+    }
 
     const report =
-      window.CBTAnalyzerOrbit &&
-      typeof window.CBTAnalyzerOrbit.getOrbitReport ===
-        "function"
-        ? window.CBTAnalyzerOrbit.getOrbitReport()
-        : null;
+      orbit.getOrbitReport();
 
-    if (report) {
-      const speed =
-        document.querySelector(
-          "#metrics"
+    if (
+      !report ||
+      !report.available
+    ) {
+      return;
+    }
+
+    const speed =
+      num(
+        report.speedQuestionsPerMinute,
+        0
+      );
+
+    /*
+      Do not rewrite the whole result.
+      Only update visible Speed text.
+    */
+    const nodes =
+      document.querySelectorAll(
+        "body *"
+      );
+
+    for (const el of nodes) {
+      if (
+        el.children.length !== 0
+      ) {
+        continue;
+      }
+
+      const text =
+        String(
+          el.textContent || ""
         );
 
-      if (speed) {
-        const text =
-          speed.innerHTML;
-
-        speed.innerHTML =
+      if (
+        /Speed\s+\d+(?:\.\d+)?\s*Q\/min/i.test(
+          text
+        )
+      ) {
+        el.textContent =
           text.replace(
-            /Speed[^<]*Q\/min/g,
+            /Speed\s+\d+(?:\.\d+)?\s*Q\/min/i,
             "Speed " +
-            report.speedQuestionsPerMinute
-              .toFixed(2) +
+            speed.toFixed(2) +
             " Q/min"
           );
       }
     }
+  }
 
-    ensurePostAction();
+  function refresh() {
+    patchOrbit();
+    refreshSpeedText();
+    renderAction();
   }
 
   function boot() {
     refresh();
 
-    try {
-      const observer =
-        new MutationObserver(
-          function () {
-            const action =
-              read(
-                POST_KEY,
-                null
-              );
-
-            if (
-              action &&
-              action.action
-            ) {
-              renderAction(
-                action.action
-              );
-            }
-          }
-        );
-
-      observer.observe(
-        document.body,
-        {
-          childList: true,
-          subtree: true
-        }
-      );
-    } catch (_) {}
-
-    [250, 750, 1500, 2500, 4000, 6000].forEach(
+    [
+      100,
+      300,
+      700,
+      1200,
+      2000,
+      3500,
+      5000,
+      8000
+    ].forEach(
       function (delay) {
         setTimeout(
           refresh,
@@ -618,6 +751,23 @@
       "cbt:result-ready",
       refresh
     );
+
+    try {
+      const observer =
+        new MutationObserver(
+          function () {
+            refresh();
+          }
+        );
+
+      observer.observe(
+        document.body,
+        {
+          childList: true,
+          subtree: true
+        }
+      );
+    } catch (_) {}
   }
 
   if (
@@ -631,5 +781,4 @@
   } else {
     boot();
   }
-
 })();
