@@ -19,6 +19,17 @@ function removeDirectWeakView(){
 
   if(!isDashboard()) return;
 
+  /* MAIN DASHBOARD MUST ONLY SHOW ENTRY POINTS.
+     Detailed feature views remain on their dedicated/internal pages. */
+  [
+    "basicSmartHistoryV1",
+    "revisionMistakeLoop",
+    "rankerMasterLoop"
+  ].forEach(function(id){
+    const el=document.getElementById(id);
+    if(el) el.remove();
+  });
+
   const headings=[
     "weak & due revision",
     "weak / due revision",
