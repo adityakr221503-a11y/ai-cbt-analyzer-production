@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranker Revision - Physics</title>
+</head>
+<body>
+
+  <h1>🏆 Ranker Revision — Physics</h1>
+
+  <a href="../index.html">← Revision Hub</a>
+
+  <p id="count">0 revision cards</p>
+
+  <div id="revisionCards"></div>
+
+  <script src="./index.js"></script>
+  <script>
+    const cards =
+      typeof RANKER_PHYSICS_REVISION !== "undefined"
+        ? RANKER_PHYSICS_REVISION
+        : [];
+
+    document.getElementById("count").textContent =
+      cards.length + " revision cards";
+
+    document.getElementById("revisionCards").innerHTML =
+      cards.length
+        ? cards.map(card => `
+            <article>
+              <h2>${card.title || card.topic || "Revision Card"}</h2>
+              <p><b>Chapter:</b> ${card.chapter || "-"}</p>
+              <p>${card.concept || ""}</p>
+              <p><b>Trap:</b> ${card.trap || "-"}</p>
+              <p><b>Exception:</b> ${card.exception || "-"}</p>
+              <p><b>Recall:</b> ${card.recall || "-"}</p>
+            </article>
+          `).join("")
+        : "<p>No verified revision cards loaded yet.</p>";
+  </script>
+
+</body>
+</html>
