@@ -171,14 +171,42 @@ function checkBankCount() {
  let bank=[];
  try{if(window.RankBoosterQuestionBank&&typeof RankBoosterQuestionBank.getAll==="function")bank=RankBoosterQuestionBank.getAll()||[];}catch(e){console.error(e)}
 
-if(!bank.length && typeof window.importTest180Questions==="function"){
- window.importTest180Questions().then(function(r){
-  console.log("Ranker TEST180 import:",r);
-  location.reload();
- }).catch(function(e){
-  console.error("Ranker TEST180 import failed:",e);
- });
-}
+ /* TEST180 DIRECT SOURCE: always recover complete 180-question pool */
+ fetch("./test180-questions.json")
+   .then(function(res){return res.json();})
+   .then(function(data){
+     var src=Array.isArray(data)?data:
+       (Array.isArray(data.questions)?data.questions:
+       (Array.isArray(data.data)?data.data:
+       (Array.isArray(data.items)?data.items:[])));
+
+     if(src.length){
+       bank=src.map(function(q,i){
+         return Object.assign({},q,{
+           id:q.id||("TEST180-"+(i+1)),
+           question:q.question||q.text||"",
+           text:q.text||q.question||"",
+           options:Array.isArray(q.options)?q.options:[],
+           answer:q.answer!==undefined?q.answer:
+             (q.correctAnswer!==undefined?q.correctAnswer:""),
+           correctAnswer:q.correctAnswer!==undefined?q.correctAnswer:
+             (q.answer!==undefined?q.answer:""),
+           chapter:q.chapter||"Test 180",
+           topic:q.topic||"",
+           concept:q.concept||"",
+           source:q.source||"TEST180"
+         });
+       }).filter(function(q){
+         return q.options.length>=2 &&
+           (q.question||q.text||q.image||q.imageUrl||q.data||q.dataUrl);
+       });
+
+       console.log("Ranker DIRECT TEST180 pool:",bank.length);
+     }
+   })
+   .catch(function(e){
+     console.error("Direct TEST180 load failed:",e);
+   });
  let attempts=[];let mastered=[];
  try{attempts=typeof getRBHistory==="function"?getRBHistory():JSON.parse(localStorage.getItem("rankBoosterAttemptHistory") || "[]")}catch(e){attempts=[]}
  try{mastered=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]")}catch(e){}
