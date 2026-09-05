@@ -116,7 +116,10 @@ if(perf.length){
  pool.sort((a,b)=>{
   const aw=stats[a.subject]?stats[a.subject].w/stats[a.subject].t:0;
   const bw=stats[b.subject]?stats[b.subject].w/stats[b.subject].t:0;
-  return bw-aw || Math.random()-.5;
+  return (bw-aw)
+  || (mistakeWeight(b)-mistakeWeight(a))
+  || (hardWeight(b)-hardWeight(a))
+  || Math.random()-.5;
  });
 } else {
  pool.sort(()=>Math.random()-.5);
