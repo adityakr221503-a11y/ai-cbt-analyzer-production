@@ -155,6 +155,20 @@ header{
 }
 
 </style>
+
+<style id="REVISION_SHEET_V1">
+.revision-sheet{margin:22px 0;padding:18px;border-radius:18px;background:var(--card,#fff);border:1px solid rgba(128,128,128,.18)}
+.revision-sheet h2{margin:0 0 6px;font-size:22px}
+.revision-sub{opacity:.7;margin-bottom:14px}
+.revision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.revision-card{padding:16px;border-radius:15px;border:1px solid rgba(128,128,128,.18);cursor:pointer;transition:.15s}
+.revision-card:hover{transform:translateY(-2px)}
+.revision-card b{font-size:17px}
+.revision-card small{display:block;margin-top:7px;opacity:.68;line-height:1.4}
+.revision-pill{display:inline-block;margin-top:10px;padding:5px 9px;border-radius:999px;background:rgba(100,100,100,.1);font-size:12px}
+#revisionSearch{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(128,128,128,.25);margin:0 0 14px;font-size:15px;background:transparent;color:inherit}
+</style>
+
 </head>
 
 <body>
@@ -570,5 +584,60 @@ loadDashboardStats();
 
 </script>
 
-<script src="mentor-execution-evidence-v1.js"></script><section class="panel" style="margin-top:12px"><div class="row"><div><strong>🧪 Mentor Execution Evidence</strong><div class="muted small" id="mentorEvidenceDetail">Start an action-evidence loop to verify improvement.</div></div><span class="chip" id="mentorEvidenceStatus">PENDING</span></div><textarea id="mentorEvidenceNote" placeholder="Optional note: what you practiced / what changed?" style="width:100%;min-height:70px;margin-top:10px;padding:10px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box"></textarea><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button id="mentorEvidenceStart" class="btn">Start evidence loop</button><button id="mentorEvidenceVerify" class="btn" disabled>Re-check after next test</button></div></section><script src="mentor-recovery-loop-v1.js"></script><script src="mentor-recovery-verification-v1.js"></script><script src="mentor-next-test-targeting-v1.js"></script><script src="mentor-adaptive-test-builder-v1.js"></script><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Recovery Verification</strong><div class="muted small" id="mentorRecoveryVerificationDetail">Start recovery verification after a baseline test.</div></div><span class="chip" id="mentorRecoveryVerificationStatus">WAITING</span></div></section><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Next-Test Targeting</strong><div class="muted small" id="mentorNextTestTargetDetail">Building next-test target...</div></div><span class="chip" id="mentorNextTestTargetStatus">BASELINE</span></div></section><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Adaptive Test Builder</strong><div class="muted small" id="mentorAdaptiveTestBuilderDetail">Building adaptive next test...</div></div><span class="chip" id="mentorAdaptiveTestBuilderStatus">MEDIUM</span></div></section></body>
+<script src="mentor-execution-evidence-v1.js"></script><section class="panel" style="margin-top:12px"><div class="row"><div><strong>🧪 Mentor Execution Evidence</strong><div class="muted small" id="mentorEvidenceDetail">Start an action-evidence loop to verify improvement.</div></div><span class="chip" id="mentorEvidenceStatus">PENDING</span></div><textarea id="mentorEvidenceNote" placeholder="Optional note: what you practiced / what changed?" style="width:100%;min-height:70px;margin-top:10px;padding:10px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box"></textarea><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button id="mentorEvidenceStart" class="btn">Start evidence loop</button><button id="mentorEvidenceVerify" class="btn" disabled>Re-check after next test</button></div></section><script src="mentor-recovery-loop-v1.js"></script><script src="mentor-recovery-verification-v1.js"></script><script src="mentor-next-test-targeting-v1.js"></script><script src="mentor-adaptive-test-builder-v1.js"></script><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Recovery Verification</strong><div class="muted small" id="mentorRecoveryVerificationDetail">Start recovery verification after a baseline test.</div></div><span class="chip" id="mentorRecoveryVerificationStatus">WAITING</span></div></section><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Next-Test Targeting</strong><div class="muted small" id="mentorNextTestTargetDetail">Building next-test target...</div></div><span class="chip" id="mentorNextTestTargetStatus">BASELINE</span></div></section><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Adaptive Test Builder</strong><div class="muted small" id="mentorAdaptiveTestBuilderDetail">Building adaptive next test...</div></div><span class="chip" id="mentorAdaptiveTestBuilderStatus">MEDIUM</span></div></section>
+<section class="revision-sheet" id="revisionSheet">
+  <h2>📚 Revision Sheets</h2>
+  <div class="revision-sub">Quick revision of high-yield concepts, traps and mistakes.</div>
+  <input id="revisionSearch" type="search" placeholder="Search subject, topic or concept...">
+  <div class="revision-grid" id="revisionGrid"></div>
+</section>
+
+
+<script id="REVISION_SHEET_V1_JS">
+(function(){
+  const sheets=[
+    {subject:"Physics",topic:"Formula Revision",concept:"Important formulas, units, graphs and common traps",tag:"High Yield"},
+    {subject:"Physics",topic:"Mechanics",concept:"Kinematics, NLM, Work-Energy, Momentum and Rotation",tag:"Core"},
+    {subject:"Chemistry",topic:"Physical Chemistry",concept:"Formulae, graphs, approximations and calculation traps",tag:"High Yield"},
+    {subject:"Chemistry",topic:"Inorganic NCERT",concept:"NCERT facts, exceptions, trends and reaction traps",tag:"NCERT"},
+    {subject:"Chemistry",topic:"Organic Chemistry",concept:"Named reactions, mechanisms, reagents and conversions",tag:"Core"},
+    {subject:"Biology",topic:"NCERT Line Revision",concept:"Important NCERT statements, examples and hidden facts",tag:"NCERT"},
+    {subject:"Biology",topic:"Human Physiology",concept:"Processes, hormones, pathways and frequent traps",tag:"High Yield"},
+    {subject:"Biology",topic:"Genetics",concept:"Inheritance, molecular genetics and numerical patterns",tag:"High Yield"}
+  ];
+
+  const grid=document.getElementById("revisionGrid");
+  const search=document.getElementById("revisionSearch");
+  if(!grid)return;
+
+  function render(){
+    const q=(search.value||"").toLowerCase().trim();
+    grid.innerHTML=sheets
+      .filter(x=>(x.subject+" "+x.topic+" "+x.concept+" "+x.tag).toLowerCase().includes(q))
+      .map((x,i)=>`
+        <article class="revision-card" data-index="${i}">
+          <b>${x.subject} — ${x.topic}</b>
+          <small>${x.concept}</small>
+          <span class="revision-pill">${x.tag}</span>
+        </article>
+      `).join("") || "<div>No revision sheet found.</div>";
+  }
+
+  grid.addEventListener("click",function(e){
+    const card=e.target.closest(".revision-card");
+    if(!card)return;
+    const x=sheets[Number(card.dataset.index)];
+    alert(
+      "📚 "+x.subject+" — "+x.topic+
+      "\\n\\n"+x.concept+
+      "\\n\\nRevision sheet content can be expanded here with NCERT points, formulas, traps and mistakes."
+    );
+  });
+
+  search.addEventListener("input",render);
+  render();
+})();
+</script>
+
+</body>
 </html>
