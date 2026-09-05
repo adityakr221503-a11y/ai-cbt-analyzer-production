@@ -3145,6 +3145,19 @@ function showResult(
   );
 
   if (
+    selectedTest &&
+    selectedTest.title === "Rankers Test Series"
+  ) {
+    const testAttempts = Number(
+      localStorage.getItem("rankerTestAttempts") || "0"
+    );
+    localStorage.setItem(
+      "rankerTestAttempts",
+      String(testAttempts + 1)
+    );
+  }
+
+  if (
     typeof window.recordRBAttempt === "function" &&
     selectedQuestions &&
     selectedQuestions.length &&
