@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orbit Test Analysis — CBT Analyzer Pro</title>
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+  background:#0b1020;
+  color:#f5f7ff;
+}
+.wrap{
+  max-width:1100px;
+  margin:auto;
+  padding:22px;
+}
+h1{margin-bottom:6px}
+.sub{opacity:.72;margin-bottom:20px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+}
+.card{
+  background:#151c31;
+  border:1px solid #29324d;
+  border-radius:14px;
+  padding:16px;
+}
+.label{
+  font-size:12px;
+  opacity:.65;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.value{
+  font-size:28px;
+  font-weight:800;
+  margin-top:5px;
+}
+.section{
+  margin-top:18px;
+}
+.signal{
+  border-left:4px solid #7785ff;
+  padding:12px;
+  margin:8px 0;
+  background:#12192b;
+  border-radius:8px;
+}
+.action{
+  background:#18243b;
+  border:1px solid #41527e;
+}
+button{
+  border:0;
+  border-radius:10px;
+  padding:11px 15px;
+  margin:5px;
+  font-weight:700;
+  cursor:pointer;
+}
+a{color:inherit;text-decoration:none}
+.small{font-size:13px;opacity:.72}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌌 Orbit Test Analysis</h1>
+  <div class="sub">
+    Common Post-Test Analysis powered by CBT Analyzer test-session data.
+  </div>
+
+  <div id="status" class="card">Loading latest test evidence…</div>
+
+  <div id="metrics" class="grid section"></div>
+
+  <div class="section">
+    <div class="card">
+      <div class="label">Diagnosis</div>
+      <h2 id="classification">—</h2>
+      <p id="diagnosis" class="small">—</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <div class="label">Bottlenecks / Signals</div>
+      <div id="signals">—</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card action">
+      <div class="label">Next Best Action</div>
+      <h2 id="nextTitle">—</h2>
+      <p id="nextReason">—</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <div class="label">Connected CBT Systems</div>
+      <p>
+        CBT Session → Orbit → Mistake Bank → Retry → Mastery →
+        Mentor → 720 Approach → Next Test
+      </p>
+      <button onclick="location.href='command-center.html'">
+        Command Center
+      </button>
+      <button onclick="location.href='cbt.html'">
+        CBT
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="./ranker-common-engine.js"></script>
+<script src="./orbit-engine.js"></script>
+<script>
+(function(){
+  function render(){
+    const O = window.CBTAnalyzerOrbit;
+
+    if(!O){
+      document.getElementById("status").textContent =
+        "Orbit engine failed to load.";
+      return;
+    }
+
+    const r = O.getOrbitReport();
+
+    if(!r.available){
+      document.getElementById("status").textContent =
+        r.message;
+      return;
+    }
+
+    document.getElementById("status").textContent =
+      "Latest: " + r.title + " • " + r.source;
+
+    const metrics = [
+      ["Score", r.score],
+      ["Percentage", r.percentage.toFixed(1) + "%"],
+      ["Accuracy", r.accuracy.toFixed(1) + "%"],
+      ["Correct", r.correct],
+      ["Wrong", r.wrong],
+      ["Skipped", r.skipped],
+      ["Answered", r.answered],
+      ["Speed", r.speedQuestionsPerMinute.toFixed(2) + " Q/min"]
+    ];
+
+    document.getElementById("metrics").innerHTML =
+      metrics.map(function(x){
+        return '<div class="card">' +
+          '<div class="label">' + x[0] + '</div>' +
+          '<div class="value">' + x[1] + '</div>' +
+        '</div>';
+      }).join("");
+
+    document.getElementById("classification").textContent =
+      r.classification;
+
+    document.getElementById("diagnosis").textContent =
+      r.classification === "STRONG"
+        ? "Strong current test performance. Continue with adaptive progression."
+        : r.classification === "STABLE"
+        ? "Performance is stable. Target remaining weak areas."
+        : r.classification === "IMPROVABLE"
+        ? "Performance is improving but still has identifiable bottlenecks."
+        : "Current evidence requires targeted diagnosis and repair.";
+
+    document.getElementById("signals").innerHTML =
+      r.weakSignals.length
+        ? r.weakSignals.map(function(s){
+            return '<div class="signal">' +
+              '<b>' + s.title + '</b><br>' +
+              '<span class="small">' + s.reason + '</span>' +
+            '</div>';
+          }).join("")
+        : '<div class="small">No major automatic bottleneck detected.</div>';
+
+    document.getElementById("nextTitle").textContent =
+      r.nextAction.title;
+
+    document.getElementById("nextReason").textContent =
+      r.nextAction.reason || "";
+  }
+
+  window.addEventListener("cbt:core-ready", render);
+  window.addEventListener("cbt:orbit-ready", render);
+  document.addEventListener("DOMContentLoaded", render);
+})();
+</script>
+</body>
+</html>
