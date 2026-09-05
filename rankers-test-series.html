@@ -142,6 +142,25 @@ if(perf.length){
      const score=q=>{
        let v=priority(q)*10;
 
+       // MASTERy-aware adaptive scoring
+       const qAttempts=history.filter(a=>a.questionId===q.id);
+       const qCorrect=qAttempts.filter(a=>a.correct===true).length;
+       const qWrong=qAttempts.filter(a=>a.correct===false).length;
+
+       if(qAttempts.length){
+         const qAcc=qCorrect/qAttempts.length;
+
+         // Strong/mastered questions are deprioritized.
+         if(qAcc>=0.8 && qAttempts.length>=2){
+           v-=45;
+         }else if(qAcc>=0.6){
+           v-=15;
+         }
+
+         // Previously wrong questions remain high priority.
+         v+=qWrong*30;
+       }
+
        const key=[q.subject||"",q.chapter||"",q.topic||"",q.concept||""].join("|");
        const st=topicStats[key];
 
