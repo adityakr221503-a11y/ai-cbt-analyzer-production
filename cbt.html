@@ -3334,6 +3334,168 @@ function showResult(
   }
 
 
+
+  /* =====================================================
+     COMMON CBT ANALYZER — TEST SESSION RECORD
+     Additive only: preserves existing result/history logic.
+  ===================================================== */
+  (function () {
+    try {
+      const questions =
+        Array.isArray(selectedQuestions)
+          ? selectedQuestions
+          : [];
+
+      if (!questions.length) return;
+
+      const total = questions.length;
+      const answered = total - skipped;
+      const source =
+        sessionStorage.getItem("CBT_ACTIVE_SOURCE") ||
+        (
+          selectedTest &&
+          selectedTest.title
+            ? selectedTest.title
+            : "CBT"
+        );
+
+      const sourceNorm =
+        String(source).toLowerCase();
+
+      let testType = "CBT";
+
+      if (sourceNorm.includes("pdf")) {
+        testType = "PDF";
+      } else if (
+        sourceNorm.includes("ranker")
+      ) {
+        testType = "RANKER";
+      }
+
+      const session = {
+        id:
+          "CBT-" +
+          Date.now() +
+          "-" +
+          Math.random()
+            .toString(36)
+            .slice(2, 8),
+
+        testId:
+          selectedTest &&
+          selectedTest.id
+            ? selectedTest.id
+            : "cbt",
+
+        title:
+          selectedTest &&
+          selectedTest.title
+            ? selectedTest.title
+            : "CBT",
+
+        source: source,
+        testType: testType,
+
+        startedAt:
+          sessionStorage.getItem(
+            "CBT_ACTIVE_STARTED_AT"
+          ) || null,
+
+        submittedAt:
+          new Date().toISOString(),
+
+        totalQuestions: total,
+        answered: answered,
+        correct: correct,
+        wrong: wrong,
+        skipped: skipped,
+
+        score: score,
+        maximumScore: maximumScore,
+
+        accuracy:
+          answered > 0
+            ? Number(
+                (
+                  (correct / answered) *
+                  100
+                ).toFixed(2)
+              )
+            : 0,
+
+        percentage:
+          Number(
+            percentage.toFixed(2)
+          ),
+
+        automatic:
+          !!automatic,
+
+        questionIds:
+          questions.map(function (q, i) {
+            return String(
+              q &&
+              (
+                q.id ||
+                q.questionId ||
+                ("CBT-" + i)
+              )
+            );
+          })
+      };
+
+      localStorage.setItem(
+        "cbtLastTestSession",
+        JSON.stringify(session)
+      );
+
+      if (
+        window.CBTAnalyzerCore &&
+        typeof window.CBTAnalyzerCore
+          .saveTestSession === "function"
+      ) {
+        window.CBTAnalyzerCore
+          .saveTestSession(session);
+      } else {
+        const key = "cbtTestSessions";
+        let sessions = [];
+
+        try {
+          sessions =
+            JSON.parse(
+              localStorage.getItem(key) ||
+              "[]"
+            );
+        } catch (e) {
+          sessions = [];
+        }
+
+        if (!Array.isArray(sessions)) {
+          sessions = [];
+        }
+
+        sessions.push(session);
+
+        localStorage.setItem(
+          key,
+          JSON.stringify(
+            sessions.slice(-500)
+          )
+        );
+      }
+
+      console.log(
+        "✅ COMMON TEST SESSION SAVED:",
+        session
+      );
+    } catch (e) {
+      console.error(
+        "Common CBT session save failed:",
+        e
+      );
+    }
+  })();
+
   /*
    * Hide CBT
 
@@ -4100,6 +4262,11 @@ console.log(
     sessionStorage.setItem(
       "CBT_ACTIVE_SOURCE",
       "Rankers Test Series"
+    );
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_STARTED_AT",
+      new Date().toISOString()
     );
 
     sessionStorage.setItem(
