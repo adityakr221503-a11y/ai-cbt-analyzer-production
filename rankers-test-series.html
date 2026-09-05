@@ -115,15 +115,127 @@ if(perf.length){
   if(m)mistakeStats[m]=(mistakeStats[m]||0)+1;
  });(Array.isArray(attempts)?attempts:[]).forEach(a=>{if(!a.topic)return;stats[a.topic]=stats[a.topic]||{w:0,t:0};stats[a.topic].t++;if(a.correct===false)stats[a.topic].w++});pool.sort((a,b)=>{const ar=stats[a.topic]?stats[a.topic].w/stats[a.topic].t:0;const br=stats[b.topic]?stats[b.topic].w/stats[b.topic].t:0;return br-ar||(stats[a.topic]?1:0)-(stats[b.topic]?1:0)})}
    if(mode==="adaptive"){
-     if(typeof window.getRBQuestionPriority==="function"){
-       pool.sort((a,b)=>{
-         const ap=Number(window.getRBQuestionPriority(a))||0;
-         const bp=Number(window.getRBQuestionPriority(b))||0;
-         return bp-ap || Math.random()-.5;
+     const priority=q=>{
+       try{
+         return typeof window.getRBQuestionPriority==="function"
+           ? Number(window.getRBQuestionPriority(q))||0
+           : 50;
+       }catch(e){return 50}
+     };
+
+     const history=Array.isArray(attempts)?attempts:[];
+
+     const mistakeStats={};
+     history.forEach(a=>{
+       const m=a.mistakeType||a.mistakeReason;
+       if(m) mistakeStats[m]=(mistakeStats[m]||0)+1;
+     });
+
+     const topicStats={};
+     history.forEach(a=>{
+       const key=[a.subject,a.chapter,a.topic,a.concept].join("|");
+       if(!topicStats[key]) topicStats[key]={t:0,w:0};
+       topicStats[key].t++;
+       if(a.correct===false) topicStats[key].w++;
+     });
+
+     const score=q=>{
+       let v=priority(q)*10;
+
+       const key=[q.subject||"",q.chapter||"",q.topic||"",q.concept||""].join("|");
+       const st=topicStats[key];
+
+       if(st){
+         const acc=st.t?st.w/st.t:0;
+         v+=acc*100;
+         v+=st.w*15;
+       }
+
+       const qa=history.filter(a=>a.questionId===q.id);
+       qa.forEach(a=>{
+         if(a.correct===false) v+=25;
+         const m=a.mistakeType||a.mistakeReason;
+         if(m){
+           const weights={
+             "Concept Gap":20,
+             "Calculation Error":15,
+             "Misread Question":10,
+             "Guessing":8,
+             "Time Pressure":6
+           };
+           v+=(weights[m]||mistakeStats[m]||0);
+         }
        });
-     }else{
-       pool.sort(()=>Math.random()-.5);
+
+       return v;
+     };
+
+     pool.sort((a,b)=>score(b)-score(a)||Math.random()-.5);
+
+     if(pool.length>3){
+       const groups={};
+       pool.forEach(q=>{
+         const key=q.subject||"Other";
+         (groups[key]??=[]).push(q);
+       });
+
+       Object.values(groups).forEach(a=>{
+         a.sort((x,y)=>score(y)-score(x)||Math.random()-.5);
+       });
+
+       const balanced=[];
+       while(balanced.length<pool.length){
+         const keys=Object.keys(groups).sort(
+           (a,b)=>groups[b].length-groups[a].length
+         );
+         let added=false;
+         for(const key of keys){
+           if(groups[key]?.length){
+             balanced.push(groups[key].shift());
+             added=true;
+             if(balanced.length>=pool.length) break;
+           }
+         }
+         if(!added) break;
+       }
+       pool=balanced;
      }
+
+     if(pool.length>6){
+       const d={easy:[],medium:[],hard:[],other:[]};
+
+       pool.forEach(q=>{
+         const x=String(q.difficulty||"").toLowerCase();
+         if(x.includes("easy")) d.easy.push(q);
+         else if(x.includes("hard")||x.includes("difficult")) d.hard.push(q);
+         else if(x.includes("medium")||x.includes("moderate")) d.medium.push(q);
+         else d.other.push(q);
+       });
+
+       Object.values(d).forEach(a=>
+         a.sort((x,y)=>score(y)-score(x)||Math.random()-.5)
+       );
+
+       const balanced=[];
+       const order=["easy","medium","hard","other"];
+
+       while(balanced.length<pool.length){
+         for(const key of order){
+           if(d[key].length) balanced.push(d[key].shift());
+           if(balanced.length>=pool.length) break;
+         }
+       }
+
+       pool=balanced;
+     }
+
+     const seen=new Set();
+     pool=pool.filter(q=>{
+       const key=String(q.question||q.id||"").trim().toLowerCase();
+       if(!key||seen.has(key)) return false;
+       seen.add(key);
+       return true;
+     });
    }else{
      pool.sort(()=>Math.random()-.5);
    }
