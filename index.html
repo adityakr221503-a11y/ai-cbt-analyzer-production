@@ -1832,5 +1832,36 @@ back.addEventListener("click",function(){
 <script src="./ranker-mentor-v5.js"></script>
 <script src="./basic-feature-hub.js"></script>
 <script src="./basic-testing-backbone.js"></script>
+
+<script id="MAIN_DASHBOARD_PRESENTATION_CLEANUP_V2">
+(function(){
+  function clean(){
+    [
+      "basicSmartHistoryV1",
+      "revisionMistakeLoop",
+      "rankerMasterLoop"
+    ].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.remove();
+    });
+
+    document.querySelectorAll(
+      ".revision-loop-card,.master-loop"
+    ).forEach(function(el){
+      el.remove();
+    });
+  }
+
+  // Run after existing dashboard scripts have rendered.
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",function(){
+      setTimeout(clean,0);
+    });
+  }else{
+    setTimeout(clean,0);
+  }
+})();
+</script>
+
 </body>
 </html>
