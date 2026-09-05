@@ -1833,30 +1833,89 @@ back.addEventListener("click",function(){
 <script src="./basic-feature-hub.js"></script>
 <script src="./basic-testing-backbone.js"></script>
 
-<script id="MAIN_DASHBOARD_PRESENTATION_CLEANUP_V3">
+<script id="MAIN_DASHBOARD_PRESENTATION_CLEANUP_V4">
 (function(){
-  function cleanDashboardDetails(){
-    [
-      "basicSmartHistoryV1",
-      "revisionMistakeLoop",
-      "rankerMasterLoop"
-    ].forEach(function(id){
+  var BLOCKS = [
+    "basicSmartHistoryV1",
+    "revisionMistakeLoop",
+    "rankerMasterLoop"
+  ];
+
+  var HEADINGS = [
+    "Weak / Due Chapters",
+    "Weak & Due Chapters",
+    "Active Mistakes",
+    "Mistake → Revision → Retry",
+    "Mistake -> Revision -> Retry",
+    "Ranker Master Loop"
+  ];
+
+  function norm(v){
+    return String(v || "")
+      .replace(/\s+/g," ")
+      .trim()
+      .toLowerCase();
+  }
+
+  function removeIds(){
+    BLOCKS.forEach(function(id){
       var el=document.getElementById(id);
       if(el) el.remove();
     });
 
     document.querySelectorAll(
-      ".revision-loop-card, .master-loop"
+      ".revision-loop-card,.master-loop"
     ).forEach(function(el){
       el.remove();
     });
   }
 
-  function startCleanup(){
-    cleanDashboardDetails();
+  function removeHeadingBlocks(){
+    var wanted=HEADINGS.map(norm);
+
+    document.querySelectorAll(
+      "h1,h2,h3,h4,h5,h6"
+    ).forEach(function(h){
+      var text=norm(h.textContent);
+
+      if(!wanted.some(function(x){
+        return text === x || text.indexOf(x) === 0;
+      })) return;
+
+      var box=h;
+
+      for(var i=0;i<8 && box.parentElement;i++){
+        box=box.parentElement;
+
+        var cls=norm(box.className);
+
+        if(
+          cls.indexOf("card") !== -1 ||
+          cls.indexOf("panel") !== -1 ||
+          cls.indexOf("loop") !== -1 ||
+          box.tagName === "SECTION"
+        ){
+          box.remove();
+          return;
+        }
+      }
+
+      if(h.parentElement){
+        h.parentElement.remove();
+      }
+    });
+  }
+
+  function clean(){
+    removeIds();
+    removeHeadingBlocks();
+  }
+
+  function boot(){
+    clean();
 
     var observer=new MutationObserver(function(){
-      cleanDashboardDetails();
+      clean();
     });
 
     if(document.body){
@@ -1868,14 +1927,18 @@ back.addEventListener("click",function(){
 
     setTimeout(function(){
       observer.disconnect();
-      cleanDashboardDetails();
-    },10000);
+      clean();
+    },12000);
   }
 
   if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",startCleanup,{once:true});
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      {once:true}
+    );
   }else{
-    startCleanup();
+    boot();
   }
 })();
 </script>
