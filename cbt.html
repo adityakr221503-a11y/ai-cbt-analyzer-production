@@ -4576,10 +4576,20 @@ sessionStorage.setItem(
       "Rankers Test Series"
     );
 
+    /* CBT_SPEED_TIMESTAMP_FIX_V2 */
+    const rankerSpeedStart = Date.now();
+
     sessionStorage.setItem(
       "CBT_ACTIVE_STARTED_AT",
-      new Date().toISOString()
+      String(rankerSpeedStart)
     );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_STARTED_AT",
+      String(rankerSpeedStart)
+    );
+
+    window.CBT_ACTIVE_STARTED_AT = rankerSpeedStart;
 
     sessionStorage.setItem(
       "CBT_ACTIVE_QUESTIONS",
