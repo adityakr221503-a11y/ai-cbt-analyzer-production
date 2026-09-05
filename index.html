@@ -1741,5 +1741,85 @@ back.addEventListener("click",function(){
 })();
 </script>
 
+
+
+<!-- =====================================================
+     RANKERS TEST SERIES — DASHBOARD ENTRY
+     Integrated navigation only. Existing CBT engine untouched.
+===================================================== -->
+<section
+  id="rankersTestSeriesDashboard"
+  class="dashboard-card rankers-test-series-card"
+  style="
+    margin-top:16px;
+    padding:18px;
+    border-radius:18px;
+    border:1px solid rgba(128,128,128,.18);
+    background:var(--card,#fff);
+  "
+>
+  <div
+    style="
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    "
+  >
+    <div>
+      <h2 style="margin:0 0 6px 0;">
+        👑 Rankers Test Series
+      </h2>
+
+      <p style="margin:0;opacity:.78;">
+        Pre-Test → Actual CBT → Orbit Analysis → Retry → Mastery
+      </p>
+    </div>
+
+    <a
+      href="./rankers-test-series.html"
+      class="primary"
+      style="
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        text-decoration:none;
+        padding:12px 18px;
+        border-radius:12px;
+        font-weight:700;
+        cursor:pointer;
+      "
+    >
+      🚀 Start Rankers Test
+    </a>
+  </div>
+
+  <div
+    style="
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+      gap:10px;
+      margin-top:14px;
+    "
+  >
+    <div style="padding:10px;border-radius:12px;background:rgba(128,128,128,.08);">
+      🟢 Pre-Test
+    </div>
+
+    <div style="padding:10px;border-radius:12px;background:rgba(128,128,128,.08);">
+      🔴 Actual CBT
+    </div>
+
+    <div style="padding:10px;border-radius:12px;background:rgba(128,128,128,.08);">
+      🔵 Orbit Analysis
+    </div>
+
+    <div style="padding:10px;border-radius:12px;background:rgba(128,128,128,.08);">
+      🔁 Retry / Mastery
+    </div>
+  </div>
+</section>
+
 </body>
 </html>
