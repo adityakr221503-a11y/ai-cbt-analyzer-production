@@ -156,490 +156,281 @@ header{
 
 </style>
 
-<style id="REVISION_SHEET_V1">
-.revision-sheet{margin:22px 0;padding:18px;border-radius:18px;background:var(--card,#fff);border:1px solid rgba(128,128,128,.18)}
-.revision-sheet h2{margin:0 0 6px;font-size:22px}
-.revision-sub{opacity:.7;margin-bottom:14px}
-.revision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-.revision-card{padding:16px;border-radius:15px;border:1px solid rgba(128,128,128,.18);cursor:pointer;transition:.15s}
-.revision-card:hover{transform:translateY(-2px)}
-.revision-card b{font-size:17px}
-.revision-card small{display:block;margin-top:7px;opacity:.68;line-height:1.4}
-.revision-pill{display:inline-block;margin-top:10px;padding:5px 9px;border-radius:999px;background:rgba(100,100,100,.1);font-size:12px}
-#revisionSearch{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid rgba(128,128,128,.25);margin:0 0 14px;font-size:15px;background:transparent;color:inherit}
+
+
+
+<style id="REVISION_SHEET_V2_CSS">
+.revision-box{
+  margin:16px 0;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid rgba(128,128,128,.18);
+  background:var(--card,#fff);
+}
+.revision-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+.revision-head strong{font-size:18px}
+.revision-head small{opacity:.65}
+.revision-subjects{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+.revision-subject{
+  border:1px solid rgba(128,128,128,.2);
+  border-radius:12px;
+  padding:12px 8px;
+  background:transparent;
+  color:inherit;
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+}
+.revision-subject:hover{transform:translateY(-1px)}
+.revision-chapters{
+  display:none;
+  margin-top:12px;
+}
+.revision-chapters.show{display:block}
+.revision-back{
+  border:0;
+  background:transparent;
+  color:inherit;
+  cursor:pointer;
+  padding:5px 0 10px;
+  font-weight:700;
+}
+.revision-chapter-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:8px;
+}
+.revision-chapter{
+  padding:11px;
+  border-radius:11px;
+  border:1px solid rgba(128,128,128,.18);
+  background:transparent;
+  color:inherit;
+  cursor:pointer;
+  text-align:left;
+}
+.revision-chapter b{display:block;font-size:13px}
+.revision-chapter small{opacity:.6}
+.revision-content{
+  display:none;
+  margin-top:12px;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid rgba(128,128,128,.18);
+}
+.revision-content.show{display:block}
+.revision-points{
+  margin:10px 0 0;
+  padding-left:20px;
+}
+.revision-points li{margin:7px 0}
+@media(max-width:600px){
+  .revision-subjects{grid-template-columns:repeat(3,1fr)}
+  .revision-chapter-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 
 </head>
 
 <body>
-<section class="revision-sheet" id="revisionSheet">
-  <h2>📚 Revision Sheets</h2>
-  <div class="revision-sub">Quick revision of high-yield concepts, traps and mistakes.</div>
-  <input id="revisionSearch" type="search" placeholder="Search subject, topic or concept...">
-  <div class="revision-grid" id="revisionGrid"></div>
-</section>
 
-
-<header>
-
-  <div class="header">
-
-    <div class="logo">
-      CBT Analyzer <span>Pro</span>
+<section class="revision-box" id="revisionSheet">
+  <div class="revision-head">
+    <div>
+      <strong>📚 Revision</strong>
+      <small>Quick chapter-wise revision</small>
     </div>
-
   </div>
 
-</header>
+  <div class="revision-subjects" id="revisionSubjects">
+    <button class="revision-subject" data-subject="Physics">⚡ Physics</button>
+    <button class="revision-subject" data-subject="Chemistry">🧪 Chemistry</button>
+    <button class="revision-subject" data-subject="Biology">🧬 Biology</button>
+  </div>
 
+  <div class="revision-chapters" id="revisionChapters">
+    <button class="revision-back" id="revisionBack">← Subjects</button>
+    <div id="revisionChapterGrid" class="revision-chapter-grid"></div>
+  </div>
 
-<div class="container">
-
-
-<!-- =====================================================
-HERO
-===================================================== -->
-
-<section class="hero">
-
-  <h1>🎯 CBT Analyzer Pro</h1>
-
-  <p>
-    Practice CBT tests, analyze mistakes, retry weak
-    questions, and convert PDF question papers into CBT.
-  </p>
-
+  <div class="revision-content" id="revisionContent"></div>
 </section>
 
 
-<!-- =====================================================
-FEATURES
-===================================================== -->
-
-<div class="grid">
-
-
-<!-- CBT TEST -->
-
-<a
-  href="cbt.html"
-  class="card primary"
->
-
-  <div class="icon">📝</div>
-
-  <h2>CBT Test</h2>
-
-  <p>
-    Start a computer-based test with questions,
-    options, timer and question palette.
-  </p>
-
-</a>
-
-
-<!-- PDF TO CBT -->
-
-<a
-  href="pdf-to-cbt.html"
-  class="card primary"
->
-
-  <div class="icon">📄</div>
-
-  <h2>PDF → CBT</h2>
-
-  <p>
-    Upload your actual PDF question paper and
-    convert it into a CBT test.
-  </p>
-
-</a>
-
-
-<!-- MISTAKE BANK -->
-
-<a
-  href="mistake.html"
-  class="card"
->
-
-  <div class="icon">🧠</div>
-
-  <h2>Mistake Bank</h2>
-
-  <p>
-    Review incorrect questions, mistake types,
-    reasons and solutions.
-  </p>
-
-</a>
-
-
-<!-- RETRY -->
-
-<a
-  href="retry.html"
-  class="card"
->
-
-  <div class="icon">🔄</div>
-
-  <h2>Retry Mistakes</h2>
-
-  <p>
-    Practice questions that you previously
-    answered incorrectly.
-  </p>
-
-</a>
-
-
-<!-- HISTORY -->
-
-<a
-  href="history.html"
-  class="card"
->
-
-  <div class="icon">📊</div>
-
-  <h2>Test History</h2>
-
-  <p>
-    View previous tests, scores, correct answers,
-    incorrect answers and skipped questions.
-  </p>
-
-</a>
-
-
-<!-- MASTERED -->
-
-<a
-  href="mastered.html"
-  class="card"
->
-
-  <div class="icon">🏆</div>
-
-  <h2>Mastered</h2>
-
-  <p>
-    View questions that have been successfully
-    mastered.
-  </p>
-
-</a>
-
-
-<!-- ATTEMPT -->
-
-<a
-  href="attempt.html"
-  class="card"
->
-
-  <div class="icon">🎯</div>
-
-  <h2>Attempt</h2>
-
-  <p>
-    Continue and review your test attempts.
-  </p>
-
-</a>
-
-
-
-<!-- RANK BOOSTER QUESTION BANK -->
-<section class="card">
-  <h2>🏆 Rank Booster Question Bank</h2>
-  <p>
-    Complete topic-wise mastery practice with concept coverage,
-    traps, mixed patterns and targeted revision.
-  </p>
-  <button onclick="window.location.href='question-bank.html'">
-    Open Rank Booster
-  </button>
-</section>
-
-<!-- RANKERS TEST SERIES -->
-<section class="card">
-  <h2>Rankers Test Series</h2>
-  <p>Coverage-first chapter, multi-chapter and full-syllabus ranker tests.</p>
-  <button onclick="window.location.href='rankers-test-series.html'">Open Rankers Test Series</button>
-</section>
-
-<!-- PDF READER -->
-
-<a
-  href="pdf.html"
-  class="card"
->
-
-  <div class="icon">📖</div>
-
-  <h2>PDF Reader</h2>
-
-  <p>
-    Open the PDF reader and inspect imported
-    question-paper content.
-  </p>
-
-</a>
-
-
-</div>
-
-
-<!-- =====================================================
-STATISTICS
-===================================================== -->
-
-<div class="stats">
-
-
-<div class="stat">
-
-  <div
-    id="tests"
-    class="stat-value">
-    0
-  </div>
-
-  <div class="stat-label">
-    Tests Completed
-  </div>
-
-</div>
-
-
-<div class="stat">
-
-  <div
-    id="mistakes"
-    class="stat-value">
-    0
-  </div>
-
-  <div class="stat-label">
-    Mistakes
-  </div>
-
-</div>
-
-
-<div class="stat">
-
-  <div
-    id="mastered"
-    class="stat-value">
-    0
-  </div>
-
-  <div class="stat-label">
-    Mastered
-  </div>
-
-</div>
-
-
-<div class="stat">
-
-  <div
-    id="questions"
-    class="stat-value">
-    0
-  </div>
-
-  <div class="stat-label">
-    Questions Attempted
-  </div>
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-<script>
-
-"use strict";
-
-
-/* =====================================================
-LOAD HISTORY
-===================================================== */
-
-function getHistory(){
-
-  try{
-
-    const data =
-      JSON.parse(
-        localStorage.getItem("cbtHistory") || "[]"
-      );
-
-    return Array.isArray(data) ? data : [];
-
-  }catch(error){
-
-    return [];
-
-  }
-
-}
-
-
-/* =====================================================
-LOAD MASTERY
-===================================================== */
-
-function getMastery(){
-
-  try{
-
-    const data =
-      JSON.parse(
-        localStorage.getItem("cbtMasteryV2") || "[]"
-      );
-
-    return Array.isArray(data) ? data : [];
-
-  }catch(error){
-
-    return [];
-
-  }
-
-}
-
-
-/* =====================================================
-DASHBOARD STATISTICS
-===================================================== */
-
-function loadDashboardStats(){
-
-  const history = getHistory();
-
-  const mastery = getMastery();
-
-
-  let mistakes = 0;
-
-  let attempted = 0;
-
-
-  history.forEach(function(test){
-
-    mistakes += Number(
-      test.incorrect ||
-      test.wrong ||
-      0
-    );
-
-
-    if(
-      Array.isArray(test.questions)
-    ){
-
-      test.questions.forEach(function(question){
-
-        if(
-          question.status !== "skipped"
-        ){
-
-          attempted++;
-
-        }
-
-      });
-
-    }
-
-  });
-
-
-  document.getElementById("tests")
-    .textContent = history.length;
-
-
-  document.getElementById("mistakes")
-    .textContent = mistakes;
-
-
-  document.getElementById("mastered")
-    .textContent = mastery.length;
-
-
-  document.getElementById("questions")
-    .textContent = attempted;
-
-}
-
-
-/* =====================================================
-START
-===================================================== */
-
-loadDashboardStats();
-
-</script>
-
-<script src="mentor-execution-evidence-v1.js"></script><section class="panel" style="margin-top:12px"><div class="row"><div><strong>🧪 Mentor Execution Evidence</strong><div class="muted small" id="mentorEvidenceDetail">Start an action-evidence loop to verify improvement.</div></div><span class="chip" id="mentorEvidenceStatus">PENDING</span></div><textarea id="mentorEvidenceNote" placeholder="Optional note: what you practiced / what changed?" style="width:100%;min-height:70px;margin-top:10px;padding:10px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box"></textarea><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button id="mentorEvidenceStart" class="btn">Start evidence loop</button><button id="mentorEvidenceVerify" class="btn" disabled>Re-check after next test</button></div></section><script src="mentor-recovery-loop-v1.js"></script><script src="mentor-recovery-verification-v1.js"></script><script src="mentor-next-test-targeting-v1.js"></script><script src="mentor-adaptive-test-builder-v1.js"></script><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Recovery Verification</strong><div class="muted small" id="mentorRecoveryVerificationDetail">Start recovery verification after a baseline test.</div></div><span class="chip" id="mentorRecoveryVerificationStatus">WAITING</span></div></section><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Next-Test Targeting</strong><div class="muted small" id="mentorNextTestTargetDetail">Building next-test target...</div></div><span class="chip" id="mentorNextTestTargetStatus">BASELINE</span></div></section><section class="panel" style="margin-top:12px"><div class="row"><div><strong>Mentor Adaptive Test Builder</strong><div class="muted small" id="mentorAdaptiveTestBuilderDetail">Building adaptive next test...</div></div><span class="chip" id="mentorAdaptiveTestBuilderStatus">MEDIUM</span></div></section>
-
-
-
-<script id="REVISION_SHEET_V1_JS">
+<script id="REVISION_SHEET_V2_JS">
 (function(){
-  const sheets=[
-    {subject:"Physics",topic:"Formula Revision",concept:"Important formulas, units, graphs and common traps",tag:"High Yield"},
-    {subject:"Physics",topic:"Mechanics",concept:"Kinematics, NLM, Work-Energy, Momentum and Rotation",tag:"Core"},
-    {subject:"Chemistry",topic:"Physical Chemistry",concept:"Formulae, graphs, approximations and calculation traps",tag:"High Yield"},
-    {subject:"Chemistry",topic:"Inorganic NCERT",concept:"NCERT facts, exceptions, trends and reaction traps",tag:"NCERT"},
-    {subject:"Chemistry",topic:"Organic Chemistry",concept:"Named reactions, mechanisms, reagents and conversions",tag:"Core"},
-    {subject:"Biology",topic:"NCERT Line Revision",concept:"Important NCERT statements, examples and hidden facts",tag:"NCERT"},
-    {subject:"Biology",topic:"Human Physiology",concept:"Processes, hormones, pathways and frequent traps",tag:"High Yield"},
-    {subject:"Biology",topic:"Genetics",concept:"Inheritance, molecular genetics and numerical patterns",tag:"High Yield"}
-  ];
 
-  const grid=document.getElementById("revisionGrid");
-  const search=document.getElementById("revisionSearch");
-  if(!grid)return;
+const revisionData={
 
-  function render(){
-    const q=(search.value||"").toLowerCase().trim();
-    grid.innerHTML=sheets
-      .filter(x=>(x.subject+" "+x.topic+" "+x.concept+" "+x.tag).toLowerCase().includes(q))
-      .map((x,i)=>`
-        <article class="revision-card" data-index="${i}">
-          <b>${x.subject} — ${x.topic}</b>
-          <small>${x.concept}</small>
-          <span class="revision-pill">${x.tag}</span>
-        </article>
-      `).join("") || "<div>No revision sheet found.</div>";
-  }
+Physics:[
+["Units & Measurements","Units, dimensions, errors and significant figures"],
+["Motion in a Straight Line","Kinematics graphs, equations and common traps"],
+["Motion in a Plane","Vectors, projectile motion and relative motion"],
+["Laws of Motion","Newton's laws, friction and connected bodies"],
+["Work, Energy & Power","Work-energy theorem, power and collisions"],
+["System of Particles & COM","Centre of mass, momentum and impulse"],
+["Rotational Motion","Torque, angular momentum and moment of inertia"],
+["Gravitation","Gravitational field, potential, satellites and escape velocity"],
+["Mechanical Properties of Solids","Stress, strain, elasticity and Young's modulus"],
+["Mechanical Properties of Fluids","Pressure, viscosity, Bernoulli and surface tension"],
+["Thermal Properties of Matter","Heat, expansion, calorimetry and heat transfer"],
+["Thermodynamics","Laws of thermodynamics, processes and PV diagrams"],
+["Kinetic Theory","Gas laws, RMS speed and degrees of freedom"],
+["Oscillations","SHM equations, energy and time period"],
+["Waves","Wave motion, sound and standing waves"],
+["Electrostatics","Charge, electric field, potential and capacitors"],
+["Current Electricity","Resistance, circuits, Kirchhoff and cells"],
+["Moving Charges & Magnetism","Magnetic force, Biot-Savart and Ampere law"],
+["Magnetism & Matter","Magnetic properties, earth magnetism and materials"],
+["Electromagnetic Induction","Faraday law, Lenz law and inductance"],
+["Alternating Current","AC circuits, reactance, impedance and resonance"],
+["Electromagnetic Waves","Spectrum, properties and applications"],
+["Ray Optics","Mirrors, lenses, refraction and optical instruments"],
+["Wave Optics","Interference, diffraction and polarization"],
+["Dual Nature","Photoelectric effect and matter waves"],
+["Atoms","Bohr model and atomic spectra"],
+["Nuclei","Radioactivity, binding energy and nuclear reactions"],
+["Semiconductor Electronics","Diodes, transistors and logic gates"]
+],
 
-  grid.addEventListener("click",function(e){
-    const card=e.target.closest(".revision-card");
-    if(!card)return;
-    const x=sheets[Number(card.dataset.index)];
-    alert(
-      "📚 "+x.subject+" — "+x.topic+
-      "\\n\\n"+x.concept+
-      "\\n\\nRevision sheet content can be expanded here with NCERT points, formulas, traps and mistakes."
-    );
-  });
+Chemistry:[
+["Some Basic Concepts of Chemistry","Mole concept, stoichiometry and concentration"],
+["Structure of Atom","Quantum numbers, orbitals and electronic configuration"],
+["Classification of Elements","Periodic trends and exceptions"],
+["Chemical Bonding","VSEPR, hybridization, MOT and hydrogen bonding"],
+["Thermodynamics","Enthalpy, entropy, Gibbs energy and spontaneity"],
+["Equilibrium","Chemical equilibrium, ionic equilibrium and pH"],
+["Redox Reactions","Oxidation number and balancing redox reactions"],
+["Solutions","Concentration terms, Raoult law and colligative properties"],
+["Electrochemistry","Cells, Nernst equation, conductance and electrolysis"],
+["Chemical Kinetics","Rate law, order, half-life and Arrhenius equation"],
+["Surface Chemistry","Adsorption, colloids and catalysis"],
+["Periodic Table & p-Block","Trends, compounds and NCERT exceptions"],
+["d- and f-Block Elements","Transition metals, colours, oxidation states"],
+["Coordination Compounds","Nomenclature, isomerism, CFT and magnetic properties"],
+["General Organic Chemistry","Electronic effects, acidity/basicity and intermediates"],
+["Hydrocarbons","Alkanes, alkenes, alkynes and aromatic compounds"],
+["Haloalkanes & Haloarenes","SN1, SN2, elimination and reactions"],
+["Alcohols, Phenols & Ethers","Preparation, reactions and acidity"],
+["Aldehydes, Ketones & Carboxylic Acids","Carbonyl chemistry and named reactions"],
+["Amines","Basicity, preparation and diazonium chemistry"],
+["Biomolecules","Carbohydrates, proteins, vitamins and nucleic acids"],
+["Polymers","Classification, monomers and important polymers"],
+["Chemistry in Everyday Life","Drugs, detergents and daily-life chemistry"]
+],
 
-  search.addEventListener("input",render);
-  render();
+Biology:[
+["The Living World","Taxonomy, nomenclature and biodiversity"],
+["Biological Classification","Kingdoms, major groups and characteristics"],
+["Plant Kingdom","Algae, bryophytes, pteridophytes, gymnosperms and angiosperms"],
+["Animal Kingdom","Animal phyla, symmetry and classification"],
+["Morphology of Flowering Plants","Root, stem, leaf, flower, fruit and seed"],
+["Anatomy of Flowering Plants","Tissues and internal structure"],
+["Structural Organisation in Animals","Animal tissues and cockroach"],
+["Cell: The Unit of Life","Cell organelles, membranes and transport"],
+["Biomolecules","Carbohydrates, proteins, lipids, enzymes and nucleic acids"],
+["Cell Cycle & Cell Division","Mitosis, meiosis and chromosome behaviour"],
+["Transport in Plants","Xylem, phloem, transpiration and pressure flow"],
+["Mineral Nutrition","Essential elements, deficiency and nitrogen metabolism"],
+["Photosynthesis","Light reaction, Calvin cycle and photorespiration"],
+["Respiration in Plants","Glycolysis, Krebs cycle and ETS"],
+["Plant Growth & Development","Hormones, growth movements and photoperiodism"],
+["Digestion & Absorption","Digestive system, enzymes and absorption"],
+["Breathing & Exchange of Gases","Mechanism, transport of gases and regulation"],
+["Body Fluids & Circulation","Blood, heart, cardiac cycle and ECG"],
+["Excretory Products & Elimination","Nephron, urine formation and osmoregulation"],
+["Locomotion & Movement","Muscles, bones and joints"],
+["Neural Control & Coordination","Neuron, CNS, reflexes and sense organs"],
+["Chemical Coordination & Integration","Endocrine glands and hormones"],
+["Reproduction in Organisms","Life cycles and reproductive phases"],
+["Sexual Reproduction in Flowering Plants","Pollination, fertilisation and seed formation"],
+["Human Reproduction","Male/female reproductive systems and gametogenesis"],
+["Reproductive Health","Contraception, STIs and reproductive technologies"],
+["Principles of Inheritance & Variation","Mendelism, linkage, crossing over and pedigree"],
+["Molecular Basis of Inheritance","DNA, replication, transcription, translation"],
+["Evolution","Evidence, theories and Hardy-Weinberg principle"],
+["Human Health & Disease","Pathogens, immunity, vaccines and disorders"],
+["Strategies for Enhancement in Food Production","Plant breeding, animal husbandry and microbes"],
+["Microbes in Human Welfare","Industrial products, antibiotics and sewage treatment"],
+["Biotechnology: Principles & Processes","rDNA technology, vectors and PCR"],
+["Biotechnology & Its Applications","GM crops, insulin, gene therapy and DNA fingerprinting"],
+["Organisms & Populations","Population interactions and adaptations"],
+["Ecosystem","Energy flow, productivity and ecological pyramids"],
+["Biodiversity & Conservation","Levels, hotspots, threats and conservation"],
+["Environmental Issues","Pollution, climate change, ozone depletion and waste"]
+]
+};
+
+const subjects=document.getElementById("revisionSubjects");
+const chapters=document.getElementById("revisionChapters");
+const grid=document.getElementById("revisionChapterGrid");
+const back=document.getElementById("revisionBack");
+const content=document.getElementById("revisionContent");
+
+if(!subjects||!chapters||!grid)return;
+
+subjects.addEventListener("click",function(e){
+ const btn=e.target.closest("[data-subject]");
+ if(!btn)return;
+
+ const subject=btn.dataset.subject;
+ const list=revisionData[subject]||[];
+
+ subjects.style.display="none";
+ chapters.classList.add("show");
+ content.classList.remove("show");
+
+ grid.innerHTML=list.map((x,i)=>`
+   <button class="revision-chapter" data-index="${i}" data-subject="${subject}">
+     <b>${x[0]}</b>
+     <small>Quick Revision →</small>
+   </button>
+ `).join("");
+});
+
+grid.addEventListener("click",function(e){
+ const btn=e.target.closest(".revision-chapter");
+ if(!btn)return;
+
+ const subject=btn.dataset.subject;
+ const item=revisionData[subject][Number(btn.dataset.index)];
+
+ content.innerHTML=`
+   <b>📖 ${subject} — ${item[0]}</b>
+   <div style="margin-top:7px;opacity:.75">${item[1]}</div>
+   <ul class="revision-points">
+     <li>⭐ NCERT high-yield points</li>
+     <li>⚠️ Common NEET traps & exceptions</li>
+     <li>🧠 Important concepts to remember</li>
+     <li>📝 Practice mistakes from this chapter</li>
+   </ul>
+ `;
+
+ content.classList.add("show");
+ content.scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
+back.addEventListener("click",function(){
+ chapters.classList.remove("show");
+ subjects.style.display="grid";
+ content.classList.remove("show");
+});
+
 })();
 </script>
+
+
+
 
 </body>
 </html>
