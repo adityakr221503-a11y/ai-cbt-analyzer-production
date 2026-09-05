@@ -1130,5 +1130,606 @@ back.addEventListener("click",function(){
 })();
 </script>
 
+
+<!-- RANKER_MASTER_LOOP_V1 -->
+<style id="RANKER_MASTER_LOOP_CSS">
+.master-loop{
+  margin:12px 0;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(127,127,127,.08);
+}
+.master-loop-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:10px 0;
+}
+.master-loop-stat{
+  padding:10px;
+  border-radius:12px;
+  background:rgba(127,127,127,.08);
+  text-align:center;
+}
+.master-loop-stat b{
+  display:block;
+  font-size:20px;
+}
+.master-loop-row{
+  padding:10px 0;
+  border-bottom:1px solid rgba(127,127,127,.15);
+}
+.master-loop-row:last-child{border-bottom:0}
+.master-loop-meta{
+  display:block;
+  opacity:.7;
+  font-size:13px;
+  margin:4px 0 7px;
+}
+.master-loop-actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+</style>
+
+<script>
+(function(){
+
+  const MASTERY_KEY="cbtMasteryV2";
+  const HISTORY_KEY="cbtHistory";
+  const RETRY_KEY="cbtRetryQuestion";
+  const RETRY_QUEUE="cbtAnalyzer.retryQueue";
+  const REVISION_KEY="cbtRevisionProgressV1";
+  const MASTER_LOOP_KEY="rankerMasterLoopV1";
+
+  function read(key,fallback){
+    try{
+      const x=JSON.parse(localStorage.getItem(key)||"null");
+      return x==null?fallback:x;
+    }catch(e){return fallback}
+  }
+
+  function write(key,value){
+    localStorage.setItem(key,JSON.stringify(value));
+  }
+
+  function history(){
+    const h=read(HISTORY_KEY,[]);
+    return Array.isArray(h)?h:[];
+  }
+
+  function testsQuestions(test){
+    if(Array.isArray(test?.questions))return test.questions;
+    if(Array.isArray(test?.questionResults))return test.questionResults;
+    if(Array.isArray(test?.results))return test.results;
+    return [];
+  }
+
+  function allAttempts(){
+    const out=[];
+
+    history().forEach(test=>{
+      testsQuestions(test).forEach(q=>{
+        out.push({
+          ...q,
+          testTime:test.timestamp||
+                   test.createdAt||
+                   test.date||
+                   0
+        });
+      });
+    });
+
+    return out;
+  }
+
+  function answer(q){
+    return q.userAnswer ??
+           q.selectedAnswer ??
+           q.selected ??
+           q.user_answer;
+  }
+
+  function correct(q){
+    return q.correctAnswer ??
+           q.answer ??
+           q.correct;
+  }
+
+  function isCorrect(q){
+    const a=answer(q);
+    const c=correct(q);
+
+    if(a===undefined || c===undefined)return false;
+
+    return String(a).trim()===String(c).trim();
+  }
+
+  function questionId(q){
+    return String(
+      q.id ||
+      q.questionId ||
+      q.question ||
+      q.text ||
+      ""
+    ).trim();
+  }
+
+  function mistakeList(){
+    const map=new Map();
+
+    allAttempts().forEach(q=>{
+      const id=questionId(q);
+      if(!id || isCorrect(q))return;
+
+      if(!map.has(id)){
+        map.set(id,{
+          id,
+          subject:q.subject||"Unknown",
+          chapter:q.chapter||"Unknown",
+          topic:q.topic||"",
+          question:q.question||q.text||"",
+          options:Array.isArray(q.options)?q.options:[],
+          correctAnswer:correct(q),
+          selectedAnswer:answer(q),
+          explanation:q.explanation||"",
+          source:q.source||"CBT",
+          mistakeReason:q.mistakeReason||"Review needed",
+          lastAttempt:q.testTime||Date.now()
+        });
+      }
+    });
+
+    return [...map.values()];
+  }
+
+  function stats(){
+
+    const attempts=allAttempts();
+
+    let total=0;
+    let correctCount=0;
+    let wrongCount=0;
+
+    const chapters={};
+    const questions={};
+
+    attempts.forEach(q=>{
+
+      total++;
+
+      const ok=isCorrect(q);
+
+      if(ok)correctCount++;
+      else wrongCount++;
+
+      const subject=q.subject||"Unknown";
+      const chapter=q.chapter||"Unknown";
+      const key=subject+"::"+chapter;
+
+      if(!chapters[key]){
+        chapters[key]={
+          subject,
+          chapter,
+          attempts:0,
+          correct:0,
+          wrong:0,
+          last:0
+        };
+      }
+
+      chapters[key].attempts++;
+
+      if(ok)chapters[key].correct++;
+      else chapters[key].wrong++;
+
+      const t=Date.parse(q.testTime||"");
+      if(Number.isFinite(t) && t>chapters[key].last)
+        chapters[key].last=t;
+
+      const id=questionId(q);
+
+      if(id){
+        if(!questions[id]){
+          questions[id]={
+            id,
+            attempts:0,
+            correct:0,
+            wrong:0,
+            question:q.question||q.text||"",
+            subject,
+            chapter,
+            last:0
+          };
+        }
+
+        questions[id].attempts++;
+        if(ok)questions[id].correct++;
+        else questions[id].wrong++;
+
+        if(Number.isFinite(t) && t>questions[id].last)
+          questions[id].last=t;
+      }
+    });
+
+    Object.values(chapters).forEach(x=>{
+      x.accuracy=x.attempts
+        ?Math.round(x.correct/x.attempts*100)
+        :0;
+
+      const days=x.last
+        ?(Date.now()-x.last)/86400000
+        :999;
+
+      x.due=days>=3;
+
+      x.priority=
+        x.wrong*5+
+        (x.accuracy<75?8:0)+
+        (x.accuracy<50?8:0)+
+        (x.due?4:0);
+    });
+
+    return{
+      total,
+      correct:correctCount,
+      wrong:wrongCount,
+      accuracy:total
+        ?Math.round(correctCount/total*100)
+        :0,
+      chapters:Object.values(chapters)
+        .sort((a,b)=>b.priority-a.priority),
+      questions:Object.values(questions)
+    };
+  }
+
+  function mastery(){
+
+    const m=read(MASTERY_KEY,{});
+
+    if(Array.isArray(m)){
+      return new Set(
+        m.map(x=>String(x.id||x.questionId||x))
+      );
+    }
+
+    return new Set(
+      Object.keys(m).filter(k=>m[k])
+    );
+  }
+
+  function retryQueue(){
+
+    const q=read(RETRY_QUEUE,[]);
+    return Array.isArray(q)?q:[];
+  }
+
+  function markMastered(q){
+
+    const id=questionId(q);
+    if(!id)return;
+
+    let m=read(MASTERY_KEY,{});
+
+    if(Array.isArray(m)){
+      if(!m.some(x=>String(x.id||x.questionId||x)===id)){
+        m.push({
+          id,
+          masteredAt:Date.now(),
+          question:q.question||"",
+          subject:q.subject||"",
+          chapter:q.chapter||""
+        });
+      }
+    }else{
+      m[id]={
+        mastered:true,
+        masteredAt:Date.now(),
+        subject:q.subject||"",
+        chapter:q.chapter||""
+      };
+    }
+
+    write(MASTERY_KEY,m);
+  }
+
+  function processRetry(){
+
+    const q=read(RETRY_KEY,null);
+    if(!q)return;
+
+    /*
+      Retry page can set one of these flags after
+      a correct retry. Existing systems remain untouched.
+    */
+    const result=
+      q.retryCorrect ??
+      q.isCorrectRetry ??
+      q.retryResult;
+
+    if(result===true){
+      markMastered(q);
+
+      const queue=retryQueue().filter(x=>
+        questionId(x)!==questionId(q)
+      );
+
+      write(RETRY_QUEUE,queue);
+
+      localStorage.removeItem(RETRY_KEY);
+    }
+  }
+
+  function revisionProgress(){
+
+    const p=read(REVISION_KEY,{});
+
+    if(!p || typeof p!=="object")return{};
+
+    return p;
+  }
+
+  function dueChapters(st){
+
+    return st.chapters
+      .filter(x=>
+        x.wrong>0 ||
+        x.accuracy<75 ||
+        x.due
+      )
+      .slice(0,8);
+  }
+
+  function openRevision(subject,chapter){
+
+    if(window.revisionRB &&
+       typeof window.revisionRB.render==="function"){
+
+      window.revisionRB.search="";
+      window.revisionRB.render(subject,chapter);
+      return;
+    }
+
+    const buttons=document.querySelectorAll(
+      "#revisionSheet [data-subject]"
+    );
+
+    for(const b of buttons){
+
+      if(
+        b.dataset.subject===subject &&
+        b.textContent.includes(chapter)
+      ){
+        b.click();
+        return;
+      }
+    }
+  }
+
+  function retryQuestion(q){
+
+    const item={
+      ...q,
+      retrySource:"Ranker Master Loop",
+      retryStartedAt:Date.now()
+    };
+
+    localStorage.setItem(
+      RETRY_KEY,
+      JSON.stringify(item)
+    );
+
+    const queue=retryQueue();
+
+    queue.unshift(item);
+
+    write(
+      RETRY_QUEUE,
+      queue.slice(0,50)
+    );
+
+    window.location.href="./retry.html";
+  }
+
+  function render(){
+
+    const sheet=document.querySelector("#revisionSheet");
+
+    if(!sheet)return;
+
+    let box=document.querySelector("#rankerMasterLoop");
+
+    if(!box){
+
+      box=document.createElement("div");
+
+      box.id="rankerMasterLoop";
+      box.className="master-loop";
+
+      sheet.prepend(box);
+    }
+
+    const st=stats();
+    const mistakes=mistakeList();
+    const mastered=mastery();
+    const progress=revisionProgress();
+
+    const due=dueChapters(st);
+
+    const revisedCount=Object.keys(progress).length;
+
+    const masteredCount=mastered.size;
+
+    const topMistakes=mista keFix(mistakes,mastered);
+
+    box.innerHTML=`
+      <h3>🏆 Ranker Master Loop</h3>
+
+      <div class="master-loop-grid">
+
+        <div class="master-loop-stat">
+          <b>${st.total}</b>
+          Questions
+        </div>
+
+        <div class="master-loop-stat">
+          <b>${st.accuracy}%</b>
+          Accuracy
+        </div>
+
+        <div class="master-loop-stat">
+          <b>${mistakes.length}</b>
+          Active Mistakes
+        </div>
+
+        <div class="master-loop-stat">
+          <b>${masteredCount}</b>
+          Mastered
+        </div>
+
+      </div>
+
+      <div style="margin:8px 0">
+        📚 Chapters Revised:
+        <b>${revisedCount}</b>
+      </div>
+
+      <h4>🎯 Weak / Due Chapters</h4>
+
+      ${
+        due.length
+        ?due.map((x,i)=>`
+          <div class="master-loop-row">
+
+            <b>${i+1}. ${x.chapter}</b>
+
+            <span class="master-loop-meta">
+              ${x.subject} •
+              ${x.accuracy}% accuracy •
+              ${x.wrong} mistakes
+              ${x.due?" • 🔔 Due":""}
+            </span>
+
+            <div class="master-loop-actions">
+
+              <button
+                type="button"
+                onclick='rankerMasterLoop.revise(${JSON.stringify(x.subject)},${JSON.stringify(x.chapter)})'>
+                📖 Revise
+              </button>
+
+            </div>
+
+          </div>
+        `).join("")
+        :`<div class="master-loop-meta">
+          🎉 No urgent weak chapter.
+        </div>`
+      }
+
+      <h4>🔁 Active Mistakes</h4>
+
+      ${
+        topMistakes.length
+        ?topMistakes.slice(0,5).map((q,i)=>`
+          <div class="master-loop-row">
+
+            <b>${i+1}. ${escapeHTML(q.question||"Question")}</b>
+
+            <span class="master-loop-meta">
+              ${escapeHTML(q.subject)} •
+              ${escapeHTML(q.chapter)}
+            </span>
+
+            <div class="master-loop-actions">
+
+              <button
+                type="button"
+                onclick='rankerMasterLoop.revise(${JSON.stringify(q.subject)},${JSON.stringify(q.chapter)})'>
+                📖 Revise
+              </button>
+
+              <button
+                type="button"
+                onclick='rankerMasterLoop.retry(${JSON.stringify(q)})'>
+                🎯 Retry
+              </button>
+
+            </div>
+
+          </div>
+        `).join("")
+        :`<div class="master-loop-meta">
+          🎉 No active mistakes.
+        </div>`
+      }
+
+      <button
+        type="button"
+        onclick="rankerMasterLoop.refresh()">
+        🔄 Recalculate
+      </button>
+    `;
+  }
+
+  function mista keFix(list,mastered){
+    return list.filter(q=>!mastered.has(questionId(q)));
+  }
+
+  function escapeHTML(x){
+    return String(x)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;");
+  }
+
+  window.rankerMasterLoop={
+    stats,
+    mistakes:mistakeList,
+
+    revise:function(subject,chapter){
+      openRevision(subject,chapter);
+    },
+
+    retry:function(q){
+      retryQuestion(q);
+    },
+
+    refresh:function(){
+      render();
+    },
+
+    markMastered:function(q){
+      markMastered(q);
+      render();
+    }
+  };
+
+  /*
+    Do not disturb the existing CBT engine.
+    This layer only reads its stored results.
+  */
+
+  processRetry();
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    render
+  );
+
+  window.addEventListener(
+    "storage",
+    render
+  );
+
+  setTimeout(render,500);
+  setTimeout(render,1500);
+  setTimeout(render,3000);
+
+})();
+</script>
+
 </body>
 </html>
