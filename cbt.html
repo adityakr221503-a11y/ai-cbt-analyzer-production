@@ -3151,11 +3151,16 @@ function showResult(
     selectedQuestions.forEach(function(question, index) {
       const userAnswer = answers[index];
       if (userAnswer !== undefined) {
-        window.recordRBAttempt(
-          question.id,
-          userAnswer,
-          question.answer || question.correctAnswer || ""
-        );
+        window.recordRBAttempt({
+          questionId: question.id,
+          subject: question.subject || "",
+          chapter: question.chapter || "",
+          topic: question.topic || "",
+          concept: question.concept || "",
+          selectedAnswer: userAnswer,
+          correctAnswer: question.answer || question.correctAnswer || "",
+          correct: userAnswer === (question.answer || question.correctAnswer || "")
+        });
       }
     });
   }
