@@ -19,53 +19,45 @@ async function extractTextPages(file){if(!window.pdfjsLib)throw new Error("PDF.j
 async function loadTesseract(){if(window.Tesseract)return window.Tesseract;await new Promise((resolve,reject)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";s.onload=resolve;s.onerror=()=>reject(new Error("OCR engine could not be loaded."));document.head.appendChild(s)});return window.Tesseract}
 async function ocrPages(file){const T=await loadTesseract(),buf=await file.arrayBuffer(),pdf=await window.pdfjsLib.getDocument({data:buf}).promise,pages=[];for(let p=1;p<=pdf.numPages;p++){status("OCR processing — page "+p+" of "+pdf.numPages+"…");const page=await pdf.getPage(p),viewport=page.getViewport({scale:2.5}),canvas=document.createElement("canvas");canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);const ctx=canvas.getContext("2d",{willReadFrequently:true});await page.render({canvasContext:ctx,viewport}).promise;const img=ctx.getImageData(0,0,canvas.width,canvas.height);for(let i=0;i<img.data.length;i+=4){const g=.299*img.data[i]+.587*img.data[i+1]+.114*img.data[i+2],v=Math.max(0,Math.min(255,(g-128)*1.25+128));img.data[i]=img.data[i+1]=img.data[i+2]=v}ctx.putImageData(img,0,0);const r=await T.recognize(canvas,"eng");pages.push({page:p,lines:String(r?.data?.text||"").split(/\r?\n/)});canvas.width=1;canvas.height=1}return pages}
 function parsePages(pages){const groups=[];let current=null;for(const pg of pages)for(const raw of pg.lines){const line=clean(raw);if(!line)continue;const q=qStart(line);if(q){if(current)groups.push(current);current={number:q.number,lines:q.text?[q.text]:[],page:pg.page}}else if(current)current.lines.push(line)}if(current)groups.push(current);return groups.map(g=>buildQuestion(g,g.page)).filter(Boolean)}
+
 function englishScore(text){
   text=String(text||"");
-  if(!text.trim()) return 0;
-
   const latin=(text.match(/[A-Za-z]/g)||[]).length;
-  const devan=(text.match(/[\\u0900-\\u097F]/g)||[]).length;
-  const total=latin+devan;
-
-  if(!total) return 0;
-  return latin/total;
+  const hindi=(text.match(/[\u0900-\u097F]/g)||[]).length;
+  const total=latin+hindi;
+  return total ? latin/total : 0;
 }
 
 function isEnglishQuestion(q){
-  const text=[
-    q?.question||"",
-    ...(Array.isArray(q?.options)?q.options:[])
-  ].join(" ");
+  const question=String(q?.question||q?.text||"");
+  const options=Array.isArray(q?.options)?q.options:[];
 
-  const score=englishScore(text);
+  const latin=(question.match(/[A-Za-z]/g)||[]).length;
+  const hindi=(question.match(/[\u0900-\u097F]/g)||[]).length;
 
-  /*
-   * Strict rule:
-   * bilingual Hindi+English question -> English only
-   * Hindi-only question -> do NOT silently convert it
-   */
-  return score >= 0.75;
+  if(latin>=5 && latin>=hindi*1.5) return true;
+
+  return englishScore(question+" "+options.join(" "))>=0.70;
 }
 
 function englishOnlyFilter(qs){
   const out=[];
-  const seenEnglish=new Set();
+  const seen=new Set();
 
   for(const q of Array.isArray(qs)?qs:[]){
     if(!isEnglishQuestion(q)) continue;
 
-    const key=norm(q.question);
-    if(!key || seenEnglish.has(key)) continue;
+    const key=norm(q.question||q.text);
+    if(!key || seen.has(key)) continue;
 
-    seenEnglish.add(key);
+    seen.add(key);
 
     out.push({
       ...q,
-      question:repairText(q.question),
+      question:repairText(q.question||q.text),
       text:repairText(q.text||q.question),
       options:(q.options||[]).map(repairText),
-      language:"English",
-      bilingualFiltered:true
+      language:"English"
     });
   }
 
@@ -73,12 +65,90 @@ function englishOnlyFilter(qs){
 }
 
 function dedupe(qs){const seen=new Set();return qs.filter(q=>{const k=norm(q.question);if(!k||seen.has(k))return false;seen.add(k);return true})}
-function mapAnswerKey(pages,questions){const answers=new Map();for(const pg of pages)for(const line of pg.lines){const m=clean(line).match(/(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\):\-]?\s*(?:answer|ans|correct)?\s*[:=\-]?\s*(?:option\s*)?[\(\[]?\s*([A-D1-4])\s*[\)\]]?/i);if(m)answers.set(+m[1],answerLetter(m[2]))}return questions.map(q=>{if(!q.correctAnswer&&answers.has(q.number)){q.correctAnswer=answers.get(q.number);q.correctIndex="ABCD".indexOf(q.correctAnswer);q.needsReview=false;q.solutionSource="answer-key"}return q})}
+
+function mapAnswerKey(pages,questions){
+  const answers=new Map();
+
+  function add(n,a){
+    n=Number(n);
+    a=answerLetter(a);
+    if(n && a) answers.set(n,a);
+  }
+
+  for(const pg of pages||[]){
+    for(const raw of pg.lines||[]){
+      const line=clean(raw);
+      if(!line) continue;
+
+      let m=line.match(
+        /^(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\):\-]?\s*(?:answer|ans|correct\s*answer|option)?\s*[:=\-]?\s*[\(\[]?\s*([A-D1-4])\s*[\)\]]?\s*$/i
+      );
+
+      if(m){
+        add(m[1],m[2]);
+        continue;
+      }
+
+      const re=/(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\):\-]?\s*[\(\[]?\s*([A-D1-4])\s*[\)\]]?/gi;
+
+      while((m=re.exec(line))!==null){
+        add(m[1],m[2]);
+      }
+    }
+  }
+
+  return questions.map(q=>{
+    const n=Number(q.number);
+
+    if(!q.correctAnswer && answers.has(n)){
+      q.correctAnswer=answers.get(n);
+      q.correctIndex="ABCD".indexOf(q.correctAnswer);
+      q.needsReview=false;
+      q.solutionSource="answer-key";
+    }
+
+    return q;
+  });
+}
+
 async function resolveAI(q){const apis=[window.CBTAnalyzerAI,window.CBTAnalyzerAIEngine,window.AISolutionEngine,window.RankerAI].filter(Boolean);for(const api of apis)for(const fn of ["solveQuestion","generateSolution","getSolution","solve"])if(typeof api[fn]==="function")try{const r=await api[fn](q);if(r){const a=answerLetter(r.correctAnswer??r.answer??r.option);if(a){q.correctAnswer=a;q.correctIndex="ABCD".indexOf(a)}q.explanation=String(r.explanation??r.solution??r.reason??"");q.solution=q.explanation;if(q.correctAnswer)q.solutionSource="ai";q.needsReview=!q.correctAnswer;return q}}catch(e){console.warn("[PDF3] AI hook failed",e)}return q}
-function normalizeFinal(qs,fileName){return qs.map((q,i)=>({...q,id:q.id||("PDF3-"+Date.now()+"-"+(i+1)),question:repairText(q.question||q.text),text:repairText(q.text||q.question),options:q.options.map(repairText),source:"Institute Test PDF",sourceFile:fileName,sourcePage:q.sourcePage||null,importedAt:new Date().toISOString(),sequence:i+1})).filter(q=>q.question.length>=5&&q.options.length===4&&q.options.every(Boolean))}
+
+function normalizeFinal(qs,fileName){
+  const stamp=Date.now();
+
+  return (Array.isArray(qs)?qs:[])
+    .map((q,i)=>({
+      ...q,
+      id:"PDF3-"+stamp+"-"+i+"-"+Math.random().toString(36).slice(2,9),
+      question:repairText(q.question||q.text),
+      text:repairText(q.text||q.question),
+      options:(q.options||[]).map(repairText),
+      source:"Institute Test PDF",
+      sourceFile:fileName,
+      sourcePage:q.sourcePage||null,
+      importedAt:new Date().toISOString(),
+      sequence:i+1
+    }))
+    .filter(q=>
+      q.question.length>=5 &&
+      q.options.length===4 &&
+      q.options.every(Boolean)
+    );
+}
+
+
 function saveImport(qs,fileName){
   const importedAt=new Date().toISOString();
-  const testId="pdf-test-"+Date.now()+"-"+Math.random().toString(36).slice(2,8);
+  const testId="pdf-test-"+Date.now()+"-"+Math.random().toString(36).slice(2,9);
+
+  const freshQuestions=qs.map((q,i)=>({
+    ...q,
+    sequence:i+1,
+    importedTestId:testId,
+    source:"Institute Test PDF",
+    sourceFile:fileName,
+    importedAt
+  }));
 
   const meta={
     version:"pdf-cbt-universal-v1",
@@ -86,30 +156,36 @@ function saveImport(qs,fileName){
     testId,
     fileName,
     importedAt,
-    questionCount:qs.length,
-    reviewCount:qs.filter(q=>q.needsReview).length
+    questionCount:freshQuestions.length,
+    reviewCount:freshQuestions.filter(q=>q.needsReview).length
   };
 
-  if(!safeSet(KEY,qs))
+  /*
+   * IMPORTANT:
+   * New PDF REPLACES old PDF pool.
+   */
+  if(!safeSet(KEY,freshQuestions))
     throw new Error("Could not save imported questions.");
 
   safeSet(META,meta);
 
   safeSet(
     REVIEW,
-    qs.filter(q=>q.needsReview).map(q=>({
-      id:q.id,
-      number:q.number,
-      sourcePage:q.sourcePage,
-      reason:"Correct answer not confidently resolved."
-    }))
+    freshQuestions
+      .filter(q=>q.needsReview)
+      .map(q=>({
+        id:q.id,
+        number:q.number,
+        sourcePage:q.sourcePage,
+        reason:"Correct answer not confidently resolved."
+      }))
   );
 
+  /*
+   * Clear only transient CBT-import state.
+   * Do NOT touch history/mastery/mistakes/retry.
+   */
   try{
-    /* FRESH IMPORT ISOLATION:
-       Never allow a previous imported test/session to leak
-       into the newly selected PDF test.
-    */
     sessionStorage.removeItem(ACTIVE);
     sessionStorage.removeItem(ACTIVE_TEST);
     sessionStorage.removeItem(ACTIVE_SOURCE);
@@ -117,14 +193,6 @@ function saveImport(qs,fileName){
     sessionStorage.removeItem("CBT_ACTIVE_ANSWERS");
     sessionStorage.removeItem("CBT_ACTIVE_SELECTED");
     sessionStorage.removeItem("CBT_ACTIVE_CURRENT_INDEX");
-
-    localStorage.removeItem("CBT_ACTIVE_TEST_ID");
-
-    const freshQuestions=qs.map((q,i)=>({
-      ...q,
-      sequence:i+1,
-      importedTestId:testId
-    }));
 
     const freshTest={
       id:testId,
@@ -135,20 +203,41 @@ function saveImport(qs,fileName){
       totalQuestions:freshQuestions.length,
       source:"Institute Test PDF",
       sourceFile:fileName,
-      importedAt
+      importedAt,
+      language:"English"
     };
 
-    sessionStorage.setItem(ACTIVE,JSON.stringify(freshQuestions));
-    sessionStorage.setItem(ACTIVE_TEST,JSON.stringify(freshTest));
-    sessionStorage.setItem(ACTIVE_SOURCE,"PDF");
-    sessionStorage.setItem("CBT_ACTIVE_TEST_ID",testId);
+    sessionStorage.setItem(
+      ACTIVE,
+      JSON.stringify(freshQuestions)
+    );
+
+    sessionStorage.setItem(
+      ACTIVE_TEST,
+      JSON.stringify(freshTest)
+    );
+
+    sessionStorage.setItem(
+      ACTIVE_SOURCE,
+      "PDF"
+    );
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_TEST_ID",
+      testId
+    );
 
   }catch(e){
-    throw new Error("Imported test could not be prepared for CBT.");
+    throw new Error(
+      "Imported test could not be prepared for CBT."
+    );
   }
+
+  return freshQuestions;
 }
+
 function preview(qs){const box=$("#questionPreview");if(!box)return;box.innerHTML=qs.slice(0,5).map((q,i)=>"<div style='margin:10px 0;padding:12px;border:1px solid #e2e8f0;border-radius:10px'><strong>Q"+(i+1)+".</strong> "+esc(q.question)+"<br><small>"+q.options.map((o,j)=>String.fromCharCode(65+j)+") "+esc(o)).join(" &nbsp; ")+"</small></div>").join("")+(qs.length>5?"<div>Showing first 5 of "+qs.length+" questions.</div>":"")}
-async function convert(file){const name=($("#moduleName")?.value||file.name).trim()||file.name;status("Reading PDF text layer…");let pages=[];try{pages=await extractTextPages(file)}catch(e){console.warn("[PDF3] text layer failed",e)}let qs=englishOnlyFilter(dedupe(parsePages(pages)));if(!qs.length){try{const ocr=await ocrPages(file);qs=englishOnlyFilter(dedupe(parsePages(ocr)));pages=pages.concat(ocr)}catch(e){console.error("[PDF3] OCR failed",e)}}qs=mapAnswerKey(pages,qs);if(!qs.length)throw new Error("No complete 4-option questions could be safely reconstructed.");for(let i=0;i<qs.length;i++)if(!qs[i].correctAnswer){status("Checking unresolved answers — "+(i+1)+" of "+qs.length+"…");qs[i]=await resolveAI(qs[i])}qs=englishOnlyFilter(normalizeFinal(qs,name));if(!qs.length)throw new Error("Validation removed all questions because their structure was incomplete.");saveImport(qs,name);preview(qs);const review=qs.filter(q=>q.needsReview).length;status("✅ Test PDF ready\n\nFile: "+name+"\nValid questions: "+qs.length+"\nNeeds answer review: "+review+"\n\nNo fixed question-count limit. Ready for CBT.");document.dispatchEvent(new CustomEvent("pdfCbtPoolUpdated",{detail:{questions:qs}}));return qs}
+async function convert(file){const name=($("#moduleName")?.value||file.name).trim()||file.name;status("Reading PDF text layer…");let pages=[];try{pages=await extractTextPages(file)}catch(e){console.warn("[PDF3] text layer failed",e)}let qs=dedupe(parsePages(pages));if(!qs.length){try{const ocr=await ocrPages(file);qs=dedupe(parsePages(ocr));pages=pages.concat(ocr)}catch(e){console.error("[PDF3] OCR failed",e)}}qs=mapAnswerKey(pages,qs);if(!qs.length)throw new Error("No complete 4-option questions could be safely reconstructed.");for(let i=0;i<qs.length;i++)if(!qs[i].correctAnswer){status("Checking unresolved answers — "+(i+1)+" of "+qs.length+"…");qs[i]=await resolveAI(qs[i])}qs=englishOnlyFilter(normalizeFinal(qs,name));if(!qs.length)throw new Error("Validation removed all questions because their structure was incomplete.");saveImport(qs,name);preview(qs);const review=qs.filter(q=>q.needsReview).length;status("✅ Test PDF ready\n\nFile: "+name+"\nValid questions: "+qs.length+"\nNeeds answer review: "+review+"\n\nNo fixed question-count limit. Ready for CBT.");document.dispatchEvent(new CustomEvent("pdfCbtPoolUpdated",{detail:{questions:qs}}));return qs}
 function install(){const input=$("#pdfInput"),button=$("#convertButton");if(!input||!button||button.dataset.pdfUniversalV1)return;button.dataset.pdfUniversalV1="1";button.addEventListener("click",async function(ev){ev.preventDefault();ev.stopImmediatePropagation();const file=input.files&&input.files[0];if(!file){status("Select a PDF first.");return}button.disabled=true;try{await convert(file)}catch(e){console.error("[PDF3]",e);status("❌ Conversion failed\n\n"+(e.message||"Unknown error"))}finally{button.disabled=false}},true);const row=button.parentElement;if(row&&!$("#pdfUniversalOpenCBT")){const open=document.createElement("button");open.id="pdfUniversalOpenCBT";open.type="button";open.className="primary";open.textContent="🚀 Open Imported Test in CBT";open.addEventListener("click",function(){
   const q=safeGet(KEY,[]);
   if(!Array.isArray(q)||!q.length){
