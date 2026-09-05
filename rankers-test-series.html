@@ -100,7 +100,7 @@ if(perf.length){
    if(mode==="new"){const fresh=pool.filter(q=>!attemptedIds.has(q.id));if(fresh.length)pool=fresh}
    if(mode==="weak"){const stats={};(Array.isArray(attempts)?attempts:[]).forEach(a=>{if(!a.topic)return;stats[a.topic]=stats[a.topic]||{w:0,t:0};stats[a.topic].t++;if(a.correct===false)stats[a.topic].w++});pool.sort((a,b)=>{const ar=stats[a.topic]?stats[a.topic].w/stats[a.topic].t:0;const br=stats[b.topic]?stats[b.topic].w/stats[b.topic].t:0;return br-ar||(stats[a.topic]?1:0)-(stats[b.topic]?1:0)})}
    if(mode==="adaptive"){
- const stats={};
+ const stats={};\n const hardWeight=q=>{const d=String(q.difficulty||"").toLowerCase();return (d.includes("hard")||d.includes("difficult"))?2:0};
  (Array.isArray(attempts)?attempts:[]).forEach(a=>{
   if(!a.subject)return;
   stats[a.subject]=stats[a.subject]||{w:0,t:0};
