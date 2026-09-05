@@ -1,11 +1,7 @@
 /* =========================================================
-   RANKER V11.3 — FINAL RUNTIME STABILITY LAYER
+   RANKER V11.4 — LIGHTWEIGHT RESULT-ONLY RUNTIME LAYER
    ADDITIVE ONLY
-   Fixes:
-   1. Reliable CBT timer based speed
-   2. Reliable post-test Next Best Action
-   3. Re-render protection
-   Existing CBT/Orbit/Mistake/Retry structure preserved.
+   Active CBT is NEVER touched.
 ========================================================= */
 (function () {
   "use strict";
@@ -14,7 +10,6 @@
   const NEXT_KEY = "cbtNextBestActionV5";
   const RETRY_KEY = "cbtAnalyzer.retryQueue";
   const POST_STATE = "cbtPostTestStateV8";
-  const START_KEY = "CBT_ACTIVE_STARTED_AT";
 
   function read(key, fallback) {
     try {
@@ -29,10 +24,7 @@
 
   function write(key, value) {
     try {
-      localStorage.setItem(
-        key,
-        JSON.stringify(value)
-      );
+      localStorage.setItem(key, JSON.stringify(value));
     } catch (_) {}
   }
 
@@ -46,32 +38,27 @@
     return Array.isArray(value) ? value : [];
   }
 
-  function getLatestSession() {
-    const value =
-      read("cbtTestSessions", []);
+  /*
+    CRITICAL:
+    This layer must NEVER run during an active CBT.
+  */
+  function resultScreenReady() {
+    const result =
+      document.getElementById("result");
+
+    if (!result) return false;
+
+    const style =
+      window.getComputedStyle(result);
 
     if (
-      !Array.isArray(value) ||
-      !value.length
+      style.display === "none" ||
+      style.visibility === "hidden"
     ) {
-      return null;
+      return false;
     }
 
-    return value[value.length - 1];
-  }
-
-  function getLatestHistory() {
-    const value =
-      read("cbtHistory", []);
-
-    if (
-      !Array.isArray(value) ||
-      !value.length
-    ) {
-      return null;
-    }
-
-    return value[value.length - 1];
+    return true;
   }
 
   function getResult() {
@@ -84,27 +71,21 @@
         const r =
           window.RankerV11Lifecycle.getCompletedResult();
 
-        if (
-          r &&
-          typeof r === "object"
-        ) {
+        if (r && typeof r === "object") {
           return r;
         }
       }
     } catch (_) {}
 
-    const keys = [
-      "cbtCoreResultV6",
-      "cbtCoreResultV5"
-    ];
-
-    for (const key of keys) {
+    for (
+      const key of [
+        "cbtCoreResultV6",
+        "cbtCoreResultV5"
+      ]
+    ) {
       const r = read(key, null);
 
-      if (
-        r &&
-        typeof r === "object"
-      ) {
+      if (r && typeof r === "object") {
         return r.result &&
           typeof r.result === "object"
           ? r.result
@@ -112,300 +93,48 @@
       }
     }
 
-    return (
-      getLatestHistory() ||
-      getLatestSession()
-    );
-  }
-
-  function startTimestamp() {
-    let session = 0;
-    let local = 0;
-
-    try {
-      session =
-        Number(
-          sessionStorage.getItem(
-            START_KEY
-          ) || 0
-        );
-    } catch (_) {}
-
-    try {
-      local =
-        Number(
-          localStorage.getItem(
-            START_KEY
-          ) || 0
-        );
-    } catch (_) {}
-
-    return session || local || 0;
-  }
-
-  /*
-    Read the actual visible CBT countdown.
-
-    Expected existing CBT display:
-    .timer
-
-    Examples:
-    29:55
-    01:42:10
-  */
-  function visibleTimerSeconds() {
-    const el =
-      document.querySelector(
-        ".timer"
-      );
-
-    if (!el) return 0;
-
-    const text =
-      String(
-        el.textContent || ""
-      ).trim();
-
-    const match =
-      text.match(
-        /(\d{1,3}):(\d{2})(?::(\d{2}))?/
-      );
-
-    if (!match) return 0;
-
-    if (match[3] != null) {
-      return (
-        Number(match[1]) * 3600 +
-        Number(match[2]) * 60 +
-        Number(match[3])
-      );
-    }
-
-    return (
-      Number(match[1]) * 60 +
-      Number(match[2])
-    );
-  }
-
-  function testDurationSeconds() {
-    try {
-      const candidates = [
-        window.selectedTest,
-        window.currentTest,
-        window.activeTest
-      ];
-
-      for (const test of candidates) {
-        if (
-          test &&
-          Number.isFinite(
-            Number(test.duration)
-          ) &&
-          Number(test.duration) > 0
-        ) {
-          return (
-            Number(test.duration) * 60
-          );
-        }
-      }
-    } catch (_) {}
-
-    const session =
-      getLatestSession();
-
-    const duration =
-      num(
-        session &&
-        session.durationSeconds,
-        0
-      );
-
-    return duration > 0
-      ? duration
-      : 0;
-  }
-
-  function authoritativeDurationSeconds() {
-    /*
-      Best source:
-      actual CBT countdown.
-
-      This avoids trusting a stale/wrong
-      submittedAt/start timestamp pair.
-    */
-    const total =
-      testDurationSeconds();
-
-    const remaining =
-      visibleTimerSeconds();
+    const history =
+      read("cbtHistory", []);
 
     if (
-      total > 0 &&
-      remaining >= 0 &&
-      remaining <= total
+      Array.isArray(history) &&
+      history.length
     ) {
-      const elapsed =
-        total - remaining;
-
-      if (elapsed > 0) {
-        return Math.max(
-          1,
-          Math.round(elapsed)
-        );
-      }
+      return history[history.length - 1];
     }
 
-    /*
-      Fallback:
-      real start timestamp.
-    */
-    const started =
-      startTimestamp();
-
-    if (started > 0) {
-      const now =
-        Date.now();
-
-      if (now >= started) {
-        return Math.max(
-          1,
-          Math.round(
-            (now - started) / 1000
-          )
-        );
-      }
-    }
-
-    const session =
-      getLatestSession();
-
-    return num(
-      session &&
-      session.durationSeconds,
-      0
-    );
-  }
-
-  function patchOrbit() {
-    const orbit =
-      window.CBTAnalyzerOrbit;
-
-    if (
-      !orbit ||
-      typeof orbit.getOrbitReport !==
-        "function"
-    ) {
-      return false;
-    }
-
-    if (
-      orbit.__rankerV11FinalSpeedFix
-    ) {
-      return true;
-    }
-
-    const original =
-      orbit.getOrbitReport;
-
-    orbit.getOrbitReport =
-      function (session) {
-        const report =
-          original.call(
-            this,
-            session
-          );
-
-        if (
-          !report ||
-          !report.available
-        ) {
-          return report;
-        }
-
-        const seconds =
-          authoritativeDurationSeconds();
-
-        const answered =
-          num(
-            report.answered,
-            0
-          );
-
-        if (
-          seconds > 0 &&
-          answered > 0
-        ) {
-          const speed =
-            answered /
-            (seconds / 60);
-
-          report.durationSeconds =
-            seconds;
-
-          report.speedQuestionsPerMinute =
-            Math.max(
-              0,
-              Math.min(
-                300,
-                speed
-              )
-            );
-        }
-
-        report.v11FinalSpeedFix =
-          true;
-
-        return report;
-      };
-
-    orbit.__rankerV11FinalSpeedFix =
-      true;
-
-    return true;
+    return null;
   }
 
   function deriveAction(result) {
-    const retry =
-      arr(RETRY_KEY);
+    const retry = arr(RETRY_KEY);
 
     if (retry.length) {
       return {
-        type:
-          "TARGETED_RETRY",
-
+        type: "TARGETED_RETRY",
         reason:
           "Pending mistakes require verified retry.",
-
         route:
           "./retry.html?source=ranker-v11"
       };
     }
 
     const post =
-      read(
-        POST_STATE,
-        null
-      );
+      read(POST_STATE, null);
 
     if (
       post &&
-      Array.isArray(
-        post.weakTopics
-      ) &&
+      Array.isArray(post.weakTopics) &&
       post.weakTopics.length
     ) {
       const target =
         post.weakTopics[0];
 
       return {
-        type:
-          "TARGETED_PRACTICE",
-
+        type: "TARGETED_PRACTICE",
         reason:
           "Weak topic requires targeted practice.",
-
         target,
-
         route:
           "./rankers-test-series.html?mode=targeted&topic=" +
           encodeURIComponent(
@@ -416,28 +145,22 @@
 
     const skipped =
       num(
-        result &&
-        result.skipped,
+        result && result.skipped,
         0
       );
 
     if (skipped > 0) {
       return {
-        type:
-          "ATTEMPT_STRATEGY",
-
+        type: "ATTEMPT_STRATEGY",
         reason:
           "Skipped questions require attempt-strategy review.",
-
-        route:
-          "./attempt.html"
+        route: "./attempt.html"
       };
     }
 
     const accuracy =
       num(
-        result &&
-        result.accuracy,
+        result && result.accuracy,
         NaN
       );
 
@@ -446,49 +169,27 @@
       accuracy < 85
     ) {
       return {
-        type:
-          "REVISION",
-
+        type: "REVISION",
         reason:
           "Accuracy requires revision before the next test.",
-
         route:
           "./question-bank.html?mode=weak"
       };
     }
 
     return {
-      type:
-        "NEXT_TEST",
-
+      type: "NEXT_TEST",
       reason:
         "Performance is ready for the next adaptive test.",
-
       route:
         "./rankers-test-series.html?mode=adaptive"
     };
   }
 
   function getAction() {
-    const saved =
-      read(
-        POST_KEY,
-        null
-      );
+    const result = getResult();
 
-    if (
-      saved &&
-      saved.action
-    ) {
-      return saved.action;
-    }
-
-    const result =
-      getResult();
-
-    if (!result) {
-      return null;
-    }
+    if (!result) return null;
 
     const action =
       deriveAction(result);
@@ -496,14 +197,9 @@
     write(
       POST_KEY,
       {
-        version:
-          "V11.3",
-
-        generatedAt:
-          Date.now(),
-
+        version: "V11.4",
+        generatedAt: Date.now(),
         result,
-
         action
       }
     );
@@ -517,12 +213,13 @@
   }
 
   function renderAction() {
-    const action =
-      getAction();
-
-    if (!action) {
+    if (!resultScreenReady()) {
       return false;
     }
+
+    const action = getAction();
+
+    if (!action) return false;
 
     let box =
       document.getElementById(
@@ -559,8 +256,7 @@
       "</b></p>" +
       "<p class='muted'>" +
       String(
-        action.reason ||
-        ""
+        action.reason || ""
       ) +
       "</p>" +
       (
@@ -572,30 +268,22 @@
           : ""
       );
 
-    /*
-      Always place after Orbit/result content
-      when possible. This prevents later result
-      rendering from putting it somewhere hidden.
-    */
     const orbit =
       document.querySelector(
         ".orbit-result-panel"
       ) ||
       document.querySelector(
         ".cbt-orbit-result-v2"
-      ) ||
-      document.querySelector(
-        "[id*='orbit']"
       );
 
     const result =
-      document.querySelector(
-        ".result"
+      document.getElementById(
+        "result"
       );
 
     const review =
-      document.querySelector(
-        "#questionReview"
+      document.getElementById(
+        "questionReview"
       ) ||
       document.querySelector(
         ".question-review"
@@ -617,18 +305,8 @@
         box,
         review
       );
-    } else if (
-      result
-    ) {
-      result.appendChild(
-        box
-      );
-    } else if (
-      !box.parentNode
-    ) {
-      document.body.appendChild(
-        box
-      );
+    } else if (result) {
+      result.appendChild(box);
     }
 
     const btn =
@@ -636,10 +314,7 @@
         "rankerV11NextBtn"
       );
 
-    if (
-      btn &&
-      action.route
-    ) {
+    if (btn && action.route) {
       btn.onclick =
         function () {
           location.href =
@@ -650,109 +325,141 @@
     return true;
   }
 
-  function refreshSpeedText() {
-    const orbit =
-      window.CBTAnalyzerOrbit;
+  /*
+    Speed correction is deliberately result-only.
+    No body-wide scanning during CBT.
+  */
+  function patchSpeedAfterResult() {
+    if (!resultScreenReady()) return;
 
-    if (
-      !orbit ||
-      typeof orbit.getOrbitReport !==
-        "function"
-    ) {
-      return;
-    }
-
-    const report =
-      orbit.getOrbitReport();
-
-    if (
-      !report ||
-      !report.available
-    ) {
-      return;
-    }
-
-    const speed =
-      num(
-        report.speedQuestionsPerMinute,
-        0
-      );
-
-    /*
-      Do not rewrite the whole result.
-      Only update visible Speed text.
-    */
-    const nodes =
-      document.querySelectorAll(
-        "body *"
-      );
-
-    for (const el of nodes) {
-      if (
-        el.children.length !== 0
-      ) {
-        continue;
-      }
-
-      const text =
-        String(
-          el.textContent || ""
-        );
+    try {
+      const orbit =
+        window.CBTAnalyzerOrbit;
 
       if (
-        /Speed\s+\d+(?:\.\d+)?\s*Q\/min/i.test(
-          text
-        )
+        !orbit ||
+        typeof orbit.getOrbitReport !==
+          "function"
       ) {
-        el.textContent =
-          text.replace(
-            /Speed\s+\d+(?:\.\d+)?\s*Q\/min/i,
-            "Speed " +
-            speed.toFixed(2) +
-            " Q/min"
-          );
+        return;
       }
-    }
+
+      if (
+        orbit.__rankerV11SpeedPatch
+      ) {
+        return;
+      }
+
+      const original =
+        orbit.getOrbitReport;
+
+      orbit.getOrbitReport =
+        function (session) {
+          const report =
+            original.call(
+              this,
+              session
+            );
+
+          if (
+            !report ||
+            !report.available
+          ) {
+            return report;
+          }
+
+          /*
+            Prefer already-recorded real duration.
+            Never scan the active CBT timer.
+          */
+          const seconds =
+            num(
+              report.durationSeconds,
+              num(
+                session &&
+                session.durationSeconds,
+                0
+              )
+            );
+
+          const answered =
+            num(
+              report.answered,
+              0
+            );
+
+          if (
+            seconds > 0 &&
+            answered > 0
+          ) {
+            report.durationSeconds =
+              seconds;
+
+            report.speedQuestionsPerMinute =
+              Math.max(
+                0,
+                Math.min(
+                  300,
+                  answered /
+                  (seconds / 60)
+                )
+              );
+          }
+
+          return report;
+        };
+
+      orbit.__rankerV11SpeedPatch =
+        true;
+
+    } catch (_) {}
   }
 
-  function refresh() {
-    patchOrbit();
-    refreshSpeedText();
+  function runOnce() {
+    /*
+      HARD GATE:
+      absolutely nothing happens on active CBT screen.
+    */
+    if (!resultScreenReady()) {
+      return;
+    }
+
+    patchSpeedAfterResult();
     renderAction();
   }
 
   function boot() {
-    refresh();
+    /*
+      No interval.
+      No MutationObserver.
+      No body-wide DOM scan.
+      No repeated refresh loop.
+    */
 
-    [
-      100,
-      300,
-      700,
-      1200,
-      2000,
-      3500,
-      5000,
-      8000
-    ].forEach(
-      function (delay) {
+    runOnce();
+
+    window.addEventListener(
+      "cbt:result-ready",
+      function () {
         setTimeout(
-          refresh,
-          delay
+          runOnce,
+          0
         );
-      }
+      },
+      { once: false }
     );
 
     window.addEventListener(
       "cbt:orbit-ready",
-      refresh
+      function () {
+        if (
+          resultScreenReady()
+        ) {
+          runOnce();
+        }
+      },
+      { once: false }
     );
-
-    window.addEventListener(
-      "cbt:result-ready",
-      refresh
-    );
-
-
   }
 
   if (
@@ -761,7 +468,8 @@
   ) {
     document.addEventListener(
       "DOMContentLoaded",
-      boot
+      boot,
+      { once: true }
     );
   } else {
     boot();
