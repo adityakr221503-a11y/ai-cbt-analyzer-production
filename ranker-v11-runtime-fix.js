@@ -752,22 +752,7 @@
       refresh
     );
 
-    try {
-      const observer =
-        new MutationObserver(
-          function () {
-            refresh();
-          }
-        );
 
-      observer.observe(
-        document.body,
-        {
-          childList: true,
-          subtree: true
-        }
-      );
-    } catch (_) {}
   }
 
   if (
