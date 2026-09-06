@@ -100,59 +100,34 @@ function parseAnswerLine(line){
  */
 function qStart(line){
   const s=clean(line);
-  if(!s) return null;
+  if(!s)return null;
 
-  if(/^(?:answer|answers|ans|correct|solution|solutions|answer\s*key)\b/i.test(s))
+  // Never treat answer-key lines as questions.
+  if(/^(answer|answers|ans|solution|solutions|answer\s*key)\b/i.test(s))
     return null;
 
-  let m=s.match(
-    /^(?:question\s*)?(\d{1,3})\s*[\.\):\-]\s*(.+)$/i
-  );
+  // Never treat numbered options (1)-(4) as question numbers.
+  if(/^\(?[1-4]\)?\s*[.):\-]\s+/.test(s))
+    return null;
 
-  if(m){
-    const text=clean(m[2]);
+  let m=s.match(/^Q(?:uestion)?\s*(\d{1,4})\s*[.):\-]?\s+(.+)$/i);
 
-    if(
-      text.length>=2 &&
-      !/^[A-Da-d1-4]$/.test(text)
-    ){
-      return {
-        number:Number(m[1]),
-        text
-      };
-    }
-  }
+  if(!m)
+    m=s.match(/^Question\s*(\d{1,4})\s*[.):\-]\s*(.+)$/i);
 
-  m=s.match(
-    /^Q\s*(\d{1,3})\s+(.+)$/i
-  );
+  if(!m)
+    m=s.match(/^(\d{1,4})\s*[.):\-]\s+(.+)$/);
 
-  if(m){
-    return {
-      number:Number(m[1]),
-      text:clean(m[2])
-    };
-  }
+  if(!m)return null;
 
-  /*
-   * OCR sometimes removes punctuation.
-   * Only accept this when the remainder looks like
-   * genuine question text.
-   */
-  m=s.match(
-    /^(\d{1,3})\s+([A-Za-z].{2,})$/i
-  );
+  const text=repair(m[2]||"");
+  if(text.length<5)return null;
 
-  if(m){
-    return {
-      number:Number(m[1]),
-      text:clean(m[2])
-    };
-  }
-
-  return null;
+  return {
+    number:Number(m[1]),
+    text
+  };
 }
-
 function optStart(line){
   const s=clean(line);
 
