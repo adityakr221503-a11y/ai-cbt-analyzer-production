@@ -141,7 +141,30 @@ function saveImport(qs,fileName){
   const importedAt=new Date().toISOString();
   const testId="pdf-test-"+Date.now()+"-"+Math.random().toString(36).slice(2,9);
 
-  const freshQuestions=qs.map((q,i)=>({
+  const universal =
+    window.PDFCBTUniversalPaper &&
+    typeof window.PDFCBTUniversalPaper.build === "function"
+      ? window.PDFCBTUniversalPaper.build(
+          qs,
+          {testId,fileName,importedAt}
+        )
+      : {
+          questions:Array.isArray(qs)?qs:[],
+          meta:{testId,fileName,importedAt}
+        };
+
+  const normalizedQuestions =
+    Array.isArray(universal.questions)
+      ? universal.questions
+      : [];
+
+  if(!normalizedQuestions.length){
+    throw new Error(
+      "No valid CBT questions remained after validation."
+    );
+  }
+
+  const freshQuestions=normalizedQuestions.map((q,i)=>({
     ...q,
     sequence:i+1,
     importedTestId:testId,
