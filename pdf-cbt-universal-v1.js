@@ -120,7 +120,7 @@ function qStart(line){
 
   if(!m)return null;
 
-  const text=repair(m[2]||"");
+  const text=repairText(m[2]||"");
   if(text.length<5)return null;
 
   return {
