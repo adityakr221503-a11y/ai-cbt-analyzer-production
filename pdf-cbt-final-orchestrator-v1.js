@@ -603,3 +603,833 @@
   }
 
 })();
+
+/* =====================================================
+   FINAL PDF FIX V2
+   VERIFIED AGAINST CURRENT ab37691 CODE
+
+   Fixes:
+   1. Old PDF questions never preview on initial load.
+   2. New PDF replaces current PDF CBT pool.
+   3. Legacy Hindi-font encoded text is removed.
+   4. English-only 4-option questions are retained.
+   5. Existing Universal parser/OCR remains preserved.
+   6. Reference-style question boundary parsing is used.
+===================================================== */
+
+(function () {
+  "use strict";
+
+  const POOL = "pdfCbtQuestions";
+  const META = "pdfCbtImportMetaV3";
+  const REVIEW = "pdfCbtReviewQueueV3";
+
+  const legacyHindiWords = new Set([
+    "ds","dk","dks","ij","ls","ugha","ug",
+    "gksxk","gSa","gS","fLFkfr","foHko",
+    "vkos'k","rFkk","nksuksa","nks","lek{kh;",
+    "NYys","irys","f=T;k","nwljs","j[krs",
+    "pkyd","lEiw.kZ","LFkkukUrfjr","ugh",
+    "fd;k","ldr","foHkokUrj","dkj.k",
+    "esa","v",",d","dsUæ","foyfxr"
+  ]);
+
+  function cleanLegacyHindi(value) {
+    let s = String(value ?? "")
+      .replace(/[\u0900-\u097F]/g, " ")
+      .replace(/[\u200B-\u200F\uFEFF]/g, " ");
+
+    const parts = s.split(/(\s+)/);
+
+    s = parts.map(function (part) {
+      const t = part.trim();
+
+      if (!t) return part;
+
+      if (legacyHindiWords.has(t)) {
+        return " ";
+      }
+
+      /* Strong legacy-font signatures */
+      if (
+        /[{}]/.test(t) &&
+        /[A-Za-z]/.test(t)
+      ) {
+        return " ";
+      }
+
+      if (
+        /[=;]/.test(t) &&
+        /[A-Za-z]/.test(t)
+      ) {
+        return " ";
+      }
+
+      const legacyHindiPrefix =
+        ["vk","fo","fL","LF","lE","nwl","dks","ds","ij","ls","ug","gks","rFkk"]
+          .some(prefix => t.toLowerCase().startsWith(prefix.toLowerCase()));
+
+      if (
+        legacyHindiPrefix &&
+        t.length <= 14 &&
+        !/^(?:focus|from|for|left|right|large|small|glass|this)$/i.test(t)
+      ) {
+        return " ";
+      }
+
+      return part;
+    }).join("");
+
+    return s
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function englishQuality(text) {
+    const s = String(text ?? "");
+
+    const latin =
+      (s.match(/[A-Za-z]/g) || []).length;
+
+    const dev =
+      (s.match(/[\u0900-\u097F]/g) || []).length;
+
+    const words =
+      (s.match(/[A-Za-z]{2,}/g) || []).length;
+
+    if (!words) return 0;
+
+    if (dev > 0) {
+      return latin / Math.max(1, latin + dev);
+    }
+
+    return Math.min(
+      1,
+      words / Math.max(1, s.split(/\s+/).length)
+    );
+  }
+
+  function cleanQuestion(q) {
+    if (!q) return null;
+
+    const question =
+      cleanLegacyHindi(
+        q.question ||
+        q.text ||
+        ""
+      );
+
+    const options =
+      (Array.isArray(q.options)
+        ? q.options
+        : []
+      )
+        .map(cleanLegacyHindi)
+        .map(function (x) {
+          return x
+            .replace(
+              /^(?:\(?[A-D1-4]\)?[.):\-]\s*)+/i,
+              ""
+            )
+            .trim();
+        })
+        .filter(Boolean);
+
+    if (question.length < 5) {
+      return null;
+    }
+
+    if (options.length !== 4) {
+      return null;
+    }
+
+    if (englishQuality(question) < 0.45) {
+      return null;
+    }
+
+    if (
+      options.some(function (o) {
+        return englishQuality(o) < 0.35;
+      })
+    ) {
+      return null;
+    }
+
+    const unique =
+      new Set(
+        options.map(function (o) {
+          return o
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim();
+        })
+      );
+
+    if (unique.size !== 4) {
+      return null;
+    }
+
+    return {
+      ...q,
+      question,
+      text: question,
+      options,
+      language: "English"
+    };
+  }
+
+  function dedupeFresh(list) {
+    const seen = new Set();
+    const result = [];
+
+    for (const q of list) {
+      const cleaned = cleanQuestion(q);
+
+      if (!cleaned) continue;
+
+      const k =
+        cleaned.question
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim();
+
+      if (!k || seen.has(k)) continue;
+
+      seen.add(k);
+      result.push(cleaned);
+    }
+
+    return result;
+  }
+
+  /*
+   * Reference-style pattern boundary parser.
+   * Question number = start signal.
+   * Next question number = end signal.
+   * A-D = option boundaries.
+   */
+  function parseReferencePages(pages) {
+    const groups = [];
+
+    for (const page of Array.isArray(pages)
+      ? pages
+      : []) {
+
+      const lines =
+        Array.isArray(page.lines)
+          ? page.lines
+          : [];
+
+      let current = null;
+
+      for (const raw of lines) {
+        const line =
+          String(raw ?? "").trim();
+
+        if (!line) continue;
+
+        const q =
+          line.match(
+            /^(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[.):\-]\s*(.*)$/i
+          );
+
+        if (q) {
+          if (current) {
+            groups.push(current);
+          }
+
+          current = {
+            number: Number(q[1]),
+            page: page.page,
+            lines: q[2]
+              ? [q[2]]
+              : []
+          };
+
+          continue;
+        }
+
+        if (current) {
+          current.lines.push(line);
+        }
+      }
+
+      if (current) {
+        groups.push(current);
+      }
+    }
+
+    const questions = [];
+
+    for (const group of groups) {
+      const stem = [];
+      const options = [];
+      let currentOption = null;
+
+      for (const raw of group.lines) {
+        const line =
+          cleanLegacyHindi(raw);
+
+        if (!line) continue;
+
+        const opt =
+          line.match(
+            /^(?:\(([A-D1-4])\)|([A-D1-4])\s*[.):\-])\s*(.+)$/i
+          );
+
+        if (opt) {
+          const letter =
+            String(
+              opt[1] || opt[2]
+            ).toUpperCase();
+
+          const text =
+            cleanLegacyHindi(opt[3]);
+
+          if (
+            text &&
+            !options.some(
+              o => o.letter === letter
+            )
+          ) {
+            currentOption = {
+              letter,
+              text
+            };
+
+            options.push(
+              currentOption
+            );
+          }
+
+          continue;
+        }
+
+        if (currentOption) {
+          currentOption.text =
+            cleanLegacyHindi(
+              currentOption.text +
+              " " +
+              line
+            );
+        } else {
+          stem.push(line);
+        }
+      }
+
+      options.sort(
+        (a, b) =>
+          "ABCD".indexOf(a.letter) -
+          "ABCD".indexOf(b.letter)
+      );
+
+      if (options.length !== 4) {
+        continue;
+      }
+
+      const question =
+        cleanLegacyHindi(
+          stem.join(" ")
+        );
+
+      const cleaned =
+        cleanQuestion({
+          id:
+            "PDF-FINAL-" +
+            Date.now() +
+            "-" +
+            questions.length,
+
+          number:
+            group.number,
+
+          question,
+          text: question,
+
+          options:
+            options.map(
+              o => o.text
+            ),
+
+          source:
+            "Institute Test PDF",
+
+          sourcePage:
+            group.page,
+
+          correctAnswer: "",
+          needsReview: true
+        });
+
+      if (cleaned) {
+        questions.push(cleaned);
+      }
+    }
+
+    return dedupeFresh(
+      questions
+    );
+  }
+
+  function saveFreshPDF(
+    questions,
+    fileName
+  ) {
+    const testId =
+      "pdf-test-" +
+      Date.now() +
+      "-" +
+      Math.random()
+        .toString(36)
+        .slice(2, 9);
+
+    const importedAt =
+      new Date().toISOString();
+
+    const fresh =
+      dedupeFresh(
+        questions
+      ).map(function (q, i) {
+        return {
+          ...q,
+
+          id:
+            testId +
+            "-q-" +
+            (i + 1),
+
+          sequence:
+            i + 1,
+
+          importedTestId:
+            testId,
+
+          source:
+            "Institute Test PDF",
+
+          sourceFile:
+            fileName,
+
+          language:
+            "English",
+
+          importedAt
+        };
+      });
+
+    if (!fresh.length) {
+      throw new Error(
+        "No valid English questions found."
+      );
+    }
+
+    const review =
+      fresh.filter(
+        q => q.needsReview
+      );
+
+    /*
+     * IMPORTANT:
+     * New PDF replaces old PDF pool.
+     */
+    localStorage.setItem(
+      POOL,
+      JSON.stringify(fresh)
+    );
+
+    localStorage.setItem(
+      REVIEW,
+      JSON.stringify(review)
+    );
+
+    localStorage.setItem(
+      META,
+      JSON.stringify({
+        version:
+          "pdf-cbt-final-v2",
+
+        testId,
+
+        fileName,
+
+        language:
+          "English",
+
+        questionCount:
+          fresh.length,
+
+        reviewCount:
+          review.length,
+
+        importedAt
+      })
+    );
+
+    /*
+     * Clear transient CBT state.
+     * History/mastery/mistakes/retry untouched.
+     */
+    [
+      "CBT_ACTIVE_QUESTIONS",
+      "CBT_ACTIVE_TEST",
+      "CBT_ACTIVE_SOURCE",
+      "CBT_ACTIVE_TEST_ID",
+      "CBT_ACTIVE_ANSWERS",
+      "CBT_ACTIVE_SELECTED",
+      "CBT_ACTIVE_CURRENT_INDEX"
+    ].forEach(function (key) {
+      try {
+        sessionStorage.removeItem(key);
+      } catch (_) {}
+    });
+
+    const test = {
+      id: testId,
+
+      title: fileName,
+
+      duration: 180,
+
+      questions: fresh,
+
+      questionIds:
+        fresh.map(
+          q => q.id
+        ),
+
+      totalQuestions:
+        fresh.length,
+
+      source:
+        "Institute Test PDF",
+
+      sourceFile:
+        fileName,
+
+      language:
+        "English",
+
+      importedAt
+    };
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      JSON.stringify(fresh)
+    );
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_TEST",
+      JSON.stringify(test)
+    );
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "PDF"
+    );
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_TEST_ID",
+      testId
+    );
+
+    return fresh;
+  }
+
+  function showFinalPreview(
+    questions
+  ) {
+    const box =
+      document.getElementById(
+        "questionPreview"
+      );
+
+    if (!box) return;
+
+    box.innerHTML =
+      questions
+        .slice(0, 5)
+        .map(function (q, i) {
+          return (
+            "<div style=\"margin:10px 0;padding:12px;border:1px solid #e2e8f0;border-radius:10px\">" +
+            "<strong>Q" +
+            (i + 1) +
+            ".</strong> " +
+            String(q.question)
+              .replace(/</g, "&lt;") +
+            "<br><small>" +
+            q.options
+              .map(function (o, j) {
+                return (
+                  String.fromCharCode(
+                    65 + j
+                  ) +
+                  ") " +
+                  String(o)
+                    .replace(
+                      /</g,
+                      "&lt;"
+                    )
+                );
+              })
+              .join(" &nbsp; ") +
+            "</small></div>"
+          );
+        })
+        .join("") +
+      (
+        questions.length > 5
+          ? "<div>Showing first 5 of " +
+            questions.length +
+            " questions.</div>"
+          : ""
+      );
+  }
+
+  async function finalConvert(
+    file
+  ) {
+    const parser =
+      window.PDFCBTUniversalV1;
+
+    if (!parser) {
+      throw new Error(
+        "Universal PDF parser is not loaded."
+      );
+    }
+
+    const moduleInput =
+      document.getElementById(
+        "moduleName"
+      );
+
+    const status =
+      document.getElementById(
+        "status"
+      );
+
+    const fileName =
+      (
+        moduleInput?.value ||
+        file.name
+      ).trim() ||
+      file.name;
+
+    if (status) {
+      status.textContent =
+        "Reading PDF text layer…";
+    }
+
+    let pages = [];
+
+    try {
+      pages =
+        await parser.extractTextPages(
+          file
+        );
+    } catch (e) {
+      console.warn(
+        "[PDF FINAL] text layer failed",
+        e
+      );
+    }
+
+    let questions =
+      parseReferencePages(
+        pages
+      );
+
+    /*
+     * Preserve OCR as fallback.
+     */
+    if (!questions.length) {
+      if (status) {
+        status.textContent =
+          "Trying OCR fallback…";
+      }
+
+      try {
+        const ocrPages =
+          await parser.ocrPages(
+            file
+          );
+
+        questions =
+          parseReferencePages(
+            ocrPages
+          );
+      } catch (e) {
+        console.warn(
+          "[PDF FINAL] OCR fallback failed",
+          e
+        );
+      }
+    }
+
+    if (!questions.length) {
+      throw new Error(
+        "No complete English 4-option questions could be safely reconstructed."
+      );
+    }
+
+    const fresh =
+      saveFreshPDF(
+        questions,
+        fileName
+      );
+
+    showFinalPreview(
+      fresh
+    );
+
+    const review =
+      fresh.filter(
+        q => q.needsReview
+      ).length;
+
+    if (status) {
+      status.textContent =
+        "✅ Test PDF ready\n\n" +
+        "File: " +
+        fileName +
+        "\n" +
+        "Valid questions: " +
+        fresh.length +
+        "\n" +
+        "Needs answer review: " +
+        review +
+        "\n\n" +
+        "No fixed question-count limit. Ready for CBT.";
+    }
+
+    document.dispatchEvent(
+      new CustomEvent(
+        "pdfCbtPoolUpdated",
+        {
+          detail: {
+            questions: fresh
+          }
+        }
+      )
+    );
+
+    return fresh;
+  }
+
+  function clearOldPreview() {
+    const box =
+      document.getElementById(
+        "questionPreview"
+      );
+
+    if (box) {
+      box.textContent =
+        "No questions from a new PDF yet. Select a PDF and convert it.";
+    }
+  }
+
+  function installFinalGate() {
+    const button =
+      document.getElementById(
+        "convertButton"
+      );
+
+    const input =
+      document.getElementById(
+        "pdfInput"
+      );
+
+    if (!button || !input) {
+      return;
+    }
+
+    /*
+     * Window capture runs before the
+     * old button handlers, so the old
+     * parser cannot also process the PDF.
+     */
+    window.addEventListener(
+      "click",
+      function (event) {
+        if (
+          event.target !== button
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        const file =
+          input.files &&
+          input.files[0];
+
+        if (!file) {
+          const status =
+            document.getElementById(
+              "status"
+            );
+
+          if (status) {
+            status.textContent =
+              "Select a PDF first.";
+          }
+
+          return;
+        }
+
+        button.disabled = true;
+
+        finalConvert(file)
+          .catch(function (error) {
+            console.error(
+              "[PDF FINAL]",
+              error
+            );
+
+            const status =
+              document.getElementById(
+                "status"
+              );
+
+            if (status) {
+              status.textContent =
+                "❌ Conversion failed\n\n" +
+                (
+                  error.message ||
+                  "Unknown error"
+                );
+            }
+          })
+          .finally(function () {
+            button.disabled = false;
+          });
+      },
+      true
+    );
+  }
+
+  function boot() {
+    /*
+     * Critical fix:
+     * never show old localStorage questions
+     * just because page opened.
+     */
+    clearOldPreview();
+
+    installFinalGate();
+  }
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot
+    );
+  } else {
+    boot();
+  }
+
+})();
