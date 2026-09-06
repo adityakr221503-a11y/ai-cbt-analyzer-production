@@ -592,7 +592,6 @@
     );
   }
 
-  observePool();
 
   if (document.readyState === "loading") {
     document.addEventListener(
