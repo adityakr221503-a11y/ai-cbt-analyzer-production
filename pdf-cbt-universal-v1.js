@@ -137,7 +137,138 @@ function normalizeFinal(qs,fileName){
 }
 
 
+
+/* =====================================================
+   ENGLISH-ONLY PDF CBT FILTER
+   - Removes Hindi/Devanagari content
+   - Keeps English from bilingual questions
+   - Rejects Hindi-only questions
+   - Removes duplicate questions
+===================================================== */
+
+function englishClean(value){
+  let s = String(value ?? "");
+
+  // Remove Devanagari/Hindi Unicode blocks.
+  s = s.replace(/[\u0900-\u097F]/g, " ");
+
+  // Remove common bilingual separators left after Hindi removal.
+  s = s
+    .replace(/\s*\|\s*/g, " ")
+    .replace(/\s*\/\s*/g, " / ")
+    .replace(/\s*[-–—]\s*$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return s;
+}
+
+function englishScore(value){
+  const s = String(value ?? "");
+  const letters = s.match(/[A-Za-z]/g) || [];
+  const nonSpace = s.replace(/\s/g,"").length;
+
+  if (!nonSpace) return 0;
+
+  return letters.length / nonSpace;
+}
+
+function englishOnlyQuestion(q){
+  if (!q || typeof q !== "object") return null;
+
+  const question = englishClean(
+    q.question ??
+    q.text ??
+    q.questionText ??
+    q.question_text ??
+    ""
+  );
+
+  let options =
+    Array.isArray(q.options)
+      ? q.options
+      : Array.isArray(q.choices)
+        ? q.choices
+        : [];
+
+  options = options
+    .map(englishClean)
+    .filter(Boolean);
+
+  /*
+    A valid English CBT question must:
+    - have meaningful English text
+    - have exactly four options
+    - not be Hindi-only
+  */
+  if (question.length < 5) return null;
+
+  if (englishScore(question) < 0.45) return null;
+
+  if (options.length !== 4) return null;
+
+  if (
+    options.some(function(o){
+      return englishScore(o) < 0.35;
+    })
+  ) {
+    return null;
+  }
+
+  const uniqueOptions =
+    new Set(
+      options.map(function(o){
+        return o
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g," ")
+          .trim();
+      })
+    );
+
+  if (uniqueOptions.size !== 4) return null;
+
+  return {
+    ...q,
+    question,
+    text: question,
+    options
+  };
+}
+
+function englishOnlyQuestions(questions){
+  const output = [];
+  const seen = new Set();
+
+  for (
+    let i = 0;
+    i < (Array.isArray(questions) ? questions.length : 0);
+    i++
+  ){
+    const q = englishOnlyQuestion(questions[i]);
+
+    if (!q) continue;
+
+    const key =
+      String(q.question || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g," ")
+        .trim();
+
+    if (!key || seen.has(key)) continue;
+
+    seen.add(key);
+    output.push(q);
+  }
+
+  return output;
+}
+
+
 function saveImport(qs,fileName){
+  qs = englishOnlyQuestions(qs);
+  if (!qs.length) {
+    throw new Error("No valid English questions found in this PDF.");
+  }
   const importedAt=new Date().toISOString();
   const testId="pdf-test-"+Date.now()+"-"+Math.random().toString(36).slice(2,9);
 
