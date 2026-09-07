@@ -1,0 +1,38 @@
+[1mdiff --git a/retry.html b/retry.html[m
+[1mindex de240a9..930f956 100644[m
+[1m--- a/retry.html[m
+[1m+++ b/retry.html[m
+[36m@@ -1313,5 +1313,33 @@[m [mloadDPP();[m
+ [m
+ </script>[m
+ [m
+[32m+[m
+[32m+[m[32m<!-- ORBIT_RETRY_MASTERY_BRIDGE_V1 -->[m
+[32m+[m[32m<script>[m
+[32m+[m[32m(function(){[m
+[32m+[m[32m  function bridgeRetry(){[m
+[32m+[m[32m    const q =[m
+[32m+[m[32m      JSON.parse([m
+[32m+[m[32m        localStorage.getItem("cbtRetryQuestion") || "null"[m
+[32m+[m[32m      );[m
+[32m+[m
+[32m+[m[32m    if(!q) return;[m
+[32m+[m
+[32m+[m[32m    window.CBTAnalyzerRetryContext = q;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  document.addEventListener([m
+[32m+[m[32m    "DOMContentLoaded",[m
+[32m+[m[32m    bridgeRetry[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m  window.addEventListener([m
+[32m+[m[32m    "cbt:recovery-ready",[m
+[32m+[m[32m    bridgeRetry[m
+[32m+[m[32m  );[m
+[32m+[m[32m})();[m
+[32m+[m[32m</script>[m
+[32m+[m[32m<!-- /ORBIT_RETRY_MASTERY_BRIDGE_V1 -->[m
+[32m+[m
+ </body>[m
+ </html>[m
