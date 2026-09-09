@@ -728,4 +728,343 @@ Future Ranker test
 
   };
 
+
+  /* PCB_MENTOR_EVIDENCE_UNIVERSAL_SUBMIT_GUARD
+   *
+   * PDF Import + Ranker + normal CBT
+   * सभी completion paths को observe करता है.
+   *
+   * Original submitTest को replace नहीं करता.
+   */
+
+  function universalResult() {
+
+    const candidates = [];
+
+    [
+      "cbtCoreResultV6",
+      "cbtCoreResultV5",
+      "cbtResult",
+      "cbtLastResult",
+      "cbtPostTestStateV8"
+    ].forEach(function(key) {
+
+      const value =
+        read(key, null);
+
+      if (value)
+        candidates.push(value);
+
+    });
+
+    const history =
+      read(
+        HISTORY_KEY,
+        []
+      );
+
+    if (Array.isArray(history) &&
+        history.length) {
+
+      candidates.push(
+        history[history.length - 1]
+      );
+    }
+
+    for (const x of candidates) {
+
+      if (!x ||
+          typeof x !== "object")
+        continue;
+
+      if (
+        Array.isArray(x.questions) ||
+        Array.isArray(x.results) ||
+        Array.isArray(x.answers)
+      )
+        return x;
+
+      if (
+        x.correct !== undefined ||
+        x.wrong !== undefined ||
+        x.score !== undefined
+      )
+        return x;
+    }
+
+    return null;
+  }
+
+
+  function universalProcess() {
+
+    try {
+
+      const result =
+        universalResult();
+
+      if (!result)
+        return false;
+
+      const active =
+        read(
+          "CBT_ACTIVE_TEST",
+          null
+        );
+
+      const source =
+        clean(
+          active?.source ||
+          localStorage.getItem(
+            "CBT_ACTIVE_SOURCE"
+          )
+        );
+
+      /*
+       * Do not repeatedly create the
+       * same session record.
+       */
+
+      const signature =
+        JSON.stringify({
+          id:
+            active?.id ||
+            active?.testId ||
+            result?.id ||
+            result?.sessionId ||
+            result?.resultId ||
+            "",
+          completed:
+            result?.completedAt ||
+            result?.submittedAt ||
+            "",
+          correct:
+            result?.correct,
+          wrong:
+            result?.wrong,
+          score:
+            result?.score
+        });
+
+      const guardKey =
+        "pcbNichodLastProcessedResult";
+
+      const previous =
+        localStorage.getItem(
+          guardKey
+        );
+
+      if (
+        previous &&
+        previous === signature
+      ) {
+        return true;
+      }
+
+      /*
+       * Always make sure the mentor
+       * evidence store exists.
+       */
+      ensureMentorStore();
+
+      /*
+       * Process actual NICHOD evidence.
+       */
+      const output =
+        process(result);
+
+      /*
+       * Explicit completion/session
+       * marker for health validation.
+       */
+      const sessionKey =
+        "pcbNichodPostTestSession";
+
+      write(
+        sessionKey,
+        {
+          version: 1,
+
+          completedAt:
+            new Date().toISOString(),
+
+          source:
+            source ||
+            "CBT",
+
+          testId:
+            active?.id ||
+            active?.testId ||
+            result?.id ||
+            result?.sessionId ||
+            result?.resultId ||
+            null,
+
+          questions:
+            Array.isArray(
+              result.questions
+            )
+              ? result.questions.length
+              : Array.isArray(
+                  result.results
+                )
+              ? result.results.length
+              : Array.isArray(
+                  result.answers
+                )
+              ? result.answers.length
+              : 0,
+
+          mentorEvidence:
+            output?.processed || 0,
+
+          mistakes:
+            output?.mistakes || 0,
+
+          correct:
+            output?.correct || 0
+        }
+      );
+
+      localStorage.setItem(
+        guardKey,
+        signature
+      );
+
+      return true;
+
+    } catch (error) {
+
+      console.warn(
+        "PCB NICHOD universal post-test:",
+        error
+      );
+
+      return false;
+    }
+  }
+
+
+  function installUniversalSubmitObserver() {
+
+    let installed = false;
+
+    function install() {
+
+      if (
+        installed ||
+        typeof window.submitTest !==
+        "function"
+      )
+        return;
+
+      const original =
+        window.submitTest;
+
+      if (
+        original.__PCB_NICHOD_UNIVERSAL
+      ) {
+        installed = true;
+        return;
+      }
+
+      function wrapped() {
+
+        const output =
+          original.apply(
+            this,
+            arguments
+          );
+
+        let attempts = 0;
+
+        const timer =
+          setInterval(
+            function() {
+
+              attempts++;
+
+              if (
+                universalProcess() ||
+                attempts >= 30
+              ) {
+                clearInterval(
+                  timer
+                );
+              }
+
+            },
+            500
+          );
+
+        return output;
+      }
+
+      wrapped.__PCB_NICHOD_UNIVERSAL =
+        true;
+
+      wrapped.__originalSubmitTest =
+        original;
+
+      window.submitTest =
+        wrapped;
+
+      installed = true;
+
+      console.log(
+        "PCB NICHOD: universal submit observer installed"
+      );
+    }
+
+    install();
+
+    /*
+     * Some CBT scripts define submitTest
+     * after the NICHOD scripts load.
+     */
+    const watcher =
+      setInterval(
+        function() {
+
+          install();
+
+          if (installed)
+            clearInterval(watcher);
+
+        },
+        250
+      );
+
+    setTimeout(
+      function() {
+        clearInterval(watcher);
+      },
+      10000
+    );
+
+    /*
+     * Also watch history/result storage
+     * without touching the CBT engine.
+     */
+    let checks = 0;
+
+    const poll =
+      setInterval(
+        function() {
+
+          checks++;
+
+          universalProcess();
+
+          if (checks >= 60)
+            clearInterval(poll);
+
+        },
+        1000
+      );
+  }
+
+
+  installUniversalSubmitObserver();
+
 })();
