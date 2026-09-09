@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-09T04:20:55.994Z",
+  "generatedAt": "2026-09-09T04:21:49.306Z",
   "project": "PCB NICHOD",
   "pipeline": [
     "PDF",
@@ -22,12 +22,12 @@
     {
       "file": "cbt.html",
       "exists": true,
-      "size": 88333
+      "size": 88401
     },
     {
       "file": "pdf-to-cbt.v317.html",
       "exists": true,
-      "size": 55807
+      "size": 55875
     },
     {
       "file": "rankers-test-series.html",
@@ -148,7 +148,7 @@
   },
   "html": {
     "cbt.html": {
-      "totalScripts": 39,
+      "totalScripts": 40,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/cbt-active-test-router.js",
@@ -170,12 +170,13 @@
         "./nichod/engine/pdf-cbt-auto-recovery.js",
         "./nichod/engine/pdf-cbt-generic-final.js",
         "./nichod/engine/pdf-cbt-universal-parser.js",
-        "./nichod/engine/pdf-cbt-live-import-bridge.js"
+        "./nichod/engine/pdf-cbt-live-import-bridge.js",
+        "./nichod/engine/pdf-cbt-session-verifier.js"
       ],
       "missingLocalScripts": []
     },
     "pdf-to-cbt.v317.html": {
-      "totalScripts": 23,
+      "totalScripts": 24,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/pdf-nichod-bridge.js",
@@ -188,6 +189,7 @@
         "./nichod/engine/pdf-cbt-generic-final.js",
         "./nichod/engine/pdf-cbt-universal-parser.js",
         "./nichod/engine/pdf-cbt-live-import-bridge.js",
+        "./nichod/engine/pdf-cbt-session-verifier.js",
         "./nichod/engine/pdf-test-session-manager.js",
         "./nichod/engine/unified-test-library.js",
         "./nichod/engine/test-creation-bridge.js",
@@ -246,8 +248,8 @@
   },
   "git": {
     "branch": "main",
-    "commit": "ef1c6b9 Add universal PDF to CBT question parser",
-    "status": "M cbt.html\n M nichod/data/pdf-cbt-runtime-report.json\n M pdf-to-cbt.v317.html\n?? nichod/engine/pdf-cbt-live-import-bridge.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
+    "commit": "1fb5e39 Connect live PDF import to independent CBT tests",
+    "status": "M cbt.html\n M nichod/data/pdf-cbt-runtime-report.json\n M pdf-to-cbt.v317.html\n?? nichod/engine/pdf-cbt-session-verifier.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
   },
   "failures": {
     "missingFiles": [],
