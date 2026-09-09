@@ -2064,6 +2064,7 @@ function buildTestQuestions() {
     try {
 
       const raw =
+        sessionStorage.getItem("CBT_ACTIVE_TEST") ||
         localStorage.getItem("CBT_ACTIVE_TEST");
 
       if (!raw)
@@ -2090,6 +2091,18 @@ function buildTestQuestions() {
        * the existing CBT start pipeline.
        */
       window.authoritativeActive = active;
+
+      /*
+       * Keep BOTH storage locations synchronized so
+       * PDF/Ranker launch survives the existing CBT flow.
+       */
+      try {
+        sessionStorage.setItem(
+          "CBT_ACTIVE_TEST",
+          JSON.stringify(active)
+        );
+      } catch (_) {}
+
       window.selectedTest = active;
       window.selectedQuestions =
         active.questions.slice();
@@ -2136,6 +2149,7 @@ startButton.addEventListener(
        * over legacy Test-180/fallback selection.
        */
       const activeRaw =
+        sessionStorage.getItem("CBT_ACTIVE_TEST") ||
         localStorage.getItem("CBT_ACTIVE_TEST");
 
       let active = null;
@@ -5691,4 +5705,4 @@ window.addEventListener("load", function () {
 
 </body>
 
-</html>\n\n
+</html>\n\n\n
