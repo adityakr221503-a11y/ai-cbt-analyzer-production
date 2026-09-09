@@ -1017,6 +1017,30 @@
 })();
 </script>
 
+
+<!-- PDF TEST ALLOCATION LIMIT V3 -->
+<script>
+(function () {
+  "use strict";
+
+  const MAX_PDF_TEST = 180;
+
+  window.CBTPDFTestAllocator = {
+    max: MAX_PDF_TEST,
+
+    allocate: function (questions) {
+      const list =
+        Array.isArray(questions)
+          ? questions
+          : [];
+
+      return list.slice(0, MAX_PDF_TEST);
+    }
+  };
+
+})();
+</script>
+
 </head>
 
 <body>

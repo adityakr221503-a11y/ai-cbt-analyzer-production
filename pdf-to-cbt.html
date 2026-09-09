@@ -768,6 +768,160 @@
 })();
 </script>
 
+
+<!-- PDF 180 QUESTION SESSION GUARD V3 -->
+<script>
+(function () {
+  "use strict";
+
+  const PDF_NS = "CBT_ISO_V2_PDF_";
+  const PDF_FILE_KEY = PDF_NS + "FILE_ID";
+  const PDF_POOL_KEY = PDF_NS + "QUESTION_POOL";
+  const PDF_SELECTED_KEY = PDF_NS + "SELECTED";
+  const PDF_USED_KEY = PDF_NS + "USED";
+  const PDF_MAX_TEST = 180;
+
+  function read(key, fallback) {
+    try {
+      const v = localStorage.getItem(key);
+      return v == null ? fallback : JSON.parse(v);
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  function write(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function qid(q, i) {
+    return String(
+      q && (
+        q.id ||
+        q.questionId ||
+        q.uid
+      ) || ("q-" + i)
+    );
+  }
+
+  function unique(list) {
+    const seen = new Set();
+
+    return (Array.isArray(list) ? list : [])
+      .filter(function (q, i) {
+        if (!q || typeof q !== "object") return false;
+
+        const id = qid(q, i);
+
+        if (seen.has(id)) return false;
+
+        seen.add(id);
+        return true;
+      });
+  }
+
+  function clearPDFRuntime() {
+    [
+      PDF_POOL_KEY,
+      PDF_SELECTED_KEY,
+      PDF_USED_KEY,
+      PDF_NS + "SESSION"
+    ].forEach(function (k) {
+      localStorage.removeItem(k);
+    });
+
+    sessionStorage.removeItem("CBT_ACTIVE_TEST");
+    sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
+
+    localStorage.removeItem("CBT_ACTIVE_TEST");
+    localStorage.removeItem("CBT_ACTIVE_SOURCE");
+  }
+
+  function beginPDFSession(file) {
+    if (!file) return;
+
+    const signature = [
+      file.name || "",
+      file.size || 0,
+      file.lastModified || 0
+    ].join("|");
+
+    const old = localStorage.getItem(PDF_FILE_KEY);
+
+    /*
+     * NEW PDF = NEW POOL.
+     * Old PDF questions are never reused.
+     */
+    if (old !== signature) {
+      clearPDFRuntime();
+      localStorage.setItem(PDF_FILE_KEY, signature);
+    }
+
+    window.CBT_PDF_MAX_TEST = PDF_MAX_TEST;
+  }
+
+  /*
+   * Expose only. The actual parser remains authoritative.
+   * This prevents old PDF data from becoming the new PDF pool.
+   */
+  window.CBTPDF180Guard = {
+    maxQuestions: PDF_MAX_TEST,
+    beginSession: beginPDFSession,
+    clearSession: clearPDFRuntime,
+
+    normalizePool: function (questions) {
+      const clean = unique(questions);
+
+      /*
+       * IMPORTANT:
+       * Pool remains the complete current PDF.
+       * We only cap TEST allocation later.
+       */
+      write(PDF_POOL_KEY, clean);
+
+      return clean;
+    },
+
+    allocateTest: function (questions) {
+      const pool = unique(questions);
+      const used = new Set(
+        read(PDF_USED_KEY, [])
+      );
+
+      let fresh = pool.filter(function (q, i) {
+        return !used.has(qid(q, i));
+      });
+
+      /*
+       * If fewer than 180 unused questions remain,
+       * use the remaining questions only.
+       * Never import questions from another PDF.
+       */
+      const selected = fresh.slice(0, PDF_MAX_TEST);
+
+      write(PDF_SELECTED_KEY, selected);
+
+      selected.forEach(function (q, i) {
+        used.add(qid(q, i));
+      });
+
+      write(
+        PDF_USED_KEY,
+        Array.from(used)
+      );
+
+      return selected;
+    }
+  };
+
+  console.log(
+    "PDF 180 Guard loaded | max test =",
+    PDF_MAX_TEST
+  );
+
+})();
+</script>
+
 </head>
 
 
