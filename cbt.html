@@ -5459,7 +5459,7 @@ window.addEventListener("load", function () {
 
         const matched =
           markers.some(function (marker) {
-            return text.startsWith(marker);
+            return text.includes(marker);
           });
 
         /*
