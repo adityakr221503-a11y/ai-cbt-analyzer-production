@@ -274,14 +274,178 @@
   function load() {
 
     /*
-     * 1. Existing explicit active test.
+     * SOURCE-AWARE LOADING
+     *
+     * Never let an old ACTIVE_TEST override the source that
+     * explicitly launched the CBT.
+     */
+    const activeSourceRaw =
+      localStorage.getItem(
+        KEYS.ACTIVE_SOURCE
+      ) || "";
+
+    const activeSource =
+      String(activeSourceRaw)
+        .trim()
+        .toLowerCase();
+
+    /*
+     * 1. Ranker is authoritative when the current source
+     * explicitly says Rankers Test Series.
+     */
+    if (
+      activeSource ===
+        "rankers test series" ||
+      activeSource ===
+        "ranker" ||
+      activeSource ===
+        "ranker pro"
+    ) {
+
+      const ranker =
+        array(
+          read(KEYS.RANKER)
+        );
+
+      if (ranker.length) {
+
+        const questions =
+          unique(
+            ranker
+              .map((q, i) =>
+                normalize(
+                  q,
+                  i,
+                  "ranker-active",
+                  "Rankers Test Series"
+                )
+              )
+              .filter(Boolean)
+          );
+
+        if (questions.length) {
+
+          return {
+            source:
+              "Rankers Test Series",
+            testId:
+              "ranker-active",
+            title:
+              "Rankers Test",
+            questions
+          };
+        }
+      }
+
+      /*
+       * Ranker was explicitly requested but its own pool
+       * is unavailable. Do NOT fall through to PDF.
+       */
+      return {
+        source:
+          "Rankers Test Series",
+        testId:
+          null,
+        title:
+          "Rankers Test",
+        questions:
+          []
+      };
+    }
+
+    /*
+     * 2. PDF is authoritative when PDF was explicitly launched.
+     */
+    if (
+      activeSource ===
+        "pdf import" ||
+      activeSource ===
+        "pdf"
+    ) {
+
+      const active =
+        getActiveTest();
+
+      if (
+        active &&
+        active.source &&
+        String(active.source)
+          .trim()
+          .toLowerCase()
+          .includes("pdf") &&
+        Array.isArray(active.questions) &&
+        active.questions.length
+      ) {
+        return {
+          source:
+            active.source,
+          testId:
+            active.testId,
+          title:
+            active.title,
+          questions:
+            active.questions
+        };
+      }
+
+      const pdf =
+        array(
+          read(KEYS.PDF)
+        );
+
+      if (pdf.length) {
+
+        const questions =
+          unique(
+            pdf
+              .map((q, i) =>
+                normalize(
+                  q,
+                  i,
+                  "pdf-active",
+                  "PDF Import"
+                )
+              )
+              .filter(Boolean)
+          );
+
+        if (questions.length) {
+          return {
+            source:
+              "PDF Import",
+            testId:
+              "pdf-active",
+            title:
+              "PDF Test",
+            questions
+          };
+        }
+      }
+
+      return {
+        source:
+          "PDF Import",
+        testId:
+          null,
+        title:
+          "PDF Test",
+        questions:
+          []
+      };
+    }
+
+    /*
+     * 3. No explicit source:
+     * only accept an active test whose source is valid.
      */
     const active =
       getActiveTest();
 
     if (
       active &&
-      active.source
+      active.source &&
+      Array.isArray(active.questions) &&
+      active.questions.length
     ) {
       return {
         source:
@@ -296,7 +460,7 @@
     }
 
     /*
-     * 2. Ranker selected questions.
+     * 4. Ranker fallback only when explicitly available.
      */
     const ranker =
       array(
