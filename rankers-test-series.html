@@ -466,4 +466,283 @@ Open Ranker Command Center
 <script src="./nichod/engine/nichod-unseen-generator.js"></script>
 <script src="./nichod/engine/nichod-generation-bridge.js"></script>
 <script src="./cbt-unified-core.js"></script>
+
+
+<!-- NICHOD_UNSEEN_CONTROL_V1 -->
+<section class="card" id="nichodUnseenControl"
+  style="margin-top:18px;">
+  <h2>🧠 NICHOD Unseen Ranker</h2>
+
+  <p class="muted">
+    Verified unseen questions are kept separate from
+    the original PYQ corpus.
+  </p>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+    margin:12px 0;
+  ">
+
+    <div style="
+      padding:12px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      text-align:center;
+    ">
+      <b id="nichodCandidateCount">0</b>
+      <div class="muted">Candidates</div>
+    </div>
+
+    <div style="
+      padding:12px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      text-align:center;
+    ">
+      <b id="nichodVerifiedCount">0</b>
+      <div class="muted">Verified Unseen</div>
+    </div>
+
+    <div style="
+      padding:12px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      text-align:center;
+    ">
+      <b id="nichodActiveCount">0</b>
+      <div class="muted">Active Test</div>
+    </div>
+
+  </div>
+
+  <div style="
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  ">
+
+    <button id="nichodGenerateBtn"
+      type="button">
+      Generate Unseen Candidates
+    </button>
+
+    <button id="nichodBuildBtn"
+      type="button">
+      Build Unseen Ranker Test
+    </button>
+
+  </div>
+
+  <div id="nichodStatus"
+    class="muted"
+    style="margin-top:12px;">
+    NICHOD ready.
+  </div>
+</section>
+
+<script>
+(function(){
+
+  "use strict";
+
+  function read(key, fallback){
+
+    try{
+
+      const value =
+        JSON.parse(
+          localStorage.getItem(key) ||
+          "null"
+        );
+
+      return value == null
+        ? fallback
+        : value;
+
+    }catch(_){
+
+      return fallback;
+
+    }
+
+  }
+
+  function update(){
+
+    const candidates =
+      read(
+        "pcbNichodUnseenCandidates",
+        []
+      );
+
+    const verified =
+      read(
+        "pcbNichodVerifiedUnseen",
+        []
+      );
+
+    const active =
+      read(
+        "rbSelectedQuestions",
+        []
+      );
+
+    const c =
+      document.getElementById(
+        "nichodCandidateCount"
+      );
+
+    const v =
+      document.getElementById(
+        "nichodVerifiedCount"
+      );
+
+    const a =
+      document.getElementById(
+        "nichodActiveCount"
+      );
+
+    if(c)
+      c.textContent =
+        Array.isArray(candidates)
+          ? candidates.length
+          : 0;
+
+    if(v)
+      v.textContent =
+        Array.isArray(verified)
+          ? verified.length
+          : 0;
+
+    if(a)
+      a.textContent =
+        Array.isArray(active)
+          ? active.length
+          : 0;
+  }
+
+  function status(text){
+
+    const el =
+      document.getElementById(
+        "nichodStatus"
+      );
+
+    if(el)
+      el.textContent =
+        text;
+
+  }
+
+  const generate =
+    document.getElementById(
+      "nichodGenerateBtn"
+    );
+
+  if(generate){
+
+    generate.onclick =
+      function(){
+
+        if(
+          !window.PCBNICHODUnseen
+        ){
+
+          status(
+            "NICHOD unseen engine is not loaded."
+          );
+
+          return;
+
+        }
+
+        const result =
+          window.PCBNICHODUnseen.generate({
+            count: 10,
+            requireVerified: true
+          });
+
+        status(
+          result.count +
+          " unseen candidate(s) prepared for review."
+        );
+
+        update();
+
+      };
+
+  }
+
+  const build =
+    document.getElementById(
+      "nichodBuildBtn"
+    );
+
+  if(build){
+
+    build.onclick =
+      function(){
+
+        if(
+          !window.PCBNICHODGeneration
+        ){
+
+          status(
+            "NICHOD generation bridge is not loaded."
+          );
+
+          return;
+
+        }
+
+        const result =
+          window.PCBNICHODGeneration.buildTest({
+            count: 45
+          });
+
+        if(!result.ok){
+
+          status(
+            "No verified unseen questions are available yet."
+          );
+
+          update();
+
+          return;
+
+        }
+
+        status(
+          result.count +
+          " verified unseen questions selected. Opening CBT..."
+        );
+
+        update();
+
+        setTimeout(
+          function(){
+
+            location.href =
+              "cbt.html?source=nichod-unseen";
+
+          },
+          250
+        );
+
+      };
+
+  }
+
+  update();
+
+  window.addEventListener(
+    "storage",
+    update
+  );
+
+})();
+</script>
+
 </body></html>
