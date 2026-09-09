@@ -50,16 +50,29 @@
       panel.id = "pcbCbtLiveSourcePanel";
 
       panel.style.cssText =
+        "display:none !important;" +
         "position:fixed;left:12px;right:12px;bottom:12px;" +
         "z-index:999999;background:#111827;color:#fff;" +
         "padding:12px;border-radius:14px;" +
         "font:13px/1.5 system-ui,sans-serif;" +
         "box-shadow:0 8px 30px rgba(0,0,0,.3);" +
         "max-height:42vh;overflow:auto;" +
-        "pointer-events:auto;";
+        "pointer-events:none;";
 
       document.body.appendChild(panel);
     }
+
+    panel.style.setProperty(
+      "display",
+      "none",
+      "important"
+    );
+
+    panel.style.setProperty(
+      "pointer-events",
+      "none",
+      "important"
+    );
 
     const x = inspect();
 
