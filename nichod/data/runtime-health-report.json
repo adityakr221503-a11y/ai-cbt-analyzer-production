@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-09T03:34:23.230Z",
+  "generatedAt": "2026-09-09T04:16:26.032Z",
   "project": "PCB NICHOD",
   "pipeline": [
     "PDF",
@@ -22,17 +22,17 @@
     {
       "file": "cbt.html",
       "exists": true,
-      "size": 82918
+      "size": 88000
     },
     {
       "file": "pdf-to-cbt.v317.html",
       "exists": true,
-      "size": 47471
+      "size": 55474
     },
     {
       "file": "rankers-test-series.html",
       "exists": true,
-      "size": 23281
+      "size": 28238
     },
     {
       "file": "nichod/engine/nichod-unified-orchestrator.js",
@@ -142,33 +142,58 @@
       "authoring": true,
       "authoringUI": true,
       "verified": true,
-      "metadata": false,
-      "postTest": false
+      "metadata": true,
+      "postTest": true
     }
   },
   "html": {
     "cbt.html": {
-      "totalScripts": 22,
+      "totalScripts": 34,
       "nichodScripts": [
+        "./nichod/engine/cbt-unified-question-loader.js",
+        "./nichod/engine/cbt-active-test-router.js",
+        "./nichod/engine/unified-test-library.js",
+        "./nichod/engine/test-creation-bridge.js",
+        "./nichod/engine/test-creation-auto-hook.js",
+        "./nichod/engine/live-test-flow-bridge.js",
+        "./nichod/engine/pdf-test-session-manager.js",
         "./nichod/engine/nichod-cbt-metadata-bridge.js",
         "./nichod/engine/nichod-posttest-bridge.js",
         "./nichod/engine/nichod-unified-orchestrator.js",
-        "./nichod/engine/nichod-system-health.js"
+        "./nichod/engine/nichod-system-health.js",
+        "./nichod/engine/nichod-e2e-harness.js",
+        "./nichod/engine/nichod-live-flow-monitor.js",
+        "./nichod/engine/pdf-cbt-runtime-guard.js",
+        "./nichod/engine/pdf-cbt-auto-recovery.js",
+        "./nichod/engine/pdf-cbt-generic-final.js"
       ],
       "missingLocalScripts": []
     },
     "pdf-to-cbt.v317.html": {
-      "totalScripts": 6,
+      "totalScripts": 18,
       "nichodScripts": [
+        "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/pdf-nichod-bridge.js",
         "./nichod/engine/nichod-unified-orchestrator.js",
-        "./nichod/engine/nichod-system-health.js"
+        "./nichod/engine/nichod-system-health.js",
+        "./nichod/engine/nichod-e2e-harness.js",
+        "./nichod/engine/nichod-live-flow-monitor.js",
+        "./nichod/engine/pdf-cbt-runtime-guard.js",
+        "./nichod/engine/pdf-cbt-auto-recovery.js",
+        "./nichod/engine/pdf-cbt-generic-final.js",
+        "./nichod/engine/pdf-test-session-manager.js",
+        "./nichod/engine/unified-test-library.js",
+        "./nichod/engine/test-creation-bridge.js",
+        "./nichod/engine/test-creation-auto-hook.js",
+        "./nichod/engine/live-test-flow-bridge.js",
+        "./nichod/engine/unified-test-library-ui.js"
       ],
       "missingLocalScripts": []
     },
     "rankers-test-series.html": {
-      "totalScripts": 15,
+      "totalScripts": 25,
       "nichodScripts": [
+        "./nichod/engine/cbt-unified-question-loader.js",
         "./pcb-nichod-ranker.js",
         "./nichod/engine/nichod-ranker-feed.js",
         "./nichod/engine/nichod-unseen-generator.js",
@@ -177,8 +202,17 @@
         "./nichod/engine/nichod-authoring-engine.js",
         "./nichod/engine/nichod-authoring-ui.js",
         "./nichod/engine/nichod-verified-feed.js",
+        "./nichod/engine/nichod-cbt-metadata-bridge.js",
+        "./nichod/engine/nichod-posttest-bridge.js",
         "./nichod/engine/nichod-unified-orchestrator.js",
-        "./nichod/engine/nichod-system-health.js"
+        "./nichod/engine/nichod-system-health.js",
+        "./nichod/engine/nichod-e2e-harness.js",
+        "./nichod/engine/nichod-live-flow-monitor.js",
+        "./nichod/engine/unified-test-library.js",
+        "./nichod/engine/test-creation-bridge.js",
+        "./nichod/engine/test-creation-auto-hook.js",
+        "./nichod/engine/live-test-flow-bridge.js",
+        "./nichod/engine/unified-test-library-ui.js"
       ],
       "missingLocalScripts": []
     }
@@ -199,8 +233,8 @@
   },
   "git": {
     "branch": "main",
-    "commit": "dca57fd Add unified PCB NICHOD pipeline health and subject validation",
-    "status": "?? nichod/engine/nichod-runtime-test.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
+    "commit": "9c10821 Auto-register PDF and Ranker sessions in unified test library",
+    "status": "M cbt.html\n M index.html\n M nichod/data/final-validation-report.json\n M nichod/data/pdf-cbt-runtime-report.json\n M nichod/data/runtime-health-report.json\n M pdf-to-cbt.v317.html\n M rankers-test-series.html\n?? nichod/engine/live-test-flow-bridge.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
   },
   "failures": {
     "missingFiles": [],

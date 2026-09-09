@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-09T03:36:27.342Z",
+  "generatedAt": "2026-09-09T04:16:29.094Z",
   "repository": "ai-cbt-analyzer-production",
   "pipeline": [
     "PDF",
@@ -12,9 +12,9 @@
     "Mentor",
     "Adaptive Next Test"
   ],
-  "passed": 116,
+  "passed": 145,
   "failed": 0,
-  "total": 116,
+  "total": 145,
   "status": "PASS",
   "results": [
     {
@@ -358,6 +358,11 @@
       "detail": "vendor/pdf.min.js"
     },
     {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/cbt-unified-question-loader.js",
+      "status": "PASS",
+      "detail": "nichod/engine/cbt-unified-question-loader.js"
+    },
+    {
       "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/pdf-nichod-bridge.js",
       "status": "PASS",
       "detail": "nichod/engine/pdf-nichod-bridge.js"
@@ -376,6 +381,61 @@
       "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/nichod-e2e-harness.js",
       "status": "PASS",
       "detail": "nichod/engine/nichod-e2e-harness.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/nichod-live-flow-monitor.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-live-flow-monitor.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/pdf-cbt-runtime-guard.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-cbt-runtime-guard.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/pdf-cbt-auto-recovery.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-cbt-auto-recovery.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/pdf-cbt-generic-final.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-cbt-generic-final.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/pdf-test-session-manager.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-test-session-manager.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/unified-test-library.js",
+      "status": "PASS",
+      "detail": "nichod/engine/unified-test-library.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/test-creation-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/test-creation-bridge.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/test-creation-auto-hook.js",
+      "status": "PASS",
+      "detail": "nichod/engine/test-creation-auto-hook.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/live-test-flow-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/live-test-flow-bridge.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/unified-test-library-ui.js",
+      "status": "PASS",
+      "detail": "nichod/engine/unified-test-library-ui.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/cbt-unified-question-loader.js",
+      "status": "PASS",
+      "detail": "nichod/engine/cbt-unified-question-loader.js"
     },
     {
       "name": "REF rankers-test-series.html -> rank-booster/question-bank.js",
@@ -468,6 +528,36 @@
       "detail": "nichod/engine/nichod-e2e-harness.js"
     },
     {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-live-flow-monitor.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-live-flow-monitor.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/unified-test-library.js",
+      "status": "PASS",
+      "detail": "nichod/engine/unified-test-library.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/test-creation-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/test-creation-bridge.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/test-creation-auto-hook.js",
+      "status": "PASS",
+      "detail": "nichod/engine/test-creation-auto-hook.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/live-test-flow-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/live-test-flow-bridge.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/unified-test-library-ui.js",
+      "status": "PASS",
+      "detail": "nichod/engine/unified-test-library-ui.js"
+    },
+    {
       "name": "REF cbt.html -> rank-booster/question-bank.js",
       "status": "PASS",
       "detail": "rank-booster/question-bank.js"
@@ -528,6 +618,41 @@
       "detail": "pdf-cbt-cbt-bridge.js"
     },
     {
+      "name": "REF cbt.html -> ./nichod/engine/cbt-unified-question-loader.js",
+      "status": "PASS",
+      "detail": "nichod/engine/cbt-unified-question-loader.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/cbt-active-test-router.js",
+      "status": "PASS",
+      "detail": "nichod/engine/cbt-active-test-router.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/unified-test-library.js",
+      "status": "PASS",
+      "detail": "nichod/engine/unified-test-library.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/test-creation-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/test-creation-bridge.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/test-creation-auto-hook.js",
+      "status": "PASS",
+      "detail": "nichod/engine/test-creation-auto-hook.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/live-test-flow-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/live-test-flow-bridge.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/pdf-test-session-manager.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-test-session-manager.js"
+    },
+    {
       "name": "REF cbt.html -> ./test180-questions.js",
       "status": "PASS",
       "detail": "test180-questions.js"
@@ -581,6 +706,26 @@
       "name": "REF cbt.html -> ./nichod/engine/nichod-e2e-harness.js",
       "status": "PASS",
       "detail": "nichod/engine/nichod-e2e-harness.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/nichod-live-flow-monitor.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-live-flow-monitor.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/pdf-cbt-runtime-guard.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-cbt-runtime-guard.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/pdf-cbt-auto-recovery.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-cbt-auto-recovery.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/pdf-cbt-generic-final.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-cbt-generic-final.js"
     },
     {
       "name": "NICHOD schema",
