@@ -134,27 +134,83 @@
 (function () {
   function allowCBTClicks() {
     const panels = document.querySelectorAll(
-      '[id*="pcb"][id*="source"],' +
-      '[id*="nichod"][id*="panel"],' +
-      '.pcb-nichod-live-source'
+      "#pcbCbtLiveSourcePanel," +
+      '[id*="pcb"],' +
+      '[id*="nichod"],' +
+      ".pcb-nichod-live-source"
     );
 
     panels.forEach(function (panel) {
-      panel.style.pointerEvents = "none";
+      if (!panel || panel === document.body) return;
 
+      const id =
+        String(panel.id || "").toLowerCase();
+
+      const className =
+        String(panel.className || "").toLowerCase();
+
+      const isNichodPanel =
+        id.includes("pcb") ||
+        id.includes("nichod") ||
+        className.includes("pcb-nichod");
+
+      if (!isNichodPanel) return;
+
+      /*
+       * IMPORTANT:
+       * The floating diagnostics panel must NEVER create a
+       * touch/click layer over CBT questions.
+       */
+      panel.style.setProperty(
+        "pointer-events",
+        "none",
+        "important"
+      );
+
+      panel.style.setProperty(
+        "touch-action",
+        "none",
+        "important"
+      );
+
+      /*
+       * Keep only the panel's own controls interactive.
+       */
       panel.querySelectorAll(
         "button, input, select, textarea, a"
       ).forEach(function (el) {
-        el.style.pointerEvents = "auto";
+        el.style.setProperty(
+          "pointer-events",
+          "auto",
+          "important"
+        );
+
+        el.style.setProperty(
+          "touch-action",
+          "manipulation",
+          "important"
+        );
       });
     });
   }
 
   allowCBTClicks();
 
-  new MutationObserver(allowCBTClicks)
-    .observe(document.documentElement, {
-      childList: true,
-      subtree: true
-    });
+  if (window.MutationObserver) {
+    new MutationObserver(
+      allowCBTClicks
+    ).observe(
+      document.documentElement,
+      {
+        childList: true,
+        subtree: true
+      }
+    );
+  }
+
+  window.addEventListener(
+    "resize",
+    allowCBTClicks,
+    { passive: true }
+  );
 })();
