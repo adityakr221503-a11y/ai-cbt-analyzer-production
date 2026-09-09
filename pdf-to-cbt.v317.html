@@ -3508,3 +3508,177 @@ console.log(
 })();
 </script>
 
+
+
+<!-- PCB_PDF_DIAGNOSTIC_V2 -->
+<script>
+(function () {
+
+  function read(key) {
+    try {
+      return JSON.parse(
+        localStorage.getItem(key) || "null"
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function count(v) {
+
+    if (Array.isArray(v))
+      return v.length;
+
+    if (v && Array.isArray(v.questions))
+      return v.questions.length;
+
+    if (v && Array.isArray(v.data))
+      return v.data.length;
+
+    if (v && Array.isArray(v.items))
+      return v.items.length;
+
+    if (v && Array.isArray(v.questionBank))
+      return v.questionBank.length;
+
+    return 0;
+  }
+
+  function show() {
+
+    if (!document.body)
+      return;
+
+    let box =
+      document.getElementById(
+        "pcbPdfDiagnostic"
+      );
+
+    if (!box) {
+
+      box =
+        document.createElement("div");
+
+      box.id =
+        "pcbPdfDiagnostic";
+
+      box.style.cssText =
+        "position:fixed;" +
+        "left:10px;" +
+        "right:10px;" +
+        "bottom:10px;" +
+        "z-index:999999;" +
+        "background:#111827;" +
+        "color:white;" +
+        "padding:14px;" +
+        "border-radius:14px;" +
+        "font:13px monospace;" +
+        "max-height:45vh;" +
+        "overflow:auto;";
+
+      document.body.appendChild(box);
+    }
+
+    const keys = [
+      "pdfCbtQuestions",
+      "pdfQuestions",
+      "cbtQuestions",
+      "importedQuestions",
+      "pdfQuestionBank",
+      "questionBank"
+    ];
+
+    let html =
+      "<b>📄 PDF → CBT DIAGNOSTIC</b><br><br>";
+
+    for (const key of keys) {
+
+      const raw =
+        localStorage.getItem(key);
+
+      html +=
+        key +
+        ": " +
+        (
+          raw === null
+            ? "NOT FOUND"
+            : count(read(key))
+        ) +
+        "<br>";
+    }
+
+    html +=
+      "<br><b>ACTIVE SOURCE:</b> " +
+      (
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ) || "—"
+      );
+
+    html +=
+      "<br><br><b>GUARD:</b> " +
+      (
+        window.PCBPDFCBTRuntimeGuard
+          ? "LOADED"
+          : "NOT LOADED"
+      );
+
+    html +=
+      "<br><b>PDF BRIDGE:</b> " +
+      (
+        window.PCBNICHODPDF
+          ? "LOADED"
+          : "NOT LOADED"
+      );
+
+    html +=
+      "<br><br>" +
+      '<button id="pcbDiagRefresh" ' +
+      'style="padding:8px;margin-right:6px">' +
+      "Refresh</button>" +
+
+      '<button id="pcbDiagClose" ' +
+      'style="padding:8px">' +
+      "Hide</button>";
+
+    box.innerHTML = html;
+
+    document.getElementById(
+      "pcbDiagRefresh"
+    ).onclick = show;
+
+    document.getElementById(
+      "pcbDiagClose"
+    ).onclick = function () {
+      box.remove();
+    };
+  }
+
+  function boot() {
+
+    setTimeout(show, 1000);
+
+    setTimeout(show, 3000);
+
+    setTimeout(show, 7000);
+  }
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot
+    );
+
+  } else {
+
+    boot();
+
+  }
+
+})();
+</script>
+
