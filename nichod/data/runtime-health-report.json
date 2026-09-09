@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-09T04:17:46.912Z",
+  "generatedAt": "2026-09-09T04:18:34.583Z",
   "project": "PCB NICHOD",
   "pipeline": [
     "PDF",
@@ -22,17 +22,17 @@
     {
       "file": "cbt.html",
       "exists": true,
-      "size": 88131
+      "size": 88195
     },
     {
       "file": "pdf-to-cbt.v317.html",
       "exists": true,
-      "size": 55605
+      "size": 55669
     },
     {
       "file": "rankers-test-series.html",
       "exists": true,
-      "size": 28369
+      "size": 28433
     },
     {
       "file": "nichod/engine/nichod-unified-orchestrator.js",
@@ -148,7 +148,7 @@
   },
   "html": {
     "cbt.html": {
-      "totalScripts": 36,
+      "totalScripts": 37,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/cbt-active-test-router.js",
@@ -158,6 +158,7 @@
         "./nichod/engine/live-test-flow-bridge.js",
         "./nichod/engine/cbt-authoritative-loader.js",
         "./nichod/engine/real-flow-validator.js",
+        "./nichod/engine/real-flow-test-suite.js",
         "./nichod/engine/pdf-test-session-manager.js",
         "./nichod/engine/nichod-cbt-metadata-bridge.js",
         "./nichod/engine/nichod-posttest-bridge.js",
@@ -172,7 +173,7 @@
       "missingLocalScripts": []
     },
     "pdf-to-cbt.v317.html": {
-      "totalScripts": 20,
+      "totalScripts": 21,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/pdf-nichod-bridge.js",
@@ -190,12 +191,13 @@
         "./nichod/engine/live-test-flow-bridge.js",
         "./nichod/engine/cbt-authoritative-loader.js",
         "./nichod/engine/real-flow-validator.js",
+        "./nichod/engine/real-flow-test-suite.js",
         "./nichod/engine/unified-test-library-ui.js"
       ],
       "missingLocalScripts": []
     },
     "rankers-test-series.html": {
-      "totalScripts": 27,
+      "totalScripts": 28,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./pcb-nichod-ranker.js",
@@ -218,6 +220,7 @@
         "./nichod/engine/live-test-flow-bridge.js",
         "./nichod/engine/cbt-authoritative-loader.js",
         "./nichod/engine/real-flow-validator.js",
+        "./nichod/engine/real-flow-test-suite.js",
         "./nichod/engine/unified-test-library-ui.js"
       ],
       "missingLocalScripts": []
@@ -239,8 +242,8 @@
   },
   "git": {
     "branch": "main",
-    "commit": "c499e75 Make active CBT test source authoritative",
-    "status": "M cbt.html\n M index.html\n M nichod/data/pdf-cbt-runtime-report.json\n M pdf-to-cbt.v317.html\n M rankers-test-series.html\n?? nichod/engine/real-flow-validator.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
+    "commit": "29f64f4 Add real PDF and Ranker CBT flow validation",
+    "status": "M cbt.html\n M index.html\n M nichod/data/pdf-cbt-runtime-report.json\n M pdf-to-cbt.v317.html\n M rankers-test-series.html\n?? nichod/engine/real-flow-test-suite.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
   },
   "failures": {
     "missingFiles": [],
