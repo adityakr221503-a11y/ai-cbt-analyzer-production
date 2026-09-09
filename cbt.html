@@ -4761,219 +4761,40 @@ console.log(
 
 <script>
 /* =====================================================
-   RANKER PRO — PDF CBT FINAL BOOTSTRAP
+   FINAL PDF / RANKER CBT SOURCE BOOTSTRAP
+   SOURCE ISOLATION V3
 ===================================================== */
 (function () {
+  "use strict";
 
-  function bootPDF() {
-
+  function safeJSON(storage, key, fallback) {
     try {
-
-      if (
-        sessionStorage.getItem("CBT_ACTIVE_SOURCE") !== "PDF"
-      ) {
-        return;
-      }
-
-      const raw =
-        sessionStorage.getItem(
-          "CBT_ACTIVE_QUESTIONS"
-        ) || "[]";
-
-      const source =
-        JSON.parse(raw);
-
-      if (
-        !Array.isArray(source) ||
-        source.length === 0
-      ) {
-        console.warn(
-          "PDF CBT: no imported questions found"
-        );
-        return;
-      }
-
-      selectedQuestions =
-        source
-          .map(function (q, i) {
-            return normalizeQuestion(q, i);
-          })
-          .filter(function (q) {
-            return (
-              q &&
-              q.text &&
-              Array.isArray(q.options) &&
-              q.options.length === 4
-            );
-          });
-
-      if (selectedQuestions.length === 0) {
-        console.warn(
-          "PDF CBT: no valid questions after normalization"
-        );
-        return;
-      }
-
-      selectedTest = {
-        id: "pdf-import",
-        title:
-          "PDF Imported CBT",
-        duration: 180,
-        questionIds:
-          selectedQuestions.map(function (q) {
-            return q.id;
-          })
-      };
-
-      questionCount.value = "all";
-
-      currentIndex = 0;
-      answers = {};
-      visitedQuestions = new Set();
-      reviewQuestions = new Set();
-      submitted = false;
-
-      remainingSeconds =
-        selectedTest.duration * 60;
-
-      setupScreen.classList.add(
-        "hidden"
-      );
-
-      resultScreen.classList.add(
-        "hidden"
-      );
-
-      cbtScreen.classList.remove(
-        "hidden"
-      );
-
-      testTitle.textContent =
-        "PDF Imported CBT — " +
-        selectedQuestions.length +
-        " Questions";
-
-      renderQuestion();
-      renderPalette();
-      startTimer();
-
-      console.log(
-        "🚀 PDF CBT STARTED:",
-        selectedQuestions.length,
-        "questions"
-      );
-
-      /*
-       * Keep source until test finishes.
-       * Do NOT remove CBT_ACTIVE_SOURCE here.
-       */
-
-    } catch (error) {
-
-      console.error(
-        "❌ PDF CBT bootstrap failed:",
-        error
-      );
-
+      const raw = storage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (_) {
+      return fallback;
     }
-
   }
 
+  function validQuestions(arr) {
+    if (!Array.isArray(arr)) return [];
 
-/* =====================================================
-   RANKERS TEST SERIES → CBT BRIDGE
-===================================================== */
-(function () {
-  try {
-    const raw = localStorage.getItem("rbSelectedQuestions");
-    if (!raw) return;
+    return arr
+      .map(function (q, i) {
+        return normalizeQuestion(q, i);
+      })
+      .filter(function (q) {
+        return (
+          q &&
+          q.text &&
+          Array.isArray(q.options) &&
+          q.options.length === 4
+        );
+      });
+  }
 
-    const selected = JSON.parse(raw);
-
-    if (!Array.isArray(selected) || !selected.length) return;
-
-    console.log(
-      "🏆 Rankers Test Series → CBT:",
-      selected.length,
-      "questions"
-    );
-
-    /* CBT_SPEED_START_ON_TEST_V1 */
-try {
-  const speedStartNow = Date.now();
-  sessionStorage.setItem(
-    "CBT_ACTIVE_STARTED_AT",
-    String(speedStartNow)
-  );
-  localStorage.setItem(
-    "CBT_ACTIVE_STARTED_AT",
-    String(speedStartNow)
-  );
-  window.CBT_ACTIVE_STARTED_AT = speedStartNow;
-} catch (speedStartError) {
-  console.warn(
-    "CBT speed start timestamp failed:",
-    speedStartError
-  );
-}
-
-sessionStorage.setItem(
-      "CBT_ACTIVE_SOURCE",
-      "Rankers Test Series"
-    );
-
-    /* CBT_SPEED_TIMESTAMP_FIX_V2 */
-    const rankerSpeedStart = Date.now();
-
-    sessionStorage.setItem(
-      "CBT_ACTIVE_STARTED_AT",
-      String(rankerSpeedStart)
-    );
-
-    localStorage.setItem(
-      "CBT_ACTIVE_STARTED_AT",
-      String(rankerSpeedStart)
-    );
-
-    window.CBT_ACTIVE_STARTED_AT = rankerSpeedStart;
-
-    sessionStorage.setItem(
-      "CBT_ACTIVE_QUESTIONS",
-      JSON.stringify(selected)
-    );
-
-    window.RANKERS_TEST_SERIES_CBT = true;
-
-    selectedQuestions =
-      selected
-        .map(function (q, i) {
-          return normalizeQuestion(q, i);
-        })
-        .filter(function (q) {
-          return (
-            q &&
-            q.text &&
-            Array.isArray(q.options) &&
-            q.options.length === 4
-          );
-        });
-
-    if (!selectedQuestions.length) {
-      console.warn(
-        "🏆 Rankers Test Series: no valid questions after normalization"
-      );
-      return;
-    }
-
-    selectedTest = {
-      id: "rankers-test-series",
-      title: "Rankers Test Series",
-      duration: 180,
-      questionIds:
-        selectedQuestions.map(function (q) {
-          return q.id;
-        })
-    };
+  function resetCBTState(test, title) {
+    selectedTest = test;
 
     questionCount.value = "all";
 
@@ -4991,715 +4812,175 @@ sessionStorage.setItem(
     cbtScreen.classList.remove("hidden");
 
     testTitle.textContent =
-      "Rankers Test Series — " +
+      title + " — " +
       selectedQuestions.length +
       " Questions";
 
     renderQuestion();
     renderPalette();
     startTimer();
-
-    console.log(
-      "🚀 RANKERS TEST SERIES STARTED:",
-      selectedQuestions.length,
-      "questions"
-    );
-
-  } catch (e) {
-    console.error(
-      "❌ Rankers Test Series CBT bridge failed:",
-      e
-    );
-  }
-})();
-
-window.addEventListener(
-    "load",
-    function () {
-      setTimeout(
-        bootPDF,
-        300
-      );
-    }
-  );
-
-})();
-</script>
-
-
-<!-- RANKER_MASTER_CBT_WIRE_V1 -->
-<script>
-(function(){
-
-  const HISTORY_KEY="cbtHistory";
-  const MISTAKE_KEY="rankBoosterAttemptHistory";
-  const RETRY_KEY="cbtRetryQuestion";
-  const QUEUE_KEY="cbtAnalyzer.retryQueue";
-  const MASTERY_KEY="cbtMasteryV2";
-
-  function read(key,fallback){
-    try{
-      const v=JSON.parse(localStorage.getItem(key));
-      return v==null?fallback:v;
-    }catch(e){return fallback;}
   }
 
-  function write(key,value){
-    localStorage.setItem(key,JSON.stringify(value));
-  }
-
-  function pick(q){
-    return q || {};
-  }
-
-  function answer(q){
-    const x=pick(q);
-    return x.selectedAnswer ??
-           x.userAnswer ??
-           x.answerSelected ??
-           x.selected ??
-           x.user_answer ??
-           null;
-  }
-
-  function correct(q){
-    const x=pick(q);
-    return x.correctAnswer ??
-           x.correct ??
-           x.answer ??
-           x.correctOption ??
-           x.correct_answer ??
-           null;
-  }
-
-  function norm(x){
-    return String(x??"").trim().toLowerCase();
-  }
-
-  function isCorrect(q){
-    const a=answer(q), c=correct(q);
-    return a!==null && a!=="" && c!==null && c!=="" && norm(a)===norm(c);
-  }
-
-  function id(q,i){
-    return String(
-      q.questionId ??
-      q.id ??
-      q._id ??
-      q.question ??
-      ("q-"+i)
-    );
-  }
-
-  function getQuestions(){
-    if(typeof selectedQuestions!=="undefined" &&
-       Array.isArray(selectedQuestions)){
-      return selectedQuestions;
-    }
-    return [];
-  }
-
-  function sync(){
-    try{
-      const qs=getQuestions();
-      if(!qs.length)return;
-
-      const history=read(HISTORY_KEY,[]);
-      const mistakes=read(MISTAKE_KEY,[]);
-      const mastery=read(MASTERY_KEY,{});
-      const retryQueue=read(QUEUE_KEY,[]);
-
-      const now=new Date().toISOString();
-
-      qs.forEach((q,i)=>{
-        if(!q || !answer(q))return;
-
-        const key=id(q,i);
-        const right=isCorrect(q);
-
-        const record={
-          questionId:key,
-          question:q.question ?? q.text ?? "",
-          subject:q.subject ?? q.section ?? "",
-          chapter:q.chapter ?? q.topic ?? "",
-          selectedAnswer:answer(q),
-          correctAnswer:correct(q),
-          isCorrect:right,
-          submittedAt:now,
-          mistakeReason:right?"":"Needs review"
-        };
-
-        history.push(record);
-
-        if(!right){
-          mistakes.push(record);
-        }
-
-        if(right){
-          mastery[key]={
-            ...(mastery[key]||{}),
-            mastered:true,
-            masteredAt:now
-          };
-        }
-      });
-
-      write(HISTORY_KEY,history.slice(-2000));
-      write(MISTAKE_KEY,mistakes.slice(-2000));
-      write(MASTERY_KEY,mastery);
-
-      /* Remove successfully retried question from queue */
-      if(retryQueue.length){
-        const remaining=retryQueue.filter(r=>{
-          const rid=id(r,0);
-          const match=qs.some((q,i)=>id(q,i)===rid);
-          return !match;
-        });
-        write(QUEUE_KEY,remaining);
-      }
-
-      /* Notify dashboard engines */
-      try{
-        window.dispatchEvent(new CustomEvent("ranker:master-sync",{
-          detail:{count:qs.length}
-        }));
-      }catch(e){}
-
-      console.log("✅ Ranker Master Loop synced:",qs.length);
-    }catch(e){
-      console.error("Ranker Master Loop sync failed:",e);
-    }
-  }
-
-  /* Expose safe manual sync */
-  window.syncRankerMasterLoop=sync;
-
-  /*
-     Wrap submitTest without replacing its original logic.
-     Original submitTest executes first, then sync runs.
-  */
-  if(typeof window.submitTest==="function" &&
-     !window.submitTest.__rankerMasterWrapped){
-
-    const originalSubmit=window.submitTest;
-
-    function wrappedSubmit(){
-      const result=originalSubmit.apply(this,arguments);
-
-      setTimeout(function(){
-        sync();
-
-        try{
-          if(window.rankerMasterLoop &&
-             typeof window.rankerMasterLoop.refresh==="function"){
-            window.rankerMasterLoop.refresh();
-          }
-        }catch(e){}
-
-      },300);
-
-      return result;
-    }
-
-    wrappedSubmit.__rankerMasterWrapped=true;
-    wrappedSubmit.__originalSubmitTest=originalSubmit;
-    window.submitTest=wrappedSubmit;
-  }
-
-})();
-</script>
-
-
-<!-- CBT_ORBIT_RESULT_V2_HTML -->
-
-<section
-  id="cbtOrbitResultV2"
-  class="cbt-orbit-result-v2 hidden"
->
-
-  <h3>🌐 Orbit Test Analysis</h3>
-
-  <div class="orbit-subtitle">
-    Your completed CBT has been connected to the common
-    performance, mistake, retry and mastery pipeline.
-  </div>
-
-  <div class="cbt-orbit-grid-v2">
-
-    <div class="cbt-orbit-card-v2">
-      <span>Score</span>
-      <strong id="cbtOrbitScoreV2">—</strong>
-    </div>
-
-    <div class="cbt-orbit-card-v2">
-      <span>Accuracy</span>
-      <strong id="cbtOrbitAccuracyV2">—</strong>
-    </div>
-
-    <div class="cbt-orbit-card-v2">
-      <span>Speed</span>
-      <strong id="cbtOrbitSpeedV2">—</strong>
-    </div>
-
-    <div class="cbt-orbit-card-v2">
-      <span>Result Signal</span>
-      <strong id="cbtOrbitSignalV2">—</strong>
-    </div>
-
-  </div>
-
-  <div class="cbt-orbit-actions-v2">
-
-    <button
-      type="button"
-      class="cbt-orbit-primary-v2"
-      onclick="window.location.href='./orbit-test-analysis.html'"
-    >
-      🌐 Full Orbit Analysis
-    </button>
-
-    <button
-      type="button"
-      class="cbt-orbit-secondary-v2"
-      onclick="window.location.href='./mistake.html'"
-    >
-      🧠 Mistake Bank
-    </button>
-
-    <button
-      type="button"
-      class="cbt-orbit-secondary-v2"
-      onclick="window.location.href='./retry.html'"
-    >
-      🔁 Retry
-    </button>
-
-  </div>
-
-</section>
-
-<!-- END CBT_ORBIT_RESULT_V2_HTML -->
-
-
-<!-- RANKER_V8_UNIFIED_LIFECYCLE -->
-<script src="./ranker-v8-unified-lifecycle.js"></script>
-
-<!-- CBT_BEHAVIOR_V9 -->
-<script src="./cbt-behavior-v9.js"></script>
-
-<!-- CBT_RANKER_V10_ADAPTIVE -->
-<script src="./ranker-v10-adaptive-engine.js"></script>
-
-<!-- RANKER_V11_REAL_LIFECYCLE -->
-<script src="./ranker-v11-real-lifecycle.js"></script>
-<script src="./cbt-unified-core.js"></script>
-
-<script src="./nichod/engine/nichod-cbt-metadata-bridge.js"></script>
-<script src="./nichod/engine/nichod-posttest-bridge.js"></script>
-
-<script src="./nichod/engine/nichod-unified-orchestrator.js"></script>
-<script src="./nichod/engine/nichod-system-health.js"></script>
-<script src="./nichod/engine/nichod-e2e-harness.js"></script>
-<script src="./nichod/engine/nichod-live-flow-monitor.js"></script>
-<script src="./nichod/engine/pdf-cbt-runtime-guard.js"></script>
-<script src="./nichod/engine/pdf-cbt-auto-recovery.js"></script>
-<script src="./nichod/engine/pdf-cbt-generic-final.js"></script>
-<script src="./nichod/engine/pdf-cbt-universal-parser.js"></script>
-<script src="./nichod/engine/pdf-nichod-bridge.js"></script>
-<script src="./nichod/engine/pdf-cbt-live-import-bridge.js"></script>
-<script>
-/* PCB_PDF_BRIDGE_RUNTIME_CHECK */
-window.addEventListener("load", function () {
-  setTimeout(function () {
-    var bridgeReady =
-      !!window.PCBNICHODPDF ||
-      !!window.PCBPDFLiveImportBridge;
-
-    window.__PCB_PDF_BRIDGE_READY__ =
-      bridgeReady;
-
-    console.log(
-      bridgeReady
-        ? "✅ PCB PDF bridge runtime: READY"
-        : "❌ PCB PDF bridge runtime: NOT READY"
-    );
-  }, 100);
-});
-</script>
-
-
-<script src="./nichod/engine/pdf-cbt-session-verifier.js"></script>
-
-
-<!-- PCB_NICHOD_LIVE_REPORT_UI_V1 -->
-<script>
-(function () {
-
-  function createUI() {
-
-    if (document.getElementById("pcbNichodLiveReport"))
-      return;
-
-    const box = document.createElement("div");
-
-    box.id = "pcbNichodLiveReport";
-
-    box.style.cssText =
-      "position:fixed;" +
-      "right:12px;" +
-      "bottom:12px;" +
-      "z-index:999999;" +
-      "background:#111827;" +
-      "color:#fff;" +
-      "padding:12px;" +
-      "border-radius:12px;" +
-      "font:14px monospace;" +
-      "max-width:90vw;" +
-      "box-shadow:0 8px 30px rgba(0,0,0,.35);";
-
-    box.innerHTML =
-      '<b>🧪 PCB NICHOD LIVE</b>' +
-      '<div id="pcbNichodLiveStatus" style="margin-top:8px">' +
-      'Reading flow…</div>' +
-      '<button id="pcbNichodLiveRefresh" ' +
-      'style="margin-top:8px;padding:8px;border-radius:8px">' +
-      'Refresh</button>' +
-      '<button id="pcbNichodLiveCopy" ' +
-      'style="margin-top:8px;margin-left:6px;padding:8px;border-radius:8px">' +
-      'Copy Report</button>';
-
-    document.body.appendChild(box);
-
-    document
-      .getElementById("pcbNichodLiveRefresh")
-      .onclick = render;
-
-    document
-      .getElementById("pcbNichodLiveCopy")
-      .onclick = copyReport;
-
-    render();
-  }
-
-  function getJSON(key) {
-
-    try {
-      return JSON.parse(
-        localStorage.getItem(key) || "null"
-      );
-    } catch (_) {
-      return null;
-    }
-  }
-
-  function lengthOf(x) {
-
-    if (Array.isArray(x))
-      return x.length;
-
-    if (x && Array.isArray(x.questions))
-      return x.questions.length;
-
-    if (x && Array.isArray(x.data))
-      return x.data.length;
-
-    if (x && Array.isArray(x.items))
-      return x.items.length;
-
-    return 0;
-  }
-
-  function render() {
-
-    const pdf =
-      getJSON("pdfCbtQuestions");
-
-    const selected =
-      getJSON("rbSelectedQuestions");
-
-    const history =
-      getJSON("cbtHistory");
-
-    const live =
-      getJSON("pcbNichodLiveFlowReport");
-
-    const status =
-      document.getElementById(
-        "pcbNichodLiveStatus"
-      );
-
-    if (!status)
-      return;
-
-    status.innerHTML =
-      "PDF questions: " +
-      lengthOf(pdf) +
-
-      "<br>Selected questions: " +
-      lengthOf(selected) +
-
-      "<br>History entries: " +
-      (
-        Array.isArray(history)
-          ? history.length
-          : 0
-      ) +
-
-      "<br>Active source: " +
-      (
-        localStorage.getItem(
-          "CBT_ACTIVE_SOURCE"
-        ) || "—"
-      ) +
-
-      "<br>Unified: " +
-      (
-        window.PCBNICHODUnified
-          ? "YES"
-          : "NO"
-      ) +
-
-      "<br>PDF bridge: " +
-      (
-        window.PCBNICHODPDF
-          ? "YES"
-          : "NO"
-      ) +
-
-      "<br>Ranker feed: " +
-      (
-        window.PCBNICHODRankerFeed
-          ? "YES"
-          : "NO"
-      ) +
-
-      "<br>Live snapshots: " +
-      (
-        live &&
-        Array.isArray(live.snapshots)
-          ? live.snapshots.length
-          : 0
-      );
-  }
-
-  function copyReport() {
-
-    const report = {
-
-      pdfQuestions:
-        lengthOf(
-          getJSON("pdfCbtQuestions")
-        ),
-
-      selectedQuestions:
-        lengthOf(
-          getJSON("rbSelectedQuestions")
-        ),
-
-      historyEntries:
-        Array.isArray(
-          getJSON("cbtHistory")
-        )
-          ? getJSON("cbtHistory").length
-          : 0,
-
-      activeSource:
-        localStorage.getItem(
-          "CBT_ACTIVE_SOURCE"
-        ),
-
-      liveFlow:
-        getJSON(
-          "pcbNichodLiveFlowReport"
-        ),
-
-      timestamp:
-        new Date().toISOString()
-
-    };
-
-    const text =
-      JSON.stringify(
-        report,
-        null,
-        2
-      );
+  function startPDF() {
+
+    const source =
+      sessionStorage.getItem(
+        "CBT_ACTIVE_SOURCE"
+      ) || "";
 
     if (
-      navigator.clipboard &&
-      navigator.clipboard.writeText
+      source !== "PDF" &&
+      source !== "PDF Import"
     ) {
+      return false;
+    }
 
-      navigator.clipboard.writeText(text)
-        .then(function () {
-
-          alert(
-            "✅ NICHOD report copied"
-          );
-
-        })
-        .catch(function () {
-
-          prompt(
-            "Copy this report:",
-            text
-          );
-
-        });
-
-    } else {
-
-      prompt(
-        "Copy this report:",
-        text
+    const imported =
+      safeJSON(
+        sessionStorage,
+        "CBT_ACTIVE_QUESTIONS",
+        []
       );
 
+    const pool =
+      imported.length
+        ? imported
+        : safeJSON(
+            localStorage,
+            "pdfCbtQuestions",
+            []
+          );
+
+    const questions =
+      validQuestions(pool);
+
+    if (!questions.length) {
+      console.warn(
+        "PDF CBT: no valid imported questions"
+      );
+      return false;
     }
-  }
 
-  if (
-    document.readyState ===
-    "loading"
-  ) {
+    selectedQuestions = questions;
 
-    document.addEventListener(
-      "DOMContentLoaded",
-      createUI
+    resetCBTState(
+      {
+        id: "pdf-import",
+        title: "PDF Imported CBT",
+        duration: 180,
+        questionIds:
+          selectedQuestions.map(
+            function (q) {
+              return q.id;
+            }
+          )
+      },
+      "PDF Imported CBT"
     );
 
-  } else {
+    console.log(
+      "PDF CBT STARTED:",
+      selectedQuestions.length
+    );
 
-    createUI();
-
+    return true;
   }
 
-})();
-</script>
+  function startRanker() {
 
+    const source =
+      sessionStorage.getItem(
+        "CBT_ACTIVE_SOURCE"
+      ) || "";
 
-<script src="./nichod/engine/cbt-live-source-panel.js"></script>
+    if (
+      source !== "Rankers Test Series"
+    ) {
+      return false;
+    }
 
-<script>
-(function () {
-  "use strict";
+    const pool =
+      safeJSON(
+        localStorage,
+        "rbSelectedQuestions",
+        []
+      );
+
+    const questions =
+      validQuestions(pool);
+
+    if (!questions.length) {
+      console.warn(
+        "Rankers Test Series: no valid Ranker questions"
+      );
+      return false;
+    }
+
+    selectedQuestions = questions;
+
+    resetCBTState(
+      {
+        id: "rankers-test-series",
+        title: "Rankers Test Series",
+        duration: 180,
+        questionIds:
+          selectedQuestions.map(
+            function (q) {
+              return q.id;
+            }
+          )
+      },
+      "Rankers Test Series"
+    );
+
+    console.log(
+      "RANKERS TEST SERIES STARTED:",
+      selectedQuestions.length
+    );
+
+    return true;
+  }
 
   /*
-   * PCB_NICHOD_PRODUCTION_UI_CLEANUP
-   *
-   * These are internal diagnostics only.
-   * Keep all engines/bridges/storage alive, but never
-   * expose debugging overlays to students.
+   * EXACTLY ONE source is allowed to boot.
+   * PDF and Ranker can never execute together.
    */
-
-  const markers = [
-    "PCB NICHOD HEALTH",
-    "PDF → CBT DIAGNOSTIC",
-    "PCB CBT LIVE SOURCE",
-    "PCB NICHOD LIVE"
-  ];
-
-  function clean() {
-
-    const ids = [
-      "nichodHealthPanel",
-      "pcbCbtLiveSourcePanel",
-      "pcbNichodLiveReport",
-      "pcbPdfDiagnostic"
-    ];
-
-    ids.forEach(function (id) {
-
-      const el =
-        document.getElementById(id);
-
-      if (el)
-        el.remove();
-
-    });
-
-    document
-      .querySelectorAll(
-        "div,section,aside,pre"
-      )
-      .forEach(function (el) {
-
-        if (!el || el === document.body)
-          return;
-
-        const text =
-          String(
-            el.textContent || ""
-          )
-          .replace(/\s+/g, " ")
-          .trim()
-          .toUpperCase();
-
-        if (!text)
-          return;
-
-        const matched =
-          markers.some(function (marker) {
-            return text.includes(marker);
-          });
-
-        /*
-         * Prevent accidentally hiding a large page container.
-         * Diagnostic cards are relatively small.
-         */
-        if (
-          matched &&
-          text.length < 6000
-        ) {
-          el.style.setProperty(
-            "display",
-            "none",
-            "important"
-          );
-
-          el.setAttribute(
-            "data-pcb-nichod-debug-hidden",
-            "true"
-          );
-        }
-
-      });
-  }
-
   function boot() {
 
-    clean();
+    const source =
+      (
+        sessionStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ) || ""
+      ).trim();
 
-    if (window.MutationObserver) {
-
-      new MutationObserver(
-        clean
-      ).observe(
-        document.documentElement,
-        {
-          childList: true,
-          subtree: true
-        }
-      );
-
+    if (
+      source === "PDF" ||
+      source === "PDF Import"
+    ) {
+      startPDF();
+      return;
     }
 
-  }
+    if (
+      source === "Rankers Test Series"
+    ) {
+      startRanker();
+      return;
+    }
 
-  if (
-    document.readyState === "loading"
-  ) {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      boot,
-      { once: true }
+    console.log(
+      "CBT source:",
+      source || "normal CBT"
     );
-
-  } else {
-
-    boot();
-
   }
+
+  window.addEventListener(
+    "load",
+    function () {
+      setTimeout(boot, 0);
+    }
+  );
 
 })();
 </script>
