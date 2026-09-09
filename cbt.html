@@ -787,6 +787,7 @@
   display:none !important;
 }
 </style>
+<script src="./nichod/engine/cbt-source-isolation-v1.js"></script>
 </head>
 
 <body>
@@ -4885,7 +4886,22 @@ console.log(
 ===================================================== */
 (function () {
   try {
-    const raw = localStorage.getItem("rbSelectedQuestions");
+    const activeSource =
+      sessionStorage.getItem("CBT_ACTIVE_SOURCE") ||
+      localStorage.getItem("CBT_ACTIVE_SOURCE") ||
+      "";
+
+    if (
+      activeSource !== "Rankers Test Series"
+    ) {
+      return;
+    }
+
+    const raw =
+      localStorage.getItem(
+        "CBT_ISO_RANKER_TEST_SERIES_SELECTED"
+      );
+
     if (!raw) return;
 
     const selected = JSON.parse(raw);

@@ -472,8 +472,9 @@ try {
   );
 }
 
-localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
+localStorage.setItem("CBT_ISO_RANKER_TEST_SERIES_SELECTED",JSON.stringify(pool));
    localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
+   localStorage.removeItem("CBT_ACTIVE_TEST");
    $("status").textContent=pool.length+" eligible questions selected. Opening CBT...";
    setTimeout(()=>location.href="cbt.html?source=rankers-test-series",250);
  };

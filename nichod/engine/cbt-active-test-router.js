@@ -4,7 +4,11 @@
   const ACTIVE = "CBT_ACTIVE_TEST";
   const SOURCE = "CBT_ACTIVE_SOURCE";
   const PDF = "pdfCbtQuestions";
-  const RANKER = "rbSelectedQuestions";
+  const RANKER =
+    "rbSelectedQuestions";
+
+  const SERIES =
+    "CBT_ISO_RANKER_TEST_SERIES_SELECTED";
 
   function read(key) {
     try {
@@ -124,11 +128,30 @@
       source === "Rankers Test Series"
     ) {
 
+      const series =
+        makeTest(
+          read(SERIES),
+          "Rankers Test Series",
+          "ranker-series-active"
+        );
+
+      return valid(series)
+        ? series
+        : null;
+    }
+
+    /*
+     * Ranker Question Bank is authoritative.
+     */
+    if (
+      source === "Ranker Questions"
+    ) {
+
       const ranker =
         makeTest(
           read(RANKER),
-          "Rankers Test Series",
-          "ranker-active"
+          "Ranker Questions",
+          "ranker-questions-active"
         );
 
       return valid(ranker)

@@ -197,7 +197,19 @@ mode.addEventListener("change",render);
 document.getElementById("start").addEventListener("click",function(){
 const data=selected();
 if(!data.length){alert("No questions are loaded for this selection yet.");return;}
-localStorage.setItem("rbSelectedQuestions",JSON.stringify(data));
+localStorage.setItem(
+  "rbSelectedQuestions",
+  JSON.stringify(data)
+);
+
+localStorage.setItem(
+  "CBT_ACTIVE_SOURCE",
+  "Ranker Questions"
+);
+
+localStorage.removeItem(
+  "CBT_ACTIVE_TEST"
+);
 location.href="cbt.html?source=rank-booster";
 });
 
