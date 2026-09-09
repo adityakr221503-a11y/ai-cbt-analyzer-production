@@ -1,3 +1,9 @@
+/* CBT SOURCE ISOLATION V2 PANEL BRIDGE */
+(function(){
+  window.CBTLiveSourceMode = function(){
+    return window.CBT_INDEPENDENT_MODE || "NORMAL";
+  };
+})();
 (function () {
   "use strict";
 

@@ -211,8 +211,8 @@ function checkBankCount() {
  let attempts=[];let mastered=[];
  try{attempts=typeof getRBHistory==="function"?getRBHistory():JSON.parse(localStorage.getItem("rankBoosterAttemptHistory") || "[]")}catch(e){attempts=[]}
  try{mastered=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]")}catch(e){}
- $("qCount").textContent=bank.length;$("attempts").textContent=Number(localStorage.getItem("rankerTestAttempts")||"0");
-const perf=JSON.parse(localStorage.getItem("rankerTestPerformance")||"[]");
+ $("qCount").textContent=bank.length;$("attempts").textContent=Number(CBTSourceIsolation.read("SERIES","ATTEMPT_COUNT",0)||"0");
+const perf=JSON.parse(CBTSourceIsolation.read("SERIES","PERFORMANCE",[])||"[]");
 if(perf.length){
  const acc=perf.map(x=>Number(x.accuracy)||0);
  $("avgAccuracy").textContent=Math.round(acc.reduce((a,b)=>a+b,0)/acc.length)+"%";

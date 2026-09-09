@@ -788,6 +788,235 @@
 }
 </style>
 <script src="./nichod/engine/cbt-source-isolation-v1.js"></script>
+
+<!-- CBT INDEPENDENT RUNTIME V2 -->
+<script>
+(function installCBTIndependentRuntime() {
+  "use strict";
+
+  const ISO = window.CBTSourceIsolation;
+  if (!ISO) return;
+
+  function detectMode() {
+    const source =
+      String(
+        sessionStorage.getItem("CBT_ACTIVE_SOURCE") ||
+        localStorage.getItem("CBT_ACTIVE_SOURCE") ||
+        ""
+      ).toLowerCase();
+
+    if (
+      source.includes("pdf") ||
+      source.includes("import")
+    ) return "PDF";
+
+    if (
+      source.includes("rankers test series") ||
+      source.includes("test series") ||
+      source.includes("series")
+    ) return "SERIES";
+
+    if (
+      source.includes("ranker") ||
+      source.includes("rank booster")
+    ) return "RANKER";
+
+    return "NORMAL";
+  }
+
+  const mode = detectMode();
+
+  window.CBT_INDEPENDENT_MODE = mode;
+
+  /*
+   * CBT_ACTIVE_TEST is transport metadata only.
+   * It must never become the permanent shared question pool.
+   */
+  window.CBTIndependentRuntime = {
+    mode: mode,
+
+    questions: function () {
+      return ISO.getQuestions(mode);
+    },
+
+    selection: function () {
+      return ISO.getSelection(mode);
+    },
+
+    attempts: function () {
+      return ISO.getAttempts(mode);
+    },
+
+    mistakes: function () {
+      return ISO.getMistakes(mode);
+    },
+
+    mastery: function () {
+      return ISO.getMastery(mode);
+    },
+
+    analytics: function () {
+      return ISO.getAnalytics(mode);
+    },
+
+    reports: function () {
+      return ISO.getReports(mode);
+    },
+
+    saveSession: function (session) {
+      return ISO.saveSession(mode, session);
+    },
+
+    addAttempt: function (attempt) {
+      return ISO.addAttempt(mode, attempt);
+    },
+
+    addMistake: function (mistake) {
+      return ISO.addMistake(mode, mistake);
+    },
+
+    addReport: function (report) {
+      return ISO.addReport(mode, report);
+    }
+  };
+
+  /*
+   * Clear only stale cross-source launch state.
+   * Do NOT delete question banks or history.
+   */
+  try {
+    const active =
+      sessionStorage.getItem("CBT_ACTIVE_TEST") ||
+      localStorage.getItem("CBT_ACTIVE_TEST");
+
+    if (active) {
+      const parsed = JSON.parse(active);
+
+      if (
+        parsed &&
+        parsed.source &&
+        String(parsed.source).toLowerCase() !==
+          mode.toLowerCase()
+      ) {
+        console.log(
+          "CBT isolation: foreign active test ignored",
+          parsed.source,
+          "!=",
+          mode
+        );
+      }
+    }
+  } catch (_) {}
+
+  console.log(
+    "CBT independent runtime:",
+    mode
+  );
+
+})();
+</script>
+
+
+<!-- SOURCE OWNED ANALYTICS V2 -->
+<script>
+(function () {
+  "use strict";
+
+  const ISO = window.CBTSourceIsolation;
+  if (!ISO) return;
+
+  const mode =
+    window.CBT_INDEPENDENT_MODE ||
+    "NORMAL";
+
+  window.CBTSourceAnalytics = {
+
+    record: function (data) {
+      const payload = Object.assign(
+        {
+          timestamp: Date.now(),
+          source: mode
+        },
+        data || {}
+      );
+
+      ISO.addAttempt(mode, payload);
+      ISO.saveAnalytics(
+        mode,
+        payload
+      );
+
+      return payload;
+    },
+
+    mistake: function (data) {
+      return ISO.addMistake(
+        mode,
+        Object.assign(
+          {
+            source: mode
+          },
+          data || {}
+        )
+      );
+    },
+
+    report: function (data) {
+      return ISO.addReport(
+        mode,
+        Object.assign(
+          {
+            source: mode
+          },
+          data || {}
+        )
+      );
+    }
+  };
+
+})();
+</script>
+
+
+<!-- CBT SOURCE OWNERSHIP GUARD V2 -->
+<script>
+(function () {
+  "use strict";
+
+  const ISO = window.CBTSourceIsolation;
+  if (!ISO) return;
+
+  const mode =
+    window.CBT_INDEPENDENT_MODE ||
+    "NORMAL";
+
+  window.CBTSourceOwnership = Object.freeze({
+    mode: mode,
+
+    owns: function (requestedMode) {
+      return String(requestedMode || "").toUpperCase() === mode;
+    },
+
+    poolKey: function () {
+      return ISO.key(mode, "QUESTION_POOL");
+    },
+
+    attemptsKey: function () {
+      return ISO.key(mode, "ATTEMPTS");
+    },
+
+    analyticsKey: function () {
+      return ISO.key(mode, "ANALYTICS");
+    },
+
+    reportsKey: function () {
+      return ISO.key(mode, "REPORTS");
+    }
+  });
+
+})();
+</script>
+
 </head>
 
 <body>
