@@ -392,98 +392,13 @@
   }
 
   function render(report) {
-
-    const old =
-      document.getElementById(
-        "nichodE2EPanel"
-      );
-
-    if (old)
-      old.remove();
-
-    const panel =
-      document.createElement(
-        "section"
-      );
-
-    panel.id =
-      "nichodE2EPanel";
-
-    panel.style.cssText =
-      [
-        "position:relative",
-        "margin:16px",
-        "padding:18px",
-        "border:2px solid #888",
-        "border-radius:16px",
-        "background:#fff",
-        "font-family:system-ui",
-        "z-index:9999"
-      ].join(";");
-
-    let html =
-      "<h2>🧪 PCB NICHOD E2E Test</h2>";
-
-    html +=
-      "<p><b>Status:</b> " +
-      report.status +
-      "</p>";
-
-    html +=
-      "<p>PASS: " +
-      report.passed +
-      " | FAIL: " +
-      report.failed +
-      "</p>";
-
-    html += "<hr>";
-
-    report.results.forEach(
-      item => {
-
-        html +=
-          "<div style='margin:6px 0'>" +
-          (
-            item.status === "PASS"
-              ? "✅ "
-              : "❌ "
-          ) +
-          "<b>" +
-          item.name +
-          "</b>" +
-          (
-            item.detail
-              ? " — " +
-                item.detail
-              : ""
-          ) +
-          "</div>";
-
-      }
-    );
-
-    html +=
-      "<hr><button id='nichodE2ERun' " +
-      "style='padding:10px 16px'>" +
-      "Run Again" +
-      "</button>";
-
-    panel.innerHTML =
-      html;
-
-    document.body.prepend(
-      panel
-    );
-
-    document
-      .getElementById(
-        "nichodE2ERun"
-      )
-      ?.addEventListener(
-        "click",
-        run
-      );
-
+    /*
+     * NICHOD E2E is a diagnostic harness.
+     * Keep report generation/storage/API active,
+     * but never inject the internal test panel into
+     * the student-facing CBT/Test Series UI.
+     */
+    return report;
   }
 
   window.PCBNICHODE2E = {
