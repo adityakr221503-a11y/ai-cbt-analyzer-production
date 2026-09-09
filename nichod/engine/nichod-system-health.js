@@ -244,8 +244,32 @@ Subjects:
       verifiedFeed:
         !!window.PCBNICHODVerifiedFeed,
 
+      /*
+       * Ranker lifecycle is required on the Ranker page
+       * and for an active Ranker CBT session.
+       * It must not make PDF / dashboard pages unhealthy.
+       */
       lifecycle:
-        !!window.RankerV11Lifecycle,
+        (
+          location.pathname
+            .toLowerCase()
+            .includes("rankers-test-series")
+          ||
+          (
+            location.pathname
+              .toLowerCase()
+              .endsWith("cbt.html") &&
+            String(
+              localStorage.getItem(
+                "CBT_ACTIVE_SOURCE"
+              ) || ""
+            )
+              .toLowerCase()
+              .includes("ranker")
+          )
+        )
+          ? !!window.RankerV11Lifecycle
+          : true,
 
       postTest:
         !!window.PCBNICHODPostTest,
@@ -471,6 +495,11 @@ Subjects:
 
     report.health =
       healthScore(report);
+
+    report.status =
+      report.health.percentage === 100
+        ? "PASS"
+        : "ATTENTION";
 
     localStorage.setItem(
       REPORT_KEY,

@@ -155,6 +155,37 @@
       test.source
     );
 
+    /*
+     * Compatibility mirrors.
+     * CBT_ACTIVE_TEST remains authoritative.
+     * These mirrors must still represent the same
+     * active test so diagnostics never report a
+     * false question-count mismatch.
+     */
+    if (
+      test.source ===
+      "PDF Import"
+    ) {
+      localStorage.setItem(
+        "pdfCbtQuestions",
+        JSON.stringify(
+          test.questions
+        )
+      );
+    }
+
+    if (
+      test.source ===
+      "Rankers Test Series"
+    ) {
+      localStorage.setItem(
+        "rbSelectedQuestions",
+        JSON.stringify(
+          test.questions
+        )
+      );
+    }
+
     return {
       ok: true,
       test

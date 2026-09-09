@@ -83,9 +83,38 @@
       !!window.PCBNICHODPDF
     );
 
+    const pagePath =
+      String(
+        location.pathname || ""
+      ).toLowerCase();
+
+    const activeSource =
+      String(
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ) || ""
+      ).toLowerCase();
+
+    const rankerContext =
+      pagePath.includes(
+        "rankers-test-series"
+      ) ||
+      (
+        pagePath.endsWith("cbt.html") &&
+        activeSource.includes("ranker")
+      );
+
     check(
       "Ranker Lifecycle",
-      !!window.RankerV11Lifecycle
+      !rankerContext ||
+      !!window.RankerV11Lifecycle,
+      rankerContext
+        ? (
+            window.RankerV11Lifecycle
+              ? "loaded"
+              : "required but missing"
+          )
+        : "not required on this page"
     );
 
     /*
@@ -203,9 +232,30 @@
         "pcbNichodMentorEvidence"
       );
 
+    const historyForMentor =
+      getJSON(
+        "cbtHistory"
+      );
+
+    /*
+     * Mentor evidence is produced by the post-test flow.
+     * Before the first completed attempt, absence is expected.
+     */
+    const mentorEvidenceReady =
+      !!evidence ||
+      !Array.isArray(historyForMentor) ||
+      historyForMentor.length === 0;
+
     check(
       "Mentor evidence store",
-      !!evidence
+      mentorEvidenceReady,
+      mentorEvidenceReady
+        ? (
+            evidence
+              ? "available"
+              : "awaiting first completed test"
+          )
+        : "missing after completed test"
     );
 
     /*
@@ -240,10 +290,19 @@
 
     if (health) {
 
+      const healthStatus =
+        health.status ||
+        (
+          health.health &&
+          health.health.percentage === 100
+            ? "PASS"
+            : "ATTENTION"
+        );
+
       check(
         "Health status",
-        health.status === "PASS",
-        health.status
+        healthStatus === "PASS",
+        healthStatus
       );
 
     }
