@@ -5818,6 +5818,92 @@ window.addEventListener("load", function () {
 
 })();
 </script>
+
+<!-- PCB_HIDE_HEALTH_DIAGNOSTIC_V1 -->
+<style>
+.pcb-hide-health-diagnostic {
+  display: none !important;
+}
+</style>
+
+<script>
+(function () {
+  const MARKER = "Health status";
+  const ATTENTION = "ATTENTION";
+  const PDF_POOL = "PDF question pool";
+  const RUN_AGAIN = "Run Again";
+
+  function hideHealthDiagnostic() {
+    const all = document.querySelectorAll("body *");
+
+    for (const el of all) {
+      if (!el || !el.textContent) continue;
+
+      const text = el.textContent
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (
+        text.includes(MARKER) &&
+        text.includes(ATTENTION) &&
+        text.includes(PDF_POOL) &&
+        text.includes(RUN_AGAIN)
+      ) {
+        /*
+         * Hide the complete diagnostic card, not individual lines.
+         * Walk upward until the smallest useful card/container is found.
+         */
+        let card = el;
+
+        for (let i = 0; i < 6 && card.parentElement; i++) {
+          const parent = card.parentElement;
+          const parentText = parent.textContent
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (
+            parentText.includes(PDF_POOL) &&
+            parentText.includes(RUN_AGAIN)
+          ) {
+            card = parent;
+          }
+        }
+
+        card.classList.add("pcb-hide-health-diagnostic");
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function run() {
+    hideHealthDiagnostic();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run);
+  } else {
+    run();
+  }
+
+  /*
+   * Diagnostic card may be rendered after page load.
+   */
+  const observer = new MutationObserver(function () {
+    if (hideHealthDiagnostic()) {
+      observer.disconnect();
+    }
+  });
+
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true
+  });
+})();
+</script>
+<!-- /PCB_HIDE_HEALTH_DIAGNOSTIC_V1 -->
+
 </body>
 
 </html>\n\n\n
