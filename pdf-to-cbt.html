@@ -251,6 +251,523 @@
 
   </style>
 
+
+<!-- CBT PDF ISOLATION FINAL V2 -->
+<script>
+(function () {
+  "use strict";
+
+  const SESSION_KEY = "CBT_PDF_SESSION_ID";
+  const META_KEY = "CBT_PDF_SESSION_META";
+  const POOL_PREFIX = "CBT_PDF_POOL_";
+  const USED_PREFIX = "CBT_PDF_USED_";
+
+  function read(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  function write(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (_) {}
+  }
+
+  function clone(x) {
+    try {
+      return JSON.parse(JSON.stringify(x));
+    } catch (_) {
+      return x;
+    }
+  }
+
+  function textOf(q) {
+    if (!q || typeof q !== "object") return "";
+
+    return String(
+      q.questionText ||
+      q.question ||
+      q.text ||
+      q.prompt ||
+      q.statement ||
+      ""
+    ).trim();
+  }
+
+  function optionsOf(q) {
+    if (!q || typeof q !== "object") return [];
+
+    if (Array.isArray(q.options))
+      return q.options;
+
+    if (Array.isArray(q.choices))
+      return q.choices;
+
+    if (Array.isArray(q.answers))
+      return q.answers;
+
+    return [];
+  }
+
+  function idOf(q, i) {
+    return String(
+      q &&
+      (
+        q.id ||
+        q.questionId ||
+        q.uid ||
+        q._id ||
+        q.questionKey ||
+        textOf(q) ||
+        ("pdf-q-" + i)
+      )
+    ).trim();
+  }
+
+  /*
+   * Preserve the COMPLETE original question object.
+   * Only add compatibility aliases when necessary.
+   */
+  function normalize(list) {
+    if (!Array.isArray(list))
+      return [];
+
+    const seen = new Set();
+
+    return list.filter(function (q, i) {
+
+      if (!q || typeof q !== "object")
+        return false;
+
+      const text = textOf(q);
+      const opts = optionsOf(q);
+      const id = idOf(q, i);
+
+      if (!text || opts.length < 2)
+        return false;
+
+      if (seen.has(id))
+        return false;
+
+      seen.add(id);
+
+      if (!q.questionText)
+        q.questionText = text;
+
+      if (!q.question)
+        q.question = text;
+
+      if (!q.text)
+        q.text = text;
+
+      if (!q.options)
+        q.options = opts;
+
+      return true;
+    });
+  }
+
+  function fingerprint(file) {
+    if (!file) return "";
+
+    return [
+      file.name || "",
+      file.size || 0,
+      file.lastModified || 0,
+      file.type || ""
+    ].join("::");
+  }
+
+  function createSession(file) {
+
+    const id =
+      "pdf-" +
+      Date.now().toString(36) +
+      "-" +
+      Math.random().toString(36).slice(2, 10);
+
+    write(SESSION_KEY, id);
+
+    write(META_KEY, {
+      id: id,
+      fingerprint: fingerprint(file),
+      fileName: file ? file.name : "",
+      fileSize: file ? file.size : 0,
+      createdAt: Date.now()
+    });
+
+    /*
+     * Clear ONLY generic active-session state.
+     * Old PDF pools remain safely stored under their own ID.
+     */
+    sessionStorage.removeItem(
+      "CBT_ACTIVE_QUESTIONS"
+    );
+
+    sessionStorage.removeItem(
+      "CBT_ACTIVE_TEST"
+    );
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "PDF"
+    );
+
+    return id;
+  }
+
+  function sessionId() {
+    return localStorage.getItem(
+      SESSION_KEY
+    ) || "";
+  }
+
+  function poolKey() {
+    const id = sessionId();
+    return id
+      ? POOL_PREFIX + id
+      : "";
+  }
+
+  function usedKey() {
+    const id = sessionId();
+    return id
+      ? USED_PREFIX + id
+      : "";
+  }
+
+  function getPool() {
+    const key = poolKey();
+
+    if (!key)
+      return [];
+
+    return normalize(
+      read(key, [])
+    );
+  }
+
+  function savePool(list) {
+
+    const clean =
+      normalize(list);
+
+    const key =
+      poolKey();
+
+    if (!key)
+      return [];
+
+    write(key, clean);
+
+    /*
+     * Compatibility mirror for existing PDF code.
+     * It always represents ONLY the CURRENT PDF.
+     */
+    write(
+      "pdfCbtQuestions",
+      clean
+    );
+
+    return clean;
+  }
+
+  function getUsed() {
+
+    const key =
+      usedKey();
+
+    if (!key)
+      return [];
+
+    const data =
+      read(key, []);
+
+    return Array.isArray(data)
+      ? data
+      : [];
+  }
+
+  function markUsed(list) {
+
+    const key =
+      usedKey();
+
+    if (!key)
+      return;
+
+    const used =
+      new Set(getUsed());
+
+    normalize(list).forEach(
+      function (q, i) {
+        used.add(
+          idOf(q, i)
+        );
+      }
+    );
+
+    write(
+      key,
+      Array.from(used)
+    );
+  }
+
+  function unused(list) {
+
+    const used =
+      new Set(getUsed());
+
+    return normalize(list)
+      .filter(function (q, i) {
+        return !used.has(
+          idOf(q, i)
+        );
+      });
+  }
+
+  /*
+   * Public API for future PDF features.
+   */
+  window.CBTPDFIsolation = {
+
+    version: 2,
+
+    createSession,
+
+    sessionId,
+
+    getPool,
+
+    savePool,
+
+    getUsed,
+
+    markUsed,
+
+    unused,
+
+    normalize,
+
+    /*
+     * Prepare exact questions for CBT.
+     */
+    prepareForCBT: function (list) {
+
+      const clean =
+        normalize(list)
+          .map(clone);
+
+      sessionStorage.setItem(
+        "CBT_ACTIVE_SOURCE",
+        "PDF"
+      );
+
+      sessionStorage.setItem(
+        "CBT_ACTIVE_QUESTIONS",
+        JSON.stringify(clean)
+      );
+
+      /*
+       * Prevent an old generic test from overriding
+       * the current PDF allocation.
+       */
+      sessionStorage.removeItem(
+        "CBT_ACTIVE_TEST"
+      );
+
+      return clean;
+    },
+
+    /*
+     * Allocate only from the current PDF.
+     */
+    allocate: function (count) {
+
+      const pool =
+        getPool();
+
+      let available =
+        unused(pool);
+
+      /*
+       * If current PDF is exhausted,
+       * start a new cycle ONLY inside this PDF.
+       */
+      if (!available.length) {
+
+        write(
+          usedKey(),
+          []
+        );
+
+        available =
+          pool.slice();
+      }
+
+      if (
+        Number.isFinite(count) &&
+        count > 0
+      ) {
+        available =
+          available.slice(
+            0,
+            Math.min(
+              count,
+              available.length
+            )
+          );
+      }
+
+      const selected =
+        available.map(clone);
+
+      markUsed(selected);
+
+      return prepare(selected);
+    }
+  };
+
+  function prepare(list) {
+    return window.CBTPDFIsolation
+      .prepareForCBT(list);
+  }
+
+  /*
+   * Detect PDF input without assuming its ID.
+   */
+  const fileInputs =
+    Array.from(
+      document.querySelectorAll(
+        'input[type="file"]'
+      )
+    );
+
+  fileInputs.forEach(function (input) {
+
+    input.addEventListener(
+      "change",
+      function () {
+
+        const file =
+          input.files &&
+          input.files[0];
+
+        if (!file)
+          return;
+
+        const fp =
+          fingerprint(file);
+
+        const oldMeta =
+          read(
+            META_KEY,
+            null
+          );
+
+        /*
+         * DIFFERENT FILE = DIFFERENT SESSION.
+         */
+        if (
+          !oldMeta ||
+          oldMeta.fingerprint !== fp
+        ) {
+
+          createSession(file);
+
+          console.log(
+            "📄 NEW PDF SESSION",
+          );
+
+          console.log(
+            "PDF:",
+            file.name
+          );
+
+          console.log(
+            "SESSION:",
+            sessionId()
+          );
+        }
+
+        sessionStorage.setItem(
+          "CBT_ACTIVE_SOURCE",
+          "PDF"
+        );
+      },
+      true
+    );
+  });
+
+  /*
+   * Existing parser can call this after extraction.
+   * We intentionally do NOT replace the parser here.
+   */
+  window.CBTPDFIsolation.commitParsedQuestions =
+    function (questions) {
+
+      const clean =
+        normalize(questions);
+
+      if (!clean.length) {
+        console.warn(
+          "PDF isolation: no valid questions"
+        );
+        return [];
+      }
+
+      savePool(clean);
+
+      console.log(
+        "📚 PDF POOL SAVED:",
+        clean.length
+      );
+
+      return clean;
+    };
+
+  /*
+   * Re-sync compatibility storage from the CURRENT
+   * isolated session only.
+   */
+  window.addEventListener(
+    "load",
+    function () {
+
+      const pool =
+        getPool();
+
+      if (pool.length) {
+
+        write(
+          "pdfCbtQuestions",
+          pool
+        );
+      }
+
+      console.log(
+        "🔒 PDF ISOLATION V2 ACTIVE"
+      );
+
+      console.log(
+        "SESSION:",
+        sessionId()
+      );
+
+      console.log(
+        "POOL:",
+        pool.length
+      );
+    }
+  );
+
+})();
+</script>
+
 </head>
 
 
