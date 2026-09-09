@@ -126,14 +126,33 @@
 
     write(tests);
 
+    /*
+     * Do not make the newly-created test merely a legacy
+     * active payload. Register it as the authoritative CBT test.
+     */
     localStorage.setItem(
       ACTIVE,
-      JSON.stringify(test)
+      JSON.stringify({
+        testId: test.testId,
+        id: test.testId,
+        title: test.title,
+        source: test.source,
+        filename: test.filename || "",
+        questionCount: test.questions.length,
+        questions: test.questions,
+        createdAt: test.createdAt,
+        updatedAt: test.updatedAt
+      })
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_TEST_ID",
+      test.testId
     );
 
     localStorage.setItem(
       SOURCE,
-      source
+      test.source
     );
 
     return {
