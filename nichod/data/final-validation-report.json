@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-09T04:16:29.094Z",
+  "generatedAt": "2026-09-09T04:17:07.161Z",
   "repository": "ai-cbt-analyzer-production",
   "pipeline": [
     "PDF",
@@ -12,9 +12,9 @@
     "Mentor",
     "Adaptive Next Test"
   ],
-  "passed": 145,
+  "passed": 148,
   "failed": 0,
-  "total": 145,
+  "total": 148,
   "status": "PASS",
   "results": [
     {
@@ -428,6 +428,11 @@
       "detail": "nichod/engine/live-test-flow-bridge.js"
     },
     {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/cbt-authoritative-loader.js",
+      "status": "PASS",
+      "detail": "nichod/engine/cbt-authoritative-loader.js"
+    },
+    {
       "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/unified-test-library-ui.js",
       "status": "PASS",
       "detail": "nichod/engine/unified-test-library-ui.js"
@@ -553,6 +558,11 @@
       "detail": "nichod/engine/live-test-flow-bridge.js"
     },
     {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/cbt-authoritative-loader.js",
+      "status": "PASS",
+      "detail": "nichod/engine/cbt-authoritative-loader.js"
+    },
+    {
       "name": "REF rankers-test-series.html -> ./nichod/engine/unified-test-library-ui.js",
       "status": "PASS",
       "detail": "nichod/engine/unified-test-library-ui.js"
@@ -646,6 +656,11 @@
       "name": "REF cbt.html -> ./nichod/engine/live-test-flow-bridge.js",
       "status": "PASS",
       "detail": "nichod/engine/live-test-flow-bridge.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/cbt-authoritative-loader.js",
+      "status": "PASS",
+      "detail": "nichod/engine/cbt-authoritative-loader.js"
     },
     {
       "name": "REF cbt.html -> ./nichod/engine/pdf-test-session-manager.js",

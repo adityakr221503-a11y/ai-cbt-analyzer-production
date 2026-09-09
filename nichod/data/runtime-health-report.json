@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-09T04:16:26.032Z",
+  "generatedAt": "2026-09-09T04:17:04.108Z",
   "project": "PCB NICHOD",
   "pipeline": [
     "PDF",
@@ -22,17 +22,17 @@
     {
       "file": "cbt.html",
       "exists": true,
-      "size": 88000
+      "size": 88068
     },
     {
       "file": "pdf-to-cbt.v317.html",
       "exists": true,
-      "size": 55474
+      "size": 55542
     },
     {
       "file": "rankers-test-series.html",
       "exists": true,
-      "size": 28238
+      "size": 28306
     },
     {
       "file": "nichod/engine/nichod-unified-orchestrator.js",
@@ -148,7 +148,7 @@
   },
   "html": {
     "cbt.html": {
-      "totalScripts": 34,
+      "totalScripts": 35,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/cbt-active-test-router.js",
@@ -156,6 +156,7 @@
         "./nichod/engine/test-creation-bridge.js",
         "./nichod/engine/test-creation-auto-hook.js",
         "./nichod/engine/live-test-flow-bridge.js",
+        "./nichod/engine/cbt-authoritative-loader.js",
         "./nichod/engine/pdf-test-session-manager.js",
         "./nichod/engine/nichod-cbt-metadata-bridge.js",
         "./nichod/engine/nichod-posttest-bridge.js",
@@ -170,7 +171,7 @@
       "missingLocalScripts": []
     },
     "pdf-to-cbt.v317.html": {
-      "totalScripts": 18,
+      "totalScripts": 19,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/pdf-nichod-bridge.js",
@@ -186,12 +187,13 @@
         "./nichod/engine/test-creation-bridge.js",
         "./nichod/engine/test-creation-auto-hook.js",
         "./nichod/engine/live-test-flow-bridge.js",
+        "./nichod/engine/cbt-authoritative-loader.js",
         "./nichod/engine/unified-test-library-ui.js"
       ],
       "missingLocalScripts": []
     },
     "rankers-test-series.html": {
-      "totalScripts": 25,
+      "totalScripts": 26,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./pcb-nichod-ranker.js",
@@ -212,6 +214,7 @@
         "./nichod/engine/test-creation-bridge.js",
         "./nichod/engine/test-creation-auto-hook.js",
         "./nichod/engine/live-test-flow-bridge.js",
+        "./nichod/engine/cbt-authoritative-loader.js",
         "./nichod/engine/unified-test-library-ui.js"
       ],
       "missingLocalScripts": []
@@ -233,8 +236,8 @@
   },
   "git": {
     "branch": "main",
-    "commit": "9c10821 Auto-register PDF and Ranker sessions in unified test library",
-    "status": "M cbt.html\n M index.html\n M nichod/data/final-validation-report.json\n M nichod/data/pdf-cbt-runtime-report.json\n M nichod/data/runtime-health-report.json\n M pdf-to-cbt.v317.html\n M rankers-test-series.html\n?? nichod/engine/live-test-flow-bridge.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
+    "commit": "4ec6d8f Add live PDF and Ranker test creation flow bridge",
+    "status": "M cbt.html\n M nichod/data/pdf-cbt-runtime-report.json\n M pdf-to-cbt.v317.html\n M rankers-test-series.html\n?? nichod/engine/cbt-authoritative-loader.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
   },
   "failures": {
     "missingFiles": [],
