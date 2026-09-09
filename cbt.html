@@ -2043,6 +2043,87 @@ function buildTestQuestions() {
    START TEST
 ===================================================== */
 
+
+/* =====================================================
+   PCB_AUTHORITATIVE_START_BRIDGE
+   PDF Import / Rankers Test Series must start directly
+   from CBT_ACTIVE_TEST.
+===================================================== */
+
+(function installAuthoritativeStartBridge() {
+
+  const btn = document.getElementById("startButton");
+
+  if (!btn || btn.__pcbAuthoritativeBridge)
+    return;
+
+  btn.__pcbAuthoritativeBridge = true;
+
+  btn.addEventListener("click", function () {
+
+    try {
+
+      const raw =
+        localStorage.getItem("CBT_ACTIVE_TEST");
+
+      if (!raw)
+        return;
+
+      const active =
+        JSON.parse(raw);
+
+      if (
+        !active ||
+        !Array.isArray(active.questions) ||
+        !active.questions.length
+      )
+        return;
+
+      if (
+        active.source !== "PDF Import" &&
+        active.source !== "Rankers Test Series"
+      )
+        return;
+
+      /*
+       * Make authoritative session visible to
+       * the existing CBT start pipeline.
+       */
+      window.authoritativeActive = active;
+      window.selectedTest = active;
+      window.selectedQuestions =
+        active.questions.slice();
+
+      if (
+        typeof window.normalizeQuestion === "function"
+      ) {
+        window.selectedQuestions =
+          active.questions
+            .map(function (q, i) {
+              return window.normalizeQuestion(q, i);
+            })
+            .filter(Boolean);
+      }
+
+      console.log(
+        "🚀 AUTHORITATIVE CBT START:",
+        active.source,
+        window.selectedQuestions.length
+      );
+
+    } catch (e) {
+
+      console.error(
+        "❌ Authoritative CBT start bridge:",
+        e
+      );
+
+    }
+
+  }, true);
+
+})();
+
 startButton.addEventListener(
   "click",
   function() {
