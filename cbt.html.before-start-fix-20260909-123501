@@ -780,13 +780,6 @@
 <script src="./nichod/engine/real-flow-validator.js"></script>
 <script src="./nichod/engine/real-flow-test-suite.js"></script>
 <script src="./nichod/engine/pdf-test-session-manager.js"></script>
-
-<!-- PCB_E2E_UI_SUPPRESS_CSS_V1 -->
-<style>
-#nichodE2EPanel {
-  display:none !important;
-}
-</style>
 </head>
 
 <body>
@@ -1365,7 +1358,14 @@ const CBT_PDF_QUESTIONS =
     ? (function () {
         try {
           const raw =
-            sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+            /* PDF CBT ISOLATION — fresh imported test has priority */
+const __PDF_ACTIVE_QUESTIONS__ =
+  sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+
+const __PDF_ACTIVE_SOURCE__ =
+  sessionStorage.getItem("CBT_ACTIVE_SOURCE");
+
+sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
 
           const data = raw ? JSON.parse(raw) : [];
 
@@ -2064,7 +2064,6 @@ function buildTestQuestions() {
     try {
 
       const raw =
-        sessionStorage.getItem("CBT_ACTIVE_TEST") ||
         localStorage.getItem("CBT_ACTIVE_TEST");
 
       if (!raw)
@@ -2091,18 +2090,6 @@ function buildTestQuestions() {
        * the existing CBT start pipeline.
        */
       window.authoritativeActive = active;
-
-      /*
-       * Keep BOTH storage locations synchronized so
-       * PDF/Ranker launch survives the existing CBT flow.
-       */
-      try {
-        sessionStorage.setItem(
-          "CBT_ACTIVE_TEST",
-          JSON.stringify(active)
-        );
-      } catch (_) {}
-
       window.selectedTest = active;
       window.selectedQuestions =
         active.questions.slice();
@@ -2139,188 +2126,103 @@ function buildTestQuestions() {
 
 startButton.addEventListener(
   "click",
-  function () {
+  function() {
 
-    try {
-
-      /*
-       * AUTHORITATIVE SOURCE
-       * PDF Import / Rankers Test Series must always win
-       * over legacy Test-180/fallback selection.
-       */
-      const activeRaw =
-        sessionStorage.getItem("CBT_ACTIVE_TEST") ||
-        localStorage.getItem("CBT_ACTIVE_TEST");
-
-      let active = null;
-
-      try {
-        active =
-          activeRaw
-            ? JSON.parse(activeRaw)
-            : null;
-      } catch (_) {
-        active = null;
-      }
-
-      const authoritative =
-        active &&
-        Array.isArray(active.questions) &&
-        active.questions.length > 0 &&
-        (
-          active.source === "PDF Import" ||
-          active.source === "Rankers Test Series"
-        );
-
-      if (authoritative) {
-
-        const normalized =
-          active.questions
-            .map(function (q, i) {
-
-              try {
-
-                return (
-                  typeof normalizeQuestion === "function"
-                    ? normalizeQuestion(q, i)
-                    : q
-                );
-
-              } catch (_) {
-
-                return q;
-
-              }
-
-            })
-            .filter(function (q) {
-
-              return !!q;
-
-            });
-
-        if (!normalized.length) {
-
-          alert(
-            "No valid questions are available."
-          );
-
-          return;
-
-        }
-
-        selectedQuestions =
-          normalized;
-
-        selectedTest = {
-
-          id:
-            active.id ||
-            (
-              active.source === "PDF Import"
-                ? "pdf-import"
-                : "rankers-test-series"
-            ),
-
-          title:
-            active.title ||
-            (
-              active.source === "PDF Import"
-                ? "PDF Imported CBT"
-                : "Rankers Test Series"
-            ),
-
-          duration:
-            Number(active.duration) > 0
-              ? Number(active.duration)
-              : 180
-
-        };
-
-      } else {
-
-        if (!selectedTest) {
-
-          alert(
-            "Please select Test 180 first."
-          );
-
-          return;
-
-        }
-
-        selectedQuestions =
-          buildTestQuestions();
-
-        if (!selectedQuestions.length) {
-
-          alert(
-            "No valid questions are available."
-          );
-
-          return;
-
-        }
-
-      }
-
-      /*
-       * RESET CBT SESSION
-       */
-      currentIndex = 0;
-      answers = {};
-      visitedQuestions = new Set();
-      reviewQuestions = new Set();
-      submitted = false;
-
-      remainingSeconds =
-        (
-          Number(selectedTest.duration) > 0
-            ? Number(selectedTest.duration)
-            : 180
-        ) * 60;
-
-      /*
-       * SCREEN TRANSITION
-       */
-      setupScreen.classList.add("hidden");
-      resultScreen.classList.add("hidden");
-      cbtScreen.classList.remove("hidden");
-
-      /*
-       * HEADER + FIRST QUESTION
-       */
-      testTitle.textContent =
-        selectedTest.title ||
-        (
-          authoritative
-            ? active.source
-            : "Test 180"
-        );
-
-      renderQuestion();
-      renderPalette();
-      startTimer();
-
-      console.log(
-        "🚀 CBT STARTED:",
-        selectedTest.title,
-        selectedQuestions.length,
-        "questions"
-      );
-
-    } catch (error) {
-
-      console.error(
-        "❌ CBT START FAILED:",
-        error
-      );
+    if (!selectedTest) {
 
       alert(
-        "CBT start failed. Please refresh once and try again."
+        "Please select Test 180 first."
       );
 
+      return;
+
     }
+
+
+    selectedQuestions =
+      buildTestQuestions();
+
+
+    if (
+      selectedQuestions.length === 0
+    ) {
+
+      alert(
+        "No valid questions are available."
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * Reset test state
+     */
+
+    currentIndex =
+      0;
+
+    answers = {};
+
+    visitedQuestions =
+      new Set();
+
+    reviewQuestions =
+      new Set();
+
+    submitted =
+      false;
+
+
+    /*
+     * Start timer
+     */
+
+    remainingSeconds =
+      selectedTest.duration *
+      60;
+
+
+    /*
+     * Change screens
+     */
+
+    setupScreen.classList.add(
+      "hidden"
+    );
+
+    cbtScreen.classList.remove(
+      "hidden"
+    );
+
+    resultScreen.classList.add(
+      "hidden"
+    );
+
+
+    /*
+     * Header
+     */
+
+    testTitle.textContent =
+      selectedTest.title;
+
+
+    /*
+     * Render first question
+     */
+
+    renderQuestion();
+
+    renderPalette();
+
+
+    /*
+     * Start countdown
+     */
+
+    startTimer();
 
   }
 );
@@ -4616,7 +4518,6 @@ console.log(
     (() => {
       try {
         const raw =
-          sessionStorage.getItem("CBT_ACTIVE_TEST") ||
           localStorage.getItem("CBT_ACTIVE_TEST");
 
         if (!raw) return null;
@@ -5703,6 +5604,7 @@ window.addEventListener("load", function () {
 
 })();
 </script>
+
 </body>
 
-</html>\n\n\n
+</html>\n

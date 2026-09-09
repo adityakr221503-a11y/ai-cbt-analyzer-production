@@ -780,13 +780,6 @@
 <script src="./nichod/engine/real-flow-validator.js"></script>
 <script src="./nichod/engine/real-flow-test-suite.js"></script>
 <script src="./nichod/engine/pdf-test-session-manager.js"></script>
-
-<!-- PCB_E2E_UI_SUPPRESS_CSS_V1 -->
-<style>
-#nichodE2EPanel {
-  display:none !important;
-}
-</style>
 </head>
 
 <body>
@@ -1365,7 +1358,14 @@ const CBT_PDF_QUESTIONS =
     ? (function () {
         try {
           const raw =
-            sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+            /* PDF CBT ISOLATION — fresh imported test has priority */
+const __PDF_ACTIVE_QUESTIONS__ =
+  sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+
+const __PDF_ACTIVE_SOURCE__ =
+  sessionStorage.getItem("CBT_ACTIVE_SOURCE");
+
+sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
 
           const data = raw ? JSON.parse(raw) : [];
 

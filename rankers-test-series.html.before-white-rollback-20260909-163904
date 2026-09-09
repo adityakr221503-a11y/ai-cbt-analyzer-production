@@ -473,6 +473,13 @@ try {
 }
 
 localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
+
+   /* PCB_SAFE_RANKER_SOURCE_RESET_V1
+      A new Ranker test must not inherit an old PDF active test.
+      Do not touch the unified loader contract.
+   */
+   localStorage.removeItem("CBT_ACTIVE_TEST");
+   localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
    localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
    $("status").textContent=pool.length+" eligible questions selected. Opening CBT...";
    setTimeout(()=>location.href="cbt.html?source=rankers-test-series",250);
