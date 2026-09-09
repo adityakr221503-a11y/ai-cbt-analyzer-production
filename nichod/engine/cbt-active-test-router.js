@@ -104,6 +104,75 @@
   }
 
   function getActive() {
+
+    /*
+     * SOURCE-FIRST ROUTING
+     *
+     * Never allow an old CBT_ACTIVE_TEST to override the
+     * source that explicitly launched the current test.
+     */
+
+    const source =
+      String(
+        localStorage.getItem(SOURCE) || ""
+      ).trim();
+
+    /*
+     * Ranker source is authoritative.
+     */
+    if (
+      source === "Rankers Test Series"
+    ) {
+
+      const ranker =
+        makeTest(
+          read(RANKER),
+          "Rankers Test Series",
+          "ranker-active"
+        );
+
+      return valid(ranker)
+        ? ranker
+        : null;
+    }
+
+    /*
+     * PDF source is authoritative.
+     */
+    if (
+      source === "PDF" ||
+      source === "PDF Import"
+    ) {
+
+      const active =
+        makeTest(
+          read(ACTIVE),
+          "PDF Import",
+          "pdf-active"
+        );
+
+      if (
+        valid(active) &&
+        Array.isArray(active.questions)
+      ) {
+        return active;
+      }
+
+      const pdf =
+        makeTest(
+          read(PDF),
+          "PDF Import",
+          "pdf-active"
+        );
+
+      return valid(pdf)
+        ? pdf
+        : null;
+    }
+
+    /*
+     * Normal non-source-specific CBT/test-series flow.
+     */
     const active =
       makeTest(
         read(ACTIVE),
@@ -114,69 +183,6 @@
 
     if (valid(active))
       return active;
-
-    /*
-     * Ranker selection has priority when
-     * Ranker explicitly started the CBT.
-     */
-    const source =
-      localStorage.getItem(SOURCE);
-
-    if (
-      source ===
-      "Rankers Test Series"
-    ) {
-      const ranker =
-        makeTest(
-          read(RANKER),
-          "Rankers Test Series",
-          "ranker-active"
-        );
-
-      if (valid(ranker))
-        return ranker;
-    }
-
-    /*
-     * PDF selection.
-     */
-    if (
-      source === "PDF" ||
-      source === "PDF Import"
-    ) {
-      const pdf =
-        makeTest(
-          read(PDF),
-          "PDF Import",
-          "pdf-active"
-        );
-
-      if (valid(pdf))
-        return pdf;
-    }
-
-    /*
-     * Compatibility fallback.
-     */
-    const ranker =
-      makeTest(
-        read(RANKER),
-        "Rankers Test Series",
-        "ranker-active"
-      );
-
-    if (valid(ranker))
-      return ranker;
-
-    const pdf =
-      makeTest(
-        read(PDF),
-        "PDF Import",
-        "pdf-active"
-      );
-
-    if (valid(pdf))
-      return pdf;
 
     return null;
   }
