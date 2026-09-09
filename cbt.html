@@ -5126,6 +5126,27 @@ window.addEventListener(
 <script src="./nichod/engine/pdf-cbt-generic-final.js"></script>
 <script src="./nichod/engine/pdf-cbt-universal-parser.js"></script>
 <script src="./nichod/engine/pdf-cbt-live-import-bridge.js"></script>
+<script>
+/* PCB_PDF_BRIDGE_RUNTIME_CHECK */
+window.addEventListener("load", function () {
+  setTimeout(function () {
+    var bridgeReady =
+      !!window.PCBNICHODPDF ||
+      !!window.PCBPDFLiveImportBridge;
+
+    window.__PCB_PDF_BRIDGE_READY__ =
+      bridgeReady;
+
+    console.log(
+      bridgeReady
+        ? "✅ PCB PDF bridge runtime: READY"
+        : "❌ PCB PDF bridge runtime: NOT READY"
+    );
+  }, 100);
+});
+</script>
+
+
 <script src="./nichod/engine/pdf-cbt-session-verifier.js"></script>
 
 
