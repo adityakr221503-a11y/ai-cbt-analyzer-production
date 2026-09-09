@@ -5704,6 +5704,196 @@ window.addEventListener("load", function () {
 })();
 </script>
 
+
+<script>
+/* =====================================================
+   PCB_DIRECT_AUTHORITATIVE_START_V3
+   PDF + RANKER -> DIRECT EXISTING CBT SCREEN
+   Bypasses conflicting legacy start listeners.
+===================================================== */
+(function () {
+
+  function install() {
+
+    const btn =
+      document.getElementById("startButton");
+
+    if (!btn || btn.__pcbDirectStartV3)
+      return;
+
+    btn.__pcbDirectStartV3 = true;
+
+    btn.addEventListener(
+      "click",
+      function (event) {
+
+        let active = null;
+
+        try {
+
+          const raw =
+            sessionStorage.getItem("CBT_ACTIVE_TEST") ||
+            localStorage.getItem("CBT_ACTIVE_TEST");
+
+          if (raw)
+            active = JSON.parse(raw);
+
+        } catch (e) {
+
+          console.error(
+            "PCB DIRECT START: storage parse failed",
+            e
+          );
+
+        }
+
+        if (
+          !active ||
+          !Array.isArray(active.questions) ||
+          !active.questions.length ||
+          (
+            active.source !== "PDF Import" &&
+            active.source !== "Rankers Test Series"
+          )
+        ) {
+
+          return;
+
+        }
+
+        /*
+         * This listener runs in capture phase.
+         * Stop all older/competing Start handlers.
+         */
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        try {
+
+          const qs =
+            active.questions
+              .map(function (q, i) {
+
+                try {
+
+                  return (
+                    typeof normalizeQuestion === "function"
+                      ? normalizeQuestion(q, i)
+                      : q
+                  );
+
+                } catch (_) {
+
+                  return q;
+
+                }
+
+              })
+              .filter(Boolean);
+
+          /*
+           * The return expression above must stay valid
+           * even when the source question is already normalized.
+           */
+          const finalQuestions =
+            qs.length
+              ? qs
+              : active.questions;
+
+          selectedQuestions =
+            finalQuestions;
+
+          selectedTest = {
+
+            id:
+              active.id ||
+              (
+                active.source === "PDF Import"
+                  ? "pdf-import"
+                  : "rankers-test-series"
+              ),
+
+            title:
+              active.title ||
+              (
+                active.source === "PDF Import"
+                  ? "PDF Imported CBT"
+                  : "Rankers Test Series"
+              ),
+
+            duration:
+              Number(active.duration) > 0
+                ? Number(active.duration)
+                : 180
+
+          };
+
+          currentIndex = 0;
+          answers = {};
+          visitedQuestions = new Set();
+          reviewQuestions = new Set();
+          submitted = false;
+
+          remainingSeconds =
+            Number(selectedTest.duration) * 60;
+
+          /*
+           * DIRECT SCREEN SWITCH
+           */
+          setupScreen.classList.add("hidden");
+          resultScreen.classList.add("hidden");
+          cbtScreen.classList.remove("hidden");
+
+          testTitle.textContent =
+            selectedTest.title;
+
+          renderQuestion();
+          renderPalette();
+          startTimer();
+
+          console.log(
+            "✅ PCB DIRECT CBT STARTED:",
+            active.source,
+            selectedQuestions.length
+          );
+
+        } catch (error) {
+
+          console.error(
+            "❌ PCB DIRECT CBT START FAILED:",
+            error
+          );
+
+          alert(
+            "CBT start failed: " +
+            (error.message || error)
+          );
+
+        }
+
+      },
+      true
+    );
+
+  }
+
+  if (document.readyState === "loading") {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      install,
+      { once: true }
+    );
+
+  } else {
+
+    install();
+
+  }
+
+})();
+</script>
+
 </body>
 
 </html>\n\n\n
