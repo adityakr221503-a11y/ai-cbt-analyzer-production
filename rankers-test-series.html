@@ -432,6 +432,45 @@ if(perf.length){
    }else{
      pool.sort(()=>Math.random()-.5);
    }
+
+/* =====================================================
+   NICHOD_VERIFIED_SELECTION_HOOK_V1
+===================================================== */
+try {
+  if (
+    window.PCBNICHODVerifiedFeed &&
+    typeof window.PCBNICHODVerifiedFeed.prepareSelection ===
+      "function"
+  ) {
+    const nichodResult =
+      window.PCBNICHODVerifiedFeed.prepareSelection(
+        pool,
+        {
+          count: pool.length || 180,
+          unseenCount: Math.min(
+            30,
+            pool.length || 30
+          )
+        }
+      );
+
+    if (
+      nichodResult &&
+      Array.isArray(nichodResult.pool)
+    ) {
+      pool = nichodResult.pool;
+    }
+
+    window.__PCB_NICHOD_LAST_SELECTION =
+      nichodResult || null;
+  }
+} catch (e) {
+  console.warn(
+    "PCB NICHOD selection hook skipped:",
+    e
+  );
+}
+
 localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
    localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
    $("status").textContent=pool.length+" eligible questions selected. Opening CBT...";
