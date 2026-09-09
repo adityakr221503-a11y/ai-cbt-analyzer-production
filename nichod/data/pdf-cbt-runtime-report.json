@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-09-09T03:41:03.540Z",
+  "status": "PASS",
+  "filesChecked": 6,
+  "missingFiles": [],
+  "failedReferences": [],
+  "checks": {
+    "pdfPageRecovery": true,
+    "pdfPageGuard": true,
+    "pdfNichod": true,
+    "cbtRecovery": true,
+    "cbtGuard": true,
+    "unified": true
+  },
+  "nextRequiredTest": "Upload a real PDF in the browser and verify recovered question count."
+}
