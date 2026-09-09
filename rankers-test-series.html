@@ -813,4 +813,251 @@ Open Ranker Command Center
 <script src="./nichod/engine/nichod-system-health.js"></script>
 <script src="./nichod/engine/nichod-e2e-harness.js"></script>
 <script src="./nichod/engine/nichod-live-flow-monitor.js"></script>
+
+
+<!-- PCB_NICHOD_LIVE_REPORT_UI_V1 -->
+<script>
+(function () {
+
+  function createUI() {
+
+    if (document.getElementById("pcbNichodLiveReport"))
+      return;
+
+    const box = document.createElement("div");
+
+    box.id = "pcbNichodLiveReport";
+
+    box.style.cssText =
+      "position:fixed;" +
+      "right:12px;" +
+      "bottom:12px;" +
+      "z-index:999999;" +
+      "background:#111827;" +
+      "color:#fff;" +
+      "padding:12px;" +
+      "border-radius:12px;" +
+      "font:14px monospace;" +
+      "max-width:90vw;" +
+      "box-shadow:0 8px 30px rgba(0,0,0,.35);";
+
+    box.innerHTML =
+      '<b>🧪 PCB NICHOD LIVE</b>' +
+      '<div id="pcbNichodLiveStatus" style="margin-top:8px">' +
+      'Reading flow…</div>' +
+      '<button id="pcbNichodLiveRefresh" ' +
+      'style="margin-top:8px;padding:8px;border-radius:8px">' +
+      'Refresh</button>' +
+      '<button id="pcbNichodLiveCopy" ' +
+      'style="margin-top:8px;margin-left:6px;padding:8px;border-radius:8px">' +
+      'Copy Report</button>';
+
+    document.body.appendChild(box);
+
+    document
+      .getElementById("pcbNichodLiveRefresh")
+      .onclick = render;
+
+    document
+      .getElementById("pcbNichodLiveCopy")
+      .onclick = copyReport;
+
+    render();
+  }
+
+  function getJSON(key) {
+
+    try {
+      return JSON.parse(
+        localStorage.getItem(key) || "null"
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function lengthOf(x) {
+
+    if (Array.isArray(x))
+      return x.length;
+
+    if (x && Array.isArray(x.questions))
+      return x.questions.length;
+
+    if (x && Array.isArray(x.data))
+      return x.data.length;
+
+    if (x && Array.isArray(x.items))
+      return x.items.length;
+
+    return 0;
+  }
+
+  function render() {
+
+    const pdf =
+      getJSON("pdfCbtQuestions");
+
+    const selected =
+      getJSON("rbSelectedQuestions");
+
+    const history =
+      getJSON("cbtHistory");
+
+    const live =
+      getJSON("pcbNichodLiveFlowReport");
+
+    const status =
+      document.getElementById(
+        "pcbNichodLiveStatus"
+      );
+
+    if (!status)
+      return;
+
+    status.innerHTML =
+      "PDF questions: " +
+      lengthOf(pdf) +
+
+      "<br>Selected questions: " +
+      lengthOf(selected) +
+
+      "<br>History entries: " +
+      (
+        Array.isArray(history)
+          ? history.length
+          : 0
+      ) +
+
+      "<br>Active source: " +
+      (
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ) || "—"
+      ) +
+
+      "<br>Unified: " +
+      (
+        window.PCBNICHODUnified
+          ? "YES"
+          : "NO"
+      ) +
+
+      "<br>PDF bridge: " +
+      (
+        window.PCBNICHODPDF
+          ? "YES"
+          : "NO"
+      ) +
+
+      "<br>Ranker feed: " +
+      (
+        window.PCBNICHODRankerFeed
+          ? "YES"
+          : "NO"
+      ) +
+
+      "<br>Live snapshots: " +
+      (
+        live &&
+        Array.isArray(live.snapshots)
+          ? live.snapshots.length
+          : 0
+      );
+  }
+
+  function copyReport() {
+
+    const report = {
+
+      pdfQuestions:
+        lengthOf(
+          getJSON("pdfCbtQuestions")
+        ),
+
+      selectedQuestions:
+        lengthOf(
+          getJSON("rbSelectedQuestions")
+        ),
+
+      historyEntries:
+        Array.isArray(
+          getJSON("cbtHistory")
+        )
+          ? getJSON("cbtHistory").length
+          : 0,
+
+      activeSource:
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ),
+
+      liveFlow:
+        getJSON(
+          "pcbNichodLiveFlowReport"
+        ),
+
+      timestamp:
+        new Date().toISOString()
+
+    };
+
+    const text =
+      JSON.stringify(
+        report,
+        null,
+        2
+      );
+
+    if (
+      navigator.clipboard &&
+      navigator.clipboard.writeText
+    ) {
+
+      navigator.clipboard.writeText(text)
+        .then(function () {
+
+          alert(
+            "✅ NICHOD report copied"
+          );
+
+        })
+        .catch(function () {
+
+          prompt(
+            "Copy this report:",
+            text
+          );
+
+        });
+
+    } else {
+
+      prompt(
+        "Copy this report:",
+        text
+      );
+
+    }
+  }
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      createUI
+    );
+
+  } else {
+
+    createUI();
+
+  }
+
+})();
+</script>
+
 </body></html>
