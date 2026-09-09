@@ -158,9 +158,29 @@
       };
     }
 
+    /*
+     * AUTHORITATIVE ACTIVE TEST
+     * CBT must load this exact test first.
+     * Source-specific stores below are compatibility mirrors only.
+     */
     localStorage.setItem(
       ACTIVE,
-      JSON.stringify(test)
+      JSON.stringify({
+        testId: test.testId,
+        id: test.testId,
+        title: test.title,
+        source: test.source,
+        filename: test.filename || "",
+        questionCount: test.questions.length,
+        questions: test.questions,
+        createdAt: test.createdAt,
+        updatedAt: test.updatedAt
+      })
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_TEST_ID",
+      test.testId
     );
 
     localStorage.setItem(

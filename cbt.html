@@ -4429,6 +4429,39 @@ console.log(
       ? ACTIVE_QUESTION_BANK.length
       : 0;
 
+  /*
+   * PDF / Ranker tests are independent CBT sessions.
+   * Their question count must NOT be forced to 180.
+   */
+  const authoritativeActive =
+    (() => {
+      try {
+        const raw =
+          localStorage.getItem("CBT_ACTIVE_TEST");
+
+        if (!raw) return null;
+
+        const test = JSON.parse(raw);
+
+        return (
+          test &&
+          Array.isArray(test.questions) &&
+          test.questions.length > 0
+        )
+          ? test
+          : null;
+      } catch (_) {
+        return null;
+      }
+    })();
+
+  const isImportedOrRanker =
+    !!authoritativeActive &&
+    (
+      authoritativeActive.source === "PDF Import" ||
+      authoritativeActive.source === "Rankers Test Series"
+    );
+
 
   console.log(
     "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -4463,6 +4496,22 @@ console.log(
    */
 
   if (
+    isImportedOrRanker
+  ) {
+
+    bankStatus.className =
+      "status success";
+
+    bankStatus.textContent =
+      `✅ ${authoritativeActive.source} ready — ` +
+      `${authoritativeActive.questions.length} questions loaded.`;
+
+    startButton.disabled =
+      false;
+
+  }
+
+  else if (
     validCount === 180
   ) {
 
