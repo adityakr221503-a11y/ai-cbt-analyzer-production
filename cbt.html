@@ -2130,6 +2130,128 @@ function buildTestQuestions() {
 
 })();
 
+
+/* ============================================================
+   CBT SOURCE ISOLATION V1
+   PDF != RANKER != TEST SERIES
+   Keep existing CBT Start handler untouched.
+============================================================ */
+(function () {
+
+  const SOURCE_KEY = "CBT_ACTIVE_SOURCE";
+
+  function getSource() {
+    return (
+      sessionStorage.getItem(SOURCE_KEY) ||
+      localStorage.getItem(SOURCE_KEY) ||
+      ""
+    ).trim().toUpperCase();
+  }
+
+  function isPDFSource() {
+    return getSource() === "PDF";
+  }
+
+  function isRankerSource() {
+    const s = getSource();
+    return s === "RANKER" ||
+           s === "RANKER_TEST" ||
+           s === "RANKER PRO";
+  }
+
+  function isTestSeriesSource() {
+    const s = getSource();
+    return s === "TEST_SERIES" ||
+           s === "TEST SERIES" ||
+           s === "TESTSERIES";
+  }
+
+  /*
+   * Expose source information without changing the CBT engine.
+   */
+  window.PCB_CBT_SOURCE_ISOLATION = {
+    getSource,
+    isPDFSource,
+    isRankerSource,
+    isTestSeriesSource
+  };
+
+  /*
+   * IMPORTANT:
+   * PDF question storage is read ONLY when the active source is PDF.
+   * Ranker/Test-Series code must not fall back to pdfCbtQuestions.
+   */
+  window.PCB_GET_PDF_QUESTIONS = function () {
+
+    if (!isPDFSource()) {
+      return [];
+    }
+
+    try {
+      const raw =
+        localStorage.getItem("pdfCbtQuestions") ||
+        sessionStorage.getItem("CBT_ACTIVE_QUESTIONS") ||
+        "[]";
+
+      const data = JSON.parse(raw);
+
+      return Array.isArray(data) ? data : [];
+    } catch (e) {
+      console.error("PDF source read failed:", e);
+      return [];
+    }
+  };
+
+  /*
+   * Clear stale PDF source whenever another source explicitly starts.
+   * Do NOT delete the actual PDF bank; only remove active-session leakage.
+   */
+  window.PCB_SET_CBT_SOURCE = function (source) {
+
+    const normalized =
+      String(source || "").trim().toUpperCase();
+
+    sessionStorage.setItem(
+      SOURCE_KEY,
+      normalized
+    );
+
+    if (normalized !== "PDF") {
+      sessionStorage.removeItem("CBT_ACTIVE_QUESTIONS");
+      sessionStorage.removeItem("CBT_ACTIVE_TEST");
+    }
+
+    console.log(
+      "CBT SOURCE:",
+      normalized
+    );
+  };
+
+  /*
+   * If an active Ranker/Test-Series test already exists,
+   * prevent stale PDF session data from taking priority.
+   */
+  const source = getSource();
+
+  if (
+    source === "RANKER" ||
+    source === "RANKER_TEST" ||
+    source === "RANKER PRO" ||
+    source === "TEST_SERIES" ||
+    source === "TEST SERIES" ||
+    source === "TESTSERIES"
+  ) {
+    sessionStorage.removeItem("CBT_ACTIVE_QUESTIONS");
+    sessionStorage.removeItem("CBT_ACTIVE_TEST");
+
+    console.log(
+      "SOURCE ISOLATION: stale PDF active session cleared for",
+      source
+    );
+  }
+
+})();
+
 startButton.addEventListener(
   "click",
   function () {
