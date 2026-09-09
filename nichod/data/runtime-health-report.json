@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-09T04:18:34.583Z",
+  "generatedAt": "2026-09-09T04:19:36.213Z",
   "project": "PCB NICHOD",
   "pipeline": [
     "PDF",
@@ -22,12 +22,12 @@
     {
       "file": "cbt.html",
       "exists": true,
-      "size": 88195
+      "size": 88263
     },
     {
       "file": "pdf-to-cbt.v317.html",
       "exists": true,
-      "size": 55669
+      "size": 55737
     },
     {
       "file": "rankers-test-series.html",
@@ -148,7 +148,7 @@
   },
   "html": {
     "cbt.html": {
-      "totalScripts": 37,
+      "totalScripts": 38,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/cbt-active-test-router.js",
@@ -168,12 +168,13 @@
         "./nichod/engine/nichod-live-flow-monitor.js",
         "./nichod/engine/pdf-cbt-runtime-guard.js",
         "./nichod/engine/pdf-cbt-auto-recovery.js",
-        "./nichod/engine/pdf-cbt-generic-final.js"
+        "./nichod/engine/pdf-cbt-generic-final.js",
+        "./nichod/engine/pdf-cbt-universal-parser.js"
       ],
       "missingLocalScripts": []
     },
     "pdf-to-cbt.v317.html": {
-      "totalScripts": 21,
+      "totalScripts": 22,
       "nichodScripts": [
         "./nichod/engine/cbt-unified-question-loader.js",
         "./nichod/engine/pdf-nichod-bridge.js",
@@ -184,6 +185,7 @@
         "./nichod/engine/pdf-cbt-runtime-guard.js",
         "./nichod/engine/pdf-cbt-auto-recovery.js",
         "./nichod/engine/pdf-cbt-generic-final.js",
+        "./nichod/engine/pdf-cbt-universal-parser.js",
         "./nichod/engine/pdf-test-session-manager.js",
         "./nichod/engine/unified-test-library.js",
         "./nichod/engine/test-creation-bridge.js",
@@ -242,8 +244,8 @@
   },
   "git": {
     "branch": "main",
-    "commit": "29f64f4 Add real PDF and Ranker CBT flow validation",
-    "status": "M cbt.html\n M index.html\n M nichod/data/pdf-cbt-runtime-report.json\n M pdf-to-cbt.v317.html\n M rankers-test-series.html\n?? nichod/engine/real-flow-test-suite.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
+    "commit": "04db60e Add unified real PDF Ranker CBT flow test suite",
+    "status": "M cbt.html\n M nichod/data/pdf-cbt-runtime-report.json\n M pdf-to-cbt.v317.html\n?? nichod/engine/pdf-cbt-universal-parser.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
   },
   "failures": {
     "missingFiles": [],
