@@ -24,7 +24,121 @@
     return m ? "ABCD".indexOf(m[1]) : -1;
   }
 
-  function normalizeQuestion(q, index) {
+  
+/* ================================================================
+   PDF ENGLISH-FIRST TEXT NORMALIZER V1
+   Removes legacy Hindi-font extraction noise WITHOUT translating
+   or modifying already-correct English text.
+   ================================================================ */
+
+function pcbEnglishFirstNormalize(text) {
+  if (text == null) return "";
+
+  let s = String(text)
+    .replace(/\u00a0/g, " ")
+    .replace(/\r\n?/g, "\n");
+
+  /*
+   * Legacy Hindi-font extraction commonly produces ASCII-looking
+   * garbage such as dFku, pkyd, lEiw.kZ, nksuksa, etc.
+   *
+   * We deliberately DO NOT globally translate these tokens.
+   * Instead, when a line contains a valid English equivalent and
+   * a corrupted Hindi-font fragment, retain the English portion.
+   */
+
+  const legacyMarkers = [
+    "dFku",
+    "dkj.k",
+    "pkyd",
+    "lEiw.kZ",
+    "nksuksa",
+    "lgh",
+    "O;k[;k",
+    "LFkkukUrfjr",
+    "lEHko",
+    "foyfxr"
+  ];
+
+  function looksLegacy(x) {
+    if (!x) return false;
+    return legacyMarkers.some(function (m) {
+      return x.includes(m);
+    });
+  }
+
+  function englishScore(x) {
+    if (!x) return 0;
+
+    const letters = (x.match(/[A-Za-z]/g) || []).length;
+    const words = (x.match(/\b[A-Za-z]{2,}\b/g) || []).length;
+
+    return letters + words * 3;
+  }
+
+  /*
+   * If the same logical sentence has both clean English and
+   * legacy-font noise, keep the clean English sentence.
+   */
+  const lines = s.split("\n");
+  const cleaned = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (!looksLegacy(line)) {
+      cleaned.push(line);
+      continue;
+    }
+
+    const chunks = line
+      .split(/\s{2,}|(?=\b(?:Assertion|Reason|Option|Question)\s*:)/i)
+      .map(function (x) {
+        return x.trim();
+      })
+      .filter(Boolean);
+
+    const good = chunks
+      .filter(function (x) {
+        return !looksLegacy(x);
+      })
+      .sort(function (a, b) {
+        return englishScore(b) - englishScore(a);
+      });
+
+    if (good.length) {
+      cleaned.push(good.join(" "));
+    } else {
+      /*
+       * Do not expose obvious legacy-font-only garbage.
+       * Preserve formulas/numbers/symbols when present.
+       */
+      const safe = line
+        .replace(/[A-Za-z]+(?:[.'-][A-Za-z]+)*/g, function (token) {
+          return looksLegacy(token) ? "" : token;
+        })
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+      if (safe) cleaned.push(safe);
+    }
+  }
+
+  return cleaned
+    .join("\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/* Make available to existing parser/normalizer code. */
+if (typeof window !== "undefined") {
+  window.pcbEnglishFirstNormalize =
+    pcbEnglishFirstNormalize;
+}
+
+
+function normalizeQuestion(q, index) {
     if (!q) return null;
 
     const text = clean(
