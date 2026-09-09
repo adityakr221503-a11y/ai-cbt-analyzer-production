@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "question": {
+    "id": "",
+    "exam": "NEET|JEE_MAIN|JEE_ADVANCED",
+    "year": 0,
+    "subject": "Physics|Chemistry|Biology",
+    "chapter": "",
+    "topic": "",
+    "question": "",
+    "options": [],
+    "answer": "",
+    "source": "",
+    "verified": false,
+    "pyqFamily": "",
+    "concepts": [],
+    "relatedConcepts": [],
+    "prerequisites": [],
+    "traps": [],
+    "shortcuts": [],
+    "diamond": false,
+    "unseen": false,
+    "difficulty": "",
+    "explanation": ""
+  }
+}
