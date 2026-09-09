@@ -4616,6 +4616,7 @@ console.log(
     (() => {
       try {
         const raw =
+          sessionStorage.getItem("CBT_ACTIVE_TEST") ||
           localStorage.getItem("CBT_ACTIVE_TEST");
 
         if (!raw) return null;
