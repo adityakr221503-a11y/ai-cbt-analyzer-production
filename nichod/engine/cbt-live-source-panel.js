@@ -128,3 +128,33 @@
     render: render
   };
 })();
+
+
+/* NICHOD LIVE SOURCE: never block CBT underneath */
+(function () {
+  function allowCBTClicks() {
+    const panels = document.querySelectorAll(
+      '[id*="pcb"][id*="source"],' +
+      '[id*="nichod"][id*="panel"],' +
+      '.pcb-nichod-live-source'
+    );
+
+    panels.forEach(function (panel) {
+      panel.style.pointerEvents = "none";
+
+      panel.querySelectorAll(
+        "button, input, select, textarea, a"
+      ).forEach(function (el) {
+        el.style.pointerEvents = "auto";
+      });
+    });
+  }
+
+  allowCBTClicks();
+
+  new MutationObserver(allowCBTClicks)
+    .observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+})();
