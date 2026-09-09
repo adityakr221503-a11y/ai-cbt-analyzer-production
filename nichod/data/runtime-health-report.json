@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-09T03:34:23.230Z",
+  "project": "PCB NICHOD",
+  "pipeline": [
+    "PDF",
+    "NICHOD",
+    "PYQ",
+    "Verified",
+    "Unseen",
+    "Authoring",
+    "Ranker",
+    "CBT",
+    "Result",
+    "Mistake Bank",
+    "Mentor",
+    "Adaptive Next Test",
+    "Retry",
+    "Mastery"
+  ],
+  "files": [
+    {
+      "file": "cbt.html",
+      "exists": true,
+      "size": 82918
+    },
+    {
+      "file": "pdf-to-cbt.v317.html",
+      "exists": true,
+      "size": 47471
+    },
+    {
+      "file": "rankers-test-series.html",
+      "exists": true,
+      "size": 23281
+    },
+    {
+      "file": "nichod/engine/nichod-unified-orchestrator.js",
+      "exists": true,
+      "size": 10489
+    },
+    {
+      "file": "nichod/engine/nichod-system-health.js",
+      "exists": true,
+      "size": 9800
+    },
+    {
+      "file": "nichod/engine/pdf-nichod-bridge.js",
+      "exists": true,
+      "size": 3926
+    },
+    {
+      "file": "nichod/engine/nichod-ranker-feed.js",
+      "exists": true,
+      "size": 6362
+    },
+    {
+      "file": "nichod/engine/nichod-unseen-generator.js",
+      "exists": true,
+      "size": 14645
+    },
+    {
+      "file": "nichod/engine/nichod-generation-bridge.js",
+      "exists": true,
+      "size": 10242
+    },
+    {
+      "file": "nichod/engine/nichod-review-ui.js",
+      "exists": true,
+      "size": 9162
+    },
+    {
+      "file": "nichod/engine/nichod-authoring-engine.js",
+      "exists": true,
+      "size": 10428
+    },
+    {
+      "file": "nichod/engine/nichod-authoring-ui.js",
+      "exists": true,
+      "size": 12665
+    },
+    {
+      "file": "nichod/engine/nichod-verified-feed.js",
+      "exists": true,
+      "size": 6059
+    },
+    {
+      "file": "nichod/engine/nichod-cbt-metadata-bridge.js",
+      "exists": true,
+      "size": 3697
+    },
+    {
+      "file": "nichod/engine/nichod-posttest-bridge.js",
+      "exists": true,
+      "size": 8694
+    }
+  ],
+  "syntax": {
+    "checked": 12,
+    "failures": []
+  },
+  "references": {
+    "cbt.html": {
+      "exists": true,
+      "unified": true,
+      "health": true,
+      "pdfBridge": false,
+      "rankerFeed": false,
+      "unseen": false,
+      "generation": false,
+      "review": false,
+      "authoring": false,
+      "authoringUI": false,
+      "verified": false,
+      "metadata": true,
+      "postTest": true
+    },
+    "pdf-to-cbt.v317.html": {
+      "exists": true,
+      "unified": true,
+      "health": true,
+      "pdfBridge": true,
+      "rankerFeed": false,
+      "unseen": false,
+      "generation": false,
+      "review": false,
+      "authoring": false,
+      "authoringUI": false,
+      "verified": false,
+      "metadata": false,
+      "postTest": false
+    },
+    "rankers-test-series.html": {
+      "exists": true,
+      "unified": true,
+      "health": true,
+      "pdfBridge": false,
+      "rankerFeed": true,
+      "unseen": true,
+      "generation": true,
+      "review": true,
+      "authoring": true,
+      "authoringUI": true,
+      "verified": true,
+      "metadata": false,
+      "postTest": false
+    }
+  },
+  "html": {
+    "cbt.html": {
+      "totalScripts": 22,
+      "nichodScripts": [
+        "./nichod/engine/nichod-cbt-metadata-bridge.js",
+        "./nichod/engine/nichod-posttest-bridge.js",
+        "./nichod/engine/nichod-unified-orchestrator.js",
+        "./nichod/engine/nichod-system-health.js"
+      ],
+      "missingLocalScripts": []
+    },
+    "pdf-to-cbt.v317.html": {
+      "totalScripts": 6,
+      "nichodScripts": [
+        "./nichod/engine/pdf-nichod-bridge.js",
+        "./nichod/engine/nichod-unified-orchestrator.js",
+        "./nichod/engine/nichod-system-health.js"
+      ],
+      "missingLocalScripts": []
+    },
+    "rankers-test-series.html": {
+      "totalScripts": 15,
+      "nichodScripts": [
+        "./pcb-nichod-ranker.js",
+        "./nichod/engine/nichod-ranker-feed.js",
+        "./nichod/engine/nichod-unseen-generator.js",
+        "./nichod/engine/nichod-generation-bridge.js",
+        "./nichod/engine/nichod-review-ui.js",
+        "./nichod/engine/nichod-authoring-engine.js",
+        "./nichod/engine/nichod-authoring-ui.js",
+        "./nichod/engine/nichod-verified-feed.js",
+        "./nichod/engine/nichod-unified-orchestrator.js",
+        "./nichod/engine/nichod-system-health.js"
+      ],
+      "missingLocalScripts": []
+    }
+  },
+  "subjects": {
+    "test180-questions.json": {
+      "exists": true,
+      "Physics": true,
+      "Chemistry": true,
+      "Biology": true
+    },
+    "test180-questions.js": {
+      "exists": true,
+      "Physics": true,
+      "Chemistry": true,
+      "Biology": true
+    }
+  },
+  "git": {
+    "branch": "main",
+    "commit": "dca57fd Add unified PCB NICHOD pipeline health and subject validation",
+    "status": "?? nichod/engine/nichod-runtime-test.js\n?? pdf-to-cbt.v317.before-nichod-20260909-084557.html\n?? test180-questions.js.before-final-ui-20260908-165833"
+  },
+  "failures": {
+    "missingFiles": [],
+    "missingReferences": [],
+    "syntaxFailures": []
+  },
+  "status": "PASS"
+}
