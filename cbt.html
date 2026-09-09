@@ -2166,10 +2166,11 @@ startButton.addEventListener(
 
               try {
 
-                return
+                return (
                   typeof normalizeQuestion === "function"
                     ? normalizeQuestion(q, i)
-                    : q;
+                    : q
+                );
 
               } catch (_) {
 
@@ -5690,4 +5691,4 @@ window.addEventListener("load", function () {
 
 </body>
 
-</html>\n
+</html>\n\n
