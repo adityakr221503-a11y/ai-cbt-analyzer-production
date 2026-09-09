@@ -1358,14 +1358,7 @@ const CBT_PDF_QUESTIONS =
     ? (function () {
         try {
           const raw =
-            /* PDF CBT ISOLATION — fresh imported test has priority */
-const __PDF_ACTIVE_QUESTIONS__ =
-  sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
-
-const __PDF_ACTIVE_SOURCE__ =
-  sessionStorage.getItem("CBT_ACTIVE_SOURCE");
-
-sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+            sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
 
           const data = raw ? JSON.parse(raw) : [];
 
