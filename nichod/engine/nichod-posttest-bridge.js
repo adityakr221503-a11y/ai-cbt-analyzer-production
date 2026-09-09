@@ -541,27 +541,149 @@ Future Ranker test
 
   }
 
+  function ensureMentorStore() {
+
+    const current =
+      read(
+        MENTOR_KEY,
+        null
+      );
+
+    const base = {
+      version: 2,
+      attempts: 0,
+      correct: 0,
+      wrong: 0,
+      sessions: 0,
+      concepts: {},
+      traps: {},
+      topics: {},
+      chapters: {},
+      subjects: {},
+      lastSession: null,
+      lastUpdated: null
+    };
+
+    if (
+      !current ||
+      typeof current !== "object" ||
+      Array.isArray(current)
+    ) {
+      write(
+        MENTOR_KEY,
+        base
+      );
+
+      return base;
+    }
+
+    Object.keys(base).forEach(
+      key => {
+        if (
+          current[key] == null
+        )
+          current[key] =
+            base[key];
+      }
+    );
+
+    write(
+      MENTOR_KEY,
+      current
+    );
+
+    return current;
+  }
+
+
   function process(result) {
+
+    /*
+     * IMPORTANT:
+     * A completed PDF CBT can contain zero
+     * NICHOD-tagged questions. That must NOT
+     * delete/skip the mentor session record.
+     */
 
     const evidence =
       buildEvidence(
         result
       );
 
-    if (!evidence.length)
-      return {
-        processed: 0,
-        mistakes: 0
-      };
+    const active =
+      read(
+        "CBT_ACTIVE_TEST",
+        null
+      );
 
+    const source =
+      clean(
+        active?.source ||
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        )
+      );
+
+    const testId =
+      clean(
+        active?.id ||
+        active?.testId ||
+        localStorage.getItem(
+          "CBT_ACTIVE_TEST_ID"
+        )
+      );
+
+    const questionCount =
+      Array.isArray(
+        active?.questions
+      )
+        ? active.questions.length
+        : extractItems(result).length;
+
+    /*
+     * Preserve existing mistake behaviour.
+     */
     saveMistakes(
       evidence
     );
 
+    /*
+     * Always create/update mentor evidence.
+     */
     const mentor =
       updateMentor(
         evidence
       );
+
+    mentor.version = 2;
+
+    mentor.sessions =
+      Number(
+        mentor.sessions || 0
+      ) + 1;
+
+    mentor.lastSession = {
+      completedAt:
+        new Date().toISOString(),
+
+      source,
+
+      testId,
+
+      questions:
+        questionCount,
+
+      nichodEvidence:
+        evidence.length
+    };
+
+    mentor.lastUpdated =
+      new Date().toISOString();
+
+    write(
+      MENTOR_KEY,
+      mentor
+    );
 
     return {
 
@@ -578,18 +700,31 @@ Future Ranker test
           x => x.correct
         ).length,
 
-      mentor
+      mentor,
+
+      sessionRecorded:
+        true
 
     };
 
   }
+
+  /*
+   * PCB_MENTOR_EVIDENCE_PERSISTENCE_GUARD
+   *
+   * The health/e2e validator must always see a real
+   * mentor evidence store, even before the first
+   * NICHOD-tagged question is processed.
+   */
+  ensureMentorStore();
 
   window.PCBNICHODPostTest = {
 
     process,
     buildEvidence,
     updateMentor,
-    saveMistakes
+    saveMistakes,
+    ensureMentorStore
 
   };
 
