@@ -5705,173 +5705,216 @@ window.addEventListener("load", function () {
 </script>
 
 
+
+
+
+
 <script>
 /* =====================================================
-   PCB_DIRECT_AUTHORITATIVE_START_V3
-   PDF + RANKER -> DIRECT EXISTING CBT SCREEN
-   Bypasses conflicting legacy start listeners.
+   PCB_SINGLE_START_FINAL
+   ONE Start handler for PDF + Ranker
 ===================================================== */
 (function () {
+
+  function readJSON(key) {
+    try {
+      const a = sessionStorage.getItem(key);
+      if (a) return JSON.parse(a);
+    } catch (_) {}
+
+    try {
+      const b = localStorage.getItem(key);
+      if (b) return JSON.parse(b);
+    } catch (_) {}
+
+    return null;
+  }
+
+  function getQuestions() {
+
+    const active =
+      readJSON("CBT_ACTIVE_TEST");
+
+    if (
+      active &&
+      Array.isArray(active.questions) &&
+      active.questions.length
+    ) {
+      return {
+        source: active.source || "PDF Import",
+        title: active.title || "Imported CBT",
+        duration: Number(active.duration) || 180,
+        questions: active.questions
+      };
+    }
+
+    const keys = [
+      "CBT_ACTIVE_QUESTIONS",
+      "pdfCbtQuestions",
+      "pdfQuestions",
+      "importedQuestions",
+      "cbtQuestions",
+      "questionBank"
+    ];
+
+    for (const key of keys) {
+
+      const data = readJSON(key);
+
+      if (Array.isArray(data) && data.length) {
+        return {
+          source: key === "pdfCbtQuestions" ||
+                  key === "pdfQuestions"
+                    ? "PDF Import"
+                    : "Rankers Test Series",
+          title: "Imported CBT",
+          duration: 180,
+          questions: data
+        };
+      }
+
+      if (
+        data &&
+        Array.isArray(data.questions) &&
+        data.questions.length
+      ) {
+        return {
+          source: data.source || "PDF Import",
+          title: data.title || "Imported CBT",
+          duration: Number(data.duration) || 180,
+          questions: data.questions
+        };
+      }
+    }
+
+    return null;
+  }
+
+  function startDirect(event) {
+
+    const active = getQuestions();
+
+    if (!active)
+      return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    try {
+
+      let qs = active.questions.slice();
+
+      if (typeof normalizeQuestion === "function") {
+
+        qs = qs.map(function (q, i) {
+
+          try {
+            return normalizeQuestion(q, i);
+          } catch (_) {
+            return q;
+          }
+
+        }).filter(Boolean);
+
+      }
+
+      if (!qs.length)
+        throw new Error("No valid questions found");
+
+      /*
+       * Use the existing CBT state variables.
+       */
+      selectedQuestions = qs;
+
+      selectedTest = {
+        id:
+          "pcb-" +
+          String(active.source || "import")
+            .toLowerCase()
+            .replace(/\s+/g, "-"),
+
+        title:
+          active.title ||
+          (
+            active.source === "PDF Import"
+              ? "PDF Imported CBT"
+              : "Rankers Test Series"
+          ),
+
+        duration:
+          Number(active.duration) > 0
+            ? Number(active.duration)
+            : 180
+      };
+
+      currentIndex = 0;
+      answers = {};
+      visitedQuestions = new Set();
+      reviewQuestions = new Set();
+      submitted = false;
+
+      remainingSeconds =
+        Number(selectedTest.duration) * 60;
+
+      /*
+       * THE ONLY SCREEN TRANSITION
+       */
+      setupScreen.classList.add("hidden");
+      resultScreen.classList.add("hidden");
+      cbtScreen.classList.remove("hidden");
+
+      testTitle.textContent =
+        selectedTest.title +
+        " — " +
+        selectedQuestions.length +
+        " Questions";
+
+      renderQuestion();
+      renderPalette();
+
+      if (typeof startTimer === "function")
+        startTimer();
+
+      console.log(
+        "✅ PCB SINGLE START:",
+        active.source,
+        selectedQuestions.length
+      );
+
+    } catch (error) {
+
+      console.error(
+        "❌ PCB SINGLE START FAILED:",
+        error
+      );
+
+      alert(
+        "CBT start failed: " +
+        (error.message || error)
+      );
+
+    }
+
+  }
 
   function install() {
 
     const btn =
       document.getElementById("startButton");
 
-    if (!btn || btn.__pcbDirectStartV3)
+    if (!btn || btn.__pcbSingleStartFinal)
       return;
 
-    btn.__pcbDirectStartV3 = true;
+    btn.__pcbSingleStartFinal = true;
 
+    /*
+     * Capture phase guarantees this runs before
+     * the old target/bubble Start handlers.
+     */
     btn.addEventListener(
       "click",
-      function (event) {
-
-        let active = null;
-
-        try {
-
-          const raw =
-            sessionStorage.getItem("CBT_ACTIVE_TEST") ||
-            localStorage.getItem("CBT_ACTIVE_TEST");
-
-          if (raw)
-            active = JSON.parse(raw);
-
-        } catch (e) {
-
-          console.error(
-            "PCB DIRECT START: storage parse failed",
-            e
-          );
-
-        }
-
-        if (
-          !active ||
-          !Array.isArray(active.questions) ||
-          !active.questions.length ||
-          (
-            active.source !== "PDF Import" &&
-            active.source !== "Rankers Test Series"
-          )
-        ) {
-
-          return;
-
-        }
-
-        /*
-         * This listener runs in capture phase.
-         * Stop all older/competing Start handlers.
-         */
-        event.preventDefault();
-        event.stopImmediatePropagation();
-
-        try {
-
-          const qs =
-            active.questions
-              .map(function (q, i) {
-
-                try {
-
-                  return (
-                    typeof normalizeQuestion === "function"
-                      ? normalizeQuestion(q, i)
-                      : q
-                  );
-
-                } catch (_) {
-
-                  return q;
-
-                }
-
-              })
-              .filter(Boolean);
-
-          /*
-           * The return expression above must stay valid
-           * even when the source question is already normalized.
-           */
-          const finalQuestions =
-            qs.length
-              ? qs
-              : active.questions;
-
-          selectedQuestions =
-            finalQuestions;
-
-          selectedTest = {
-
-            id:
-              active.id ||
-              (
-                active.source === "PDF Import"
-                  ? "pdf-import"
-                  : "rankers-test-series"
-              ),
-
-            title:
-              active.title ||
-              (
-                active.source === "PDF Import"
-                  ? "PDF Imported CBT"
-                  : "Rankers Test Series"
-              ),
-
-            duration:
-              Number(active.duration) > 0
-                ? Number(active.duration)
-                : 180
-
-          };
-
-          currentIndex = 0;
-          answers = {};
-          visitedQuestions = new Set();
-          reviewQuestions = new Set();
-          submitted = false;
-
-          remainingSeconds =
-            Number(selectedTest.duration) * 60;
-
-          /*
-           * DIRECT SCREEN SWITCH
-           */
-          setupScreen.classList.add("hidden");
-          resultScreen.classList.add("hidden");
-          cbtScreen.classList.remove("hidden");
-
-          testTitle.textContent =
-            selectedTest.title;
-
-          renderQuestion();
-          renderPalette();
-          startTimer();
-
-          console.log(
-            "✅ PCB DIRECT CBT STARTED:",
-            active.source,
-            selectedQuestions.length
-          );
-
-        } catch (error) {
-
-          console.error(
-            "❌ PCB DIRECT CBT START FAILED:",
-            error
-          );
-
-          alert(
-            "CBT start failed: " +
-            (error.message || error)
-          );
-
-        }
-
-      },
+      startDirect,
       true
     );
 
