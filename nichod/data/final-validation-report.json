@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-09-09T03:35:59.299Z",
+  "generatedAt": "2026-09-09T03:36:27.342Z",
   "repository": "ai-cbt-analyzer-production",
   "pipeline": [
     "PDF",
@@ -12,10 +12,10 @@
     "Mentor",
     "Adaptive Next Test"
   ],
-  "passed": 112,
-  "failed": 2,
-  "total": 114,
-  "status": "ATTENTION",
+  "passed": 116,
+  "failed": 0,
+  "total": 116,
+  "status": "PASS",
   "results": [
     {
       "name": "FILE pdf-to-cbt.v317.html",
@@ -284,12 +284,12 @@
     },
     {
       "name": "RANKER nichod-cbt-metadata-bridge.js",
-      "status": "FAIL",
+      "status": "PASS",
       "detail": ""
     },
     {
       "name": "RANKER nichod-posttest-bridge.js",
-      "status": "FAIL",
+      "status": "PASS",
       "detail": ""
     },
     {
@@ -441,6 +441,16 @@
       "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-verified-feed.js",
       "status": "PASS",
       "detail": "nichod/engine/nichod-verified-feed.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-cbt-metadata-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-cbt-metadata-bridge.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-posttest-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-posttest-bridge.js"
     },
     {
       "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-unified-orchestrator.js",
