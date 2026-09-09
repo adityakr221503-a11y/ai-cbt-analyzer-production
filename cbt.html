@@ -4455,6 +4455,35 @@ console.log(
       }
     })();
 
+  /*
+   * PCB_AUTHORITATIVE_SESSION_GUARD
+   *
+   * PDF Import / Rankers Test Series sessions are independent
+   * CBT sessions. Once CBT_ACTIVE_TEST contains one of these
+   * sources, legacy Test-180 / fallback boot code must not replace
+   * its question bank.
+   */
+  const PCB_AUTHORITATIVE_SESSION =
+    !!authoritativeActive &&
+    (
+      authoritativeActive.source === "PDF Import" ||
+      authoritativeActive.source === "Rankers Test Series"
+    );
+
+  if (PCB_AUTHORITATIVE_SESSION) {
+    window.__PCB_AUTHORITATIVE_SESSION__ =
+      authoritativeActive;
+
+    window.__PCB_SKIP_LEGACY_TEST180__ = true;
+
+    console.log(
+      "🔒 PCB authoritative CBT session:",
+      authoritativeActive.source,
+      authoritativeActive.questions.length,
+      "questions"
+    );
+  }
+
   const isImportedOrRanker =
     !!authoritativeActive &&
     (
