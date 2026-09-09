@@ -1,0 +1,591 @@
+{
+  "version": 2,
+  "generatedAt": "2026-09-09T03:35:59.299Z",
+  "repository": "ai-cbt-analyzer-production",
+  "pipeline": [
+    "PDF",
+    "NICHOD",
+    "Ranker",
+    "CBT",
+    "Result",
+    "Mistake Bank",
+    "Mentor",
+    "Adaptive Next Test"
+  ],
+  "passed": 112,
+  "failed": 2,
+  "total": 114,
+  "status": "ATTENTION",
+  "results": [
+    {
+      "name": "FILE pdf-to-cbt.v317.html",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE rankers-test-series.html",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE cbt.html",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-ingest.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/pyq-pipeline.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/pdf-nichod-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-ranker-feed.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-unseen-generator.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-generation-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-review-ui.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-authoring-engine.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-authoring-ui.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-verified-feed.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-cbt-metadata-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-posttest-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-unified-orchestrator.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-system-health.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-runtime-test.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "FILE nichod/engine/nichod-e2e-harness.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-ingest.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/pyq-pipeline.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/pdf-nichod-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-ranker-feed.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-unseen-generator.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-generation-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-review-ui.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-authoring-engine.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-authoring-ui.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-verified-feed.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-cbt-metadata-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-posttest-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-unified-orchestrator.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-system-health.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-runtime-test.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "SYNTAX nichod/engine/nichod-e2e-harness.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "PDF.js local vendor",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "PDF storage key",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "PDF NICHOD bridge",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "PDF unified orchestrator",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "PDF health monitor",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "PDF E2E harness",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER question-bank.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER import-test180.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER ranker-v11-real-lifecycle.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER cbt-unified-core.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER pcb-nichod-ranker.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-ranker-feed.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-unseen-generator.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-generation-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-review-ui.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-authoring-engine.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-authoring-ui.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-verified-feed.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-cbt-metadata-bridge.js",
+      "status": "FAIL",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-posttest-bridge.js",
+      "status": "FAIL",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-unified-orchestrator.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-system-health.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "RANKER nichod-e2e-harness.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Ranker selection storage",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Ranker CBT source",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "CBT nichod-cbt-metadata-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "CBT nichod-posttest-bridge.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "CBT nichod-unified-orchestrator.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "CBT nichod-system-health.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "CBT nichod-e2e-harness.js",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "CBT history",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./test180-questions.js",
+      "status": "PASS",
+      "detail": "test180-questions.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./vendor/pdf.min.js",
+      "status": "PASS",
+      "detail": "vendor/pdf.min.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/pdf-nichod-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/pdf-nichod-bridge.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/nichod-unified-orchestrator.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-unified-orchestrator.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/nichod-system-health.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-system-health.js"
+    },
+    {
+      "name": "REF pdf-to-cbt.v317.html -> ./nichod/engine/nichod-e2e-harness.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-e2e-harness.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> rank-booster/question-bank.js",
+      "status": "PASS",
+      "detail": "rank-booster/question-bank.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> rank-booster/import-test180.js",
+      "status": "PASS",
+      "detail": "rank-booster/import-test180.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./ranker-v8-unified-lifecycle.js",
+      "status": "PASS",
+      "detail": "ranker-v8-unified-lifecycle.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./ranker-v11-real-lifecycle.js",
+      "status": "PASS",
+      "detail": "ranker-v11-real-lifecycle.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./pcb-nichod-ranker.js",
+      "status": "PASS",
+      "detail": "pcb-nichod-ranker.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-ranker-feed.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-ranker-feed.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-unseen-generator.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-unseen-generator.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-generation-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-generation-bridge.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./cbt-unified-core.js",
+      "status": "PASS",
+      "detail": "cbt-unified-core.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-review-ui.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-review-ui.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-authoring-engine.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-authoring-engine.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-authoring-ui.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-authoring-ui.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-verified-feed.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-verified-feed.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-unified-orchestrator.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-unified-orchestrator.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-system-health.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-system-health.js"
+    },
+    {
+      "name": "REF rankers-test-series.html -> ./nichod/engine/nichod-e2e-harness.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-e2e-harness.js"
+    },
+    {
+      "name": "REF cbt.html -> rank-booster/question-bank.js",
+      "status": "PASS",
+      "detail": "rank-booster/question-bank.js"
+    },
+    {
+      "name": "REF cbt.html -> ranker-common-engine.js",
+      "status": "PASS",
+      "detail": "ranker-common-engine.js"
+    },
+    {
+      "name": "REF cbt.html -> orbit-engine.js",
+      "status": "PASS",
+      "detail": "orbit-engine.js"
+    },
+    {
+      "name": "REF cbt.html -> ./cbt-core-preservation-v1.js",
+      "status": "PASS",
+      "detail": "cbt-core-preservation-v1.js"
+    },
+    {
+      "name": "REF cbt.html -> ./cbt-core-v2.js",
+      "status": "PASS",
+      "detail": "cbt-core-v2.js"
+    },
+    {
+      "name": "REF cbt.html -> ./cbt-core-v3.js",
+      "status": "PASS",
+      "detail": "cbt-core-v3.js"
+    },
+    {
+      "name": "REF cbt.html -> ./cbt-core-v4.js",
+      "status": "PASS",
+      "detail": "cbt-core-v4.js"
+    },
+    {
+      "name": "REF cbt.html -> ./cbt-core-v5.js",
+      "status": "PASS",
+      "detail": "cbt-core-v5.js"
+    },
+    {
+      "name": "REF cbt.html -> ./cbt-core-v6.js",
+      "status": "PASS",
+      "detail": "cbt-core-v6.js"
+    },
+    {
+      "name": "REF cbt.html -> ./ranker-v11-runtime-fix.js",
+      "status": "PASS",
+      "detail": "ranker-v11-runtime-fix.js"
+    },
+    {
+      "name": "REF cbt.html -> ./basic-foundation-hardening-v1.js",
+      "status": "PASS",
+      "detail": "basic-foundation-hardening-v1.js"
+    },
+    {
+      "name": "REF cbt.html -> ./pdf-cbt-cbt-bridge.js",
+      "status": "PASS",
+      "detail": "pdf-cbt-cbt-bridge.js"
+    },
+    {
+      "name": "REF cbt.html -> ./test180-questions.js",
+      "status": "PASS",
+      "detail": "test180-questions.js"
+    },
+    {
+      "name": "REF cbt.html -> ./ranker-v8-unified-lifecycle.js",
+      "status": "PASS",
+      "detail": "ranker-v8-unified-lifecycle.js"
+    },
+    {
+      "name": "REF cbt.html -> ./cbt-behavior-v9.js",
+      "status": "PASS",
+      "detail": "cbt-behavior-v9.js"
+    },
+    {
+      "name": "REF cbt.html -> ./ranker-v10-adaptive-engine.js",
+      "status": "PASS",
+      "detail": "ranker-v10-adaptive-engine.js"
+    },
+    {
+      "name": "REF cbt.html -> ./ranker-v11-real-lifecycle.js",
+      "status": "PASS",
+      "detail": "ranker-v11-real-lifecycle.js"
+    },
+    {
+      "name": "REF cbt.html -> ./cbt-unified-core.js",
+      "status": "PASS",
+      "detail": "cbt-unified-core.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/nichod-cbt-metadata-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-cbt-metadata-bridge.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/nichod-posttest-bridge.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-posttest-bridge.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/nichod-unified-orchestrator.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-unified-orchestrator.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/nichod-system-health.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-system-health.js"
+    },
+    {
+      "name": "REF cbt.html -> ./nichod/engine/nichod-e2e-harness.js",
+      "status": "PASS",
+      "detail": "nichod/engine/nichod-e2e-harness.js"
+    },
+    {
+      "name": "NICHOD schema",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "NICHOD imports directory",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Runtime health report",
+      "status": "PASS",
+      "detail": ""
+    }
+  ]
+}
