@@ -3702,3 +3702,126 @@ console.log(
 <script src="./nichod/engine/unified-test-library-ui.js"></script>
 
 <script src="./nichod/engine/cbt-live-source-panel.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  /*
+   * PCB_NICHOD_PRODUCTION_UI_CLEANUP
+   *
+   * These are internal diagnostics only.
+   * Keep all engines/bridges/storage alive, but never
+   * expose debugging overlays to students.
+   */
+
+  const markers = [
+    "PCB NICHOD HEALTH",
+    "PDF → CBT DIAGNOSTIC",
+    "PCB CBT LIVE SOURCE",
+    "PCB NICHOD LIVE"
+  ];
+
+  function clean() {
+
+    const ids = [
+      "nichodHealthPanel",
+      "pcbCbtLiveSourcePanel"
+    ];
+
+    ids.forEach(function (id) {
+
+      const el =
+        document.getElementById(id);
+
+      if (el)
+        el.remove();
+
+    });
+
+    document
+      .querySelectorAll(
+        "div,section,aside,pre"
+      )
+      .forEach(function (el) {
+
+        if (!el || el === document.body)
+          return;
+
+        const text =
+          String(
+            el.textContent || ""
+          )
+          .replace(/\s+/g, " ")
+          .trim()
+          .toUpperCase();
+
+        if (!text)
+          return;
+
+        const matched =
+          markers.some(function (marker) {
+            return text.startsWith(marker);
+          });
+
+        /*
+         * Prevent accidentally hiding a large page container.
+         * Diagnostic cards are relatively small.
+         */
+        if (
+          matched &&
+          text.length < 6000
+        ) {
+          el.style.setProperty(
+            "display",
+            "none",
+            "important"
+          );
+
+          el.setAttribute(
+            "data-pcb-nichod-debug-hidden",
+            "true"
+          );
+        }
+
+      });
+  }
+
+  function boot() {
+
+    clean();
+
+    if (window.MutationObserver) {
+
+      new MutationObserver(
+        clean
+      ).observe(
+        document.documentElement,
+        {
+          childList: true,
+          subtree: true
+        }
+      );
+
+    }
+
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      { once: true }
+    );
+
+  } else {
+
+    boot();
+
+  }
+
+})();
+</script>

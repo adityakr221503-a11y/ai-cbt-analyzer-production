@@ -43,77 +43,20 @@
   }
 
   function render() {
-    let panel = document.getElementById("pcbCbtLiveSourcePanel");
+    /*
+     * Live source inspection remains available through
+     * window.PCB_CBT_LIVE_SOURCE_PANEL.inspect().
+     * The floating diagnostic panel is production-hidden.
+     */
+    const panel =
+      document.getElementById(
+        "pcbCbtLiveSourcePanel"
+      );
 
-    if (!panel) {
-      panel = document.createElement("div");
-      panel.id = "pcbCbtLiveSourcePanel";
+    if (panel)
+      panel.remove();
 
-      panel.style.cssText =
-        "display:none !important;" +
-        "position:fixed;left:12px;right:12px;bottom:12px;" +
-        "z-index:999999;background:#111827;color:#fff;" +
-        "padding:12px;border-radius:14px;" +
-        "font:13px/1.5 system-ui,sans-serif;" +
-        "box-shadow:0 8px 30px rgba(0,0,0,.3);" +
-        "max-height:42vh;overflow:auto;" +
-        "pointer-events:none;";
-
-      document.body.appendChild(panel);
-    }
-
-    panel.style.setProperty(
-      "display",
-      "none",
-      "important"
-    );
-
-    panel.style.setProperty(
-      "pointer-events",
-      "none",
-      "important"
-    );
-
-    const x = inspect();
-
-    panel.innerHTML =
-      "<b>PCB CBT LIVE SOURCE</b>" +
-      "<div>Source: " + escapeHtml(x.source) + "</div>" +
-      "<div>Test ID: " + escapeHtml(x.testId) + "</div>" +
-      "<div>Active Questions: <b>" + x.questions + "</b></div>" +
-      "<div>PDF Bank: " + x.pdfQuestions + "</div>" +
-      "<div>Ranker Bank: " + x.rankerQuestions + "</div>" +
-      "<div>Authoritative: " +
-      (x.authoritative ? "✅ YES" : "❌ NO") +
-      "</div>" +
-      "<div style='display:flex;gap:8px;margin-top:8px;'>" +
-      "<button id='pcbCbtLiveRefresh' " +
-      "style='padding:7px 10px;border:0;border-radius:8px;cursor:pointer'>" +
-      "Refresh</button>" +
-      "<button id='pcbCbtLiveMinimize' " +
-      "style='padding:7px 10px;border:0;border-radius:8px;cursor:pointer'>" +
-      "Minimize</button>" +
-      "</div>";
-
-    document.getElementById("pcbCbtLiveRefresh").onclick = render;
-
-    document.getElementById("pcbCbtLiveMinimize").onclick =
-      function () {
-        panel.style.maxHeight = "42px";
-        panel.style.overflow = "hidden";
-
-        const buttons =
-          panel.querySelectorAll("button");
-
-        if (buttons.length > 1) {
-          buttons[1].textContent = "Open";
-          buttons[1].onclick = function () {
-            panel.style.maxHeight = "42vh";
-            panel.style.overflow = "auto";
-            buttons[1].textContent = "Minimize";
-          };
-        }
-      };
+    return null;
   }
 
   function escapeHtml(value) {
