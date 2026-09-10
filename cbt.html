@@ -1178,6 +1178,47 @@
 })();
 </script>
 
+
+<script>
+/* ============================================================
+   AUTHORITATIVE PDF CBT RESOLVER
+   ============================================================ */
+(function () {
+  "use strict";
+
+  const MAX = 180;
+  const KEY = "CBT_ISO_V2_PDF_SELECTION";
+
+  function read() {
+    try {
+      const x = JSON.parse(
+        localStorage.getItem(KEY) || "[]"
+      );
+      return Array.isArray(x) ? x : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  window.getAuthoritativePDFQuestions = function () {
+    return read().slice(0, MAX);
+  };
+
+  /*
+   * Legacy PDF pool must never directly become
+   * the active PDF CBT.
+   */
+  window.__PDF_CBT_MAX_QUESTIONS__ = MAX;
+
+  console.log(
+    "AUTHORITATIVE PDF CBT:",
+    window.getAuthoritativePDFQuestions().length,
+    "/",
+    MAX
+  );
+})();
+</script>
+
 </head>
 
 <body>
@@ -5818,7 +5859,7 @@ window.addEventListener("load", function () {
   function render() {
 
     const pdf =
-      getJSON("pdfCbtQuestions");
+      window.getIsolatedPDFCBTQuestions ? window.getIsolatedPDFCBTQuestions() : [];
 
     const selected =
       getJSON("rbSelectedQuestions");
@@ -5894,7 +5935,7 @@ window.addEventListener("load", function () {
 
       pdfQuestions:
         lengthOf(
-          getJSON("pdfCbtQuestions")
+          window.getIsolatedPDFCBTQuestions ? window.getIsolatedPDFCBTQuestions() : []
         ),
 
       selectedQuestions:
