@@ -460,44 +460,136 @@ function normalizeQuestion(q, index) {
     const document =
       await loadingTask.promise;
 
-    const pages = [];
+    /*
+     * Rebuild real PDF lines using PDF.js coordinates.
+     * Do not flatten every text item into one giant string.
+     */
+    function pageToLines(items) {
+      const rows = [];
+
+      for (const item of items || []) {
+        const value =
+          String(item.str || "").trim();
+
+        if (!value) continue;
+
+        const tr =
+          Array.isArray(item.transform)
+            ? item.transform
+            : [];
+
+        const x =
+          Number(tr[4] || 0);
+
+        const y =
+          Number(tr[5] || 0);
+
+        let row = null;
+
+        for (const r of rows) {
+          if (Math.abs(r.y - y) <= 3.5) {
+            row = r;
+            break;
+          }
+        }
+
+        if (!row) {
+          row = {
+            y: y,
+            items: []
+          };
+
+          rows.push(row);
+        }
+
+        row.items.push({
+          x: x,
+          text: value
+        });
+      }
+
+      rows.sort(function (a, b) {
+        return b.y - a.y;
+      });
+
+      return rows
+        .map(function (row) {
+          row.items.sort(function (a, b) {
+            return a.x - b.x;
+          });
+
+          return row.items
+            .map(function (x) {
+              return x.text;
+            })
+            .join(" ")
+            .replace(/\s+/g, " ")
+            .trim();
+        })
+        .filter(Boolean);
+    }
+
+    const allLines = [];
 
     for (
-      let i = 1;
-      i <= document.numPages;
-      i++
+      let pageNo = 1;
+      pageNo <= document.numPages;
+      pageNo++
     ) {
       const page =
-        await document.getPage(i);
+        await document.getPage(pageNo);
 
       const content =
         await page.getTextContent();
 
-      const text =
-        content.items
-          .map(x => x.str || "")
-          .join(" ");
+      const lines =
+        pageToLines(
+          content.items
+        );
 
-      pages.push(text);
+      allLines.push.apply(
+        allLines,
+        lines
+      );
     }
 
     const fullText =
-      pages.join("\n");
+      allLines.join("\n");
 
+    /*
+     * Primary parser.
+     *
+     * Question numbers are recognized only when they
+     * begin a reconstructed PDF line.
+     *
+     * Therefore text such as:
+     * "conductor 11 . dFku ..."
+     * cannot become Question 11.
+     */
     let questions =
       parseBlocks(fullText);
 
-    if (
-      questions.length === 0
-    ) {
+    /*
+     * Keep loose parser only as fallback for PDFs whose
+     * primary line parser finds nothing.
+     */
+    if (!questions.length) {
       questions =
-        parseNumberedLoose(
-          fullText
-        );
+        parseNumberedLoose(fullText);
     }
 
     questions =
       dedupe(questions);
+
+    /*
+     * HARD CBT LIMIT.
+     *
+     * One PDF CBT can never launch with more than 180.
+     */
+    if (questions.length > 180) {
+      questions =
+        questions.slice(0, 180);
+    }
 
     if (!questions.length) {
       throw new Error(
@@ -525,7 +617,7 @@ function normalizeQuestion(q, index) {
     return {
       success: true,
 
-      test,
+      test: test,
 
       questionCount:
         questions.length,
@@ -535,10 +627,89 @@ function normalizeQuestion(q, index) {
     };
   }
 
+
   window.PCBUniversalPDFParser = {
     parsePdfDocument,
     parseBlocks,
     normalizeQuestion
   };
 
+})();
+
+
+
+/* ============================================================
+   FINAL PDF CBT TEXT SAFETY LAYER
+   English-first + legacy-font noise protection
+   ============================================================ */
+(function () {
+  function cleanPdfText(value) {
+    if (value == null) return "";
+
+    let s = String(value)
+      .replace(/\u00a0/g, " ")
+      .replace(/\r\n?/g, "\n");
+
+    /*
+     * Do NOT translate English.
+     * Remove only obvious legacy-Hindi-font extraction fragments
+     * when clean English content exists in the same line.
+     */
+    const legacy = [
+      "dFku","dkj.k","pkyd","lEiw.kZ","nksuksa",
+      "lgh","O;k[;k","LFkkukUrfjr","lEHko","foyfxr",
+      "vkos'k","nwljs","nwljs","LFkkukUrfjr"
+    ];
+
+    const isLegacy = function (x) {
+      return legacy.some(function (m) {
+        return String(x).includes(m);
+      });
+    };
+
+    const lines = s.split("\n");
+    const out = [];
+
+    for (const line of lines) {
+      if (!isLegacy(line)) {
+        out.push(line);
+        continue;
+      }
+
+      /*
+       * If a line contains recognizable English, preserve the
+       * English portion and discard legacy-font noise.
+       */
+      const english = line.match(
+        /(?:Assertion|Reason|Question|Which|What|The|A|An|After|Before|Find|Calculate|Consider|Statement|Option)\b.*$/i
+      );
+
+      if (english && english[0].length >= 12) {
+        out.push(english[0].trim());
+        continue;
+      }
+
+      /*
+       * Remove only known legacy tokens.
+       */
+      let x = line;
+      for (const token of legacy) {
+        x = x.split(token).join(" ");
+      }
+
+      x = x
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+      if (x) out.push(x);
+    }
+
+    return out
+      .join("\n")
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  window.cleanPdfText = cleanPdfText;
 })();
