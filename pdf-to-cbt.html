@@ -922,6 +922,60 @@
 })();
 </script>
 
+
+<script>
+/* ============================================================
+   FINAL PDF CBT ALLOCATION CONTROLLER
+   ============================================================ */
+(function () {
+  window.PDF_CBT_MAX_QUESTIONS = 180;
+
+  function pdfFinalUnique(list) {
+    const seen = new Set();
+
+    return (Array.isArray(list) ? list : []).filter(function (q, i) {
+      if (!q || typeof q !== "object") return false;
+
+      const id = String(
+        q.id ||
+        q.questionId ||
+        q.uid ||
+        ("pdf-q-" + i)
+      );
+
+      if (seen.has(id)) return false;
+
+      seen.add(id);
+      return true;
+    });
+  }
+
+  window.finalizePDFQuestions = function (questions) {
+    const clean = pdfFinalUnique(questions);
+
+    /*
+     * Preserve FULL question objects.
+     * Only allocation count is limited.
+     */
+    return clean.slice(
+      0,
+      window.PDF_CBT_MAX_QUESTIONS
+    );
+  };
+
+  window.finalCleanPDFText = function (value) {
+    if (typeof window.cleanPdfText === "function") {
+      return window.cleanPdfText(value);
+    }
+
+    return String(value == null ? "" : value)
+      .replace(/\u00a0/g, " ")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  };
+})();
+</script>
+
 </head>
 
 
