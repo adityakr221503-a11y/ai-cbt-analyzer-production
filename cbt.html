@@ -1041,6 +1041,143 @@
 })();
 </script>
 
+
+<script>
+/* ============================================================
+   FINAL PDF CBT LAUNCH SAFETY
+   ============================================================ */
+(function () {
+  const PDF_KEYS = [
+    "CBT_ISO_V2_PDF_QUESTIONS",
+    "CBT_ISO_V2_PDF_SELECTION"
+  ];
+
+  function readJSON(key, fallback) {
+    try {
+      const x = localStorage.getItem(key);
+      return x == null ? fallback : JSON.parse(x);
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  window.getFinalPDFQuestions = function () {
+    const selected =
+      readJSON("CBT_ISO_V2_PDF_SELECTION", []);
+
+    const pool =
+      readJSON("CBT_ISO_V2_PDF_QUESTIONS", []);
+
+    /*
+     * Selection is authoritative.
+     * Pool is fallback only.
+     * Never read Ranker selection here.
+     */
+    const source =
+      Array.isArray(selected) && selected.length
+        ? selected
+        : pool;
+
+    return source.slice(0, 180);
+  };
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   PDF CBT LAUNCH GUARD
+   ============================================================ */
+(function () {
+  "use strict";
+
+  const POOL = "CBT_ISO_V2_PDF_QUESTIONS";
+  const SELECTED = "CBT_ISO_V2_PDF_SELECTION";
+  const MAX = 180;
+
+  function getJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw == null ? fallback : JSON.parse(raw);
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  function unique(list) {
+    const seen = new Set();
+
+    return (Array.isArray(list) ? list : [])
+      .filter(function (q, i) {
+        if (!q || typeof q !== "object") return false;
+
+        const id = String(
+          q.id ||
+          q.questionId ||
+          q.uid ||
+          ("pdf-q-" + i)
+        );
+
+        if (seen.has(id)) return false;
+
+        seen.add(id);
+        return true;
+      });
+  }
+
+  /*
+   * PDF CBT MUST use PDF selection.
+   * It MUST NOT fall back to:
+   * rbSelectedQuestions
+   * rankerTestAttempts
+   * ranker pools
+   * generic questions
+   */
+  window.getIsolatedPDFCBTQuestions = function () {
+    const selected = unique(
+      getJSON(SELECTED, [])
+    );
+
+    if (selected.length) {
+      return selected.slice(0, MAX);
+    }
+
+    return unique(
+      getJSON(POOL, [])
+    ).slice(0, MAX);
+  };
+
+  /*
+   * Diagnostic information only.
+   */
+  window.getIsolatedPDFCBTInfo = function () {
+    const pool = unique(
+      getJSON(POOL, [])
+    );
+
+    const selected = unique(
+      getJSON(SELECTED, [])
+    );
+
+    return {
+      pool: pool.length,
+      selected: selected.length,
+      finalCount:
+        Math.min(
+          MAX,
+          selected.length || pool.length
+        )
+    };
+  };
+
+  console.log(
+    "PDF CBT isolated:",
+    window.getIsolatedPDFCBTInfo()
+  );
+
+})();
+</script>
+
 </head>
 
 <body>

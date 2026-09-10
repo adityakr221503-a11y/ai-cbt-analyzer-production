@@ -976,6 +976,226 @@
 })();
 </script>
 
+
+<script>
+/* ============================================================
+   FINAL PDF CBT RUNTIME
+   CURRENT PDF ONLY
+   HARD LIMIT = 180
+   ============================================================ */
+(function () {
+  "use strict";
+
+  const PDF_POOL =
+    "CBT_ISO_V2_PDF_QUESTIONS";
+
+  const PDF_SELECTION =
+    "CBT_ISO_V2_PDF_SELECTION";
+
+  const PDF_USED =
+    "CBT_ISO_V2_PDF_USED";
+
+  const PDF_SESSION =
+    "CBT_ISO_V2_PDF_SESSION";
+
+  const MAX = 180;
+
+  function read(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw == null) return fallback;
+      const value = JSON.parse(raw);
+      return value == null ? fallback : value;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  function write(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function qid(q, i) {
+    return String(
+      q && (
+        q.id ||
+        q.questionId ||
+        q.uid
+      ) || ("pdf-q-" + i)
+    );
+  }
+
+  function unique(questions) {
+    const seen = new Set();
+
+    return (Array.isArray(questions) ? questions : [])
+      .filter(function (q, i) {
+        if (!q || typeof q !== "object") return false;
+
+        const id = qid(q, i);
+
+        if (seen.has(id)) return false;
+
+        seen.add(id);
+        return true;
+      });
+  }
+
+  function cleanText(value) {
+    return String(value == null ? "" : value)
+      .replace(/\u00a0/g, " ")
+      .replace(/\r\n?/g, "\n")
+      .replace(/[ \t]{2,}/g, " ")
+      .trim();
+  }
+
+  function cleanQuestion(q) {
+    if (!q || typeof q !== "object") return q;
+
+    const x = Object.assign({}, q);
+
+    if (typeof x.question === "string")
+      x.question = cleanText(x.question);
+
+    if (typeof x.text === "string")
+      x.text = cleanText(x.text);
+
+    if (Array.isArray(x.options)) {
+      x.options = x.options.map(function (o) {
+        if (typeof o === "string") return cleanText(o);
+        return o;
+      });
+    }
+
+    return x;
+  }
+
+  function getPool() {
+    return unique(
+      read(PDF_POOL, [])
+    ).map(cleanQuestion);
+  }
+
+  function getUsed() {
+    return new Set(
+      read(PDF_USED, []).map(String)
+    );
+  }
+
+  function getUnused() {
+    const used = getUsed();
+
+    return getPool().filter(function (q, i) {
+      return !used.has(qid(q, i));
+    });
+  }
+
+  function startNewPDFSession(questions, source) {
+    const pool = unique(
+      (Array.isArray(questions) ? questions : [])
+        .map(cleanQuestion)
+    );
+
+    const session = {
+      id:
+        "PDF-" +
+        Date.now() +
+        "-" +
+        Math.random().toString(36).slice(2),
+
+      source: cleanText(source || "PDF"),
+
+      questionCount: pool.length,
+
+      createdAt: Date.now()
+    };
+
+    /*
+     * CRITICAL:
+     * New PDF replaces old PDF pool.
+     * It NEVER appends to old PDF questions.
+     */
+    write(PDF_SESSION, session);
+    write(PDF_POOL, pool);
+    write(PDF_SELECTION, []);
+    write(PDF_USED, []);
+
+    /*
+     * Prevent stale generic test.
+     */
+    localStorage.removeItem("CBT_ACTIVE_TEST");
+
+    return session;
+  }
+
+  function allocate(limit) {
+    const n = Math.min(
+      MAX,
+      Math.max(1, Number(limit) || MAX)
+    );
+
+    const selected = getUnused()
+      .slice(0, n);
+
+    write(PDF_SELECTION, selected);
+
+    return selected;
+  }
+
+  function markUsed(questions) {
+    const used = getUsed();
+
+    (Array.isArray(questions) ? questions : [])
+      .forEach(function (q, i) {
+        const id = qid(q, i);
+        if (id) used.add(id);
+      });
+
+    write(
+      PDF_USED,
+      Array.from(used)
+    );
+  }
+
+  /*
+   * Public API
+   */
+  window.CBTPDFRuntime = {
+    MAX,
+    getPool,
+    getUnused,
+    startNewPDFSession,
+    allocate,
+    markUsed,
+    read,
+    write
+  };
+
+  /*
+   * HARD SAFETY:
+   * Any PDF selection larger than 180 is truncated.
+   */
+  const existing = read(PDF_SELECTION, []);
+
+  if (Array.isArray(existing) && existing.length > MAX) {
+    write(
+      PDF_SELECTION,
+      unique(existing)
+        .map(cleanQuestion)
+        .slice(0, MAX)
+    );
+  }
+
+  console.log(
+    "CBT PDF Runtime:",
+    "MAX=" + MAX,
+    "POOL=" + getPool().length,
+    "SELECTED=" + read(PDF_SELECTION, []).length
+  );
+
+})();
+</script>
+
 </head>
 
 
