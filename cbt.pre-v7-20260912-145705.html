@@ -1,0 +1,4141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><script src="ranker-state-v2.js"></script>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Topper Test Pro — CBT</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    button,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .header {
+      max-width: 1200px;
+      margin: auto;
+      padding: 15px 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    .logo span {
+      color: #4f46e5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 25px auto;
+      padding: 0 15px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+
+      box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.07);
+    }
+
+    .setup {
+      max-width: 700px;
+      margin: 30px auto;
+    }
+
+    .subtitle {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .field {
+      margin-top: 20px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    select {
+      width: 100%;
+      padding: 13px;
+
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mode {
+      padding: 15px;
+
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+
+      background: #ffffff;
+    }
+
+    .mode.selected {
+      border-color: #4f46e5;
+      background: #eef2ff;
+    }
+
+    .mode strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .mode small {
+      color: #64748b;
+    }
+
+    .primary {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+
+      border: 0;
+      border-radius: 10px;
+
+      background: #4f46e5;
+      color: #ffffff;
+
+      font-weight: 900;
+    }
+
+    .primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .info {
+      margin-top: 15px;
+      padding: 13px;
+
+      border-radius: 10px;
+
+      background: #eef2ff;
+      color: #3730a3;
+
+      line-height: 1.5;
+    }
+
+    .status {
+      margin-top: 10px;
+      padding: 10px 12px;
+
+      border-radius: 8px;
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status.warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .cbt-layout {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        320px;
+
+      gap: 18px;
+    }
+
+    .test-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .timer {
+      min-width: 100px;
+      padding: 10px 14px;
+
+      border-radius: 10px;
+
+      background: #0f172a;
+      color: #ffffff;
+
+      text-align: center;
+      font-weight: 900;
+      font-size: 18px;
+    }
+
+    .timer.warning {
+      background: #f59e0b;
+    }
+
+    .timer.danger {
+      background: #dc2626;
+    }
+
+    .question-number {
+      margin-top: 20px;
+      color: #64748b;
+      font-weight: 800;
+    }
+
+    .cbt-progress {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .progress-track {
+      height: 7px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    #cbtProgressBar {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: #4f46e5;
+      border-radius: inherit;
+      transition: width .2s ease;
+    }
+
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #475569;
+      flex-wrap: wrap;
+    }
+
+    .question-text {
+      margin-top: 12px;
+
+      font-size: 20px;
+      line-height: 1.6;
+
+      white-space: pre-wrap;
+    }
+
+    .options {
+      margin-top: 20px;
+    }
+
+    .option {
+      display: block;
+
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+
+      border: 2px solid #e2e8f0;
+      border-radius: 11px;
+
+      background: #ffffff;
+      color: #0f172a;
+
+      text-align: left;
+      font-weight: 600;
+
+      line-height: 1.5;
+    }
+
+    .option:hover {
+      border-color: #818cf8;
+    }
+
+    .option.selected {
+      border-color: #16a34a;
+      background: #dcfce7;
+    }
+
+    .navigation {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+
+      margin-top: 20px;
+    }
+
+    .navigation button,
+    .review-button,
+    .clear-button,
+    .submit-button {
+      padding: 13px;
+
+      border: 0;
+      border-radius: 10px;
+
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    .navigation button {
+      background: #4f46e5;
+    }
+
+    .navigation button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .review-button {
+      width: 100%;
+      margin-top: 10px;
+      background: #f59e0b;
+    }
+
+    .clear-button {
+      width: 100%;
+      margin-top: 10px;
+      background: #64748b;
+    }
+
+    .submit-button {
+      width: 100%;
+      margin-top: 10px;
+      background: #dc2626;
+    }
+
+    .palette-title {
+      font-size: 19px;
+      font-weight: 900;
+      margin-bottom: 15px;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+      gap: 9px;
+      margin-bottom: 18px;
+
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 17px;
+      height: 17px;
+
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .palette button {
+      height: 42px;
+      padding: 0;
+
+      border: 0;
+      border-radius: 8px;
+
+      font-weight: 900;
+    }
+
+    .palette-current {
+      background: #7c3aed;
+      color: #ffffff;
+    }
+
+    .palette-answered {
+      background: #22c55e;
+      color: #ffffff;
+    }
+
+    .palette-notanswered {
+      background: #f8fafc;
+      color: #475569;
+
+      border:
+        2px solid #cbd5e1 !important;
+    }
+
+    .palette-notvisited {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+
+    .palette-review {
+      background: #f59e0b;
+      color: #ffffff;
+    }
+
+    .palette-answered-review {
+      background: #ea580c;
+      color: #ffffff;
+    }
+
+    .result {
+      max-width: 850px;
+      margin: 30px auto;
+    }
+
+    .score {
+      font-size: 40px;
+      font-weight: 900;
+      color: #4f46e5;
+    }
+
+    .result-row {
+      padding: 13px;
+      margin-top: 8px;
+
+      border-radius: 9px;
+
+      background: #f8fafc;
+    }
+
+    .review-item {
+      margin-top: 12px;
+      padding: 15px;
+
+      border-radius: 10px;
+      background: #f8fafc;
+
+      line-height: 1.6;
+    }
+
+    .correct {
+      margin-top: 8px;
+      color: #15803d;
+      font-weight: 800;
+    }
+
+    .incorrect {
+      margin-top: 8px;
+      color: #dc2626;
+      font-weight: 800;
+    }
+
+    .skipped {
+      margin-top: 8px;
+      color: #64748b;
+      font-weight: 800;
+    }
+
+    .review-answer {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 800px) {
+
+      .cbt-layout {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+    @media (max-width: 600px) {
+
+      .container {
+        margin-top: 10px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .question-text {
+        font-size: 18px;
+      }
+
+    }
+
+  
+.ranker-analysis{margin:20px 0;padding:18px;border:1px solid #e2e8f0;border-radius:16px;background:#f8fafc}.ranker-analysis h2{margin:0 0 14px}.analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.analysis-grid>div{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;text-align:center}.analysis-grid strong{display:block;font-size:22px}.analysis-grid span,.analysis-row small{display:block;color:#64748b;font-size:12px}.analysis-section{margin-top:18px}.analysis-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin:6px 0}.analysis-next{margin-top:16px;padding:14px;border-radius:12px;background:#eef2ff;color:#312e81}@media(max-width:600px){.analysis-grid{grid-template-columns:repeat(2,1fr)}.analysis-row{grid-template-columns:1fr auto}.analysis-row small{grid-column:1/-1}}
+</style>
+
+<script src="production-hardening.js"></script></head>
+
+<body>
+
+<header>
+
+  <div class="header">
+
+    <div class="logo">
+      Topper Test <span>Pro</span>
+    </div>
+
+    <div>
+      CBT Test Series
+    </div>
+
+  </div>
+
+</header>
+
+<div class="container">
+
+  <!-- =================================================
+       TEST SETUP
+  ================================================== -->
+
+  <section
+    id="setupScreen"
+    class="card setup"
+  >
+
+    <h1>
+      🎯 Topper Test Pro
+    </h1>
+
+    <p class="subtitle">
+      Adaptive CBT Test Series — Test 180
+    </p>
+
+    <div
+      id="bankStatus"
+      class="status warning"
+    >
+      Loading 180-question bank...
+    </div>
+
+    <div class="field">
+
+      <label for="testSelect">
+        Test
+      </label>
+
+      <select id="testSelect">
+
+        <option value="">
+          Select Test
+        </option>
+
+        <option value="test180">
+          Ranker Pro — NEET Full Mock 001
+        </option>
+
+      </select>
+
+    </div>
+
+    <div class="field">
+
+      <label for="questionCount">
+        Number of Questions
+      </label>
+
+      <select id="questionCount">
+
+        <option value="all">
+          All Questions
+        </option>
+
+        <option value="180">
+          180 Questions
+        </option>
+
+        <option value="90">
+          90 Questions
+        </option>
+
+        <option value="45">
+          45 Questions
+        </option>
+
+        <option value="10">
+          10 Questions
+        </option>
+
+      </select>
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        Question Order
+      </label>
+
+      <div class="mode-grid">
+
+        <div
+          id="sequentialMode"
+          class="mode selected"
+        >
+
+          <strong>
+            📋 Sequential
+          </strong>
+
+          <small>
+            Questions appear in order.
+          </small>
+
+        </div>
+
+        <div
+          id="randomMode"
+          class="mode"
+        >
+
+          <strong>
+            🔀 Random
+          </strong>
+
+          <small>
+            Questions are randomly selected.
+          </small>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      id="testInfo"
+      class="info"
+    >
+      Select a ready test to continue.
+    </div>
+
+    <button
+      id="startButton"
+      class="primary"
+      type="button"
+      disabled
+    >
+      Start Test 180
+    </button>
+
+  </section>
+
+
+  <!-- =================================================
+       CBT SCREEN
+  ================================================== -->
+
+  <section
+    id="cbtScreen"
+    class="hidden"
+  >
+
+    <div class="cbt-layout">
+
+      <main class="card">
+
+        <div class="test-header">
+
+          <h2 id="testTitle">
+            Topper Test Pro — Test 180
+          </h2>
+
+          <div
+            id="timer"
+            class="timer"
+          >
+            180:00
+          </div>
+
+        </div>
+
+        <div
+          id="questionNumber"
+          class="question-number"
+        >
+          Question 1
+        </div>
+
+        <div id="cbtProgress" class="cbt-progress" aria-live="polite">
+          <div class="progress-track"><span id="cbtProgressBar"></span></div>
+          <div class="progress-stats">
+            <span id="answeredCount">0 Answered</span>
+            <span id="reviewCount">0 Review</span>
+            <span id="unansweredCount">0 Unanswered</span>
+          </div>
+        </div>
+
+        <div id="questionFigure"></div>
+
+        <div
+          id="questionText"
+          class="question-text"
+        ></div>
+
+        <div
+          id="options"
+          class="options"
+        ></div>
+
+        <div class="navigation">
+
+          <button
+            id="previousButton"
+            type="button"
+          >
+            Previous
+          </button>
+
+          <button
+            id="nextButton"
+            type="button"
+          >
+            Next
+          </button>
+
+        </div>
+
+        <button
+          id="reviewButton"
+          class="review-button"
+          type="button"
+        >
+          Mark for Review
+        </button>
+
+        <button
+          id="clearButton"
+          class="clear-button"
+          type="button"
+        >
+          Clear Answer
+        </button>
+
+        <button
+          id="submitButton"
+          class="submit-button"
+          type="button"
+        >
+          Submit Test
+        </button>
+
+      </main>
+
+      <aside class="card">
+
+        <div class="palette-title">
+          Question Palette
+        </div>
+
+        <div class="legend">
+
+          <div class="legend-item">
+            <span
+              class="legend-dot"
+              style="background:#7c3aed"
+            ></span>
+            Current
+          </div>
+
+          <div class="legend-item">
+            <span
+              class="legend-dot"
+              style="background:#22c55e"
+            ></span>
+            Answered
+          </div>
+
+          <div class="legend-item">
+            <span
+              class="legend-dot"
+              style="
+                background:#f8fafc;
+                border:2px solid #cbd5e1
+              "
+            ></span>
+            Not Answered
+          </div>
+
+          <div class="legend-item">
+            <span
+              class="legend-dot"
+              style="background:#3b82f6"
+            ></span>
+            Not Visited
+          </div>
+
+          <div class="legend-item">
+            <span
+              class="legend-dot"
+              style="background:#f59e0b"
+            ></span>
+            Review
+          </div>
+
+        </div>
+
+        <div
+          id="palette"
+          class="palette"
+        ></div>
+
+      </aside>
+
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       RESULT SCREEN
+  ================================================== -->
+
+  <section
+    id="resultScreen"
+    class="card result hidden"
+  >
+
+    <h2>
+      🎯 Test Completed
+    </h2>
+
+    <div id="resultContent"></div>
+
+  </section>
+
+</div>
+
+
+<!-- =====================================================
+     IMPORTANT:
+     TEST180 QUESTION BANK MUST BE LOADED FIRST
+===================================================== -->
+
+<script src="./test-registry.js"></script>
+<script src="./test180-questions.js"></script>
+
+<script>
+  /* =====================================================
+   PART 2
+   TEST 180 QUESTION BANK
+===================================================== */
+
+
+/* =====================================================
+   CHECK TEST180_QUESTIONS
+===================================================== */
+
+if (
+  !Array.isArray(
+    window.TEST180_QUESTIONS
+  )
+) {
+
+  window.TEST180_QUESTIONS = [];
+
+}
+
+
+console.log(
+  "🔥 TEST 180 RAW QUESTIONS:",
+  window.TEST180_QUESTIONS.length
+);
+
+
+/* =====================================================
+   NORMALIZE QUESTION
+   Supports PDF → CBT question format
+===================================================== */
+
+function normalizeQuestion(
+  question,
+  index
+) {
+
+  if (!question) {
+    return null;
+  }
+
+
+  /*
+   * Question text
+   */
+
+  const text =
+    question.text ||
+    question.question ||
+    "";
+
+
+  /*
+   * Options
+   */
+
+  let questionOptions =
+    Array.isArray(question.options)
+      ? question.options
+      : [];
+
+
+  questionOptions =
+    questionOptions.map(
+      function(option) {
+
+        return String(
+          option ?? ""
+        ).trim();
+
+      }
+    );
+
+
+  /*
+   * Correct answer
+   */
+
+  let correctAnswer =
+    question.correctAnswer;
+
+
+  /*
+   * Some PDF/HTML converters store the answer as
+   * 1, 2, 3 or 4. Convert that to option text.
+   */
+
+  if (
+    (
+      correctAnswer === undefined ||
+      correctAnswer === null ||
+      correctAnswer === ""
+    ) &&
+    Number.isInteger(question.answer) &&
+    question.answer >= 1 &&
+    question.answer <= questionOptions.length
+  ) {
+
+    correctAnswer =
+      questionOptions[question.answer - 1];
+
+  }
+
+
+  /*
+   * If source uses correctIndex,
+   * convert it to actual option text.
+   */
+
+  if (
+    (
+      correctAnswer === undefined ||
+      correctAnswer === null ||
+      correctAnswer === ""
+    ) &&
+    Number.isInteger(
+      question.correctIndex
+    )
+  ) {
+
+    correctAnswer =
+      questionOptions[
+        question.correctIndex
+      ];
+
+  }
+
+
+  /*
+   * If source uses A/B/C/D,
+   * convert it to option text.
+   */
+
+  if (
+    typeof correctAnswer === "string"
+  ) {
+
+    const answer =
+      correctAnswer
+        .trim()
+        .toUpperCase();
+
+
+    const letters = [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ];
+
+
+    const answerIndex =
+      letters.indexOf(
+        answer
+      );
+
+
+    if (
+      answerIndex >= 0 &&
+      questionOptions[
+        answerIndex
+      ] !== undefined
+    ) {
+
+      correctAnswer =
+        questionOptions[
+          answerIndex
+        ];
+
+    }
+
+  }
+
+
+  /*
+   * Return normalized format
+   */
+
+  return {
+
+    id:
+      question.id ||
+      `test180-q${index + 1}`,
+
+    text:
+      text,
+
+    options:
+      questionOptions,
+
+    optionImages:
+      Array.isArray(question.optionImages)
+        ? question.optionImages.map(function(image){ return String(image || "").trim(); })
+        : [],
+
+    questionImage:
+      question.questionImage
+        ? String(question.questionImage)
+        : "",
+
+    correctAnswer:
+      correctAnswer || "",
+
+    subject:
+      question.subject ||
+      "",
+
+    chapter:
+      question.chapter ||
+      "",
+
+    topic:
+      question.topic ||
+      "",
+
+    concept:
+      question.concept ||
+      "",
+
+    difficulty:
+      question.difficultyLevel ||
+      question.difficulty ||
+      "L2",
+
+    difficultyLevel:
+      question.difficultyLevel ||
+      question.difficulty ||
+      "L2",
+
+    questionType:
+      question.questionType ||
+      "MCQ",
+
+    qualityFlags:
+      question.qualityFlags ||
+      {},
+
+    marks:
+      Number(
+        question.marks ?? 4
+      ),
+
+    negativeMarks:
+      Number(
+        question.negativeMarks ?? 1
+      ),
+
+    explanation:
+      question.explanation ||
+      question.solution ||
+      "",
+
+    source:
+      question.source ||
+      window.CBT_IMPORTED_SOURCE ||
+      "Topper Test Pro — Test 180"
+
+  };
+
+}
+
+
+/* =====================================================
+   BUILD NORMALIZED 180 BANK
+===================================================== */
+
+/* =====================================================
+   LOAD IMPORTED / SAVED CBT SOURCE
+===================================================== */
+
+(function loadCBTSource() {
+  try {
+    const qs = new URLSearchParams(location.search);
+    const requestedId = qs.get("id") || localStorage.getItem("CBT_ACTIVE_TEST_ID") || sessionStorage.getItem("CBT_ACTIVE_TEST_ID");
+
+    const parseArray = (storage, key) => {
+      try {
+        const raw = storage.getItem(key);
+        const value = raw ? JSON.parse(raw) : null;
+        return Array.isArray(value) ? value : [];
+      } catch (_) { return []; }
+    };
+
+    const parseObject = (storage, key) => {
+      try {
+        const raw = storage.getItem(key);
+        const value = raw ? JSON.parse(raw) : null;
+        return value && typeof value === "object" ? value : null;
+      } catch (_) { return null; }
+    };
+
+    /* =====================================================
+       CANONICAL SOURCE-FIRST LOADING
+       PDF tests are authoritative in localStorage. Legacy
+       sessionStorage remains compatibility-only.
+    ===================================================== */
+    const canonical = parseObject(localStorage, "CBT_ACTIVE_TEST");
+    const canonicalQuestions = canonical && Array.isArray(canonical.questions) ? canonical.questions : [];
+    const canonicalSource = String(
+      canonical?.source || localStorage.getItem("CBT_ACTIVE_SOURCE") || ""
+    ).trim().toLowerCase();
+    const isPdf = canonicalQuestions.length > 0 &&
+      (canonicalSource.includes("pdf") || String(requestedId || "").startsWith("pdf-"));
+
+    if (isPdf) {
+      window.PDF_ACTIVE_TEST = Object.assign({}, canonical, {
+        id: canonical.id || canonical.testId || requestedId || ("pdf-" + Date.now()),
+        testId: canonical.testId || canonical.id || requestedId,
+        title: canonical.title || "PDF Imported Test",
+        source: "PDF Import",
+        questions: canonicalQuestions,
+        questionCount: canonicalQuestions.length,
+        totalQuestions: canonicalQuestions.length,
+        duration: Number(canonical.duration) || Math.max(30, Math.ceil(canonicalQuestions.length * 1.2)),
+        marks: Number(canonical.marks) || canonicalQuestions.length * 4
+      });
+      window.TEST180_QUESTIONS = canonicalQuestions.slice();
+      window.CBT_IMPORTED_SOURCE = "PDF Import";
+      console.log("📄 RankForge canonical PDF test loaded:", canonicalQuestions.length);
+      return;
+    }
+
+    let questions = parseArray(sessionStorage, "CBT_ACTIVE_QUESTIONS");
+    const savedTest = parseObject(sessionStorage, "CBT_ACTIVE_TEST");
+
+    if (questions.length === 0 && savedTest && Array.isArray(savedTest.questions)) {
+      questions = savedTest.questions;
+    }
+
+    if (questions.length === 0) {
+      questions = parseArray(localStorage, "pdfCbtQuestions");
+      if (questions.length) window.CBT_IMPORTED_SOURCE = "PDF Import";
+    }
+
+    if (questions.length === 0) {
+      const saved180 = parseObject(localStorage, "TOPPER_TEST_180");
+      if (saved180 && Array.isArray(saved180.questions)) questions = saved180.questions;
+    }
+
+    if (questions.length > 0) {
+      window.TEST180_QUESTIONS = questions;
+      window.CBT_IMPORTED_SOURCE =
+        window.CBT_IMPORTED_SOURCE ||
+        sessionStorage.getItem("CBT_ACTIVE_SOURCE") ||
+        localStorage.getItem("CBT_ACTIVE_SOURCE") || "PDF";
+      console.log("📥 Imported CBT source loaded:", questions.length);
+    }
+  } catch (error) {
+    console.warn("⚠️ Could not load imported CBT source:", error);
+  }
+
+})();
+
+
+const NORMALIZED_QUESTION_BANK =
+  window.TEST180_QUESTIONS
+    .map(
+      function(
+        question,
+        index
+      ) {
+
+        return normalizeQuestion(
+          question,
+          index
+        );
+
+      }
+    )
+    .filter(
+      function(question) {
+
+        return (
+          question &&
+          question.text &&
+          Array.isArray(
+            question.options
+          ) &&
+          question.options.length >= 2
+        );
+
+      }
+    );
+
+
+/* =====================================================
+   ACTIVE QUESTION BANK
+===================================================== */
+
+const ACTIVE_QUESTION_BANK =
+  NORMALIZED_QUESTION_BANK;
+
+
+console.log(
+  "✅ TEST 180 VALID QUESTIONS:",
+  ACTIVE_QUESTION_BANK.length
+);
+
+
+/* =====================================================
+   TEST 180 VALIDATION
+===================================================== */
+
+if (
+  ACTIVE_QUESTION_BANK.length === 180
+) {
+
+  console.log(
+    "🎯 TEST 180 READY — 180 QUESTIONS"
+  );
+
+}
+else {
+
+  console.warn(
+    "⚠️ TEST 180 contains",
+    ACTIVE_QUESTION_BANK.length,
+    "valid questions instead of 180."
+  );
+
+}
+
+
+/* =====================================================
+   TEST CONFIGURATION
+===================================================== */
+
+const TEST_REGISTRY = Array.isArray(window.RANKER_TEST_REGISTRY) ? window.RANKER_TEST_REGISTRY : [];
+const ACTIVE_TEST_ID = new URLSearchParams(location.search).get("id") || localStorage.getItem("CBT_ACTIVE_TEST_ID") || sessionStorage.getItem("CBT_ACTIVE_TEST_ID") || "test180";
+const ACTIVE_REGISTRY_TEST = TEST_REGISTRY.find(function(test){ return test.id === ACTIVE_TEST_ID; }) || TEST_REGISTRY.find(function(test){ return test.id === "test180"; });
+
+/* Build CBT test definitions from the central Test Series registry. */
+const PDF_ACTIVE_TEST = (function(){
+  try {
+    const raw = localStorage.getItem("CBT_ACTIVE_TEST");
+    const t = raw ? JSON.parse(raw) : null;
+    if (!t || !Array.isArray(t.questions) || !t.questions.length) return null;
+    const source = String(t.source || localStorage.getItem("CBT_ACTIVE_SOURCE") || "").toLowerCase();
+    const id = new URLSearchParams(location.search).get("id") || localStorage.getItem("CBT_ACTIVE_TEST_ID") || "";
+    if (!source.includes("pdf") && !id.startsWith("pdf-")) return null;
+    window.PDF_ACTIVE_TEST = Object.assign({}, t, {source:"PDF Import"});
+    return {
+      id: t.id || t.testId || id || "pdf-active",
+      title: t.title || "PDF Imported Test",
+      duration: Number(t.duration) || Math.max(30, Math.ceil(t.questions.length * 1.2)),
+      totalQuestions: t.questions.length,
+      marks: Number(t.marks) || t.questions.length * 4,
+      questionIds: t.questions.map(function(question){ return question.id; }),
+      source: "PDF Import"
+    };
+  } catch (_) { return null; }
+})();
+
+const TESTS = []
+  .concat(PDF_ACTIVE_TEST ? [PDF_ACTIVE_TEST] : [])
+  .concat(TEST_REGISTRY
+    .filter(function(test){ return test.status === "live" && test.id === "test180"; })
+    .map(function(test){
+      return {
+        id: test.id,
+        title: test.name,
+        duration: Number(test.duration) || 180,
+        totalQuestions: Number(test.questions) || 0,
+        marks: Number(test.marks) || 0,
+        questionIds: ACTIVE_QUESTION_BANK.map(function(question){ return question.id; })
+      };
+    }));
+
+function getTestById(testId){
+  return TESTS.find(function(test){ return test.id === testId; }) || null;
+}
+
+/* =====================================================
+   INITIAL TEST STATUS
+===================================================== */
+
+const bankStatus =
+  document.getElementById(
+    "bankStatus"
+  );
+
+
+if (
+  ACTIVE_QUESTION_BANK.length === 180
+) {
+
+  bankStatus.className =
+    "status success";
+
+  bankStatus.textContent =
+    "✅ Test 180 loaded successfully — 180 questions ready.";
+
+}
+else if (
+  ACTIVE_QUESTION_BANK.length > 0
+) {
+
+  bankStatus.className =
+    "status warning";
+
+  bankStatus.textContent =
+    `⚠️ ${ACTIVE_QUESTION_BANK.length} valid questions loaded. Expected 180.`;
+
+}
+else {
+
+  bankStatus.className =
+    "status error";
+
+  bankStatus.textContent =
+    "❌ No valid Test 180 questions loaded. Check test180-questions.js.";
+
+}
+
+
+/* =====================================================
+   EXPOSE BANK FOR DEBUGGING
+===================================================== */
+
+window.TOPPER_TEST_180 =
+  ACTIVE_QUESTION_BANK;
+
+window.TOPPER_TESTS =
+  TESTS;
+
+console.log(
+  "🎯 Topper Test Pro ready:",
+  TESTS[0].title
+);
+  /* =====================================================
+   PART 3
+   APPLICATION STATE
+===================================================== */
+
+let selectedTest = null;
+
+let selectedQuestions = [];
+
+let currentIndex = 0;
+
+let answers = {};
+
+let visitedQuestions =
+  new Set();
+
+let reviewQuestions =
+  new Set();
+
+let selectionMode =
+  "sequential";
+
+let timerInterval =
+  null;
+
+let remainingSeconds =
+  0;
+
+let submitted =
+  false;
+
+let testStartedAt = null;
+
+/* =====================================================
+   PERSISTENT CBT SESSION — TEST SERIES 2.0
+===================================================== */
+const CBT_SESSION_KEY = "rankerPro.activeCbtSession";
+function saveCbtSession(){
+  if(submitted || !selectedTest || !selectedQuestions.length) return;
+  try{
+    localStorage.setItem(CBT_SESSION_KEY,JSON.stringify({
+      testId:selectedTest.id, title:selectedTest.title, duration:selectedTest.duration,
+      questionIds:selectedQuestions.map(q=>q.id), answers:answers,
+      currentIndex:currentIndex, visited:[...visitedQuestions], review:[...reviewQuestions],
+      remainingSeconds:remainingSeconds, testStartedAt:testStartedAt, savedAt:Date.now()
+    }));
+  }catch(e){console.warn('CBT session save failed',e);}
+}
+function clearCbtSession(){try{localStorage.removeItem(CBT_SESSION_KEY);}catch(e){}}
+function restoreCbtSession(){
+  try{
+    const raw=localStorage.getItem(CBT_SESSION_KEY); if(!raw) return false;
+    const st=JSON.parse(raw);
+    if(!st || !Array.isArray(st.questionIds)) return false;
+    const t=getTestById(st.testId); if(!t) return false;
+    const byId=new Map(ACTIVE_QUESTION_BANK.map(q=>[q.id,q]));
+    const restored=st.questionIds.map(id=>byId.get(id)).filter(Boolean);
+    if(!restored.length) return false;
+    selectedTest=t; selectedQuestions=restored; answers=st.answers||{};
+    currentIndex=Math.max(0,Math.min(Number(st.currentIndex)||0,restored.length-1));
+    visitedQuestions=new Set(Array.isArray(st.visited)?st.visited:[]);
+    reviewQuestions=new Set(Array.isArray(st.review)?st.review:[]);
+    remainingSeconds=Math.max(0,Number(st.remainingSeconds)||0);
+    testStartedAt=Number(st.testStartedAt)||Date.now();
+    submitted=false;
+    startButton.textContent='Resume Test';
+    testInfo.textContent=`${selectedTest.title} • ${selectedQuestions.length} questions • ${selectedTest.duration} minutes • session saved`;
+    return true;
+  }catch(e){console.warn('CBT session restore failed',e); return false;}
+}
+
+
+
+/* =====================================================
+   DOM REFERENCES
+===================================================== */
+
+const setupScreen =
+  document.getElementById(
+    "setupScreen"
+  );
+
+const cbtScreen =
+  document.getElementById(
+    "cbtScreen"
+  );
+
+const resultScreen =
+  document.getElementById(
+    "resultScreen"
+  );
+
+const testSelect =
+  document.getElementById(
+    "testSelect"
+  );
+
+const questionCount =
+  document.getElementById(
+    "questionCount"
+  );
+
+const testInfo =
+  document.getElementById(
+    "testInfo"
+  );
+
+const startButton =
+  document.getElementById(
+    "startButton"
+  );
+
+const sequentialMode =
+  document.getElementById(
+    "sequentialMode"
+  );
+
+const randomMode =
+  document.getElementById(
+    "randomMode"
+  );
+
+const testTitle =
+  document.getElementById(
+    "testTitle"
+  );
+
+const timer =
+  document.getElementById(
+    "timer"
+  );
+
+const questionNumber =
+  document.getElementById(
+    "questionNumber"
+  );
+
+const cbtProgressBar = document.getElementById("cbtProgressBar");
+const answeredCountEl = document.getElementById("answeredCount");
+const reviewCountEl = document.getElementById("reviewCount");
+const unansweredCountEl = document.getElementById("unansweredCount");
+
+const questionText =
+  document.getElementById(
+    "questionText"
+  );
+
+const options =
+  document.getElementById(
+    "options"
+  );
+
+const previousButton =
+  document.getElementById(
+    "previousButton"
+  );
+
+const nextButton =
+  document.getElementById(
+    "nextButton"
+  );
+
+const reviewButton =
+  document.getElementById(
+    "reviewButton"
+  );
+
+const clearButton =
+  document.getElementById(
+    "clearButton"
+  );
+
+const submitButton =
+  document.getElementById(
+    "submitButton"
+  );
+
+const palette =
+  document.getElementById(
+    "palette"
+  );
+
+const resultContent =
+  document.getElementById(
+    "resultContent"
+  );
+
+
+/* =====================================================
+   TEST INFORMATION
+===================================================== */
+
+function updateTestInfo() {
+
+  if (!selectedTest) {
+
+    testInfo.textContent =
+      "Select a ready test to continue.";
+
+    startButton.disabled =
+      true;
+
+    return;
+  }
+
+
+  const available =
+    selectedTest.questionIds.length;
+
+
+  let count;
+
+
+  if (
+    questionCount.value ===
+    "all"
+  ) {
+
+    count = available;
+
+  }
+
+  else {
+
+    count =
+      Math.min(
+        Number(
+          questionCount.value
+        ),
+        available
+      );
+
+  }
+
+
+  testInfo.textContent =
+    `${selectedTest.title} • ` +
+    `${count} questions • ` +
+    `${selectedTest.duration} minutes`;
+
+
+  startButton.disabled =
+    count <= 0;
+
+}
+
+
+/* =====================================================
+   TEST SELECTOR
+===================================================== */
+
+function populateTestSelector(){
+  testSelect.innerHTML = '<option value="">Select a ready test</option>';
+  TESTS.forEach(function(test){
+    const option = document.createElement("option");
+    option.value = test.id;
+    option.textContent = `${test.title} • ${test.totalQuestions} Q • ${test.duration} min`;
+    testSelect.appendChild(option);
+  });
+  if(ACTIVE_TEST_ID && TESTS.some(function(test){return test.id===ACTIVE_TEST_ID;})){
+    testSelect.value = ACTIVE_TEST_ID;
+    selectedTest = getTestById(ACTIVE_TEST_ID);
+  }
+}
+
+testSelect.addEventListener("change", function(){
+  selectedTest = getTestById(testSelect.value);
+  if(selectedTest){
+    sessionStorage.setItem("CBT_ACTIVE_TEST_ID", selectedTest.id);
+    sessionStorage.setItem("CBT_ACTIVE_TEST_META", JSON.stringify({id:selectedTest.id,title:selectedTest.title,duration:selectedTest.duration,questions:selectedTest.totalQuestions,marks:selectedTest.marks}));
+  }
+  updateTestInfo();
+});
+
+
+/* =====================================================
+   QUESTION COUNT
+===================================================== */
+
+questionCount.addEventListener(
+  "change",
+  function() {
+
+    updateTestInfo();
+
+  }
+);
+
+
+/* =====================================================
+   SEQUENTIAL MODE
+===================================================== */
+
+sequentialMode.addEventListener(
+  "click",
+  function() {
+
+    selectionMode =
+      "sequential";
+
+
+    sequentialMode.classList.add(
+      "selected"
+    );
+
+    randomMode.classList.remove(
+      "selected"
+    );
+
+  }
+);
+
+
+/* =====================================================
+   RANDOM MODE
+===================================================== */
+
+randomMode.addEventListener(
+  "click",
+  function() {
+
+    selectionMode =
+      "random";
+
+
+    randomMode.classList.add(
+      "selected"
+    );
+
+    sequentialMode.classList.remove(
+      "selected"
+    );
+
+  }
+);
+
+
+/* =====================================================
+   SHUFFLE
+===================================================== */
+
+function shuffleQuestions(
+  questions
+) {
+
+  const result =
+    [...questions];
+
+
+  for (
+    let i =
+      result.length - 1;
+
+    i > 0;
+
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+
+    const temp =
+      result[i];
+
+    result[i] =
+      result[j];
+
+    result[j] =
+      temp;
+
+  }
+
+
+  return result;
+
+}
+
+
+/* =====================================================
+   BUILD QUESTIONS FOR TEST
+===================================================== */
+
+function buildTestQuestions() {
+
+  if (!selectedTest) {
+
+    return [];
+
+  }
+
+
+  let questions =
+    selectedTest.questionIds
+      .map(
+        function(id) {
+
+          return ACTIVE_QUESTION_BANK.find(
+            function(question) {
+
+              return (
+                question.id === id
+              );
+
+            }
+          );
+
+        }
+      )
+      .filter(
+        function(question) {
+
+          return Boolean(
+            question
+          );
+
+        }
+      );
+
+
+  /*
+   * Random mode
+   */
+
+  if (
+    selectionMode ===
+    "random"
+  ) {
+
+    questions =
+      shuffleQuestions(
+        questions
+      );
+
+  }
+
+
+  /*
+   * Question count
+   */
+
+  if (
+    questionCount.value !==
+    "all"
+  ) {
+
+    const requested =
+      Number(
+        questionCount.value
+      );
+
+
+    if (
+      Number.isFinite(
+        requested
+      ) &&
+      requested > 0
+    ) {
+
+      questions =
+        questions.slice(
+          0,
+          requested
+        );
+
+    }
+
+  }
+
+
+  return questions;
+
+}
+
+
+/* =====================================================
+   START TEST
+===================================================== */
+
+startButton.addEventListener(
+  "click",
+  function() {
+
+    if (!selectedTest) {
+
+      alert(
+        "Please select a ready test first."
+      );
+
+      return;
+
+    }
+
+
+    selectedQuestions =
+      buildTestQuestions();
+
+
+    if (
+      selectedQuestions.length === 0
+    ) {
+
+      alert(
+        "No valid questions are available."
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * Resume an existing session for this exact test when available.
+     */
+    let resumed = false;
+    try {
+      const raw = localStorage.getItem(CBT_SESSION_KEY);
+      if (raw) {
+        const st = JSON.parse(raw);
+        resumed = Boolean(st && st.testId === selectedTest.id && Array.isArray(st.questionIds));
+      }
+    } catch(e) {}
+
+    if (resumed && restoreCbtSession()) {
+      /* state already restored */
+    } else {
+      clearCbtSession();
+      currentIndex = 0;
+      answers = {};
+      visitedQuestions = new Set();
+      reviewQuestions = new Set();
+      submitted = false;
+      testStartedAt = Date.now();
+      remainingSeconds = selectedTest.duration * 60;
+      saveCbtSession();
+    }
+
+
+    /*
+     * Change screens
+     */
+
+    setupScreen.classList.add(
+      "hidden"
+    );
+
+    cbtScreen.classList.remove(
+      "hidden"
+    );
+
+    resultScreen.classList.add(
+      "hidden"
+    );
+
+
+    /*
+     * Header
+     */
+
+    testTitle.textContent =
+      selectedTest.title;
+
+
+    /*
+     * Render first question
+     */
+
+    renderQuestion();
+
+    renderPalette();
+
+
+    /*
+     * Start countdown
+     */
+
+    startTimer();
+
+  }
+);
+
+
+/* =====================================================
+   INITIAL SETUP
+===================================================== */
+
+populateTestSelector();
+const __initialRestored = restoreCbtSession();
+updateTestInfo();
+if(__initialRestored){
+  startButton.textContent = "Resume Test";
+  testInfo.textContent = `${selectedTest.title} • ${selectedQuestions.length} questions • ${selectedTest.duration} minutes • saved session available`;
+}
+updateCbtProgress();
+
+console.log(
+  "🚀 CBT application initialized."
+);
+
+console.log(
+  "Available tests:",
+  TESTS
+);
+
+console.log(
+  "Active questions:",
+  ACTIVE_QUESTION_BANK.length
+);
+  /* =====================================================
+   PART 4
+   QUESTION RENDERING
+===================================================== */
+
+
+/* =====================================================
+   RENDER CURRENT QUESTION
+===================================================== */
+
+function renderQuestion() {
+
+  if (
+    !selectedQuestions ||
+    selectedQuestions.length === 0
+  ) {
+
+    questionNumber.textContent =
+      "No Question";
+
+    questionText.textContent =
+      "No questions are available.";
+
+    options.innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  const question =
+    selectedQuestions[
+      currentIndex
+    ];
+
+
+  if (!question) {
+    return;
+  }
+
+
+  /*
+   * Mark current question as visited
+   */
+
+  visitedQuestions.add(
+    currentIndex
+  );
+
+
+  /*
+   * Question number
+   */
+
+  questionNumber.textContent =
+    `Question ${currentIndex + 1} of ${selectedQuestions.length}`;
+
+
+  /*
+   * Question text
+   */
+
+  questionText.textContent =
+    question.text;
+
+  /* Optional source figure for image-based questions */
+  const questionFigure = document.getElementById("questionFigure");
+  if (questionFigure) {
+    questionFigure.innerHTML = "";
+    if (question.questionImage) {
+      const img = document.createElement("img");
+      img.src = question.questionImage;
+      img.alt = "Question diagram";
+      img.style.maxWidth = "100%";
+      img.style.display = "block";
+      img.style.margin = "10px auto";
+      questionFigure.appendChild(img);
+    }
+  }
+
+
+  /*
+   * Clear previous options
+   */
+
+  options.innerHTML =
+    "";
+
+
+  /*
+   * Create options
+   */
+
+  question.options.forEach(
+    function(
+      option,
+      index
+    ) {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "option";
+
+
+      /*
+       * A / B / C / D / E
+       */
+
+      const letter =
+        String.fromCharCode(
+          65 + index
+        );
+
+
+      const optionImage =
+        Array.isArray(question.optionImages)
+          ? question.optionImages[index]
+          : "";
+
+      if (optionImage) {
+        const label = document.createElement("span");
+        label.textContent = `${letter}.`;
+        label.style.fontWeight = "800";
+        label.style.marginRight = "8px";
+
+        const img = document.createElement("img");
+        img.src = optionImage;
+        img.alt = `Option ${letter}`;
+        img.style.maxWidth = "100%";
+        img.style.maxHeight = "190px";
+        img.style.objectFit = "contain";
+        img.style.verticalAlign = "middle";
+
+        button.appendChild(label);
+        button.appendChild(img);
+      } else {
+        button.textContent =
+          `${letter}. ${option}`;
+      }
+
+
+      /*
+       * Restore selected answer
+       */
+
+      if (
+        answers[currentIndex] ===
+        option
+      ) {
+
+        button.classList.add(
+          "selected"
+        );
+
+      }
+
+
+      /*
+       * Answer click
+       */
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          selectAnswer(
+            option
+          );
+
+        }
+      );
+
+
+      options.appendChild(
+        button
+      );
+
+    }
+  );
+
+
+  /*
+   * Previous button
+   */
+
+  previousButton.disabled =
+    currentIndex === 0;
+
+
+  /*
+   * Next button
+   */
+
+  nextButton.disabled =
+    currentIndex ===
+    selectedQuestions.length - 1;
+
+
+  /*
+   * Review button
+   */
+
+  if (
+    reviewQuestions.has(
+      currentIndex
+    )
+  ) {
+
+    reviewButton.textContent =
+      "Remove Review";
+
+  }
+
+  else {
+
+    reviewButton.textContent =
+      "Mark for Review";
+
+  }
+
+
+  /*
+   * Refresh palette
+   */
+
+  renderPalette();
+  updateCbtProgress();
+  saveCbtSession();
+
+}
+
+
+/* =====================================================
+   SELECT ANSWER
+===================================================== */
+
+function selectAnswer(
+  answer
+) {
+
+  if (submitted) {
+    return;
+  }
+
+
+  answers[currentIndex] =
+    answer;
+
+  saveCbtSession();
+
+
+  /*
+   * Re-render question
+   * so selected option becomes visible
+   */
+
+  renderQuestion();
+
+
+  /*
+   * Update palette
+   */
+
+  renderPalette();
+
+}
+
+
+/* =====================================================
+   CLEAR ANSWER
+===================================================== */
+
+function clearAnswer() {
+
+  if (submitted) {
+    return;
+  }
+
+
+  delete answers[
+    currentIndex
+  ];
+
+  saveCbtSession();
+
+
+  renderQuestion();
+
+  renderPalette();
+
+}
+
+
+/* =====================================================
+   CBT PROGRESS SUMMARY
+===================================================== */
+
+function updateCbtProgress(){
+  const total = selectedQuestions.length;
+  const answered = total ? Object.keys(answers).filter(function(k){ return Number(k) >= 0 && Number(k) < total && answers[k] !== undefined; }).length : 0;
+  const review = total ? [...reviewQuestions].filter(function(i){ return i >= 0 && i < total; }).length : 0;
+  const unanswered = Math.max(0, total - answered);
+  const pct = total ? Math.round((answered / total) * 100) : 0;
+  if(cbtProgressBar) cbtProgressBar.style.width = pct + "%";
+  if(answeredCountEl) answeredCountEl.textContent = answered + " Answered";
+  if(reviewCountEl) reviewCountEl.textContent = review + " Review";
+  if(unansweredCountEl) unansweredCountEl.textContent = unanswered + " Unanswered";
+}
+
+/* =====================================================
+   RENDER QUESTION PALETTE
+===================================================== */
+
+function renderPalette() {
+
+  palette.innerHTML =
+    "";
+
+
+  if (
+    !selectedQuestions ||
+    selectedQuestions.length === 0
+  ) {
+
+    return;
+
+  }
+
+
+  selectedQuestions.forEach(
+    function(
+      question,
+      index
+    ) {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.textContent =
+        index + 1;
+
+
+      /*
+       * CURRENT
+       */
+
+      if (
+        index === currentIndex
+      ) {
+
+        button.className =
+          "palette-current";
+
+      }
+
+
+      /*
+       * ANSWERED + REVIEW
+       */
+
+      else if (
+        answers[index] !==
+          undefined &&
+        reviewQuestions.has(
+          index
+        )
+      ) {
+
+        button.className =
+          "palette-answered-review";
+
+      }
+
+
+      /*
+       * REVIEW
+       */
+
+      else if (
+        reviewQuestions.has(
+          index
+        )
+      ) {
+
+        button.className =
+          "palette-review";
+
+      }
+
+
+      /*
+       * ANSWERED
+       */
+
+      else if (
+        answers[index] !==
+        undefined
+      ) {
+
+        button.className =
+          "palette-answered";
+
+      }
+
+
+      /*
+       * VISITED BUT NOT ANSWERED
+       */
+
+      else if (
+        visitedQuestions.has(
+          index
+        )
+      ) {
+
+        button.className =
+          "palette-notanswered";
+
+      }
+
+
+      /*
+       * NOT VISITED
+       */
+
+      else {
+
+        button.className =
+          "palette-notvisited";
+
+      }
+
+
+      /*
+       * Jump to question
+       */
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          if (submitted) {
+            return;
+          }
+
+
+          currentIndex =
+            index;
+
+
+          renderQuestion();
+
+        }
+      );
+
+
+      palette.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   PREVIOUS QUESTION
+===================================================== */
+
+previousButton.addEventListener(
+  "click",
+  function() {
+
+    if (submitted) {
+      return;
+    }
+
+
+    if (
+      currentIndex > 0
+    ) {
+
+      currentIndex--;
+
+      renderQuestion();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   NEXT QUESTION
+===================================================== */
+
+nextButton.addEventListener(
+  "click",
+  function() {
+
+    if (submitted) {
+      return;
+    }
+
+
+    if (
+      currentIndex <
+      selectedQuestions.length - 1
+    ) {
+
+      currentIndex++;
+
+      renderQuestion();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   CLEAR ANSWER BUTTON
+===================================================== */
+
+clearButton.addEventListener(
+  "click",
+  function() {
+
+    clearAnswer();
+
+  }
+);
+
+
+/* =====================================================
+   MARK / REMOVE REVIEW
+===================================================== */
+
+reviewButton.addEventListener(
+  "click",
+  function() {
+
+    if (submitted) {
+      return;
+    }
+
+
+    if (
+      reviewQuestions.has(
+        currentIndex
+      )
+    ) {
+
+      reviewQuestions.delete(
+        currentIndex
+      );
+
+    }
+
+    else {
+
+      reviewQuestions.add(
+        currentIndex
+      );
+
+    }
+
+
+    /*
+     * Refresh button text
+     * and palette
+     */
+
+    renderQuestion();
+
+    saveCbtSession();
+  renderPalette();
+
+  }
+);
+
+
+/* =====================================================
+   KEYBOARD NAVIGATION
+===================================================== */
+
+document.addEventListener(
+  "keydown",
+  function(event) {
+
+    /*
+     * Don't interfere while typing
+     */
+
+    if (
+      event.target.tagName ===
+        "INPUT" ||
+      event.target.tagName ===
+        "TEXTAREA" ||
+      event.target.tagName ===
+        "SELECT"
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      cbtScreen.classList.contains(
+        "hidden"
+      )
+    ) {
+
+      return;
+
+    }
+
+
+    if (submitted) {
+      return;
+    }
+
+
+    /*
+     * Left arrow = Previous
+     */
+
+    if (
+      event.key ===
+      "ArrowLeft"
+    ) {
+
+      if (
+        currentIndex > 0
+      ) {
+
+        currentIndex--;
+        saveCbtSession();
+        renderQuestion();
+
+      }
+
+    }
+
+
+    /*
+     * Right arrow = Next
+     */
+
+    if (
+      event.key ===
+      "ArrowRight"
+    ) {
+
+      if (
+        currentIndex <
+        selectedQuestions.length - 1
+      ) {
+
+        currentIndex++;
+        saveCbtSession();
+        renderQuestion();
+
+      }
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   DEBUG
+===================================================== */
+
+console.log(
+  "✅ Question rendering system loaded."
+);
+  /* =====================================================
+   PART 5
+   TIMER SYSTEM
+===================================================== */
+
+
+/* =====================================================
+   START TIMER
+===================================================== */
+
+function startTimer() {
+
+  /*
+   * Clear any previous timer
+   */
+
+  clearInterval(
+    timerInterval
+  );
+
+
+  /*
+   * Display initial time
+   */
+
+  updateTimer();
+
+
+  /*
+   * Start countdown
+   */
+
+  timerInterval =
+    setInterval(
+      function() {
+
+        /*
+         * Safety check
+         */
+
+        if (submitted) {
+
+          clearInterval(
+            timerInterval
+          );
+
+          return;
+
+        }
+
+
+        /*
+         * Time finished
+         */
+
+        if (
+          remainingSeconds <= 0
+        ) {
+
+          remainingSeconds = 0;
+
+          updateTimer();
+
+
+          clearInterval(
+            timerInterval
+          );
+
+
+          /*
+           * Automatic submission
+           */
+
+          submitTest(
+            true
+          );
+
+
+          return;
+
+        }
+
+
+        /*
+         * Reduce one second
+         */
+
+        remainingSeconds--;
+  saveCbtSession();
+
+
+        /*
+         * Update display
+         */
+
+        updateTimer();
+
+      },
+      1000
+    );
+
+}
+
+
+/* =====================================================
+   UPDATE TIMER DISPLAY
+===================================================== */
+
+function updateTimer() {
+
+  const minutes =
+    Math.floor(
+      remainingSeconds / 60
+    );
+
+
+  const seconds =
+    remainingSeconds % 60;
+
+
+  timer.textContent =
+    `${String(
+      minutes
+    ).padStart(2, "0")}:` +
+    `${String(
+      seconds
+    ).padStart(2, "0")}`;
+
+
+  /*
+   * Remove previous warning states
+   */
+
+  timer.classList.remove(
+    "warning",
+    "danger"
+  );
+
+
+  /*
+   * Last 60 seconds
+   */
+
+  if (
+    remainingSeconds <= 60
+  ) {
+
+    timer.classList.add(
+      "danger"
+    );
+
+  }
+
+
+  /*
+   * Last 5 minutes
+   */
+
+  else if (
+    remainingSeconds <= 300
+  ) {
+
+    timer.classList.add(
+      "warning"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PAGE VISIBILITY SAFETY
+===================================================== */
+
+document.addEventListener(
+  "visibilitychange",
+  function() {
+
+    /*
+     * When the user returns to the CBT,
+     * immediately refresh the displayed timer.
+     */
+
+    if (
+      !document.hidden &&
+      !cbtScreen.classList.contains(
+        "hidden"
+      ) &&
+      !submitted
+    ) {
+
+      updateTimer();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   BEFORE PAGE CLOSE / REFRESH
+===================================================== */
+
+window.addEventListener(
+  "beforeunload",
+  function(event) {
+
+    /*
+     * Only warn if an active test is running.
+     */
+
+    if (
+      !cbtScreen.classList.contains(
+        "hidden"
+      ) &&
+      !submitted
+    ) {
+
+      event.preventDefault();
+
+      event.returnValue =
+        "";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   TIMER DEBUG
+===================================================== */
+
+console.log(
+  "⏱️ Timer system loaded."
+);
+  /* =====================================================
+   PART 6
+   SUBMIT + SCORING
+===================================================== */
+
+
+/* =====================================================
+   SUBMIT BUTTON
+===================================================== */
+
+submitButton.addEventListener(
+  "click",
+  function() {
+
+    /*
+     * Prevent submission if already submitted
+     */
+
+    if (submitted) {
+      return;
+    }
+
+
+    /*
+     * Count unanswered questions
+     */
+
+    const unanswered =
+      selectedQuestions.length -
+      Object.keys(
+        answers
+      ).length;
+
+
+    /*
+     * Ask for confirmation if
+     * some questions are unanswered
+     */
+
+    if (
+      unanswered > 0
+    ) {
+
+      const confirmSubmit =
+        window.confirm(
+          `${unanswered} question(s) are unanswered.\n\n` +
+          `Do you want to submit the test?`
+        );
+
+
+      if (!confirmSubmit) {
+
+        return;
+
+      }
+
+    }
+
+
+    /*
+     * Manual submission
+     */
+
+    submitTest(
+      false
+    );
+
+  }
+);
+
+
+/* =====================================================
+   SUBMIT TEST
+===================================================== */
+
+function submitTest(
+  automatic
+) {
+
+  /*
+   * Prevent duplicate submission
+   */
+
+  if (submitted) {
+
+    return;
+
+  }
+
+
+  /*
+   * Safety check
+   */
+
+  if (
+    !selectedQuestions ||
+    selectedQuestions.length === 0
+  ) {
+
+    return;
+
+  }
+
+
+  /*
+   * Lock submission
+   */
+
+  submitted = true;
+
+
+  /*
+   * Stop timer
+   */
+
+  clearInterval(
+    timerInterval
+  );
+
+
+  /*
+   * Reset timer interval reference
+   */
+
+  timerInterval =
+    null;
+
+
+  /*
+   * Result counters
+   */
+
+  let correct = 0;
+
+  let wrong = 0;
+
+  let skipped = 0;
+
+
+  /*
+   * Analyze every question
+   */
+
+  selectedQuestions.forEach(
+    function(
+      question,
+      index
+    ) {
+
+      const userAnswer =
+        answers[index];
+
+
+      /*
+       * SKIPPED
+       */
+
+      if (
+        userAnswer ===
+        undefined
+      ) {
+
+        skipped++;
+
+        return;
+
+      }
+
+
+      /*
+       * CORRECT
+       */
+
+      if (
+        userAnswer ===
+        question.correctAnswer
+      ) {
+
+        correct++;
+
+        return;
+
+      }
+
+
+      /*
+       * WRONG
+       */
+
+      wrong++;
+
+    }
+  );
+
+
+  /* ===================================================
+     CBT SCORING
+     
+     Correct  = +4
+     Wrong    = -1
+     Skipped  =  0
+  =================================================== */
+
+  const correctMarks = 4;
+
+  const negativeMarks = 1;
+
+  const score =
+    (
+      correct *
+      correctMarks
+    ) -
+    (
+      wrong *
+      negativeMarks
+    );
+
+
+  /*
+   * Maximum possible score
+   */
+
+  const maximumScore =
+    selectedQuestions.length *
+    correctMarks;
+
+
+  /*
+   * Percentage is based on
+   * correct answers / total questions
+   */
+
+  const percentage =
+    selectedQuestions.length > 0
+      ? (
+          correct /
+          selectedQuestions.length
+        ) * 100
+      : 0;
+
+
+  /*
+   * Send everything to result screen
+   */
+
+  showResult(
+    correct,
+    wrong,
+    skipped,
+    score,
+    maximumScore,
+    percentage,
+    automatic
+  );
+
+}
+
+
+/* =====================================================
+   RESULT DATA OBJECT
+===================================================== */
+
+function buildDeepAnalysis() {
+
+  const groups = {};
+  const mistakes = [];
+
+  selectedQuestions.forEach(function(question, index) {
+    const userAnswer = answers[index];
+    const answered = userAnswer !== undefined;
+    const correct = answered && userAnswer === question.correctAnswer;
+    const keyParts = [
+      question.subject || "Unknown",
+      question.chapter || "Unclassified",
+      question.topic || "Unclassified",
+      question.concept || "Unclassified"
+    ];
+
+    [
+      ["subject", keyParts[0]],
+      ["chapter", keyParts[1]],
+      ["topic", keyParts[2]],
+      ["concept", keyParts[3]],
+      ["difficulty", question.difficulty || "Medium"]
+    ].forEach(function(pair) {
+      const type = pair[0];
+      const name = pair[1];
+      const id = type + "::" + name;
+      if (!groups[id]) groups[id] = { type:type, name:name, total:0, attempted:0, correct:0, wrong:0, score:0 };
+      const g = groups[id];
+      g.total++;
+      if (answered) {
+        g.attempted++;
+        if (correct) { g.correct++; g.score += 4; }
+        else { g.wrong++; g.score -= 1; }
+      }
+    });
+
+    if (answered && !correct) {
+      mistakes.push({
+        id: question.id,
+        question: question.text,
+        options: question.options,
+        subject: question.subject || "Unknown",
+        chapter: question.chapter || "Unclassified",
+        topic: question.topic || "Unclassified",
+        concept: question.concept || "Unclassified",
+        difficulty: question.difficulty || "Medium",
+        selectedAnswer: userAnswer,
+        correctAnswer: question.correctAnswer,
+        explanation: question.explanation || "Review this concept again.",
+        mistakeReason: "Needs review"
+      });
+    }
+  });
+
+  const breakdown = Object.values(groups).map(function(g) {
+    return Object.assign(g, {
+      accuracy: g.attempted ? Math.round((g.correct / g.attempted) * 1000) / 10 : 0
+    });
+  });
+
+  const subject = breakdown.filter(function(g){ return g.type === "subject"; });
+  const chapters = breakdown.filter(function(g){ return g.type === "chapter"; });
+  const topics = breakdown.filter(function(g){ return g.type === "topic"; });
+  const concepts = breakdown.filter(function(g){ return g.type === "concept"; });
+  const difficulty = breakdown.filter(function(g){ return g.type === "difficulty"; });
+
+  const weakTopics = topics
+    .filter(function(g){ return g.attempted > 0 && g.accuracy < 70; })
+    .sort(function(a,b){ return a.accuracy - b.accuracy || b.wrong - a.wrong; })
+    .slice(0,5);
+
+  const strongTopics = topics
+    .filter(function(g){ return g.attempted > 0 && g.accuracy >= 80; })
+    .sort(function(a,b){ return b.accuracy - a.accuracy; })
+    .slice(0,5);
+
+  const totalTime = testStartedAt ? Math.max(0, Math.floor((Date.now() - testStartedAt) / 1000)) : 0;
+  const attempted = selectedQuestions.length - mistakes.length - selectedQuestions.filter(function(_,i){ return answers[i] === undefined; }).length + mistakes.length;
+  const answeredCount = selectedQuestions.filter(function(_,i){ return answers[i] !== undefined; }).length;
+  const accuracy = answeredCount ? Math.round((selectedQuestions.reduce(function(n,q,i){ return n + (answers[i] !== undefined && answers[i] === q.correctAnswer ? 1 : 0); },0) / answeredCount) * 1000) / 10 : 0;
+  const speed = totalTime ? Math.round((answeredCount / (totalTime / 60)) * 10) / 10 : 0;
+
+  let recommendation = "Keep building consistency with mixed practice.";
+  if (weakTopics.length) recommendation = "Prioritize: " + weakTopics.slice(0,3).map(function(g){ return g.name; }).join(", ") + ".";
+  else if (accuracy < 70) recommendation = "Focus on concept revision before increasing difficulty.";
+  else if (speed < 1.5 && accuracy >= 75) recommendation = "Accuracy is good; work on solving speed with timed practice.";
+  else if (accuracy < 85) recommendation = "Target repeated errors with new-question practice and retest.";
+  else recommendation = "Strong performance. Move selected mastered areas toward higher difficulty.";
+
+  return {
+    timeSeconds: totalTime,
+    answered: answeredCount,
+    speedQuestionsPerMinute: speed,
+    accuracy: accuracy,
+    subject: subject,
+    chapters: chapters,
+    topics: topics,
+    concepts: concepts,
+    difficulty: difficulty,
+    weakTopics: weakTopics,
+    strongTopics: strongTopics,
+    mistakes: mistakes,
+    recommendation: recommendation
+  };
+}
+
+function createResultData(correct, wrong, skipped, score, maximumScore, percentage, automatic) {
+  const analysis = buildDeepAnalysis();
+  return {
+    testId: selectedTest ? selectedTest.id : "test180",
+    testTitle: selectedTest ? selectedTest.title : "Ranker Pro Mock 001",
+    total: selectedQuestions.length,
+    correct: correct,
+    wrong: wrong,
+    skipped: skipped,
+    attempted: correct + wrong,
+    score: score,
+    maximumScore: maximumScore,
+    percentage: percentage,
+    automatic: automatic,
+    submittedAt: new Date().toISOString(),
+    analysis: analysis
+  };
+}
+
+function classifyMistakeForBank(question) {
+  const type = String(question.questionType || question.type || '').toLowerCase();
+  const text = String(question.text || question.question || '').toLowerCase();
+  if (type.includes('numer') || /calculate|find the value|determine|velocity|force|energy|work done|current|resistance|molarity|pH|equilibrium/.test(text)) return 'Calculation';
+  if (type.includes('factual') || type.includes('memory') || /according to ncert|which of the following is true|called|known as|definition/.test(text)) return 'Factual';
+  return 'Concept Gap';
+}
+
+function buildMistakeReasonForBank(question, type) {
+  if (type === 'Calculation') return 'Recheck the formula, units, values and calculation steps; then solve a new question using the same skill.';
+  if (type === 'Factual') return 'The required fact/detail was not recalled correctly. Review the relevant NCERT point and test it again with a new question.';
+  return 'The selected answer indicates a concept gap. Review the underlying concept and test the same skill with a new question.';
+}
+
+function saveMistakesToBank(resultData) {
+  try {
+    const key = 'cbtMistakes';
+    const bank = JSON.parse(localStorage.getItem(key) || '[]');
+    const now = new Date().toISOString();
+    const byId = {};
+    bank.forEach(function(item, index) {
+      if (item && item.id) byId[String(item.id)] = index;
+    });
+
+    (resultData.analysis && resultData.analysis.mistakes || []).forEach(function(m) {
+      const question = selectedQuestions.find(function(q) { return String(q.id) === String(m.id); }) || {};
+      const mistakeType = classifyMistakeForBank(question);
+      const record = Object.assign({}, m, {
+        questionId: m.id,
+        testId: resultData.testId,
+        testTitle: resultData.testTitle,
+        chapter: question.chapter || m.chapter || 'Unclassified',
+        topic: question.topic || m.topic || 'Unclassified',
+        concept: question.concept || m.concept || 'Unclassified',
+        difficulty: question.difficulty || m.difficulty || 'Medium',
+        questionType: question.questionType || question.type || 'MCQ',
+        mistakeType: mistakeType,
+        mistakeReason: buildMistakeReasonForBank(question, mistakeType),
+        explanation: question.explanation || m.explanation || 'Review this question and the underlying concept.',
+        solution: question.detailedSolution || question.solution || question.explanation || m.explanation || 'Solution not available.',
+        firstSeenAt: now,
+        lastSeenAt: now
+      });
+
+      const existingIndex = byId[String(record.questionId)];
+      if (existingIndex !== undefined && bank[existingIndex]) {
+        const existing = bank[existingIndex];
+        record.firstSeenAt = existing.firstSeenAt || now;
+        record.occurrenceCount = Number(existing.occurrenceCount || 1) + 1;
+        record.previousMistakeTypes = Array.from(new Set((existing.previousMistakeTypes || []).concat(existing.mistakeType || [])));
+        bank[existingIndex] = Object.assign({}, existing, record);
+      } else {
+        record.occurrenceCount = 1;
+        record.previousMistakeTypes = [];
+        bank.unshift(record);
+      }
+    });
+
+    localStorage.setItem(key, JSON.stringify(bank.slice(0, 1000)));
+  } catch (error) {
+    console.warn('Mistake Bank save error:', error);
+  }
+}
+
+function saveTestHistory(resultData) {
+  try {
+    const key = "cbtHistory";
+    const history = JSON.parse(localStorage.getItem(key) || "[]");
+    const entry = Object.assign({}, resultData, { id: "attempt-" + Date.now() });
+    history.unshift(entry);
+    localStorage.setItem(key, JSON.stringify(history.slice(0,100)));
+  } catch (error) {
+    console.warn("History save error:", error);
+  }
+}
+
+
+
+/* =====================================================
+   SAVE LAST RESULT
+===================================================== */
+
+function saveLastResult(
+  resultData
+) {
+
+  try {
+
+    localStorage.setItem(
+      "topper_test_pro_last_result",
+      JSON.stringify(
+        resultData
+      )
+    );
+
+  }
+
+  catch (error) {
+
+    console.warn(
+      "Could not save result:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   DEBUG
+===================================================== */
+
+console.log(
+  "✅ Submit and scoring system loaded."
+);
+  /* =====================================================
+   PART 7
+   RESULT SCREEN
+===================================================== */
+
+
+/* =====================================================
+   SHOW RESULT
+===================================================== */
+
+function showResult(
+  correct,
+  wrong,
+  skipped,
+  score,
+  maximumScore,
+  percentage,
+  automatic
+) {
+
+  /*
+   * Create result object
+   */
+
+  const resultData =
+    createResultData(
+      correct,
+      wrong,
+      skipped,
+      score,
+      maximumScore,
+      percentage,
+      automatic
+    );
+
+
+  /*
+   * Save last result
+   */
+
+  saveLastResult(
+    resultData
+  );
+
+  saveTestHistory(resultData);
+  saveMistakesToBank(resultData);
+  clearCbtSession();
+
+
+  /*
+   * Hide CBT
+
+   */
+
+  setupScreen.classList.add(
+    "hidden"
+  );
+
+  cbtScreen.classList.add(
+    "hidden"
+  );
+
+
+  /*
+   * Show result
+   */
+
+  resultScreen.classList.remove(
+    "hidden"
+  );
+
+
+  /*
+   * Clear old result
+   */
+
+  resultContent.innerHTML =
+    "";
+
+
+  /* ===================================================
+     RESULT HEADER
+  =================================================== */
+
+  const scoreElement =
+    document.createElement(
+      "div"
+    );
+
+  scoreElement.className =
+    "score";
+
+  scoreElement.textContent =
+    `${score} / ${maximumScore}`;
+
+
+  resultContent.appendChild(
+    scoreElement
+  );
+
+
+  /* ===================================================
+     TEST NAME
+  =================================================== */
+
+  const testName =
+    document.createElement(
+      "p"
+    );
+
+  testName.className =
+    "subtitle";
+
+  testName.textContent =
+    selectedTest
+      ? selectedTest.title
+      : "Topper Test Pro";
+
+
+  resultContent.appendChild(
+    testName
+  );
+
+
+  /* ===================================================
+     SUMMARY
+  =================================================== */
+
+  const summary =
+    document.createElement(
+      "div"
+    );
+
+
+  summary.innerHTML = `
+
+    <div class="result-row">
+      <strong>Total Questions:</strong>
+      ${selectedQuestions.length}
+    </div>
+
+    <div class="result-row">
+      <strong>Correct:</strong>
+      ${correct}
+    </div>
+
+    <div class="result-row">
+      <strong>Wrong:</strong>
+      ${wrong}
+    </div>
+
+    <div class="result-row">
+      <strong>Skipped:</strong>
+      ${skipped}
+    </div>
+
+    <div class="result-row">
+      <strong>Score:</strong>
+      ${score}
+    </div>
+
+    <div class="result-row">
+      <strong>Maximum Score:</strong>
+      ${maximumScore}
+    </div>
+
+    <div class="result-row">
+      <strong>Accuracy:</strong>
+      ${percentage.toFixed(2)}%
+    </div>
+
+    <div class="result-row">
+      <strong>Marking:</strong>
+      +4 correct / −1 wrong / 0 skipped
+    </div>
+
+    ${
+      automatic
+        ? `
+          <div class="result-row">
+            ⏰ <strong>Time Up:</strong>
+            The test was submitted automatically.
+          </div>
+        `
+        : ""
+    }
+
+  `;
+
+
+  resultContent.appendChild(
+    summary
+  );
+
+
+  /* ===================================================
+     DEEP ANALYSIS
+  =================================================== */
+
+  const analysis = resultData.analysis;
+  const analysisBox = document.createElement("div");
+  analysisBox.className = "ranker-analysis";
+  analysisBox.innerHTML = `
+    <h2>🧠 Ranker Pro Deep Analysis</h2>
+    <div class="analysis-grid">
+      <div><strong>${analysis.accuracy}%</strong><span>Answer Accuracy</span></div>
+      <div><strong>${analysis.speedQuestionsPerMinute}</strong><span>Questions / min</span></div>
+      <div><strong>${analysis.answered}</strong><span>Attempted</span></div>
+      <div><strong>${Math.floor(analysis.timeSeconds/60)}m ${analysis.timeSeconds%60}s</strong><span>Time Used</span></div>
+    </div>
+    <div class="analysis-section"><h3>📚 Subject Performance</h3>${analysis.subject.map(function(g){return `<div class="analysis-row"><span>${g.name}</span><strong>${g.accuracy}%</strong><small>${g.correct}/${g.attempted} correct</small></div>`;}).join("") || "<p>No subject data.</p>"}</div>
+    <div class="analysis-section"><h3>⚠️ Highest-Impact Weaknesses</h3>${analysis.weakTopics.length ? analysis.weakTopics.map(function(g){return `<div class="analysis-row"><span>${g.name}</span><strong>${g.accuracy}%</strong><small>${g.wrong} wrong</small></div>`;}).join("") : "<p>🎯 No major weak topic detected in this attempt.</p>"}</div>
+    <div class="analysis-section"><h3>💪 Strengths</h3>${analysis.strongTopics.length ? analysis.strongTopics.map(function(g){return `<div class="analysis-row"><span>${g.name}</span><strong>${g.accuracy}%</strong></div>`;}).join("") : "<p>Strengths will become clearer after more attempts.</p>"}</div>
+    <div class="analysis-next"><strong>🎯 Next Best Action</strong><br>${analysis.recommendation}</div>
+  `;
+  resultContent.appendChild(analysisBox);
+
+  /* ===================================================
+     QUESTION REVIEW HEADING
+  =================================================== */
+
+  const heading =
+    document.createElement(
+      "h3"
+    );
+
+  heading.textContent =
+    "📝 Question Review";
+
+
+  resultContent.appendChild(
+    heading
+  );
+
+
+  /* ===================================================
+     QUESTION-BY-QUESTION REVIEW
+  =================================================== */
+
+  selectedQuestions.forEach(
+    function(
+      question,
+      index
+    ) {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "review-item";
+
+
+      const userAnswer =
+        answers[index];
+
+
+      /*
+       * Determine status
+       */
+
+      let statusHTML;
+
+
+      if (
+        userAnswer ===
+        undefined
+      ) {
+
+        statusHTML = `
+          <div class="skipped">
+            ⏭ Skipped
+          </div>
+        `;
+
+      }
+
+      else if (
+        userAnswer ===
+        question.correctAnswer
+      ) {
+
+        statusHTML = `
+          <div class="correct">
+            ✓ Correct
+          </div>
+        `;
+
+      }
+
+      else {
+
+        statusHTML = `
+          <div class="incorrect">
+            ✗ Wrong
+          </div>
+        `;
+
+      }
+
+
+      /*
+       * Safe text helper
+       */
+
+      function safeText(
+        value
+      ) {
+
+        if (
+          value ===
+          undefined ||
+          value ===
+          null ||
+          value === ""
+        ) {
+
+          return "Not available";
+
+        }
+
+
+        return String(
+          value
+        );
+
+      }
+
+
+      /*
+       * Build review
+       */
+
+      item.innerHTML = `
+
+        <strong>
+          Q${index + 1}.
+          ${safeText(
+            question.text
+          )}
+        </strong>
+
+        ${statusHTML}
+
+        <div class="review-answer">
+          <strong>Your answer:</strong>
+          ${
+            userAnswer !== undefined
+              ? safeText(
+                  userAnswer
+                )
+              : "Not answered"
+          }
+        </div>
+
+        <div class="review-answer">
+          <strong>Correct answer:</strong>
+          ${safeText(
+            question.correctAnswer
+          )}
+        </div>
+
+        <div class="review-answer">
+          <strong>Explanation:</strong>
+          ${safeText(
+            question.explanation
+          )}
+        </div>
+
+      `;
+
+
+      resultContent.appendChild(
+        item
+      );
+
+    }
+  );
+
+
+  /* ===================================================
+     ACTION BUTTON CONTAINER
+  =================================================== */
+
+  const actions =
+    document.createElement(
+      "div"
+    );
+
+
+  actions.style.marginTop =
+    "20px";
+
+
+  /* ===================================================
+     TAKE TEST AGAIN
+  =================================================== */
+
+  const restartButton =
+    document.createElement(
+      "button"
+    );
+
+
+  restartButton.type =
+    "button";
+
+  restartButton.className =
+    "primary";
+
+  restartButton.textContent =
+    "🔄 Take Test Again";
+
+
+  restartButton.addEventListener(
+    "click",
+    function() {
+
+      /*
+       * Reset to setup screen
+       */
+
+      clearInterval(
+        timerInterval
+      );
+
+
+      timerInterval =
+        null;
+
+
+      submitted =
+        false;
+
+
+      selectedQuestions =
+        [];
+
+
+      currentIndex =
+        0;
+
+
+      answers =
+        {};
+
+
+      visitedQuestions =
+        new Set();
+
+
+      reviewQuestions =
+        new Set();
+
+
+      remainingSeconds =
+        0;
+
+
+      resultScreen.classList.add(
+        "hidden"
+      );
+
+      cbtScreen.classList.add(
+        "hidden"
+      );
+
+      setupScreen.classList.remove(
+        "hidden"
+      );
+
+
+      /*
+       * Refresh test information
+       */
+
+      const __restoredCbtSession = restoreCbtSession();
+
+updateTestInfo();
+
+
+      /*
+       * Scroll to top
+       */
+
+      window.scrollTo(
+        0,
+        0
+      );
+
+    }
+  );
+
+
+  actions.appendChild(
+    restartButton
+  );
+
+
+  /* ===================================================
+     PRINT RESULT
+  =================================================== */
+
+  const printButton =
+    document.createElement(
+      "button"
+    );
+
+
+  printButton.type =
+    "button";
+
+  printButton.className =
+    "primary";
+
+  printButton.textContent =
+    "🖨️ Print / Save Result";
+
+
+  printButton.style.marginTop =
+    "10px";
+
+
+  printButton.addEventListener(
+    "click",
+    function() {
+
+      window.print();
+
+    }
+  );
+
+
+  actions.appendChild(
+    printButton
+  );
+
+
+  resultContent.appendChild(
+    actions
+  );
+
+
+  /*
+   * Scroll to result
+   */
+
+  window.scrollTo(
+    0,
+    0
+  );
+
+
+  console.log(
+    "🏆 Test completed:",
+    resultData
+  );
+
+}
+
+
+/* =====================================================
+   PART 7 COMPLETE
+===================================================== */
+
+console.log(
+  "✅ Result system loaded."
+);
+  /* =====================================================
+   PART 8
+   FINAL STARTUP CHECK
+===================================================== */
+
+
+/*
+ * Final question-bank verification
+ */
+
+(function() {
+
+  const count =
+    Array.isArray(
+      window.TEST180_QUESTIONS
+    )
+      ? window.TEST180_QUESTIONS.length
+      : 0;
+
+
+  const validCount =
+    Array.isArray(
+      ACTIVE_QUESTION_BANK
+    )
+      ? ACTIVE_QUESTION_BANK.length
+      : 0;
+
+
+  console.log(
+    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  );
+
+  console.log(
+    "🎯 TOPPER TEST PRO"
+  );
+
+  console.log(
+    "📚 Raw Test 180:",
+    count
+  );
+
+  console.log(
+    "✅ Valid Test 180:",
+    validCount
+  );
+
+  console.log(
+    "📝 Available Tests:",
+    TESTS.length
+  );
+
+  console.log(
+    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  );
+
+
+  /*
+   * Final UI status
+   */
+
+  if (
+    validCount === 180
+  ) {
+
+    bankStatus.className =
+      "status success";
+
+    bankStatus.textContent =
+      "✅ Test 180 ready — all 180 questions loaded.";
+
+  }
+
+  else {
+
+    bankStatus.className =
+      "status error";
+
+    bankStatus.textContent =
+      `❌ Test 180 has ${validCount} valid questions. Expected 180.`;
+
+    startButton.disabled =
+      true;
+
+  }
+
+})();
+
+
+/* =====================================================
+   FINAL SCRIPT END
+===================================================== */
+
+console.log(
+  "🚀 CBT Analyzer Pro is ready."
+);
+
+</script>
+
+</body>
+
+</html>
