@@ -1315,4 +1315,450 @@ Open Ranker Command Center
 })();
 </script>
 
+
+<style id="rankforge-ai-studio-css">
+#rankforge-ai-question-studio{
+  margin:24px auto;
+  max-width:1100px;
+  border:1px solid rgba(120,140,180,.28);
+  border-radius:20px;
+  padding:20px;
+  background:linear-gradient(145deg,rgba(20,28,48,.96),rgba(12,18,32,.98));
+  box-shadow:0 14px 45px rgba(0,0,0,.18);
+  color:#f5f7fb;
+}
+#rankforge-ai-question-studio .rf-ai-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+#rankforge-ai-question-studio .rf-ai-title{
+  font-size:22px;
+  font-weight:800;
+}
+#rankforge-ai-question-studio .rf-ai-sub{
+  opacity:.72;
+  font-size:13px;
+  margin-top:4px;
+}
+#rankforge-ai-question-studio .rf-ai-badge{
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(99,102,241,.16);
+  border:1px solid rgba(129,140,248,.3);
+  font-size:12px;
+  font-weight:700;
+}
+#rankforge-ai-question-studio .rf-ai-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+#rankforge-ai-question-studio label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  opacity:.8;
+  margin-bottom:6px;
+}
+#rankforge-ai-question-studio select,
+#rankforge-ai-question-studio input,
+#rankforge-ai-question-studio textarea{
+  width:100%;
+  box-sizing:border-box;
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(15,23,42,.9);
+  color:#fff;
+  padding:11px 12px;
+  outline:none;
+}
+#rankforge-ai-question-studio textarea{
+  min-height:150px;
+  resize:vertical;
+  font-family:monospace;
+  font-size:12px;
+}
+#rankforge-ai-question-studio .rf-ai-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:14px;
+}
+#rankforge-ai-question-studio button{
+  border:0;
+  border-radius:12px;
+  padding:11px 14px;
+  cursor:pointer;
+  font-weight:800;
+}
+#rf-ai-generate{
+  background:#6366f1;
+  color:#fff;
+}
+#rf-ai-validate{
+  background:#16a34a;
+  color:#fff;
+}
+#rf-ai-spec{
+  background:#334155;
+  color:#fff;
+}
+#rankforge-ai-question-studio .rf-ai-status{
+  margin-top:14px;
+  padding:11px 13px;
+  border-radius:12px;
+  background:rgba(15,23,42,.7);
+  border:1px solid rgba(148,163,184,.18);
+  font-size:13px;
+  line-height:1.5;
+}
+#rankforge-ai-question-studio .rf-ai-bank{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+#rankforge-ai-question-studio .rf-ai-stat{
+  padding:13px;
+  border-radius:14px;
+  background:rgba(15,23,42,.72);
+  border:1px solid rgba(148,163,184,.18);
+}
+#rankforge-ai-question-studio .rf-ai-stat b{
+  display:block;
+  font-size:20px;
+}
+#rankforge-ai-question-studio .rf-ai-stat span{
+  font-size:11px;
+  opacity:.68;
+}
+@media(max-width:760px){
+  #rankforge-ai-question-studio{
+    margin:14px 8px;
+    padding:15px;
+    border-radius:16px;
+  }
+  #rankforge-ai-question-studio .rf-ai-grid{
+    grid-template-columns:1fr 1fr;
+  }
+  #rankforge-ai-question-studio .rf-ai-bank{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media(max-width:480px){
+  #rankforge-ai-question-studio .rf-ai-grid,
+  #rankforge-ai-question-studio .rf-ai-bank{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+
+
+<section id="rankforge-ai-question-studio" aria-label="RankForge AI Question Studio">
+
+  <div class="rf-ai-head">
+    <div>
+      <div class="rf-ai-title">🤖 RankForge AI Question Studio</div>
+      <div class="rf-ai-sub">
+        AI-powered Rank Booster question creation • NCERT-first • duplicate protected
+      </div>
+    </div>
+    <div class="rf-ai-badge">AI QUESTION ENGINE v1</div>
+  </div>
+
+  <div class="rf-ai-grid">
+
+    <div>
+      <label for="rf-ai-subject">Subject</label>
+      <select id="rf-ai-subject">
+        <option value="Mixed NEET">Mixed NEET</option>
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Biology">Biology</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="rf-ai-difficulty">Difficulty</label>
+      <select id="rf-ai-difficulty">
+        <option value="Hard">Hard</option>
+        <option value="Very Hard">Very Hard</option>
+        <option value="Rank Booster">Rank Booster</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="rf-ai-count">Questions</label>
+      <select id="rf-ai-count">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="45">45</option>
+        <option value="90">90</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="rf-ai-topic">Chapter / Topic</label>
+      <input id="rf-ai-topic"
+             placeholder="e.g. Rotational Motion / Genetics / Coordination Chemistry">
+    </div>
+
+  </div>
+
+  <div class="rf-ai-actions">
+    <button id="rf-ai-generate" type="button">⚡ Generate with AI</button>
+    <button id="rf-ai-spec" type="button">📋 Copy AI Specification</button>
+  </div>
+
+  <div class="rf-ai-status" id="rf-ai-status">
+    Ready. Configure subject, difficulty and topic, then generate or import validated AI JSON.
+  </div>
+
+  <div class="rf-ai-bank">
+    <div class="rf-ai-stat">
+      <b id="rf-ai-total">0</b>
+      <span>AI questions</span>
+    </div>
+    <div class="rf-ai-stat">
+      <b id="rf-ai-ranker-total">0</b>
+      <span>RankForge master bank</span>
+    </div>
+    <div class="rf-ai-stat">
+      <b id="rf-ai-test180-total">0</b>
+      <span>Real Test 180 bank</span>
+    </div>
+  </div>
+
+  <div style="margin-top:16px">
+    <label for="rf-ai-json">Validated AI Question JSON</label>
+    <textarea id="rf-ai-json"
+      placeholder='Paste AI-generated JSON here when using an external AI provider. Example: [{"id":"...","question":"...","options":["A","B","C","D"],"correctAnswer":"A","explanation":"..."}]'></textarea>
+  </div>
+
+  <div class="rf-ai-actions">
+    <button id="rf-ai-validate" type="button">✅ Validate & Add AI Questions</button>
+  </div>
+
+</section>
+
+
+<script>
+/* RANKFORGE_AI_STUDIO_BRIDGE_V1 */
+(function(){
+
+  function el(id){ return document.getElementById(id); }
+
+  function setStatus(msg){
+    var x = el("rf-ai-status");
+    if(x) x.textContent = msg;
+  }
+
+  function readBank(){
+    try{
+      var raw = localStorage.getItem("rankForgeAIQuestionBankV1");
+      var ai = raw ? JSON.parse(raw) : [];
+      if(!Array.isArray(ai)) ai = [];
+
+      var masterRaw = localStorage.getItem("rankBoosterQuestionBankV1");
+      var master = masterRaw ? JSON.parse(masterRaw) : [];
+      if(!Array.isArray(master)) master = [];
+
+      var test180 = Array.isArray(window.TEST180_QUESTIONS)
+        ? window.TEST180_QUESTIONS
+        : [];
+
+      if(el("rf-ai-total")) el("rf-ai-total").textContent = ai.length;
+      if(el("rf-ai-ranker-total")) el("rf-ai-ranker-total").textContent = master.length;
+      if(el("rf-ai-test180-total")) el("rf-ai-test180-total").textContent = test180.length;
+    }catch(e){
+      console.warn("RankForge AI bank read failed:", e);
+    }
+  }
+
+  function payload(){
+    return {
+      subject: el("rf-ai-subject")?.value || "Mixed NEET",
+      difficulty: el("rf-ai-difficulty")?.value || "Rank Booster",
+      count: Number(el("rf-ai-count")?.value || 10),
+      chapter: (el("rf-ai-topic")?.value || "").trim(),
+      topic: (el("rf-ai-topic")?.value || "").trim()
+    };
+  }
+
+  function specification(){
+    var p = payload();
+
+    return [
+      "RankForge AI Question Studio Specification",
+      "",
+      "Generate " + p.count + " original " + p.difficulty + " questions.",
+      "Subject: " + p.subject,
+      "Chapter/Topic: " + (p.chapter || "Adaptive"),
+      "",
+      "Requirements:",
+      "- NCERT-first",
+      "- NEET treatment",
+      "- Rank-booster quality",
+      "- Concept + trap + application + inference",
+      "- Close but defensible options",
+      "- Exactly one correct answer",
+      "- Four unique options",
+      "- Detailed stepwise explanation",
+      "- NCERT anchor",
+      "- Concept/trap metadata",
+      "- No copied or reworded duplicates",
+      "- No ambiguous or unsupported questions",
+      "- Preserve source/chapter/topic metadata",
+      "",
+      "Return strict JSON array only."
+    ].join("\\n");
+  }
+
+  async function generate(){
+
+    if(!window.RankForgeAI ||
+       typeof window.RankForgeAI.generateQuestions !== "function"){
+      setStatus(
+        "AI engine loaded, but no AI provider is connected yet. " +
+        "Use the JSON importer below or connect a provider to RankForgeAI.generateQuestions()."
+      );
+      return;
+    }
+
+    var p = payload();
+
+    setStatus("Generating " + p.count + " " + p.difficulty +
+              " questions for " + p.subject + "…");
+
+    try{
+      var result = await window.RankForgeAI.generateQuestions(p);
+
+      var questions =
+        Array.isArray(result) ? result :
+        (result && Array.isArray(result.questions) ? result.questions : []);
+
+      if(!questions.length){
+        setStatus("AI provider returned no valid questions.");
+        readBank();
+        return;
+      }
+
+      var json = el("rf-ai-json");
+      if(json) json.value = JSON.stringify(questions, null, 2);
+
+      setStatus(
+        "AI returned " + questions.length +
+        " question(s). Review/validate them before adding to the master bank."
+      );
+
+      readBank();
+
+    }catch(err){
+      console.error(err);
+      setStatus("AI generation failed: " + (err.message || err));
+    }
+  }
+
+  function importJSON(){
+
+    var box = el("rf-ai-json");
+    if(!box || !box.value.trim()){
+      setStatus("Paste AI JSON first.");
+      return;
+    }
+
+    try{
+      var parsed = JSON.parse(box.value);
+      var questions = Array.isArray(parsed)
+        ? parsed
+        : (parsed && Array.isArray(parsed.questions) ? parsed.questions : []);
+
+      if(!questions.length){
+        setStatus("No question array found in the JSON.");
+        return;
+      }
+
+      if(!window.RankForgeAI ||
+         typeof window.RankForgeAI.importQuestions !== "function"){
+        setStatus(
+          "AI engine import function is unavailable. " +
+          "The engine file may need to be refreshed."
+        );
+        return;
+      }
+
+      var result = window.RankForgeAI.importQuestions(questions);
+
+      var added =
+        result && typeof result.added === "number"
+          ? result.added
+          : questions.length;
+
+      var rejected =
+        result && typeof result.rejected === "number"
+          ? result.rejected
+          : 0;
+
+      setStatus(
+        "Validation complete: " + added +
+        " added, " + rejected + " rejected."
+      );
+
+      readBank();
+
+    }catch(err){
+      setStatus("Invalid JSON: " + (err.message || err));
+    }
+  }
+
+  document.addEventListener("click", function(e){
+
+    if(e.target.closest("#rf-ai-generate")){
+      e.preventDefault();
+      generate();
+    }
+
+    if(e.target.closest("#rf-ai-validate")){
+      e.preventDefault();
+      importJSON();
+    }
+
+    if(e.target.closest("#rf-ai-spec")){
+      e.preventDefault();
+
+      var text = specification();
+
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text)
+          .then(function(){
+            setStatus("AI specification copied.");
+          })
+          .catch(function(){
+            setStatus(text);
+          });
+      }else{
+        setStatus(text);
+      }
+    }
+
+  });
+
+  document.addEventListener("DOMContentLoaded", function(){
+    readBank();
+
+    /* Refresh after seed/test banks initialise. */
+    setTimeout(readBank, 500);
+    setTimeout(readBank, 1500);
+    setTimeout(readBank, 3000);
+  });
+
+  window.RANKFORGE_AI_STUDIO_BRIDGE_V1 = true;
+
+})();
+</script>
+
 </body></html>
