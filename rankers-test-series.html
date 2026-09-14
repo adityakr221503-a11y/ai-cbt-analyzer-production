@@ -1074,4 +1074,285 @@ Open Ranker Command Center
 <script src="./nichod/engine/unified-test-library-ui.js"></script>
 
 <script src="./nichod/engine/cbt-live-source-panel.js"></script>
+
+<!-- RankForge AI Question Intelligence -->
+<script src="./rank-booster/ai-question-engine.js"></script>
+<script src="./rank-booster/seed-test180.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  function bootRankForgeAI() {
+    if (!window.RankForgeAI) {
+      console.warn("[RankForge] AI engine unavailable");
+      return;
+    }
+
+    if (document.getElementById("rankforge-ai-studio"))
+      return;
+
+    const style = document.createElement("style");
+    style.textContent = `
+      #rankforge-ai-studio {
+        margin: 18px 0;
+        padding: 18px;
+        border: 1px solid rgba(120,120,120,.25);
+        border-radius: 18px;
+        background: linear-gradient(145deg,#111827,#1f2937);
+        color: #fff;
+        box-shadow: 0 12px 35px rgba(0,0,0,.18);
+        font-family: inherit;
+      }
+      #rankforge-ai-studio h3 {
+        margin: 0 0 6px;
+        font-size: 20px;
+      }
+      #rankforge-ai-studio p {
+        margin: 5px 0 14px;
+        opacity: .78;
+        font-size: 13px;
+      }
+      #rankforge-ai-studio .rf-grid {
+        display: grid;
+        grid-template-columns: repeat(3,minmax(0,1fr));
+        gap: 10px;
+      }
+      #rankforge-ai-studio select,
+      #rankforge-ai-studio input,
+      #rankforge-ai-studio button {
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,.16);
+        padding: 10px;
+        font: inherit;
+      }
+      #rankforge-ai-studio select,
+      #rankforge-ai-studio input {
+        background: rgba(255,255,255,.08);
+        color: #fff;
+      }
+      #rankforge-ai-studio option {
+        color: #111;
+      }
+      #rankforge-ai-studio button {
+        margin-top: 10px;
+        cursor: pointer;
+        background: #fff;
+        color: #111827;
+        font-weight: 700;
+      }
+      #rankforge-ai-status {
+        margin-top: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        opacity: .9;
+      }
+      @media(max-width:700px) {
+        #rankforge-ai-studio .rf-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const box = document.createElement("section");
+    box.id = "rankforge-ai-studio";
+
+    box.innerHTML = `
+      <h3>⚡ RankForge AI Question Studio</h3>
+      <p>AI-assisted test selection, trap analysis, novelty filtering and quality scoring.</p>
+
+      <div class="rf-grid">
+        <select id="rf-ai-subject">
+          <option value="Mixed">Mixed Subjects</option>
+          <option value="Physics">Physics</option>
+          <option value="Chemistry">Chemistry</option>
+          <option value="Biology">Biology</option>
+        </select>
+
+        <select id="rf-ai-difficulty">
+          <option value="NEET+">NEET+</option>
+          <option value="NEET">NEET</option>
+          <option value="JEE Main">JEE Main</option>
+          <option value="JEE Advanced">JEE Advanced</option>
+        </select>
+
+        <input id="rf-ai-count" type="number" min="5" max="180" value="20">
+      </div>
+
+      <button id="rf-ai-build">Generate AI Ranked Test</button>
+      <div id="rankforge-ai-status">Initializing RankForge AI…</div>
+    `;
+
+    const candidates = Array.from(document.body.children);
+    const target =
+      candidates.find(x =>
+        /rank|test|series|180/i.test(
+          (x.innerText || "").slice(0, 400)
+        )
+      ) || document.body.firstElementChild;
+
+    if (target && target.parentNode)
+      target.parentNode.insertBefore(box, target);
+    else
+      document.body.prepend(box);
+
+    const status = document.getElementById("rankforge-ai-status");
+
+    function setStatus(text) {
+      if (status) status.textContent = text;
+    }
+
+    function getExistingPool() {
+      const keys = [
+        "pdfCbtQuestions",
+        "pdfQuestions",
+        "cbtQuestions",
+        "importedQuestions",
+        "pdfQuestionBank",
+        "questionBank",
+        "cbtHistory"
+      ];
+
+      const result = [];
+
+      keys.forEach(key => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+
+          const parsed = JSON.parse(raw);
+
+          if (Array.isArray(parsed))
+            result.push.apply(result, parsed);
+
+          if (parsed && Array.isArray(parsed.questions))
+            result.push.apply(result, parsed.questions);
+        } catch (_) {}
+      });
+
+      return result;
+    }
+
+    async function getPool() {
+      let pool = getExistingPool();
+
+      const test180 = await window.RankForgeSeed.load(
+        "./test180-questions.json"
+      );
+
+      pool = pool.concat(test180);
+
+      return window.RankForgeAI.deduplicate(pool)
+        .filter(window.RankForgeAI.validate);
+    }
+
+    document
+      .getElementById("rf-ai-build")
+      .addEventListener("click", async function () {
+        const button = this;
+
+        try {
+          button.disabled = true;
+          button.textContent = "Building…";
+          setStatus("Loading question intelligence…");
+
+          const pool = await getPool();
+
+          if (!pool.length) {
+            setStatus(
+              "No valid questions found. Existing Test180 JSON could not be loaded."
+            );
+            return;
+          }
+
+          const subject =
+            document.getElementById("rf-ai-subject").value;
+
+          const difficulty =
+            document.getElementById("rf-ai-difficulty").value;
+
+          const count = Math.max(
+            5,
+            Math.min(
+              180,
+              Number(
+                document.getElementById("rf-ai-count").value
+              ) || 20
+            )
+          );
+
+          const test = window.RankForgeAI.createTest(
+            pool,
+            {
+              title: "RankForge AI Ranked Test",
+              subject,
+              difficulty,
+              count
+            }
+          );
+
+          window.RankForgeAI.lastGeneratedTest = test;
+
+          localStorage.setItem(
+            "rankforge.ai.active.test",
+            JSON.stringify(test)
+          );
+
+          setStatus(
+            "Generated " +
+            test.questionCount +
+            " questions from " +
+            pool.length +
+            " valid candidates. " +
+            "AI quality filtering + duplicate protection applied."
+          );
+
+          window.dispatchEvent(
+            new CustomEvent("rankforge:ai-test-created", {
+              detail: test
+            })
+          );
+
+          if (typeof window.openCBTWithQuestions === "function") {
+            window.openCBTWithQuestions(test.questions);
+          } else if (typeof window.startCBT === "function") {
+            window.startCBT(test.questions);
+          }
+
+        } catch (error) {
+          console.error("[RankForge]", error);
+          setStatus(
+            "RankForge error: " +
+            (error && error.message
+              ? error.message
+              : String(error))
+          );
+        } finally {
+          button.disabled = false;
+          button.textContent = "Generate AI Ranked Test";
+        }
+      });
+
+    getPool().then(function (pool) {
+      setStatus(
+        "RankForge AI ready • " +
+        pool.length +
+        " valid questions available"
+      );
+    }).catch(function () {
+      setStatus("RankForge AI ready.");
+    });
+  }
+
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", bootRankForgeAI);
+  else
+    bootRankForgeAI();
+
+})();
+</script>
+
 </body></html>
