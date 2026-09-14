@@ -65,12 +65,141 @@ const usedKey='rankerUsedQuestionIdsV2';
 const used=new Set(read(usedKey,[]));
 function difficultyRank(q){return Math.max(1,Math.min(6,parseInt(String(q.difficultyLevel||q.difficulty||'L3').replace(/\D/g,''),10)||3));}
 function score(q,subject,diff,type){let s=0;if(subject!=='All'&&q.subject===subject)s+=40;const d=difficultyRank(q);if(diff!=='adaptive'&&q.difficultyLevel===diff)s+=45;if(diff==='adaptive'){const target=type==='Topper Challenge'?5:type==='Mastery Check'?3:type==='Revision Test'?2:top?3:2;s+=Math.max(0,25-Math.abs(d-target)*8)}if(top){const text=norm([q.subject,q.chapter,q.topic,q.concept,q.question].join(' '));top.key.split(' • ').filter(Boolean).forEach(part=>{if(text.includes(part))s+=30})}if(q.qualityFlags&&q.qualityFlags.hasFourOptions)s+=5;if(q.qualityFlags&&q.qualityFlags.hasAnswer)s+=5;if(used.has(q.id))s-=18;return s+Math.random()*4}
-function generate(){
+async function generate(){
  const type=document.getElementById('type').value,count=Number(document.getElementById('count').value)||10,subject=document.getElementById('subject').value,diff=document.getElementById('difficulty').value;
  const pool=bank.filter(q=>subject==='All'||q.subject===subject);
  const ranked=[...pool].sort((a,b)=>score(b,subject,diff,type)-score(a,subject,diff,type));
  generated=ranked.slice(0,count).map((q,i)=>({...q,questionNumber:i+1,source:q.source||'Ranker Pro Master Question Bank',generatedBy:q.bankSource==='ai-generated'?'ranker-ai-bank':'ranker-adaptive-v3'}));
- if(generated.length<count){updateStatus('Only '+generated.length+' matching questions available. AI fallback will be used when a secure endpoint is configured.');return}
+ if(generated.length<count){
+    const need = count - generated.length;
+    updateStatus('Core + AI bank me '+generated.length+'/'+count+' questions mile. Secure AI se '+need+' new questions generate ho rahe hain...');
+
+    try{
+      const endpoint =
+        window.RANKFORGE_AI_ENDPOINT ||
+        localStorage.getItem('rankforgeAiEndpoint') ||
+        '/api/ai/generate';
+
+      const payload = {
+        count: Math.min(need, 20),
+        subject: subject,
+        difficulty: difficulty,
+        type: 'MCQ',
+        focus: 'NEET rank-booster; NCERT-first; concept + application + examiner-trap; original questions only',
+        sourceBasis: 'Approved curriculum/reference calibration only. Do not copy source wording or questions.'
+      };
+
+      const response = await fetch(endpoint,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+
+      if(!response.ok){
+        throw new Error('AI endpoint HTTP '+response.status);
+      }
+
+      const data = await response.json();
+      const aiRaw =
+        Array.isArray(data) ? data :
+        Array.isArray(data.questions) ? data.questions :
+        Array.isArray(data.candidates) ? data.candidates :
+        [];
+
+      const normaliseAI = q => {
+        if(!q || typeof q !== 'object') return null;
+
+        const text = String(q.question ?? q.text ?? '').trim();
+        const opts = Array.isArray(q.options)
+          ? q.options.map(x=>String(x ?? '').trim()).filter(Boolean)
+          : [];
+
+        let ci = Number.isInteger(q.correctIndex)
+          ? q.correctIndex
+          : Number.isInteger(q.answerIndex)
+            ? q.answerIndex
+            : -1;
+
+        if(ci < 0 && typeof q.correctAnswer === 'string'){
+          const m=q.correctAnswer.trim().toUpperCase().match(/^[ABCD]/);
+          if(m) ci=m[0].charCodeAt(0)-65;
+        }
+
+        if(!text || opts.length !== 4 || ci < 0 || ci > 3) return null;
+
+        return {
+          id: q.id || ('AI-'+Date.now()+'-'+Math.random().toString(36).slice(2,10)),
+          question: text,
+          options: opts,
+          correctIndex: ci,
+          correctAnswer: String.fromCharCode(65+ci),
+          subject: q.subject || subject,
+          chapter: q.chapter || '',
+          topic: q.topic || '',
+          concept: q.concept || '',
+          difficulty: q.difficulty || difficulty,
+          trapType: q.trapType || '',
+          explanation: q.explanation || '',
+          source: 'RankForge Secure AI',
+          bankSource: 'ai',
+          sourceBasis: q.sourceBasis || payload.sourceBasis,
+          sourceType: q.sourceType || 'approved-curriculum',
+          generationMethod: q.generationMethod || 'secure-ai',
+          noveltyScore: q.noveltyScore ?? null
+        };
+      };
+
+      const aiQuestions = aiRaw.map(normaliseAI).filter(Boolean);
+
+      if(!aiQuestions.length){
+        throw new Error('AI returned no valid questions');
+      }
+
+      const existing = [
+        ...generated,
+        ...(bankApi && typeof bankApi.getAll === 'function' ? bankApi.getAll() : [])
+      ];
+
+      const seen = new Set(
+        existing.map(q => {
+          const x = String(q.question || '').toLowerCase().replace(/\s+/g,' ').trim();
+          return x;
+        })
+      );
+
+      const freshAI = [];
+      for(const q of aiQuestions){
+        const key = q.question.toLowerCase().replace(/\s+/g,' ').trim();
+        if(seen.has(key)) continue;
+        seen.add(key);
+        freshAI.push(q);
+      }
+
+      if(!freshAI.length){
+        throw new Error('AI questions duplicate existing bank questions');
+      }
+
+      if(bankApi && typeof bankApi.saveAI === 'function'){
+        bankApi.saveAI(freshAI);
+      }else{
+        const key='rankerAiApprovedQuestionsV1';
+        const oldAI=JSON.parse(localStorage.getItem(key)||'[]');
+        localStorage.setItem(key,JSON.stringify(oldAI.concat(freshAI)));
+      }
+
+      generated.push(...freshAI);
+
+      if(generated.length<count){
+        updateStatus('AI ne '+freshAI.length+' valid new questions diye; requested '+count+' me '+generated.length+' available hain.');
+      }else{
+        updateStatus('Secure AI fallback successful — new questions AI Question Bank me save ho gaye.');
+      }
+    }catch(err){
+      console.error('RankForge secure AI fallback:',err);
+      updateStatus('AI fallback failed: '+(err.message||err)+'. Core/AI bank se available questions ke saath test start nahi kiya gaya.');
+      return;
+    }
+  }
  generated.forEach(q=>{if(q.id)used.add(q.id)});localStorage.setItem(usedKey,JSON.stringify([...used].slice(-5000)));
  sessionStorage.setItem('CBT_ACTIVE_QUESTIONS',JSON.stringify(generated));
  sessionStorage.setItem('CBT_ACTIVE_SOURCE','Ranker Pro — Unified Question Bank');
