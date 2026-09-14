@@ -826,46 +826,6 @@ Open Ranker Command Center
     if (document.getElementById("pcbNichodLiveReport"))
       return;
 
-    const box = document.createElement("div");
-
-    box.id = "pcbNichodLiveReport";
-
-    box.style.cssText =
-      "position:fixed;" +
-      "right:12px;" +
-      "bottom:12px;" +
-      "z-index:999999;" +
-      "background:#111827;" +
-      "color:#fff;" +
-      "padding:12px;" +
-      "border-radius:12px;" +
-      "font:14px monospace;" +
-      "max-width:90vw;" +
-      "box-shadow:0 8px 30px rgba(0,0,0,.35);";
-
-    box.innerHTML =
-      '<b>🧪 PCB NICHOD LIVE</b>' +
-      '<div id="pcbNichodLiveStatus" style="margin-top:8px">' +
-      'Reading flow…</div>' +
-      '<button id="pcbNichodLiveRefresh" ' +
-      'style="margin-top:8px;padding:8px;border-radius:8px">' +
-      'Refresh</button>' +
-      '<button id="pcbNichodLiveCopy" ' +
-      'style="margin-top:8px;margin-left:6px;padding:8px;border-radius:8px">' +
-      'Copy Report</button>';
-
-    document.body.appendChild(box);
-
-    document
-      .getElementById("pcbNichodLiveRefresh")
-      .onclick = render;
-
-    document
-      .getElementById("pcbNichodLiveCopy")
-      .onclick = copyReport;
-
-    render();
-  }
 
   function getJSON(key) {
 
