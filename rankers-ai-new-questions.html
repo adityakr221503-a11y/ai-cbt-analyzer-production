@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RankForge AI — New Questions</title>
+<style>
+body{font-family:system-ui;margin:0;background:#f5f7fb;color:#172033}
+main{max-width:900px;margin:auto;padding:20px}
+.card{background:#fff;border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 5px 22px #00000010}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+select,input,textarea,button{width:100%;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #ccd3df;margin-top:6px}
+button{cursor:pointer;font-weight:700}
+textarea{min-height:280px;font-family:monospace}
+small{color:#667085}
+</style>
+</head>
+<body>
+<main>
+<h1>🤖 RankForge AI — New Questions</h1>
+<p>AI questions are kept separate until validation and approval.</p>
+
+<div class="card">
+<div class="grid">
+<label>Subject<select id="rfAISubject">
+<option>Mixed</option><option>Physics</option><option>Chemistry</option><option>Biology</option>
+</select></label>
+
+<label>Difficulty<select id="rfAIDifficulty">
+<option>Hard</option><option>Very Hard</option><option>Rank Booster</option>
+</select></label>
+
+<label>Count<select id="rfAICount">
+<option>10</option><option>15</option><option>30</option><option>45</option><option>90</option>
+</select></label>
+</div>
+
+<label>Chapter / Topic
+<input id="rfAITopic" placeholder="e.g. Rotational Motion / Genetics / Electrochemistry">
+</label>
+
+<button onclick="generateSpec()">Generate AI Specification</button>
+</div>
+
+<div class="card">
+<h3>Strict AI specification</h3>
+<textarea id="rfAISpec" readonly></textarea>
+<button onclick="navigator.clipboard?.writeText(document.getElementById('rfAISpec').value)">Copy Specification</button>
+</div>
+
+<div class="card">
+<h3>AI JSON → Validate</h3>
+<textarea id="rfAIJson" placeholder='Paste provider-generated JSON array here'></textarea>
+<button onclick="validateAI()">Validate & Add to AI Bank</button>
+<p id="rfAIStatus"></p>
+</div>
+</main>
+
+<script src="./rank-booster/ai-question-engine.js"></script>
+<script src="./rank-booster/ai-new-question-module-v1.js"></script>
+<script>
+function generateSpec(){
+ const subject=document.getElementById("rfAISubject").value;
+ const difficulty=document.getElementById("rfAIDifficulty").value;
+ const count=Number(document.getElementById("rfAICount").value);
+ const topic=document.getElementById("rfAITopic").value.trim();
+
+ const spec={
+   task:"Generate genuinely new NEET RankForge questions",
+   subject,difficulty,count,topic,
+   rules:[
+    "NCERT-first and NEET-relevant",
+    "Do not copy or reword existing questions",
+    "Avoid near-duplicate solving paths",
+    "Exactly one correct option",
+    "Four clear options",
+    "No unsupported facts",
+    "No filler/basic questions",
+    "Include concept/application/trap/inference where appropriate",
+    "Return ONLY a JSON array"
+   ],
+   schema:{
+    text:"string",
+    options:["A","B","C","D"],
+    correctIndex:0,
+    subject,
+    chapter:topic,
+    topic,
+    difficulty,
+    explanation:"string",
+    trapType:"string"
+   }
+ };
+ document.getElementById("rfAISpec").value=JSON.stringify(spec,null,2);
+}
+
+function validateAI(){
+ try{
+   const raw=JSON.parse(document.getElementById("rfAIJson").value);
+   const result=window.RankForgeAINewQuestionModuleV1.importAndValidate(raw);
+   document.getElementById("rfAIStatus").textContent=
+     `Accepted: ${result.accepted} | Rejected: ${result.rejected} | AI Bank total: ${result.total}`;
+ }catch(e){
+   document.getElementById("rfAIStatus").textContent=e.message;
+ }
+}
+</script>
+</body>
+</html>

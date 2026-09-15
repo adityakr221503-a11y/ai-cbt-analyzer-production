@@ -1761,4 +1761,28 @@ Open Ranker Command Center
 })();
 </script>
 
+
+<script src="./rankforge-master-pool-v1.js"></script>
+<script src="./rankforge-ranker-practice-v1.js"></script>
+<script src="./rankforge-unified-ranker-test-v1.js"></script>
+<div id="rankforge-unified-tools" style="margin:20px 0;padding:18px;border-radius:16px;background:#fff;box-shadow:0 4px 20px #0001">
+<h2>🏆 RankForge Unified</h2>
+<p>Ranker Question Bank + DPP + approved AI Question Bank</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">
+<select id="rfPracticeSubject"><option>Mixed</option><option>Physics</option><option>Chemistry</option><option>Biology</option></select>
+<select id="rfPracticeDifficulty"><option>All</option><option>NEET</option><option>NEET+</option><option>Hard</option><option>Very Hard</option><option>Rank Booster</option></select>
+<input id="rfPracticeTopic" placeholder="Practice chapter/topic">
+<select id="rfPracticeCount"><option>5</option><option>10</option><option>15</option><option>20</option></select>
+<button onclick="RankForgePracticeV1.start()">🧠 Start Practice</button>
+</div>
+<hr>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">
+<select id="rfTestSubject"><option>Mixed</option><option>Physics</option><option>Chemistry</option><option>Biology</option></select>
+<select id="rfTestDifficulty"><option>All</option><option>NEET</option><option>NEET+</option><option>Hard</option><option>Very Hard</option><option>Rank Booster</option></select>
+<input id="rfTestTopic" placeholder="Test chapter/topic">
+<select id="rfTestCount"><option>10</option><option>15</option><option>45</option><option>90</option><option>180</option></select>
+<button onclick="RankForgeUnifiedRankerV1.start()">🏆 Start AI + Bank Test</button>
+</div>
+<p><a href="./rankers-ai-new-questions.html">🤖 Open AI New Questions Module</a></p>
+</div>
 </body></html>
