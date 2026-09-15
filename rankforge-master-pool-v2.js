@@ -17,11 +17,26 @@
   const MASTER_KEY = "rankForgeMasterQuestionPoolV2";
 
   const SOURCE_KEYS = {
-    ranker: ["rankBoosterQuestionBankV1"],
-    pdf: ["pdfCbtQuestions"],
-    nichod: ["pcbNichodCorpus"],
-    dpp: ["rankforgeAdaptiveDPPV1"],
-    ai: ["rankForgeAIQuestionBankV1"]
+    ranker: [
+      "rankBoosterQuestionBankV1",
+      "rankForgeQuestionBank",
+      "rankerQuestionBank"
+    ],
+    pdf: [
+      "pdfCbtQuestions",
+      "pdfQuestionBank",
+      "pdfQuestions"
+    ],
+    nichod: [
+      "pcbNichodCorpus",
+      "pcbNichodCBTSnapshot"
+    ],
+    dpp: [
+      "rankforgeAdaptiveDPPV1"
+    ],
+    ai: [
+      "rankForgeAIQuestionBankV1"
+    ]
   };
 
   const api = {};
