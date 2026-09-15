@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RankForge Bank Audit</title>
+<style>
+body{font-family:system-ui;margin:0;background:#f5f7fb;color:#172033}
+main{max-width:1000px;margin:auto;padding:20px}
+.card{background:#fff;padding:18px;margin:14px 0;border-radius:18px;box-shadow:0 4px 20px #0001}
+button{padding:12px 18px;border:0;border-radius:10px;font-weight:700;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+td,th{padding:10px;border-bottom:1px solid #ddd;text-align:left}
+.big{font-size:32px;font-weight:800}
+pre{white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+<main>
+<h1>🔎 RankForge Question Bank Audit</h1>
+<p>This is a read-only audit. It does not delete or modify question banks.</p>
+
+<div class="card">
+<button onclick="audit()">🔄 Run Actual Bank Audit</button>
+</div>
+
+<div class="card">
+<h2>Total discovered questions</h2>
+<div id="total" class="big">—</div>
+</div>
+
+<div class="card">
+<h2>Source breakdown</h2>
+<table>
+<thead><tr><th>Source</th><th>Questions</th><th>Storage Keys</th></tr></thead>
+<tbody id="sources"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>All question-like localStorage keys</h2>
+<pre id="keys">—</pre>
+</div>
+
+<div class="card">
+<h2>Duplicate / structure information</h2>
+<pre id="details">—</pre>
+</div>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+const KNOWN={
+ "Ranker Question Bank":[
+  "rankerQuestionBank","rankForgeQuestionBank",
+  "questionBank","rankforgeQuestionBankV1"
+ ],
+ "DPP":[
+  "dppQuestionBank","rankforgeDPPQuestionBank",
+  "rankForgeDPPBankV1","dppBank","dppQuestions"
+ ],
+ "AI Question Bank":[
+  "rankForgeAIQuestionBankV1"
+ ]
+};
+
+function parse(v){
+ try{return JSON.parse(v)}
+ catch(e){return null}
+}
+
+function extract(v,depth=0){
+ if(depth>8||v==null)return [];
+ if(Array.isArray(v))return v;
+
+ if(typeof v==="object"){
+  for(const k of ["questions","items","bank","data","questionBank"]){
+   if(Array.isArray(v[k]))return v[k];
+   if(v[k]&&typeof v[k]==="object"){
+    const r=extract(v[k],depth+1);
+    if(r.length)return r;
+   }
+  }
+ }
+ return [];
+}
+
+function looksLikeQuestion(q){
+ if(!q||typeof q!=="object")return false;
+ const text=q.text||q.question||q.questionText||q.prompt;
+ const opts=q.options||q.choices||q.answers;
+ return typeof text==="string" && text.trim().length>=5 &&
+        Array.isArray(opts) && opts.length>=2;
+}
+
+function scanKey(key){
+ const raw=localStorage.getItem(key);
+ if(raw===null)return {count:0,valid:0,value:null};
+ const value=parse(raw);
+ const arr=extract(value);
+ return {
+  count:arr.length,
+  valid:arr.filter(looksLikeQuestion).length,
+  value
+ };
+}
+
+function audit(){
+ const rows=[];
+ const used=new Set();
+ let total=0;
+
+ for(const [source,keys] of Object.entries(KNOWN)){
+  let count=0,valid=0,found=[];
+
+  for(const key of keys){
+   if(!localStorage.getItem(key))continue;
+   const r=scanKey(key);
+   if(r.count||r.valid){
+    count+=r.count;
+    valid+=r.valid;
+    found.push(`${key}: ${r.valid}/${r.count}`);
+    used.add(key);
+   }
+  }
+
+  rows.push({source,count,valid,keys:found});
+  total+=valid;
+ }
+
+ const all=[];
+ for(let i=0;i<localStorage.length;i++){
+  const key=localStorage.key(i);
+  if(!key)continue;
+
+  const r=scanKey(key);
+
+  if(r.valid){
+   const name=key.toLowerCase();
+   const source=
+    name.includes("dpp") ? "DPP-like" :
+    name.includes("ai") ? "AI-like" :
+    name.includes("rank")||name.includes("question")||
+    name.includes("bank") ? "Question-bank-like" :
+    "Other";
+
+   all.push({
+    key,
+    valid:r.valid,
+    raw:r.count,
+    source
+   });
+
+   if(!used.has(key)){
+    total+=r.valid;
+   }
+  }
+ }
+
+ document.getElementById("total").textContent=total.toLocaleString();
+
+ document.getElementById("sources").innerHTML=rows.map(r=>
+  `<tr>
+   <td><b>${r.source}</b></td>
+   <td>${r.valid.toLocaleString()}</td>
+   <td>${r.keys.length?r.keys.join("<br>"):"Not found"}</td>
+  </tr>`
+ ).join("");
+
+ document.getElementById("keys").textContent=
+  all.length
+   ? all.map(x=>`${x.key}  →  ${x.valid} valid / ${x.raw} array entries  [${x.source}]`).join("\n")
+   : "No question-like localStorage keys discovered.";
+
+ const stats={
+  localStorageKeys:localStorage.length,
+  knownSources:rows,
+  additionalQuestionLikeKeys:all.filter(x=>!used.has(x.key)),
+  totalDiscovered:total,
+  note:"Counts are read-only browser storage counts. No questions were created, deleted, or modified."
+ };
+
+ document.getElementById("details").textContent=
+   JSON.stringify(stats,null,2);
+}
+
+window.audit= audit;
+audit();
+})();
+</script>
+</body>
+</html>
