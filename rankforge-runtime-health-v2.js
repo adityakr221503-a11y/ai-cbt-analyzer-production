@@ -91,23 +91,7 @@ function test(){
 }
 
 function render(){
-  let box=document.getElementById("rankforge-runtime-health-v2");
-
-  if(!box){
-    box=document.createElement("pre");
-    box.id="rankforge-runtime-health-v2";
-
-    box.style.cssText=
-      "position:fixed;left:10px;right:10px;bottom:10px;z-index:999999;"+
-      "max-height:45vh;overflow:auto;padding:12px;border-radius:10px;"+
-      "background:#111;color:#fff;font:12px monospace;white-space:pre-wrap;";
-
-    document.body.appendChild(box);
-  }
-
-  box.textContent=
-    "RANKFORGE RUNTIME HEALTH V2\n\n"+
-    JSON.stringify(test(),null,2);
+  return test();
 }
 
 global.RankForgeRuntimeHealthV2={
