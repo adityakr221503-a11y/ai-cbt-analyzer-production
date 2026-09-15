@@ -1,0 +1,12 @@
+{
+  "name": "rankforge-ai",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-12",
+  "secrets": {
+    "required": ["OPENAI_API_KEY"]
+  },
+  "vars": {
+    "OPENAI_MODEL": "gpt-4.1-mini",
+    "ALLOWED_ORIGIN": "https://adityakr221503-a11y.github.io"
+  }
+}

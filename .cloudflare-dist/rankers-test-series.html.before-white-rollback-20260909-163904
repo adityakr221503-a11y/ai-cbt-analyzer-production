@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rankers Test Series</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#f5f7fb;color:#172033}
+.wrap{max-width:1000px;margin:auto;padding:22px}.hero,.card{background:#fff;border:1px solid #e4e8f0;border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 5px 18px #00000009}
+h1{margin:0 0 8px}.muted{color:#687386}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+button,select{width:100%;padding:12px;border-radius:11px;border:1px solid #d8deea;background:#fff;font-size:15px}
+button{cursor:pointer;font-weight:700;background:#172033;color:#fff;border:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{padding:15px;border-radius:14px;background:#f1f4f9}.num{font-size:25px;font-weight:800}
+.test{padding:16px;border:1px solid #e3e7ef;border-radius:14px}.test h3{margin:0 0 6px}
+@media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+<script src="./nichod/engine/cbt-unified-question-loader.js"></script>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<h1>Rankers Test Series</h1>
+<div class="muted">Coverage-first tests using the existing Rank Booster question bank. No fixed question count.</div>
+</section>
+<section class="card">
+<div class="stats">
+<div class="stat"><div class="num" id="qCount">0</div><div class="muted">Bank questions</div></div>
+<div class="stat"><div class="num" id="attempts">0</div><div class="muted">Attempts</div></div>
+<div class="stat"><div class="num" id="avgAccuracy">0%</div><div class="muted">Avg Accuracy</div></div>
+<div class="stat"><div class="num" id="bestAccuracy">0%</div><div class="muted">Best Accuracy</div></div>
+<div class="stat"><div class="num" id="mastered">0</div><div class="muted">Mastered</div></div>
+<div class="stat"><div class="num" id="subjects">0</div><div class="muted">Subjects</div></div>
+</div>
+</section>
+<section class="card">
+<h2>Build a Ranker Test</h2>
+<div class="grid">
+<div><label>Subject</label><select id="subject"><option value="">All subjects</option></select></div>
+<div><label>Chapter</label><select id="chapter"><option value="">All chapters</option></select></div>
+<div><label>Test type</label><select id="type">
+<option value="chapter">Chapter / Topic Mastery</option>
+<option value="multi">Multi-Chapter Ranker</option>
+<option value="full">Full Syllabus Ranker</option>
+<option value="challenge">Ranker Challenge</option>
+</select></div>
+<div><label>Selection</label><select id="mode">
+<option value="new">Prioritize new patterns</option>
+<option value="weak">Prioritize weak topics</option>
+<option value="mixed">Balanced coverage</option>
+<option value="adaptive">Adaptive Ranker</option>
+</select></div>
+</div><br>
+<button id="start">Start Ranker Test</button>
+<p id="status" class="muted"></p>
+</section>
+<section class="card">
+<h2>Test Series Rules</h2>
+<div class="grid">
+<div class="test"><h3>Coverage First</h3><div class="muted">Concept and pattern coverage comes before arbitrary question counts.</div></div>
+<div class="test"><h3>Adaptive</h3><div class="muted">Weak and unseen areas can be prioritized from attempt history.</div></div>
+<div class="test"><h3>Mastery</h3><div class="muted">Mistakes flow into retry and mastery tracking through the existing CBT system.</div></div>
+<div class="test"><h3>Source Separation</h3><div class="muted">Ranker tests remain distinguishable from imported PDF tests.</div></div>
+</div>
+</section>
+</div>
+
+<script>
+/* IMAGE_DATA_RANKERS_PIPELINE_V2 */
+(function () {
+  function has(v) {
+    return v !== undefined && v !== null &&
+      !(typeof v === "string" && !v.trim());
+  }
+
+  window.RBNormalizeQuestionV2 = function (q, i) {
+    q = q || {};
+
+    var text =
+      q.question ||
+      q.text ||
+      q.questionText ||
+      q.question_text ||
+      q.statement ||
+      "";
+
+    var image =
+      q.image ||
+      q.imageUrl ||
+      q.imageURL ||
+      q.image_url ||
+      q.img ||
+      q.figure ||
+      q.diagram ||
+      q.questionImage ||
+      q.question_image ||
+      "";
+
+    var data =
+      q.data ||
+      q.dataImage ||
+      q.dataUrl ||
+      q.dataURL ||
+      q.data_url ||
+      q.chart ||
+      q.graph ||
+      q.table ||
+      q.passage ||
+      "";
+
+    var options =
+      q.options ||
+      q.choices ||
+      q.answers ||
+      [];
+
+    if (!Array.isArray(options)) {
+      if (typeof options === "object" && options) {
+        options = Object.values(options);
+      } else {
+        options = [];
+      }
+    }
+
+    return Object.assign({}, q, {
+      id: q.id || ("RB-" + i),
+      question: text,
+      text: text,
+      options: options,
+      image: image,
+      data: data,
+      imageUrl: q.imageUrl || image,
+      dataUrl: q.dataUrl || data,
+      correctAnswer:
+        q.correctAnswer !== undefined ? q.correctAnswer :
+        q.answer !== undefined ? q.answer : "",
+      answer:
+        q.answer !== undefined ? q.answer :
+        q.correctAnswer !== undefined ? q.correctAnswer : ""
+    });
+  };
+
+  window.RBNormalizePoolV2 = function (pool) {
+    if (!Array.isArray(pool)) return [];
+
+    return pool.map(function (q, i) {
+      return window.RBNormalizeQuestionV2(q, i);
+    }).filter(function (q) {
+      return (
+        has(q.question) ||
+        has(q.image) ||
+        has(q.data)
+      ) && q.options.length >= 2;
+    });
+  };
+})();
+</script>
+
+<script src="rank-booster/question-bank.js"></script>
+<script>
+function checkBankCount() {
+  alert("BANK=" + RankBoosterQuestionBank.getAll().length +
+        " ADD=" + (typeof window.addRankBoosterQuestion));
+}
+</script>
+
+<script src="rank-booster/import-test180.js?v=2eca0b1"></script>
+<button id="importTest180Btn" type="button" onclick="importTest180Questions().then(r => alert(JSON.stringify(r)))">IMPORT TEST 180</button>
+<button type="button" onclick="checkBankCount()">CHECK BANK COUNT</button>
+<script>
+(function(){
+ const $=id=>document.getElementById(id);
+ let bank=[];
+ try{if(window.RankBoosterQuestionBank&&typeof RankBoosterQuestionBank.getAll==="function")bank=RankBoosterQuestionBank.getAll()||[];}catch(e){console.error(e)}
+
+ /* TEST180 DIRECT SOURCE: always recover complete 180-question pool */
+ fetch("./test180-questions.json")
+   .then(function(res){return res.json();})
+   .then(function(data){
+     var src=Array.isArray(data)?data:
+       (Array.isArray(data.questions)?data.questions:
+       (Array.isArray(data.data)?data.data:
+       (Array.isArray(data.items)?data.items:[])));
+
+     if(src.length){
+       bank=src.map(function(q,i){
+         return Object.assign({},q,{
+           id:q.id||("TEST180-"+(i+1)),
+           question:q.question||q.text||"",
+           text:q.text||q.question||"",
+           options:Array.isArray(q.options)?q.options:[],
+           answer:q.answer!==undefined?q.answer:
+             (q.correctAnswer!==undefined?q.correctAnswer:""),
+           correctAnswer:q.correctAnswer!==undefined?q.correctAnswer:
+             (q.answer!==undefined?q.answer:""),
+           chapter:q.chapter||"Test 180",
+           topic:q.topic||"",
+           concept:q.concept||"",
+           source:q.source||"TEST180"
+         });
+       }).filter(function(q){
+         return q.options.length>=2 &&
+           (q.question||q.text||q.image||q.imageUrl||q.data||q.dataUrl);
+       });
+
+       console.log("Ranker DIRECT TEST180 pool:",bank.length);
+     }
+   })
+   .catch(function(e){
+     console.error("Direct TEST180 load failed:",e);
+   });
+ let attempts=[];let mastered=[];
+ try{attempts=typeof getRBHistory==="function"?getRBHistory():JSON.parse(localStorage.getItem("rankBoosterAttemptHistory") || "[]")}catch(e){attempts=[]}
+ try{mastered=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]")}catch(e){}
+ $("qCount").textContent=bank.length;$("attempts").textContent=Number(localStorage.getItem("rankerTestAttempts")||"0");
+const perf=JSON.parse(localStorage.getItem("rankerTestPerformance")||"[]");
+if(perf.length){
+ const acc=perf.map(x=>Number(x.accuracy)||0);
+ $("avgAccuracy").textContent=Math.round(acc.reduce((a,b)=>a+b,0)/acc.length)+"%";
+ $("bestAccuracy").textContent=Math.max(...acc)+"%";
+}
+ $("mastered").textContent=Array.isArray(mastered)?mastered.length:0;
+ $("subjects").textContent=new Set(bank.map(q=>q.subject).filter(Boolean)).size;
+ const subjects=[...new Set(bank.map(q=>q.subject).filter(Boolean))].sort();
+ subjects.forEach(x=>$("subject").insertAdjacentHTML("beforeend","<option>"+esc(x)+"</option>"));
+ function updateChapters(){const s=$("subject").value;const vals=[...new Set(bank.filter(q=>!s||q.subject===s).map(q=>q.chapter).filter(Boolean))].sort();$("chapter").innerHTML='<option value="">All chapters</option>'+vals.map(x=>"<option>"+esc(x)+"</option>").join("")}
+ $("subject").onchange=updateChapters;updateChapters();
+
+ /* WAIT FOR DIRECT TEST180 SOURCE BEFORE START */
+ var rbTest180Ready = false;
+ var rbOriginalStart = null;
+ $("start").disabled = true;
+ $("status").textContent = "Loading complete TEST180 question bank...";
+
+ fetch("./test180-questions.json")
+   .then(function(res){ return res.json(); })
+   .then(function(data){
+     var src=Array.isArray(data)?data:
+       (Array.isArray(data.questions)?data.questions:
+       (Array.isArray(data.data)?data.data:
+       (Array.isArray(data.items)?data.items:[])));
+
+     if(src.length){
+       bank=src.map(function(q,i){
+         return Object.assign({},q,{
+           id:q.id||("TEST180-"+(i+1)),
+           question:q.question||q.text||"",
+           text:q.text||q.question||"",
+           options:Array.isArray(q.options)?q.options:[],
+           answer:q.answer!==undefined?q.answer:
+             (q.correctAnswer!==undefined?q.correctAnswer:""),
+           correctAnswer:q.correctAnswer!==undefined?q.correctAnswer:
+             (q.answer!==undefined?q.answer:""),
+           chapter:q.chapter||"Test 180",
+           topic:q.topic||"",
+           concept:q.concept||"",
+           source:q.source||"TEST180"
+         });
+       }).filter(function(q){
+         return q.options.length>=2 &&
+           (q.question||q.text||q.image||q.imageUrl||q.data||q.dataUrl);
+       });
+     }
+
+     rbTest180Ready = bank.length === 180;
+     $("start").disabled = !rbTest180Ready;
+     updateChapters();
+     $("status").textContent = rbTest180Ready
+       ? "180/180 TEST180 questions loaded. Ready to start."
+       : bank.length + "/180 questions loaded.";
+     console.log("FINAL TEST180 BANK:",bank.length);
+   })
+   .catch(function(e){
+     console.error(e);
+     $("status").textContent="TEST180 loading failed.";
+   });
+
+ $("start").onclick=function(){
+   if(!rbTest180Ready){
+     $("status").textContent="Please wait — complete 180-question bank is still loading.";
+     return;
+   }
+   let pool=bank.filter(q=>(!$("subject").value||q.subject===$("subject").value)&&(!$("chapter").value||q.chapter===$("chapter").value));
+   if(!pool.length){$("status").textContent="No verified Ranker questions are loaded for this selection yet.";return}
+   const mode=$("mode").value;const attemptedIds=new Set((Array.isArray(attempts)?attempts:[]).flatMap(a=>Array.isArray(a.questionIds)?a.questionIds:(a.questionId?[a.questionId]:[])));
+   if(mode==="new"){const fresh=pool.filter(q=>!attemptedIds.has(q.id));if(fresh.length)pool=fresh}
+   if(mode==="weak"){const stats={};
+ const mistakeStats={};
+ (Array.isArray(attempts)?attempts:[]).forEach(a=>{
+  const m=a.mistakeType||a.mistakeReason;
+  if(m)mistakeStats[m]=(mistakeStats[m]||0)+1;
+ });(Array.isArray(attempts)?attempts:[]).forEach(a=>{if(!a.topic)return;stats[a.topic]=stats[a.topic]||{w:0,t:0};stats[a.topic].t++;if(a.correct===false)stats[a.topic].w++});pool.sort((a,b)=>{const ar=stats[a.topic]?stats[a.topic].w/stats[a.topic].t:0;const br=stats[b.topic]?stats[b.topic].w/stats[b.topic].t:0;return br-ar||(stats[a.topic]?1:0)-(stats[b.topic]?1:0)})}
+   if(mode==="adaptive"){
+     const priority=q=>{
+       try{
+         return typeof window.getRBQuestionPriority==="function"
+           ? Number(window.getRBQuestionPriority(q))||0
+           : 50;
+       }catch(e){return 50}
+     };
+
+     const history=Array.isArray(attempts)?attempts:[];
+
+     const mistakeStats={};
+     history.forEach(a=>{
+       const m=a.mistakeType||a.mistakeReason;
+       if(m) mistakeStats[m]=(mistakeStats[m]||0)+1;
+     });
+
+     const topicStats={};
+     history.forEach(a=>{
+       const key=[a.subject,a.chapter,a.topic,a.concept].join("|");
+       if(!topicStats[key]) topicStats[key]={t:0,w:0};
+       topicStats[key].t++;
+       if(a.correct===false) topicStats[key].w++;
+     });
+
+     const score=q=>{
+       let v=priority(q)*10;
+
+       // MASTERy-aware adaptive scoring
+       const qAttempts=history.filter(a=>a.questionId===q.id);
+       const qCorrect=qAttempts.filter(a=>a.correct===true).length;
+       const qWrong=qAttempts.filter(a=>a.correct===false).length;
+
+       if(qAttempts.length){
+         const qAcc=qCorrect/qAttempts.length;
+
+         // Strong/mastered questions are deprioritized.
+         if(qAcc>=0.8 && qAttempts.length>=2){
+           v-=45;
+         }else if(qAcc>=0.6){
+           v-=15;
+         }
+
+         // Previously wrong questions remain high priority.
+         v+=qWrong*30;
+       }
+
+       const key=[q.subject||"",q.chapter||"",q.topic||"",q.concept||""].join("|");
+       const st=topicStats[key];
+
+       if(st){
+         const acc=st.t?st.w/st.t:0;
+         v+=acc*100;
+         v+=st.w*15;
+       }
+
+       const qa=history.filter(a=>a.questionId===q.id);
+       qa.forEach(a=>{
+         if(a.correct===false) v+=25;
+         const m=a.mistakeType||a.mistakeReason;
+         if(m){
+           const weights={
+             "Concept Gap":20,
+             "Calculation Error":15,
+             "Misread Question":10,
+             "Guessing":8,
+             "Time Pressure":6
+           };
+           v+=(weights[m]||mistakeStats[m]||0);
+         }
+       });
+
+       return v;
+     };
+
+     pool.sort((a,b)=>score(b)-score(a)||Math.random()-.5);
+
+     if(pool.length>3){
+       const groups={};
+       pool.forEach(q=>{
+         const key=q.subject||"Other";
+         (groups[key]??=[]).push(q);
+       });
+
+       Object.values(groups).forEach(a=>{
+         a.sort((x,y)=>score(y)-score(x)||Math.random()-.5);
+       });
+
+       const balanced=[];
+       while(balanced.length<pool.length){
+         const keys=Object.keys(groups).sort(
+           (a,b)=>groups[b].length-groups[a].length
+         );
+         let added=false;
+         for(const key of keys){
+           if(groups[key]?.length){
+             balanced.push(groups[key].shift());
+             added=true;
+             if(balanced.length>=pool.length) break;
+           }
+         }
+         if(!added) break;
+       }
+       pool=balanced;
+     }
+
+     if(pool.length>6){
+       const d={easy:[],medium:[],hard:[],other:[]};
+
+       pool.forEach(q=>{
+         const x=String(q.difficulty||"").toLowerCase();
+         if(x.includes("easy")) d.easy.push(q);
+         else if(x.includes("hard")||x.includes("difficult")) d.hard.push(q);
+         else if(x.includes("medium")||x.includes("moderate")) d.medium.push(q);
+         else d.other.push(q);
+       });
+
+       Object.values(d).forEach(a=>
+         a.sort((x,y)=>score(y)-score(x)||Math.random()-.5)
+       );
+
+       const balanced=[];
+       const order=["easy","medium","hard","other"];
+
+       while(balanced.length<pool.length){
+         for(const key of order){
+           if(d[key].length) balanced.push(d[key].shift());
+           if(balanced.length>=pool.length) break;
+         }
+       }
+
+       pool=balanced;
+     }
+
+     const seen=new Set();
+     pool=pool.filter(q=>{
+       const key=String(q.question||q.id||"").trim().toLowerCase();
+       if(!key||seen.has(key)) return false;
+       seen.add(key);
+       return true;
+     });
+   }else{
+     pool.sort(()=>Math.random()-.5);
+   }
+
+/* =====================================================
+   NICHOD_VERIFIED_SELECTION_HOOK_V1
+===================================================== */
+try {
+  if (
+    window.PCBNICHODVerifiedFeed &&
+    typeof window.PCBNICHODVerifiedFeed.prepareSelection ===
+      "function"
+  ) {
+    const nichodResult =
+      window.PCBNICHODVerifiedFeed.prepareSelection(
+        pool,
+        {
+          count: pool.length || 180,
+          unseenCount: Math.min(
+            30,
+            pool.length || 30
+          )
+        }
+      );
+
+    if (
+      nichodResult &&
+      Array.isArray(nichodResult.pool)
+    ) {
+      pool = nichodResult.pool;
+    }
+
+    window.__PCB_NICHOD_LAST_SELECTION =
+      nichodResult || null;
+  }
+} catch (e) {
+  console.warn(
+    "PCB NICHOD selection hook skipped:",
+    e
+  );
+}
+
+localStorage.setItem("rbSelectedQuestions",JSON.stringify(pool));
+
+   /* PCB_SAFE_RANKER_SOURCE_RESET_V1
+      A new Ranker test must not inherit an old PDF active test.
+      Do not touch the unified loader contract.
+   */
+   localStorage.removeItem("CBT_ACTIVE_TEST");
+   localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
+   localStorage.setItem("CBT_ACTIVE_SOURCE","Rankers Test Series");
+   $("status").textContent=pool.length+" eligible questions selected. Opening CBT...";
+   setTimeout(()=>location.href="cbt.html?source=rankers-test-series",250);
+ };
+ function esc(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+})();
+</script>
+
+<!-- RANKERS_COMMAND_CENTER_LINK_V1 -->
+<section class="card">
+<h2>🧠 Connected Control</h2>
+<p class="muted">
+Use the unified Command Center for 720 Approach, Skip/Attempt Strategy,
+Topic-wise Practice, Ranker Practice and Mentor actions.
+</p>
+<a href="ranker-command-center.html"
+   style="display:block;text-align:center;padding:12px;border-radius:11px;
+   background:#4f46e5;color:#fff;text-decoration:none;font-weight:700;">
+Open Ranker Command Center
+</a>
+</section>
+
+
+<!-- RANKER_V8_UNIFIED_LIFECYCLE -->
+<script src="./ranker-v8-unified-lifecycle.js"></script>
+
+<!-- RANKER_V11_REAL_LIFECYCLE -->
+<script src="./ranker-v11-real-lifecycle.js"></script>
+<script src="./pcb-nichod-ranker.js"></script>
+<script src="./nichod/engine/nichod-ranker-feed.js"></script>
+<script src="./nichod/engine/nichod-unseen-generator.js"></script>
+<script src="./nichod/engine/nichod-generation-bridge.js"></script>
+<script src="./cbt-unified-core.js"></script>
+
+
+<!-- NICHOD_UNSEEN_CONTROL_V1 -->
+<section class="card" id="nichodUnseenControl"
+  style="margin-top:18px;">
+  <h2>🧠 NICHOD Unseen Ranker</h2>
+
+  <p class="muted">
+    Verified unseen questions are kept separate from
+    the original PYQ corpus.
+  </p>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+    margin:12px 0;
+  ">
+
+    <div style="
+      padding:12px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      text-align:center;
+    ">
+      <b id="nichodCandidateCount">0</b>
+      <div class="muted">Candidates</div>
+    </div>
+
+    <div style="
+      padding:12px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      text-align:center;
+    ">
+      <b id="nichodVerifiedCount">0</b>
+      <div class="muted">Verified Unseen</div>
+    </div>
+
+    <div style="
+      padding:12px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      text-align:center;
+    ">
+      <b id="nichodActiveCount">0</b>
+      <div class="muted">Active Test</div>
+    </div>
+
+  </div>
+
+  <div style="
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  ">
+
+    <button id="nichodGenerateBtn"
+      type="button">
+      Generate Unseen Candidates
+    </button>
+
+    <button id="nichodBuildBtn"
+      type="button">
+      Build Unseen Ranker Test
+    </button>
+
+  </div>
+
+  <div id="nichodStatus"
+    class="muted"
+    style="margin-top:12px;">
+    NICHOD ready.
+  </div>
+</section>
+
+<script src="./nichod/engine/nichod-review-ui.js"></script>
+<script src="./nichod/engine/nichod-authoring-engine.js"></script>
+<script src="./nichod/engine/nichod-authoring-ui.js"></script>
+<script src="./nichod/engine/nichod-verified-feed.js"></script>
+<script>
+(function(){
+
+  "use strict";
+
+  function read(key, fallback){
+
+    try{
+
+      const value =
+        JSON.parse(
+          localStorage.getItem(key) ||
+          "null"
+        );
+
+      return value == null
+        ? fallback
+        : value;
+
+    }catch(_){
+
+      return fallback;
+
+    }
+
+  }
+
+  function update(){
+
+    const candidates =
+      read(
+        "pcbNichodUnseenCandidates",
+        []
+      );
+
+    const verified =
+      read(
+        "pcbNichodVerifiedUnseen",
+        []
+      );
+
+    const active =
+      read(
+        "rbSelectedQuestions",
+        []
+      );
+
+    const c =
+      document.getElementById(
+        "nichodCandidateCount"
+      );
+
+    const v =
+      document.getElementById(
+        "nichodVerifiedCount"
+      );
+
+    const a =
+      document.getElementById(
+        "nichodActiveCount"
+      );
+
+    if(c)
+      c.textContent =
+        Array.isArray(candidates)
+          ? candidates.length
+          : 0;
+
+    if(v)
+      v.textContent =
+        Array.isArray(verified)
+          ? verified.length
+          : 0;
+
+    if(a)
+      a.textContent =
+        Array.isArray(active)
+          ? active.length
+          : 0;
+  }
+
+  function status(text){
+
+    const el =
+      document.getElementById(
+        "nichodStatus"
+      );
+
+    if(el)
+      el.textContent =
+        text;
+
+  }
+
+  const generate =
+    document.getElementById(
+      "nichodGenerateBtn"
+    );
+
+  if(generate){
+
+    generate.onclick =
+      function(){
+
+        if(
+          !window.PCBNICHODUnseen
+        ){
+
+          status(
+            "NICHOD unseen engine is not loaded."
+          );
+
+          return;
+
+        }
+
+        const result =
+          window.PCBNICHODUnseen.generate({
+            count: 10,
+            requireVerified: true
+          });
+
+        status(
+          result.count +
+          " unseen candidate(s) prepared for review."
+        );
+
+        update();
+
+      };
+
+  }
+
+  const build =
+    document.getElementById(
+      "nichodBuildBtn"
+    );
+
+  if(build){
+
+    build.onclick =
+      function(){
+
+        if(
+          !window.PCBNICHODGeneration
+        ){
+
+          status(
+            "NICHOD generation bridge is not loaded."
+          );
+
+          return;
+
+        }
+
+        const result =
+          window.PCBNICHODGeneration.buildTest({
+            count: 45
+          });
+
+        if(!result.ok){
+
+          status(
+            "No verified unseen questions are available yet."
+          );
+
+          update();
+
+          return;
+
+        }
+
+        status(
+          result.count +
+          " verified unseen questions selected. Opening CBT..."
+        );
+
+        update();
+
+        setTimeout(
+          function(){
+
+            location.href =
+              "cbt.html?source=nichod-unseen";
+
+          },
+          250
+        );
+
+      };
+
+  }
+
+  update();
+
+  window.addEventListener(
+    "storage",
+    update
+  );
+
+})();
+</script>
+
+
+<section class="card"
+  id="nichodReview">
+  <h2>🔎 Review Unseen Candidates</h2>
+  <div id="nichodReviewList"></div>
+
+<section class="card"
+  id="nichodAuthoring">
+  <h2>✍️ NICHOD Authoring Editor</h2>
+  <p class="muted">
+    Edit and manually verify unseen PCB candidates
+    before they enter the Ranker pool.
+  </p>
+  <div id="nichodAuthoringEditor"></div>
+</section>
+
+</section>
+
+
+<script src="./nichod/engine/nichod-cbt-metadata-bridge.js"></script>
+<script src="./nichod/engine/nichod-posttest-bridge.js"></script>
+<script src="./nichod/engine/nichod-unified-orchestrator.js"></script>
+<script src="./nichod/engine/nichod-system-health.js"></script>
+<script src="./nichod/engine/nichod-e2e-harness.js"></script>
+<script src="./nichod/engine/nichod-live-flow-monitor.js"></script>
+
+
+<!-- PCB_NICHOD_LIVE_REPORT_UI_V1 -->
+<script>
+(function () {
+
+  function createUI() {
+
+    if (document.getElementById("pcbNichodLiveReport"))
+      return;
+
+    const box = document.createElement("div");
+
+    box.id = "pcbNichodLiveReport";
+
+    box.style.cssText =
+      "position:fixed;" +
+      "right:12px;" +
+      "bottom:12px;" +
+      "z-index:999999;" +
+      "background:#111827;" +
+      "color:#fff;" +
+      "padding:12px;" +
+      "border-radius:12px;" +
+      "font:14px monospace;" +
+      "max-width:90vw;" +
+      "box-shadow:0 8px 30px rgba(0,0,0,.35);";
+
+    box.innerHTML =
+      '<b>🧪 PCB NICHOD LIVE</b>' +
+      '<div id="pcbNichodLiveStatus" style="margin-top:8px">' +
+      'Reading flow…</div>' +
+      '<button id="pcbNichodLiveRefresh" ' +
+      'style="margin-top:8px;padding:8px;border-radius:8px">' +
+      'Refresh</button>' +
+      '<button id="pcbNichodLiveCopy" ' +
+      'style="margin-top:8px;margin-left:6px;padding:8px;border-radius:8px">' +
+      'Copy Report</button>';
+
+    document.body.appendChild(box);
+
+    document
+      .getElementById("pcbNichodLiveRefresh")
+      .onclick = render;
+
+    document
+      .getElementById("pcbNichodLiveCopy")
+      .onclick = copyReport;
+
+    render();
+  }
+
+  function getJSON(key) {
+
+    try {
+      return JSON.parse(
+        localStorage.getItem(key) || "null"
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function lengthOf(x) {
+
+    if (Array.isArray(x))
+      return x.length;
+
+    if (x && Array.isArray(x.questions))
+      return x.questions.length;
+
+    if (x && Array.isArray(x.data))
+      return x.data.length;
+
+    if (x && Array.isArray(x.items))
+      return x.items.length;
+
+    return 0;
+  }
+
+  function render() {
+
+    const pdf =
+      getJSON("pdfCbtQuestions");
+
+    const selected =
+      getJSON("rbSelectedQuestions");
+
+    const history =
+      getJSON("cbtHistory");
+
+    const live =
+      getJSON("pcbNichodLiveFlowReport");
+
+    const status =
+      document.getElementById(
+        "pcbNichodLiveStatus"
+      );
+
+    if (!status)
+      return;
+
+    status.innerHTML =
+      "PDF questions: " +
+      lengthOf(pdf) +
+
+      "<br>Selected questions: " +
+      lengthOf(selected) +
+
+      "<br>History entries: " +
+      (
+        Array.isArray(history)
+          ? history.length
+          : 0
+      ) +
+
+      "<br>Active source: " +
+      (
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ) || "—"
+      ) +
+
+      "<br>Unified: " +
+      (
+        window.PCBNICHODUnified
+          ? "YES"
+          : "NO"
+      ) +
+
+      "<br>PDF bridge: " +
+      (
+        window.PCBNICHODPDF
+          ? "YES"
+          : "NO"
+      ) +
+
+      "<br>Ranker feed: " +
+      (
+        window.PCBNICHODRankerFeed
+          ? "YES"
+          : "NO"
+      ) +
+
+      "<br>Live snapshots: " +
+      (
+        live &&
+        Array.isArray(live.snapshots)
+          ? live.snapshots.length
+          : 0
+      );
+  }
+
+  function copyReport() {
+
+    const report = {
+
+      pdfQuestions:
+        lengthOf(
+          getJSON("pdfCbtQuestions")
+        ),
+
+      selectedQuestions:
+        lengthOf(
+          getJSON("rbSelectedQuestions")
+        ),
+
+      historyEntries:
+        Array.isArray(
+          getJSON("cbtHistory")
+        )
+          ? getJSON("cbtHistory").length
+          : 0,
+
+      activeSource:
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ),
+
+      liveFlow:
+        getJSON(
+          "pcbNichodLiveFlowReport"
+        ),
+
+      timestamp:
+        new Date().toISOString()
+
+    };
+
+    const text =
+      JSON.stringify(
+        report,
+        null,
+        2
+      );
+
+    if (
+      navigator.clipboard &&
+      navigator.clipboard.writeText
+    ) {
+
+      navigator.clipboard.writeText(text)
+        .then(function () {
+
+          alert(
+            "✅ NICHOD report copied"
+          );
+
+        })
+        .catch(function () {
+
+          prompt(
+            "Copy this report:",
+            text
+          );
+
+        });
+
+    } else {
+
+      prompt(
+        "Copy this report:",
+        text
+      );
+
+    }
+  }
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      createUI
+    );
+
+  } else {
+
+    createUI();
+
+  }
+
+})();
+</script>
+
+
+<script src="./nichod/engine/unified-test-library.js"></script>
+<script src="./nichod/engine/test-creation-bridge.js"></script>
+<script src="./nichod/engine/test-creation-auto-hook.js"></script>
+<script src="./nichod/engine/live-test-flow-bridge.js"></script>
+<script src="./nichod/engine/cbt-authoritative-loader.js"></script>
+<script src="./nichod/engine/cbt-question-source-lock.js"></script>
+<script src="./nichod/engine/real-flow-validator.js"></script>
+<script src="./nichod/engine/real-flow-test-suite.js"></script>
+<script src="./nichod/engine/unified-test-library-ui.js"></script>
+
+<script src="./nichod/engine/cbt-live-source-panel.js"></script>
+</body></html>

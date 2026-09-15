@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>CBT Analyzer Pro — Test Details</title>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+margin:0;
+padding:0;
+}
+
+body{
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
+}
+
+header{
+background:#fff;
+border-bottom:1px solid #e2e8f0;
+padding:16px 20px;
+}
+
+.header{
+max-width:1000px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+}
+
+.logo{
+font-size:21px;
+font-weight:800;
+}
+
+.logo span{
+color:#4f46e5;
+}
+
+button{
+font-family:Arial,sans-serif;
+cursor:pointer;
+touch-action:manipulation;
+}
+
+.top-btn{
+border:0;
+background:#4f46e5;
+color:#fff;
+padding:11px 15px;
+border-radius:10px;
+font-weight:800;
+}
+
+.container{
+max-width:1000px;
+margin:22px auto;
+padding:0 15px;
+}
+
+.hero{
+background:#4f46e5;
+color:#fff;
+border-radius:20px;
+padding:25px;
+margin-bottom:18px;
+}
+
+.hero h1{
+margin:0 0 8px;
+font-size:27px;
+}
+
+.hero p{
+margin:5px 0;
+line-height:1.5;
+}
+
+.card{
+background:#fff;
+border-radius:16px;
+padding:20px;
+margin-bottom:18px;
+box-shadow:0 3px 14px rgba(0,0,0,.07);
+}
+
+.summary{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+}
+
+.stat{
+background:#f8fafc;
+border-radius:12px;
+padding:15px;
+text-align:center;
+}
+
+.stat strong{
+display:block;
+font-size:25px;
+margin-bottom:5px;
+}
+
+.stat span{
+font-size:13px;
+color:#64748b;
+font-weight:700;
+}
+
+.question-card{
+border:1px solid #e2e8f0;
+border-radius:14px;
+padding:17px;
+margin-top:14px;
+}
+
+.q-top{
+display:flex;
+justify-content:space-between;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.badge{
+display:inline-block;
+padding:6px 9px;
+border-radius:8px;
+font-size:12px;
+font-weight:800;
+background:#eef2ff;
+color:#3730a3;
+}
+
+.badge.correct{
+background:#dcfce7;
+color:#166534;
+}
+
+.badge.wrong{
+background:#fee2e2;
+color:#991b1b;
+}
+
+.badge.skipped{
+background:#fef3c7;
+color:#92400e;
+}
+
+.question{
+font-size:18px;
+font-weight:800;
+line-height:1.55;
+margin:14px 0;
+}
+
+.answer-box{
+background:#f8fafc;
+border-radius:11px;
+padding:14px;
+line-height:1.6;
+}
+
+.answer{
+font-weight:700;
+}
+
+.wrong-text{
+color:#dc2626;
+}
+
+.correct-text{
+color:#15803d;
+}
+
+.solution{
+margin-top:12px;
+background:#eef2ff;
+border-radius:11px;
+padding:14px;
+line-height:1.6;
+}
+
+.analysis{
+margin-top:12px;
+background:#fff7ed;
+border-left:5px solid #f59e0b;
+border-radius:9px;
+padding:13px;
+line-height:1.6;
+}
+
+.actions{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:14px;
+}
+
+.action{
+border:0;
+border-radius:10px;
+padding:13px;
+font-weight:800;
+background:#e2e8f0;
+}
+
+.retry{
+background:#4f46e5;
+color:#fff;
+}
+
+.empty{
+text-align:center;
+padding:40px 15px;
+color:#64748b;
+}
+
+.error{
+background:#fee2e2;
+color:#991b1b;
+padding:15px;
+border-radius:11px;
+}
+
+@media(max-width:700px){
+
+.summary{
+grid-template-columns:1fr 1fr;
+}
+
+}
+
+@media(max-width:500px){
+
+.container{
+margin:15px auto;
+}
+
+.card{
+padding:16px;
+}
+
+.hero{
+padding:20px;
+}
+
+.actions{
+grid-template-columns:1fr;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="header">
+
+<div class="logo">
+CBT Analyzer <span>Pro</span>
+</div>
+
+<button
+class="top-btn"
+type="button"
+onclick="goDashboard()">
+Dashboard
+</button>
+
+</div>
+</header>
+
+
+<div class="container">
+
+<section class="hero">
+
+<h1>📜 Test Details</h1>
+
+<p id="testDate">Loading test...</p>
+
+<p id="testScore"></p>
+
+</section>
+
+
+<section class="card">
+
+<h2>📊 Test Summary</h2>
+
+<div class="summary">
+
+<div class="stat">
+<strong id="total">0</strong>
+<span>Total</span>
+</div>
+
+<div class="stat">
+<strong id="correct">0</strong>
+<span>Correct</span>
+</div>
+
+<div class="stat">
+<strong id="wrong">0</strong>
+<span>Wrong</span>
+</div>
+
+<div class="stat">
+<strong id="skipped">0</strong>
+<span>Skipped</span>
+</div>
+
+</div>
+
+</section>
+
+
+<section class="card">
+
+<h2>🧠 Question Analysis</h2>
+
+<div id="questions"></div>
+
+</section>
+
+</div>
+
+
+<script>
+
+"use strict";
+
+
+/* =========================
+STORAGE
+========================= */
+
+const HISTORY_KEY="cbtHistory";
+
+
+/* =========================
+READ HISTORY
+========================= */
+
+function readHistory(){
+
+try{
+
+const raw=
+localStorage.getItem(HISTORY_KEY);
+
+if(!raw){
+return [];
+}
+
+const data=
+JSON.parse(raw);
+
+return Array.isArray(data)
+?data
+:[];
+
+}catch(error){
+
+console.error(error);
+
+return [];
+
+}
+
+}
+
+
+/* =========================
+ESCAPE
+========================= */
+
+function escapeHTML(value){
+
+return String(
+value===undefined||value===null
+?""
+:value
+)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+URL INDEX
+========================= */
+
+function getTestIndex(){
+
+const params=
+new URLSearchParams(
+window.location.search
+);
+
+const value=
+Number(params.get("test"));
+
+return Number.isInteger(value)
+?value
+:-1;
+
+}
+
+
+/* =========================
+RETRY QUESTION
+========================= */
+
+function retryQuestion(q){
+
+if(!q||!q.question){
+
+return;
+
+}
+
+const options=
+Array.isArray(q.options)
+?q.options
+:[];
+
+const retryQuestion={
+
+id:
+q.id||
+("details-"+Date.now()),
+
+question:q.question,
+
+options:options,
+
+subject:q.subject||"Unknown",
+
+topic:q.topic||"Unknown",
+
+correctIndex:
+Number.isInteger(Number(q.correctIndex))
+?Number(q.correctIndex)
+:-1,
+
+correctAnswer:
+q.correctAnswer||
+(
+options[Number(q.correctIndex)]||
+""
+),
+
+solution:
+q.solution||
+q.explanation||
+"Solution not available.",
+
+selectedIndex:
+q.selectedIndex??null,
+
+selectedAnswer:
+q.selectedAnswer||
+"",
+
+mistakeType:
+q.mistakeType||
+"Not Classified",
+
+mistakeReason:
+q.mistakeReason||
+"Review the concept before retrying."
+
+};
+
+
+if(
+retryQuestion.options.length<2||
+retryQuestion.correctIndex<0
+){
+
+alert(
+"This question cannot be retried because its answer data is incomplete."
+);
+
+return;
+
+}
+
+
+localStorage.setItem(
+"cbtRetryQuestion",
+JSON.stringify(retryQuestion)
+);
+
+localStorage.setItem(
+"cbtAnalyzer.retryQueue",
+JSON.stringify([retryQuestion])
+);
+
+window.location.href="retry.html";
+
+}
+
+
+/* =========================
+DASHBOARD
+========================= */
+
+function goDashboard(){
+
+window.location.href="index.html";
+
+}
+
+
+/* =========================
+RENDER
+========================= */
+
+function render(){
+
+const history=
+readHistory();
+
+const index=
+getTestIndex();
+
+const box=
+document.getElementById("questions");
+
+
+if(
+index<0||
+index>=history.length
+){
+
+box.innerHTML=`
+
+<div class="empty">
+
+<div style="font-size:50px">⚠️</div>
+
+<h2>Test not found</h2>
+
+<p>
+This test record could not be found in your saved history.
+</p>
+
+<button
+class="top-btn"
+onclick="goDashboard()">
+
+Back to Dashboard
+
+</button>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+const test=
+history[index];
+
+
+const list=
+Array.isArray(test.questions)
+?test.questions
+:[];
+
+
+document.getElementById("testDate")
+.textContent=
+"📅 "+
+(
+test.date||
+"Unknown date"
+);
+
+
+document.getElementById("testScore")
+.textContent=
+"🎯 Score: "+
+(
+test.score!==undefined
+?test.score
+:"—"
+);
+
+
+let correct=
+0;
+
+let wrong=
+0;
+
+let skipped=
+0;
+
+
+list.forEach(function(q){
+
+if(q.status==="correct"){
+correct++;
+}
+
+else if(q.status==="wrong"){
+wrong++;
+}
+
+else{
+skipped++;
+}
+
+});
+
+
+document.getElementById("total")
+.textContent=list.length;
+
+document.getElementById("correct")
+.textContent=correct;
+
+document.getElementById("wrong")
+.textContent=wrong;
+
+document.getElementById("skipped")
+.textContent=skipped;
+
+
+if(list.length===0){
+
+box.innerHTML=`
+
+<div class="empty">
+
+No question-level data was saved for this test.
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+box.innerHTML="";
+
+
+list.forEach(function(q,i){
+
+const status=
+q.status==="correct"
+?"correct"
+:q.status==="wrong"
+?"wrong"
+:"skipped";
+
+
+const statusText=
+status==="correct"
+?"✅ Correct"
+:status==="wrong"
+?"❌ Wrong"
+:"⏭️ Skipped";
+
+
+const selected=
+q.selectedAnswer||
+(
+q.selectedIndex!==null&&
+q.selectedIndex!==undefined&&
+Array.isArray(q.options)
+?q.options[q.selectedIndex]
+:"Not answered"
+);
+
+
+const correctAnswer=
+q.correctAnswer||
+(
+Array.isArray(q.options)&&
+q.correctIndex!==undefined
+?q.options[q.correctIndex]
+:"Not available"
+);
+
+
+const div=
+document.createElement("div");
+
+div.className=
+"question-card";
+
+
+let html=`
+
+<div class="q-top">
+
+<span class="badge">
+Question ${i+1}
+</span>
+
+<span class="badge ${status}">
+${statusText}
+</span>
+
+<span class="badge">
+${escapeHTML(q.subject||"Unknown")}
+</span>
+
+</div>
+
+
+<div class="question">
+${escapeHTML(q.question)}
+</div>
+
+
+<div class="answer-box">
+
+<strong>Your Answer</strong>
+
+<br>
+
+<span class="${
+status==="wrong"
+?"wrong-text"
+:"answer"
+}">
+
+${escapeHTML(
+selected||"Not answered"
+)}
+
+</span>
+
+<br><br>
+
+<strong>Correct Answer</strong>
+
+<br>
+
+<span class="correct-text">
+
+${escapeHTML(
+correctAnswer||
+"Not available"
+)}
+
+</span>
+
+</div>
+
+`;
+
+
+if(status==="wrong"){
+
+html+=`
+
+<div class="analysis">
+
+<strong>🧠 Mistake Intelligence</strong>
+
+<br><br>
+
+<strong>Mistake Type:</strong>
+${escapeHTML(
+q.mistakeType||
+"Not Classified"
+)}
+
+<br>
+
+<strong>Why:</strong>
+${escapeHTML(
+q.mistakeReason||
+"Review the concept and identify why the answer was incorrect."
+)}
+
+</div>
+
+`;
+
+}
+
+
+if(q.solution){
+
+html+=`
+
+<div class="solution">
+
+<strong>💡 Solution</strong>
+
+<br><br>
+
+${escapeHTML(q.solution)}
+
+</div>
+
+`;
+
+}
+
+
+if(status==="wrong"){
+
+html+=`
+
+<div class="actions">
+
+<button
+class="action retry"
+type="button">
+
+🔄 Retry Question
+
+</button>
+
+<button
+class="action"
+type="button"
+onclick="window.location.href='mistake.html'">
+
+🧠 Mistake Bank
+
+</button>
+
+</div>
+
+`;
+
+}
+
+
+div.innerHTML=html;
+
+
+if(status==="wrong"){
+
+const retry=
+div.querySelector(".retry");
+
+if(retry){
+
+retry.addEventListener(
+"click",
+function(){
+
+retryQuestion(q);
+
+});
+
+}
+
+}
+
+
+box.appendChild(div);
+
+});
+
+}
+
+
+render();
+
+</script>
+
+</body>
+</html>

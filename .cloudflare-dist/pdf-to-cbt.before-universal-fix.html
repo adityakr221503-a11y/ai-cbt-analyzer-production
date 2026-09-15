@@ -1,0 +1,3120 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="./test180-questions.js"></script>
+<head>
+<script src="./vendor/pdf.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "./vendor/pdf.worker.min.js";
+  }
+</script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+</script>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>PDF → CBT | CBT Analyzer Pro</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .header {
+      max-width: 1200px;
+      margin: auto;
+      padding: 15px 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .logo span {
+      color: #4f46e5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 25px auto;
+      padding: 0 15px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+
+      box-shadow:
+        0 4px 15px
+        rgba(15, 23, 42, 0.07);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+    }
+
+    .subtitle {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .upload-box {
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .upload-box:hover {
+      border-color: #818cf8;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+
+      background: #ffffff;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .field {
+      margin-top: 18px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .primary,
+    .secondary,
+    .danger {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-weight: 800;
+    }
+
+    .primary {
+      background: #4f46e5;
+      color: #ffffff;
+    }
+
+    .secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .danger {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 14px;
+
+      border-radius: 10px;
+
+      background: #eef2ff;
+      color: #3730a3;
+
+      white-space: pre-wrap;
+    }
+
+    .stats {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 10px;
+
+      margin-top: 18px;
+    }
+
+    .stat {
+      padding: 15px;
+      border-radius: 12px;
+      background: #f8fafc;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 25px;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+
+      .stats {
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+      .header {
+        padding: 13px 15px;
+      }
+
+      .container {
+        margin-top: 12px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<header>
+
+  <div class="header">
+
+    <div class="logo">
+      CBT Analyzer <span>Pro</span>
+    </div>
+
+    <div>
+      PDF → CBT
+    </div>
+
+  </div>
+
+</header>
+
+
+<div class="container">
+
+  <!-- =================================================
+       PDF UPLOAD
+  ================================================== -->
+
+  <section class="card">
+
+    <h1>
+      📄 PDF → CBT Converter
+    </h1>
+
+    <p class="subtitle">
+      Upload a question-bank module and add its
+      questions to your Topper Test Pro CBT pool.
+    </p>
+
+
+    <div class="upload-box">
+
+      <strong>
+        Select Question Bank PDF
+      </strong>
+
+      <p class="subtitle">
+        The extracted questions will be added to the
+        existing question pool.
+      </p>
+
+      <input
+        id="pdfInput"
+        type="file"
+        accept=".pdf,application/pdf"
+      >
+
+    </div>
+
+
+    <!-- =================================================
+         MODULE NAME
+    ================================================== -->
+
+    <div class="field">
+
+      <label for="moduleName">
+        Module Name
+      </label>
+
+      <input
+        id="moduleName"
+        type="text"
+        placeholder="Example: Momentum Booster Physics Class XI Part-1"
+      >
+
+    </div>
+
+
+    <!-- =================================================
+         BUTTONS
+    ================================================== -->
+
+    <div class="button-row">
+
+      <button
+        id="convertButton"
+        class="primary"
+        type="button"
+        disabled
+      >
+        📄 Convert PDF → CBT
+      </button>
+
+
+      <button
+        id="clearPoolButton"
+        class="danger"
+        type="button"
+      >
+        🗑️ Clear PDF Pool
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         STATUS
+    ================================================== -->
+
+    <div
+      id="status"
+      class="status"
+    >
+      Select a PDF to begin.
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       QUESTION POOL
+  ================================================== -->
+
+  <section class="card">
+
+    <h2>
+      📚 Current CBT Question Pool
+    </h2>
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <strong id="totalQuestions">
+          0
+        </strong>
+
+        <span>
+          Total
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="physicsQuestions">
+          0
+        </strong>
+
+        <span>
+          Physics
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="chemistryQuestions">
+          0
+        </strong>
+
+        <span>
+          Chemistry
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="biologyQuestions">
+          0
+        </strong>
+
+        <span>
+          Biology
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+</div>
+
+
+<!-- =====================================================
+     PART 1 JAVASCRIPT START
+===================================================== -->
+
+<script>
+
+/* =====================================================
+   TOPPER TEST PRO
+   PDF → CBT QUESTION POOL
+===================================================== */
+
+
+/* =====================================================
+   STORAGE KEY
+===================================================== */
+
+const PDF_CBT_STORAGE_KEY =
+  "pdfCbtQuestions";
+
+
+/* =====================================================
+   DOM REFERENCES
+===================================================== */
+
+const pdfInput =
+  document.getElementById(
+    "pdfInput"
+  );
+
+const moduleNameInput =
+  document.getElementById(
+    "moduleName"
+  );
+
+const convertButton =
+  document.getElementById(
+    "convertButton"
+  );
+
+const clearPoolButton =
+  document.getElementById(
+    "clearPoolButton"
+  );
+
+const statusBox =
+  document.getElementById(
+    "status"
+  );
+
+const totalQuestions =
+  document.getElementById(
+    "totalQuestions"
+  );
+
+const physicsQuestions =
+  document.getElementById(
+    "physicsQuestions"
+  );
+
+const chemistryQuestions =
+  document.getElementById(
+    "chemistryQuestions"
+  );
+
+const biologyQuestions =
+  document.getElementById(
+    "biologyQuestions"
+  );
+
+
+/* =====================================================
+   READ QUESTION POOL
+===================================================== */
+
+function getPDFQuestionPool() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(
+        PDF_CBT_STORAGE_KEY
+      );
+
+
+    if (!saved) {
+      return [];
+    }
+
+
+    const parsed =
+      JSON.parse(saved);
+
+
+    return Array.isArray(parsed)
+      ? parsed
+      : [];
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Question pool read error:",
+      error
+    );
+
+    return [];
+
+  }
+
+}
+
+
+/* =====================================================
+   SAVE QUESTION POOL
+===================================================== */
+
+function savePDFQuestionPool(
+  questions
+) {
+
+  try {
+
+    localStorage.setItem(
+      PDF_CBT_STORAGE_KEY,
+      JSON.stringify(
+        questions
+      )
+    );
+
+
+    console.log(
+      "✅ Question pool saved:",
+      questions.length
+    );
+
+
+    return true;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Question pool save error:",
+      error
+    );
+
+
+    statusBox.textContent =
+      "❌ Could not save question pool.";
+
+
+    return false;
+
+  }
+
+}
+
+
+/* =====================================================
+   UPDATE POOL STATISTICS
+===================================================== */
+
+function updatePoolStats() {
+
+  const pool =
+    getPDFQuestionPool();
+
+
+  let physics = 0;
+  let chemistry = 0;
+  let biology = 0;
+
+
+  pool.forEach(
+    function(question) {
+
+      const subject =
+        String(
+          question.subject ||
+          ""
+        ).toLowerCase();
+
+
+      if (
+        subject.includes("physics")
+      ) {
+
+        physics++;
+
+      }
+
+      else if (
+        subject.includes("chem")
+      ) {
+
+        chemistry++;
+
+      }
+
+      else if (
+        subject.includes("bio")
+      ) {
+
+        biology++;
+
+      }
+
+    }
+  );
+
+
+  totalQuestions.textContent =
+    pool.length;
+
+  physicsQuestions.textContent =
+    physics;
+
+  chemistryQuestions.textContent =
+    chemistry;
+
+  biologyQuestions.textContent =
+    biology;
+
+}
+
+
+/* =====================================================
+   ENABLE CONVERT BUTTON
+===================================================== */
+
+pdfInput.addEventListener(
+  "change",
+  function() {
+
+    const file =
+      pdfInput.files[0];
+
+
+    convertButton.disabled =
+      !file;
+
+
+    if (file) {
+
+      statusBox.textContent =
+        `📄 Selected:\n${file.name}`;
+
+    }
+
+    else {
+
+      statusBox.textContent =
+        "Select a PDF to begin.";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+updatePoolStats();
+
+
+console.log(
+  "✅ PDF → CBT Part 1 loaded."
+);
+
+console.log(
+  "📚 Existing PDF questions:",
+  getPDFQuestionPool().length
+);
+
+</script>
+<script>
+
+/* =====================================================
+   PART 2
+   PDF TEXT → CBT QUESTIONS
+===================================================== */
+
+
+/* =====================================================
+   PDF TEXT EXTRACTION
+===================================================== */
+
+async function extractPDFText(file) {
+  if (!window.pdfjsLib) throw new Error("PDF.js is not loaded.");
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data:buffer}).promise;
+  const pages=[];
+  for(let n=1;n<=pdf.numPages;n++){
+    const page=await pdf.getPage(n), c=await page.getTextContent();
+    const items=c.items.filter(x=>x.str&&x.str.trim()).map(x=>({text:x.str,x:x.transform[4],y:x.transform[5]}));
+    items.sort((a,b)=>Math.abs(b.y-a.y)>3?b.y-a.y:a.x-b.x);
+    const rows=[];
+    for(const it of items){let r=rows.find(r=>Math.abs(r.y-it.y)<=3);if(!r){r={y:it.y,items:[]};rows.push(r)}r.items.push(it)}
+    rows.sort((a,b)=>b.y-a.y);
+    const lines=rows.map(r=>r.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(" ").replace(/[ 	]+/g," ").trim()).filter(Boolean);
+    pages.push({pageNumber:n,lines,text:lines.join("\n")});
+  }
+  window.__PDF_PAGES__=pages;
+  return pages.map(p=>p.text).join("\n\n").trim();
+}
+function cleanPDFText(
+  text
+) {
+
+  if (!text) {
+    return "";
+  }
+
+
+  return String(text)
+
+    .replace(
+      /\r/g,
+      ""
+    )
+
+    .replace(
+      /[ \t]+/g,
+      " "
+    )
+
+    .replace(
+      /\n{3,}/g,
+      "\n\n"
+    )
+
+    .trim();
+
+}
+
+
+/* =====================================================
+   OPTION LETTER NORMALIZER
+===================================================== */
+
+function normalizeOptionLetter(
+  value
+) {
+
+  if (
+    value === undefined ||
+    value === null
+  ) {
+
+    return null;
+
+  }
+
+
+  const text =
+    String(value)
+      .trim()
+      .toUpperCase();
+
+
+  if (
+    /^[A-D]$/.test(text)
+  ) {
+
+    return (
+      text.charCodeAt(0) -
+      65
+    );
+
+  }
+
+
+  if (
+    /^[1-4]$/.test(text)
+  ) {
+
+    return (
+      Number(text) - 1
+    );
+
+  }
+
+
+  return null;
+
+}
+
+
+/* =====================================================
+   GET CORRECT ANSWER
+===================================================== */
+
+function getCorrectAnswer(
+  question
+) {
+
+  if (
+    Array.isArray(
+      question.options
+    ) === false
+  ) {
+
+    return "";
+
+  }
+
+
+  /* -----------------------------------------------
+     correctIndex
+  ------------------------------------------------ */
+
+  if (
+    Number.isInteger(
+      question.correctIndex
+    ) &&
+    question.options[
+      question.correctIndex
+    ] !== undefined
+  ) {
+
+    return String(
+      question.options[
+        question.correctIndex
+      ]
+    );
+
+  }
+
+
+  /* -----------------------------------------------
+     correctAnswer
+  ------------------------------------------------ */
+
+  if (
+    question.correctAnswer !==
+    undefined
+  ) {
+
+    const answer =
+      String(
+        question.correctAnswer
+      ).trim();
+
+
+    const index =
+      normalizeOptionLetter(
+        answer
+      );
+
+
+    if (
+      index !== null &&
+      question.options[index] !==
+        undefined
+    ) {
+
+      return String(
+        question.options[index]
+      );
+
+    }
+
+
+    /*
+     * It may already contain
+     * the complete option text.
+     */
+
+    const matchingOption =
+      question.options.find(
+        function(option) {
+
+          return (
+            String(option)
+              .trim()
+              .toLowerCase() ===
+            answer.toLowerCase()
+          );
+
+        }
+      );
+
+
+    if (
+      matchingOption !==
+      undefined
+    ) {
+
+      return String(
+        matchingOption
+      );
+
+    }
+
+  }
+
+
+  return "";
+
+}
+
+
+/* =====================================================
+   NORMALIZE ONE QUESTION
+===================================================== */
+
+function normalizeQuestion(
+  question,
+  index,
+  moduleName
+) {
+
+  if (!question) {
+    return null;
+  }
+
+
+  const text =
+    question.text ||
+    question.question ||
+    question.questionText ||
+    "";
+
+
+  const rawOptions =
+    Array.isArray(
+      question.options
+    )
+      ? question.options
+      : [];
+
+
+  const options =
+    rawOptions
+      .map(
+        function(option) {
+
+          return String(
+            option
+          )
+            .replace(
+              /^[A-D][.)]\s*/i,
+              ""
+            )
+            .trim();
+
+        }
+      )
+      .filter(Boolean);
+
+
+  if (
+    text.trim().length < 5 ||
+    options.length < 2
+  ) {
+
+    return null;
+
+  }
+
+
+  const correctAnswer =
+    getCorrectAnswer({
+      ...question,
+      options: options
+    });
+
+
+  const generatedId =
+    `PDF-${Date.now()}-${index + 1}`;
+
+
+  return {
+
+    id:
+      question.id ||
+      generatedId,
+
+
+    text:
+      text.trim(),
+
+
+    options:
+      options,
+
+
+    correctAnswer:
+      correctAnswer,
+
+
+    subject:
+      question.subject ||
+      "Unknown",
+
+
+    chapter:
+      question.chapter ||
+      "",
+
+
+    topic:
+      question.topic ||
+      "",
+
+
+    difficulty:
+      question.difficulty ||
+      "Medium",
+
+
+    marks:
+      Number(
+        question.marks
+      ) || 4,
+
+
+    negativeMarks:
+      Number(
+        question.negativeMarks
+      ) || 1,
+
+
+    explanation:
+      question.explanation ||
+      question.solution ||
+      "",
+
+
+    source:
+      question.source ||
+      moduleName ||
+      "PDF Module"
+
+  };
+
+}
+
+
+/* =====================================================
+   NORMALIZE QUESTION ARRAY
+===================================================== */
+
+function normalizeQuestions(
+  questions,
+  moduleName
+) {
+
+  if (
+    !Array.isArray(
+      questions
+    )
+  ) {
+
+    return [];
+
+  }
+
+
+  const result = [];
+
+
+  questions.forEach(
+    function(question, index) {
+
+      const normalized =
+        normalizeQuestion(
+          question,
+          index,
+          moduleName
+        );
+
+
+      if (normalized) {
+
+        result.push(
+          normalized
+        );
+
+      }
+
+    }
+  );
+
+
+  return result;
+
+}
+
+
+/* =====================================================
+   ADD QUESTIONS TO EXISTING POOL
+===================================================== */
+
+function addQuestionsToPool(
+  questions
+) {
+
+  const existing =
+    getPDFQuestionPool();
+
+
+  const existingIds =
+    new Set(
+      existing.map(
+        function(question) {
+          return question.id;
+        }
+      )
+    );
+
+
+  const newQuestions = [];
+
+
+  let duplicates = 0;
+
+
+  questions.forEach(
+    function(question) {
+
+      if (
+        existingIds.has(
+          question.id
+        )
+      ) {
+
+        duplicates++;
+
+        return;
+
+      }
+
+
+      existingIds.add(
+        question.id
+      );
+
+
+      newQuestions.push(
+        question
+      );
+
+    }
+  );
+
+
+  const updatedPool =
+    existing.concat(
+      newQuestions
+    );
+
+
+  savePDFQuestionPool(
+    updatedPool
+  );
+
+
+  updatePoolStats();
+
+
+  return {
+
+    added:
+      newQuestions.length,
+
+    duplicates:
+      duplicates,
+
+    total:
+      updatedPool.length
+
+  };
+
+}
+
+
+/* =====================================================
+   EXTRACT QUESTIONS FROM JSON
+===================================================== */
+
+function parseQuestionJSON(
+  text
+) {
+
+  try {
+
+    const parsed =
+      JSON.parse(text);
+
+
+    if (
+      Array.isArray(parsed)
+    ) {
+
+      return parsed;
+
+    }
+
+
+    if (
+      Array.isArray(
+        parsed.questions
+      )
+    ) {
+
+      return parsed.questions;
+
+    }
+
+
+    return [];
+
+  }
+
+  catch (error) {
+
+    return [];
+
+  }
+
+}
+
+
+/* =====================================================
+   OPTIONAL TEXT QUESTION PARSER
+===================================================== */
+
+function parsePlainTextQuestions(text) {
+  const questions = [];
+  const cleaned = cleanPDFText(text).replace(/
+/g, "
+").replace(/[ 	]+/g, " ").trim();
+  const blocks = cleaned.split(/(?=(?:^|
+)\s*\d+\s*[.)]\s*)/gm);
+
+  blocks.forEach(function(block) {
+    block = block.trim();
+    const qm = block.match(/^\s*\d+\s*[.)]\s*([\s\S]*?)(?=\s+(?:A|B|C|D)\s*[.)]\s+)/i);
+    if (!qm) return;
+
+    const questionText = qm[1].replace(/\s+/g, " ").trim();
+    const matches = [...block.matchAll(/(?:^|\s)([A-D])\s*[.)]\s+([\s\S]*?)(?=\s+(?:[A-D])\s*[.)]\s+|$)/gi)];
+
+    const options = matches.map(function(m) {
+      return m[2].replace(/\s+/g, " ").trim();
+    }).filter(Boolean);
+
+    if (questionText.length >= 5 && options.length >= 2) {
+      questions.push({
+        text: questionText,
+        options: options,
+        subject: "Unknown",
+        difficulty: "Medium"
+      });
+    }
+  });
+
+  console.log("PDF parser detected:", questions.length);
+  return questions;
+}
+
+
+/* =====================================================
+   CONVERT SELECTED PDF
+===================================================== */
+
+async function convertSelectedPDF() {
+
+  const file =
+    pdfInput.files[0];
+
+
+  if (!file) {
+
+    alert(
+      "Please select a PDF first."
+    );
+
+    return;
+
+  }
+
+
+  const moduleName =
+    moduleNameInput.value.trim() ||
+    file.name;
+
+
+  convertButton.disabled =
+    true;
+
+
+  statusBox.textContent =
+    "⏳ Reading PDF...\nPlease wait.";
+
+
+  try {
+
+    const pdfText =
+      await extractPDFText(
+        file
+      );
+
+
+    if (!pdfText) {
+
+      throw new Error(
+        "No readable text was found in this PDF."
+      );
+
+    }
+
+
+    statusBox.textContent =
+      "🔎 PDF text extracted.\n" +
+      "Preparing questions...";
+
+
+    /*
+     * First try JSON.
+     *
+     * This is useful when your existing
+     * PDF converter already creates structured
+     * question data.
+     */
+
+    let extractedQuestions =
+      parseQuestionJSON(
+        pdfText
+      );
+
+
+    /*
+     * Otherwise use the basic text parser.
+     */
+
+    if (
+      extractedQuestions.length === 0
+    ) {
+
+      extractedQuestions =
+        parsePlainTextQuestions(
+          pdfText
+        );
+
+    }
+
+
+    const normalizedQuestions =
+      normalizeQuestions(
+        extractedQuestions,
+        moduleName
+      );
+
+
+    if (
+      normalizedQuestions.length === 0
+    ) {
+
+      throw new Error(
+        "Questions could not be detected automatically. " +
+        "The PDF may require the existing specialized parser."
+      );
+
+    }
+
+
+    const result =
+      addQuestionsToPool(
+        normalizedQuestions
+      );
+
+
+    statusBox.textContent =
+      `✅ Module processed.\n\n` +
+      `Module: ${moduleName}\n` +
+      `Questions detected: ${normalizedQuestions.length}\n` +
+      `New questions added: ${result.added}\n` +
+      `Duplicates skipped: ${result.duplicates}\n` +
+      `Total PDF pool: ${result.total}`;
+
+
+    console.log(
+      "📚 Module result:",
+      result
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ PDF conversion error:",
+      error
+    );
+
+
+    statusBox.textContent =
+      "❌ Conversion failed.\n\n" +
+      error.message;
+
+  }
+
+  finally {
+
+    convertButton.disabled =
+      false;
+
+  }
+
+}
+
+
+/* =====================================================
+   CONVERT BUTTON
+===================================================== */
+
+convertButton.addEventListener(
+  "click",
+  function() {
+
+    convertSelectedPDF();
+
+  }
+);
+
+
+/* =====================================================
+   CLEAR PDF POOL
+===================================================== */
+
+clearPoolButton.addEventListener(
+  "click",
+  function() {
+
+    const confirmed =
+      confirm(
+        "Delete all PDF-generated CBT questions?\n\n" +
+        "Your test180-questions.js file will NOT be deleted."
+      );
+
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    localStorage.removeItem(
+      PDF_CBT_STORAGE_KEY
+    );
+
+
+    updatePoolStats();
+
+
+    statusBox.textContent =
+      "🗑️ PDF question pool cleared.";
+
+  }
+);
+
+
+/* =====================================================
+   PART 2 READY
+===================================================== */
+
+console.log(
+  "✅ PDF → CBT Part 2 loaded."
+);
+
+          </script>
+          <script>
+
+/* =====================================================
+   PART 3
+   CONNECT PDF QUESTION POOL → CBT
+===================================================== */
+
+
+/* =====================================================
+   GET QUESTIONS FOR CBT
+===================================================== */
+
+function getQuestionsForCBT() {
+
+  const pool =
+    getPDFQuestionPool();
+
+
+  if (
+    !Array.isArray(pool)
+  ) {
+
+    return [];
+
+  }
+
+
+  return pool.filter(
+    function(question) {
+
+      return (
+        question &&
+        typeof question.text === "string" &&
+        question.text.trim().length > 0 &&
+        Array.isArray(question.options) &&
+        question.options.length >= 2
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   EXPORT QUESTIONS TO WINDOW
+===================================================== */
+
+function exportPDFQuestionsToCBT() {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  /*
+   * Make the complete PDF pool
+   * available to other pages.
+   */
+
+  window.PDF_CBT_QUESTIONS =
+    questions;
+
+
+  console.log(
+    "✅ PDF CBT questions available:",
+    questions.length
+  );
+
+
+  return questions;
+
+}
+
+
+/* =====================================================
+   CREATE CBT TEST OBJECT
+===================================================== */
+
+function createPDFCBTTest() {
+
+  const questions =
+    exportPDFQuestionsToCBT();
+
+
+  if (
+    questions.length === 0
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      "pdf-cbt-test",
+
+    title:
+      "PDF Module CBT",
+
+    duration:
+      180,
+
+    questions:
+      questions,
+
+    questionIds:
+      questions.map(
+        function(question) {
+
+          return question.id;
+
+        }
+      )
+
+  };
+
+}
+
+
+/* =====================================================
+   GET SUBJECT QUESTIONS
+===================================================== */
+
+function getPDFQuestionsBySubject(
+  subject
+) {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  if (!subject) {
+
+    return questions;
+
+  }
+
+
+  const wanted =
+    String(subject)
+      .trim()
+      .toLowerCase();
+
+
+  return questions.filter(
+    function(question) {
+
+      return String(
+        question.subject || ""
+      )
+        .trim()
+        .toLowerCase()
+        .includes(wanted);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   GET MODULE QUESTIONS
+===================================================== */
+
+function getPDFQuestionsByModule(
+  moduleName
+) {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  if (!moduleName) {
+
+    return questions;
+
+  }
+
+
+  const wanted =
+    String(moduleName)
+      .trim()
+      .toLowerCase();
+
+
+  return questions.filter(
+    function(question) {
+
+      return String(
+        question.source || ""
+      )
+        .trim()
+        .toLowerCase()
+        .includes(wanted);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   GET RANDOM QUESTIONS
+===================================================== */
+
+function getRandomPDFQuestions(
+  count
+) {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  const shuffled =
+    [...questions];
+
+
+  for (
+    let i =
+      shuffled.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+
+    [
+      shuffled[i],
+      shuffled[j]
+    ] =
+    [
+      shuffled[j],
+      shuffled[i]
+    ];
+
+  }
+
+
+  return shuffled.slice(
+    0,
+    Math.max(
+      0,
+      Number(count) || 0
+    )
+  );
+
+}
+
+
+/* =====================================================
+   CREATE TEST FROM MODULE
+===================================================== */
+
+function createModuleTest(
+  moduleName,
+  questionCount = "all"
+) {
+
+  let questions =
+    getPDFQuestionsByModule(
+      moduleName
+    );
+
+
+  if (
+    questions.length === 0
+  ) {
+
+    console.warn(
+      "⚠️ No questions found for module:",
+      moduleName
+    );
+
+    return null;
+
+  }
+
+
+  if (
+    questionCount !== "all"
+  ) {
+
+    questions =
+      questions.slice(
+        0,
+        Number(questionCount)
+      );
+
+  }
+
+
+  return {
+
+    id:
+      "module-" +
+      Date.now(),
+
+    title:
+      moduleName,
+
+    duration:
+      180,
+
+    questions:
+      questions,
+
+    questionIds:
+      questions.map(
+        function(question) {
+
+          return question.id;
+
+        }
+      )
+
+  };
+
+}
+
+
+/* =====================================================
+   CREATE MIXED TEST
+===================================================== */
+
+function createMixedPDFTest(
+  questionCount = 180
+) {
+
+  const questions =
+    getRandomPDFQuestions(
+      questionCount
+    );
+
+
+  if (
+    questions.length === 0
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      "mixed-pdf-test-" +
+      Date.now(),
+
+    title:
+      "Topper Test Pro — PDF Module Test",
+
+    duration:
+      180,
+
+    questions:
+      questions,
+
+    questionIds:
+      questions.map(
+        function(question) {
+
+          return question.id;
+
+        }
+      )
+
+  };
+
+}
+
+
+/* =====================================================
+   EXPORT TEST DATA
+===================================================== */
+
+function exportPDFTestData() {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  const test =
+    createPDFCBTTest();
+
+
+  window.PDF_CBT_TEST =
+    test;
+
+
+  return {
+
+    questions:
+      questions,
+
+    test:
+      test
+
+  };
+
+}
+
+
+/* =====================================================
+   OPEN CBT
+===================================================== */
+
+function openCBTWithPDFQuestions() {
+
+  const questions =
+    getQuestionsForCBT();
+
+
+  if (
+    questions.length === 0
+  ) {
+
+    alert(
+      "No PDF questions are available yet.\n\n" +
+      "Convert a PDF module first."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Store the selected pool
+   * for cbt.html.
+   */
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_SOURCE",
+    "PDF"
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(
+      questions
+    )
+  );
+
+
+  window.location.href =
+    "./cbt.html";
+
+}
+
+
+/* =====================================================
+   CREATE OPEN CBT BUTTON
+===================================================== */
+
+const openCBTButton =
+  document.createElement(
+    "button"
+  );
+
+
+openCBTButton.type =
+  "button";
+
+openCBTButton.className =
+  "primary";
+
+openCBTButton.textContent =
+  "🚀 Open PDF Questions in CBT";
+
+
+openCBTButton.style.marginTop =
+  "10px";
+
+
+openCBTButton.addEventListener(
+  "click",
+  function() {
+
+    openCBTWithPDFQuestions();
+
+  }
+);
+
+
+/* =====================================================
+   ADD BUTTON TO PAGE
+===================================================== */
+
+const buttonContainer =
+  document.querySelector(
+    ".button-row"
+  );
+
+
+if (
+  buttonContainer
+) {
+
+  buttonContainer.appendChild(
+    openCBTButton
+  );
+
+}
+
+
+/* =====================================================
+   REFRESH EXPORT
+===================================================== */
+
+exportPDFQuestionsToCBT();
+
+exportPDFTestData();
+
+
+/* =====================================================
+   DEBUG
+===================================================== */
+
+console.log(
+  "===================================="
+);
+
+console.log(
+  "✅ PDF → CBT Part 3 loaded"
+);
+
+console.log(
+  "📚 PDF questions:",
+  getQuestionsForCBT().length
+);
+
+console.log(
+  "🚀 PDF CBT test:",
+  window.PDF_CBT_TEST
+);
+
+console.log(
+  "===================================="
+);
+
+          </script>
+          <script>
+
+/* =====================================================
+   PART 4
+   PDF MODULE → TEST BUILDER
+===================================================== */
+
+
+/* =====================================================
+   GET CURRENT PDF QUESTION POOL
+===================================================== */
+
+function getCurrentPDFPool() {
+
+  const questions =
+    getPDFQuestionPool();
+
+  if (!Array.isArray(questions)) {
+    return [];
+  }
+
+  return questions.filter(
+    function(question) {
+
+      return (
+        question &&
+        typeof question.text === "string" &&
+        question.text.trim().length > 0 &&
+        Array.isArray(question.options) &&
+        question.options.length >= 2
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   BUILD 180 QUESTION TEST
+===================================================== */
+
+function build180QuestionTest() {
+
+  const pool =
+    getCurrentPDFPool();
+
+
+  if (pool.length < 180) {
+
+    return {
+
+      success: false,
+
+      message:
+        `Only ${pool.length} questions are available.\n\n` +
+        `180 questions are required for Test 180.`
+
+    };
+
+  }
+
+
+  /*
+   * Take first 180 questions.
+   *
+   * Part 5 will add proper random/module
+   * selection controls.
+   */
+
+  const questions =
+    pool.slice(
+      0,
+      180
+    );
+
+
+  return {
+
+    success: true,
+
+    test: {
+
+      id:
+        "topper-test-180-" +
+        Date.now(),
+
+      title:
+        "🔥 Topper Test Pro — Test 180",
+
+      duration:
+        180,
+
+      totalQuestions:
+        180,
+
+      questions:
+        questions,
+
+      questionIds:
+        questions.map(
+          function(question) {
+
+            return question.id;
+
+          }
+        )
+
+    }
+
+  };
+
+}
+
+
+/* =====================================================
+   SAVE TEST 180
+===================================================== */
+
+function saveTest180() {
+
+  const result =
+    build180QuestionTest();
+
+
+  if (!result.success) {
+
+    statusBox.textContent =
+      "⚠️ " +
+      result.message;
+
+    return null;
+
+  }
+
+
+  try {
+
+    localStorage.setItem(
+      "TOPPER_TEST_180",
+      JSON.stringify(
+        result.test
+      )
+    );
+
+
+    console.log(
+      "✅ Test 180 saved:",
+      result.test
+    );
+
+
+    statusBox.textContent =
+      "🔥 Test 180 created successfully.\n\n" +
+      "Questions: 180\n" +
+      "Duration: 180 minutes";
+
+
+    return result.test;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Test 180 save error:",
+      error
+    );
+
+
+    statusBox.textContent =
+      "❌ Could not save Test 180.";
+
+    return null;
+
+  }
+
+}
+
+
+/* =====================================================
+   LOAD SAVED TEST 180
+===================================================== */
+
+function loadTest180() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(
+        "TOPPER_TEST_180"
+      );
+
+
+    if (!saved) {
+      return null;
+    }
+
+
+    const test =
+      JSON.parse(saved);
+
+
+    if (
+      !test ||
+      !Array.isArray(
+        test.questions
+      )
+    ) {
+
+      return null;
+
+    }
+
+
+    return test;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Test 180 loading error:",
+      error
+    );
+
+    return null;
+
+  }
+
+}
+
+
+/* =====================================================
+   SHOW TEST 180 STATUS
+===================================================== */
+
+function updateTest180Status() {
+
+  const pool =
+    getCurrentPDFPool();
+
+
+  const savedTest =
+    loadTest180();
+
+
+  if (savedTest) {
+
+    statusBox.textContent =
+      `🔥 Test 180 ready.\n\n` +
+      `Questions: ${savedTest.questions.length}\n` +
+      `Duration: ${savedTest.duration} minutes`;
+
+    return;
+
+  }
+
+
+  if (pool.length >= 180) {
+
+    statusBox.textContent =
+      `📚 ${pool.length} PDF questions available.\n\n` +
+      `You can now create Test 180.`;
+
+    return;
+
+  }
+
+
+  statusBox.textContent =
+    `📚 Current PDF question pool: ${pool.length}\n\n` +
+    `Need ${180 - pool.length} more questions ` +
+    `to create Test 180.`;
+
+}
+
+
+/* =====================================================
+   CREATE TEST 180 BUTTON
+===================================================== */
+
+const create180Button =
+  document.createElement(
+    "button"
+  );
+
+
+create180Button.type =
+  "button";
+
+create180Button.className =
+  "primary";
+
+create180Button.textContent =
+  "🔥 Create Test 180";
+
+create180Button.style.marginTop =
+  "10px";
+
+
+create180Button.addEventListener(
+  "click",
+  function() {
+
+    saveTest180();
+
+  }
+);
+
+
+/* =====================================================
+   ADD BUTTON TO PAGE
+===================================================== */
+
+if (
+  buttonContainer
+) {
+
+  buttonContainer.appendChild(
+    create180Button
+  );
+
+}
+
+
+/* =====================================================
+   TEST 180 → CBT
+===================================================== */
+
+function openTest180InCBT() {
+
+  const test =
+    loadTest180();
+
+
+  if (!test) {
+
+    alert(
+      "Test 180 has not been created yet."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !Array.isArray(
+      test.questions
+    ) ||
+    test.questions.length === 0
+  ) {
+
+    alert(
+      "Test 180 contains no questions."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Send Test 180 questions
+   * to cbt.html.
+   */
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_SOURCE",
+    "TEST180"
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_TEST",
+    JSON.stringify(
+      test
+    )
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(
+      test.questions
+    )
+  );
+
+
+  window.location.href =
+    "./cbt.html";
+
+}
+
+
+/* =====================================================
+   OPEN TEST 180 BUTTON
+===================================================== */
+
+const open180Button =
+  document.createElement(
+    "button"
+  );
+
+
+open180Button.type =
+  "button";
+
+open180Button.className =
+  "primary";
+
+open180Button.textContent =
+  "🚀 Start Test 180";
+
+
+open180Button.style.marginTop =
+  "10px";
+
+
+open180Button.addEventListener(
+  "click",
+  function() {
+
+    openTest180InCBT();
+
+  }
+);
+
+
+/* =====================================================
+   ADD START BUTTON
+===================================================== */
+
+if (
+  buttonContainer
+) {
+
+  buttonContainer.appendChild(
+    open180Button
+  );
+
+}
+
+
+/* =====================================================
+   INITIAL STATUS
+===================================================== */
+
+updateTest180Status();
+
+
+console.log(
+  "===================================="
+);
+
+console.log(
+  "🔥 PART 4 READY"
+);
+
+console.log(
+  "PDF pool:",
+  getCurrentPDFPool().length
+);
+
+console.log(
+  "Saved Test 180:",
+  loadTest180()
+);
+
+console.log(
+  "===================================="
+);
+
+          </script>
+          <!-- =====================================================
+     PART 4
+     BUILD TEST 180 FROM PDF QUESTION POOL
+===================================================== -->
+
+<script>
+
+function getCurrentPDFPool() {
+
+  /*
+   * Part 3 should provide getPDFQuestionPool().
+   */
+
+  if (
+    typeof getPDFQuestionPool !== "function"
+  ) {
+
+    console.error(
+      "❌ getPDFQuestionPool() not found."
+    );
+
+    return [];
+
+  }
+
+
+  const pool =
+    getPDFQuestionPool();
+
+
+  if (!Array.isArray(pool)) {
+    return [];
+  }
+
+
+  return pool.filter(function(question) {
+
+    return (
+      question &&
+      typeof question.text === "string" &&
+      question.text.trim() !== "" &&
+      Array.isArray(question.options) &&
+      question.options.length >= 2
+    );
+
+  });
+
+}
+
+
+/* =====================================================
+   BUILD TEST 180
+===================================================== */
+
+function buildTest180() {
+
+  const pool =
+    getCurrentPDFPool();
+
+
+  console.log(
+    "📚 Available PDF questions:",
+    pool.length
+  );
+
+
+  if (pool.length < 180) {
+
+    alert(
+      "Only " +
+      pool.length +
+      " questions are available.\n\n" +
+      "Need " +
+      (180 - pool.length) +
+      " more questions for Test 180."
+    );
+
+    return null;
+
+  }
+
+
+  /*
+   * Select exactly 180 questions.
+   */
+
+  const questions =
+    pool.slice(0, 180);
+
+
+  const test = {
+
+    id:
+      "topper-test-180",
+
+    title:
+      "Topper Test Pro — Test 180",
+
+    duration:
+      180,
+
+    totalQuestions:
+      180,
+
+    questions:
+      questions,
+
+    questionIds:
+      questions.map(function(question) {
+
+        return (
+          question.id ||
+          ""
+        );
+
+      }),
+
+    createdAt:
+      new Date().toISOString()
+
+  };
+
+
+  console.log(
+    "✅ Test 180 built:",
+    test
+  );
+
+
+  return test;
+
+}
+
+
+/* =====================================================
+   SAVE TEST 180
+===================================================== */
+
+function saveTest180() {
+
+  const test =
+    buildTest180();
+
+
+  if (!test) {
+    return;
+  }
+
+
+  try {
+
+    localStorage.setItem(
+      "TOPPER_TEST_180",
+      JSON.stringify(test)
+    );
+
+
+    /*
+     * Also keep the questions ready
+     * for CBT.
+     */
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "TEST180"
+    );
+
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_TEST",
+      JSON.stringify(test)
+    );
+
+
+    sessionStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      JSON.stringify(
+        test.questions
+      )
+    );
+
+
+    alert(
+      "✅ Test 180 created successfully!\n\n" +
+      "Questions: 180\n" +
+      "Duration: 180 minutes"
+    );
+
+
+    updateTest180Status();
+
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Error saving Test 180:",
+      error
+    );
+
+
+    alert(
+      "❌ Could not save Test 180."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   LOAD SAVED TEST 180
+===================================================== */
+
+function loadTest180() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(
+        "TOPPER_TEST_180"
+      );
+
+
+    if (!saved) {
+      return null;
+    }
+
+
+    const test =
+      JSON.parse(saved);
+
+
+    if (
+      !test ||
+      !Array.isArray(
+        test.questions
+      )
+    ) {
+
+      return null;
+
+    }
+
+
+    return test;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "❌ Error loading Test 180:",
+      error
+    );
+
+    return null;
+
+  }
+
+}
+
+
+/* =====================================================
+   TEST 180 STATUS
+===================================================== */
+
+function updateTest180Status() {
+
+  const pool =
+    getCurrentPDFPool();
+
+
+  const saved =
+    loadTest180();
+
+
+  const oldStatus =
+    document.getElementById(
+      "test180Status"
+    );
+
+
+  if (!oldStatus) {
+    return;
+  }
+
+
+  if (
+    saved &&
+    saved.questions &&
+    saved.questions.length === 180
+  ) {
+
+    oldStatus.innerHTML =
+      "🔥 <strong>Test 180 Ready</strong><br>" +
+      "Questions: 180<br>" +
+      "Duration: 180 minutes";
+
+    return;
+
+  }
+
+
+  if (pool.length >= 180) {
+
+    oldStatus.innerHTML =
+      "📚 <strong>180+ questions available</strong><br>" +
+      "Ready to create Test 180.";
+
+    return;
+
+  }
+
+
+  oldStatus.innerHTML =
+    "📚 Questions available: " +
+    pool.length +
+    "<br>Need " +
+    (180 - pool.length) +
+    " more questions.";
+
+}
+
+
+/* =====================================================
+   CREATE TEST 180 BUTTON
+===================================================== */
+
+function createTest180Button() {
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+
+  button.type =
+    "button";
+
+  button.textContent =
+    "🔥 Create Test 180";
+
+  button.className =
+    "primary";
+
+
+  button.style.marginTop =
+    "10px";
+
+
+  button.addEventListener(
+    "click",
+    function() {
+
+      saveTest180();
+
+    }
+  );
+
+
+  return button;
+
+}
+
+
+/* =====================================================
+   START TEST 180
+===================================================== */
+
+function startTest180() {
+
+  const test =
+    loadTest180();
+
+
+  if (
+    !test ||
+    !Array.isArray(
+      test.questions
+    ) ||
+    test.questions.length !== 180
+  ) {
+
+    alert(
+      "Please create Test 180 first."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Send the complete test to cbt.html.
+   */
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_SOURCE",
+    "TEST180"
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_TEST",
+    JSON.stringify(test)
+  );
+
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(
+      test.questions
+    )
+  );
+
+
+  console.log(
+    "🚀 Sending Test 180 to CBT:",
+    test.questions.length
+  );
+
+
+  window.location.href =
+    "./cbt.html";
+
+}
+
+
+/* =====================================================
+   START TEST 180 BUTTON
+===================================================== */
+
+function createStartTest180Button() {
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+
+  button.type =
+    "button";
+
+  button.textContent =
+    "🚀 Start Test 180";
+
+  button.className =
+    "primary";
+
+
+  button.style.marginTop =
+    "10px";
+
+
+  button.addEventListener(
+    "click",
+    function() {
+
+      startTest180();
+
+    }
+  );
+
+
+  return button;
+
+}
+
+
+/* =====================================================
+   ADD TEST 180 CONTROLS
+===================================================== */
+
+(function addTest180Controls() {
+
+  /*
+   * Create a dedicated container.
+   */
+
+  const box =
+    document.createElement(
+      "div"
+    );
+
+
+  box.id =
+    "test180Box";
+
+
+  box.className =
+    "card";
+
+
+  box.style.marginTop =
+    "20px";
+
+
+  box.innerHTML = `
+
+    <h2>
+      🔥 Topper Test Pro — Test 180
+    </h2>
+
+    <p>
+      Build a 180-question CBT from the
+      questions extracted from your PDF modules.
+    </p>
+
+    <div
+      id="test180Status"
+      class="info"
+    >
+      Checking question pool...
+    </div>
+
+  `;
+
+
+  const createButton =
+    createTest180Button();
+
+
+  const startButton =
+    createStartTest180Button();
+
+
+  box.appendChild(
+    createButton
+  );
+
+
+  box.appendChild(
+    startButton
+  );
+
+
+  /*
+   * Add to existing page.
+   */
+
+  const container =
+    document.querySelector(
+      ".container"
+    );
+
+
+  if (container) {
+
+    container.appendChild(
+      box
+    );
+
+  }
+
+  else {
+
+    document.body.appendChild(
+      box
+    );
+
+  }
+
+
+  updateTest180Status();
+
+
+})();
+
+
+console.log(
+  "✅ PDF → CBT Part 4 loaded."
+);
+
+</script>

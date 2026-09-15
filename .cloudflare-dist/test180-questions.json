@@ -1,0 +1,3242 @@
+[
+  {
+    "id": "NEET-MAJOR-2026-Q1",
+    "questionNumber": 1,
+    "question": "A student measured the length of a rod and wrote it as\n3.60 cm. Which instrument did he use to measure it ?",
+    "options": [
+      "A screw gauge having 100 divisions in the\ncircular scale and pitch as 1mm.",
+      "A screw gauge having 50 divisions in the\ncircular scale and pitch as 1mm",
+      "A meter scale",
+      "A vernier calliper where the 10 divisions in\nvernier scale match with 9 divisions of the main\nscale and main scale have 10 divisions in 1 cm."
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q2",
+    "questionNumber": 2,
+    "question": "A ball was thrown from height H and the ball hit\n^ ^\n10(i −j)\nthe floor with velocity m/s after 1.5 sec\nof its projection. The height H is :",
+    "options": [
+      "3.75 m",
+      "2.25 m",
+      "1.50 m",
+      "4.75 m"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q3",
+    "questionNumber": 3,
+    "question": "Velocity v/s time graph of a particle starting from\norigin is given below. Choose the correct option for\ncorresponding acceleration and displacement graphs :-",
+    "options": [
+      "II, I",
+      "III, I",
+      "II, IV",
+      "III, IV\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q4",
+    "questionNumber": 4,
+    "question": "A man stands on a weighing machine kept inside a lift.\nInitially the lift is ascending with the acceleration 'a' due\nto which the reading is W. Now the lift decends with\nthe same accleration and reading is 10 % of initial. Find\nthe acceleration of lift?\ng\n9g\nm/sec2\nm/sec2",
+    "options": [
+      "",
+      "19\n11\n2 2\n0 m/sec g m/sec",
+      "",
+      ""
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q5",
+    "questionNumber": 5,
+    "question": "ℓ\nA uniform rope of length is pulled by a constant\nforce F as shown. The tension in the rope at\ndistance x from the end where force is applied to -\nx\nF(1+ )\nF\n(2)",
+    "options": [
+      "L\nx x\nF(1− )\nF",
+      "",
+      "",
+      "L L"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q6",
+    "questionNumber": 6,
+    "question": "Match the column\nColumnI ColumnII\nWork done by conservative\nA. P.\nPath dependent\nforce\nWork done by\nB. Q.\nPositive, negative, zero\nnon-conservative force\nChange in kinetic\nC. R.\nWork done by friction force\nenergy\nD. S.\nWork done by all forces Path independent",
+    "options": [
+      "A-P,Q; B-Q,R; C-R,S; D-S,P",
+      "A-Q,S; B-P,Q; C-P,Q; D-Q,R",
+      "A-P,R; B-P,S; C-Q,S; D-P,Q",
+      "A-P,Q; B-P,R; C-P,R; D-Q,S"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q7",
+    "questionNumber": 7,
+    "question": "A particle of mass 'm' describes a circle of radius r.\n2\nThe centripetal acceleration of the particle is .\nr3\nThe momentum of the particle is :-\n2m 4m\n√2m\n4m",
+    "options": [
+      "",
+      "",
+      "",
+      "√r √r\nr\nr"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q8",
+    "questionNumber": 8,
+    "question": "A moving mass of 8 kg collides elastically with a\nstationary mass of 2 kg. If E be the initial kinetic\nenergy of the moving mass, the kinetic energy\nleft with it after the collision will be.",
+    "options": [
+      "0.80E",
+      "0.64E",
+      "0.36E",
+      "0.08E"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q9",
+    "questionNumber": 9,
+    "question": "2\nThe M.I. of a body about the given axis is 1.2 kgm .\nInitially the body is at rest. In order to produce a\nrotational kinetic energy of 1500 joule an angular\n2\nacceleration of 25 rad/sec must be applied about that\naxis for a duration of :",
+    "options": [
+      "4 sec",
+      "2 sec",
+      "8 sec",
+      "10 sec"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q10",
+    "questionNumber": 10,
+    "question": "An arrangement consists of two objects of\nmasses 2 m and 3 m separated by distance a. The\nmoment of inertia about axis passing through\ncenter of mass is :-\n6 5\n2 2\nma ma",
+    "options": [
+      "",
+      "5 6\n12 13\n2 2\nma ma",
+      "",
+      "13 25"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q11",
+    "questionNumber": 11,
+    "question": "In case of earth :",
+    "options": [
+      "Gravitational field is zero, both at center\nand infinity",
+      "Gravitational potential is zero, both at\ncenter and infinity",
+      "Gravitational potential is same, both at\ncenter and infinity but not zero",
+      "Gravitational potential is maximum at the center"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q12",
+    "questionNumber": 12,
+    "question": "ν\nA body falls freely under gravity. Its speed is\nwhen it has lost an amount U of the gravitational\nenergy. Then its mass is :\nU2\nUg\n2U\n2Ugν2",
+    "options": [
+      "",
+      "",
+      "",
+      "g ν2\nν2\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q13",
+    "questionNumber": 13,
+    "question": "The stress-strain graph for a metal wire is as shown\nin the figure. In the graph, the region in which\nHooke's law is obeyed, the ultimate strength and\nfracture points are respectively represented by",
+    "options": [
+      "OA, C, D",
+      "OB, D, E",
+      "OA, D, E",
+      "OB, C, D"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q14",
+    "questionNumber": 14,
+    "question": "Find the fraction of volume of a ball which is\ninside 3d liquid.\n1 1 1 1",
+    "options": [
+      "",
+      "",
+      "",
+      "2 3 4 6"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q15",
+    "questionNumber": 15,
+    "question": "There is a hole of area A at the bottom of\ncylindrical vessel.Water is filled upto a height h\nand water flows out in t second. If water is filled\nto a height 4h, it will flow out in time equal to :-",
+    "options": [
+      "t",
+      "4t",
+      "2t",
+      "t/4"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q16",
+    "questionNumber": 16,
+    "question": "Statement 1:\n–\nIn presence of non-conservative\nforce, a system cannot execute simple harmonic\nmotion.\nStatement 2:\n–\nIn simple harmonic motion, total\nmechanical energy remains constant.\nStatement–1 Statement–2",
+    "options": [
+      "is True, is True ;\nStatement–2\nis a correct explanation for\nStatement–1.\nStatement–1 Statement–2",
+      "is True, is True ;\nStatement–2\nis not a correct explanation\nStatement–1.\nfor\nStatement–1 Statement–2",
+      "is True, is False.\nStatement–1 Statement–2",
+      "is False, is True."
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q17",
+    "questionNumber": 17,
+    "question": "The speed of sound in hydrogen gas at N.T.P is\nth\n1\n( )\n1328 m/s. If the density of hydrogen is of\n16\nthat of air then the speed of sound in air at N.T.P is:",
+    "options": [
+      "340 m/s",
+      "332 m/s",
+      "300 m/s",
+      "380 m/s"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q18",
+    "questionNumber": 18,
+    "question": "A liquid having coefficient of real cubical\n'γ'\nexpansion is filled in a vessel having\nγ\ncoefficient of linear expansion . What is the\n6\ncoefficient of apparent expansion of liquid ?\nγ γ γ\n5γ",
+    "options": [
+      "",
+      "",
+      "",
+      "2\n3 6\n6"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q19",
+    "questionNumber": 19,
+    "question": "3 moles of a diatomic ideal gas undergo the\n3\nV\nprocess = constant. If the temperature is\nT2\nincreased by 200 K, find the work done by the\ngas. (R is universal gas constant.)",
+    "options": [
+      "200 R",
+      "400 R",
+      "800 R",
+      "Data insufficient"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q20",
+    "questionNumber": 20,
+    "question": "Ratio of radius of two ideal black body is 1 : 2\nand ratio of their temperature is 2 : 3 then ratio\nof power radiated is-",
+    "options": [
+      "4 : 9",
+      "16 : 9",
+      "4 : 81",
+      "None of these"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q21",
+    "questionNumber": 21,
+    "question": "An ideal gas at 0ºC temperature and atmospheric\npressure P has volume V. The percentage\nincrease in it's temperature needed to expand it\nto 4V at constant pressure is-",
+    "options": [
+      "100%",
+      "200%",
+      "300%",
+      "400%\nAssertion :"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q22",
+    "questionNumber": 22,
+    "question": "If we see along the axis of a\nuniformly charged ring, the magnitude of\nElectric field is minimum at centre and\nmagnitude of electric potential is maximum.\nReason :\nElectric field is a vector quantity while\nelectric potential is scalar.",
+    "options": [
+      "Both assertion and reason are true and\nreason correctly explains Assertion.",
+      "Both assertion and reason are true and reason\nis not correct explaination of Assertion.",
+      "Assertion is true and Reason is false.",
+      "Assertion is false and Reason is true.\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q23",
+    "questionNumber": 23,
+    "question": "A spherical charged conductor has surface\nσ.\ncharge density The electric field on its surface\nis E and electric potential of conductor is V.\nNow the radius of the sphere is halved keeping\nthe charge to be constant. The new values of\nelectric field and potential would be :-",
+    "options": [
+      "2E, 2V",
+      "4E, 2V",
+      "4E, 4V",
+      "2E, 4V"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q24",
+    "questionNumber": 24,
+    "question": "If the plates of a parallel plate capacitor\nconnected to a battery are moved close to each\nother, then\nA. The charge stored in it, increases.\nB. The energy stored in it, decreases.\nC. Its capacitance increases.\nD. The ratio of charge to its potential remains the\nsame.\nE. The product of charge and voltage increases.\nCorrect statements are :",
+    "options": [
+      "A,B and E only",
+      "A,C and E only",
+      "B, D and E only",
+      "A, B and C only"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q25",
+    "questionNumber": 25,
+    "question": "A galvanometer is converted into ammeter and\nvoltmeter. Resistance of these are R , R and R\ng A V\nrespectively then:-",
+    "options": [
+      "R > R > R",
+      "R < R < R\nA g V A g V",
+      "R > R > R",
+      "R > R > R\nV A g g A V"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q26",
+    "questionNumber": 26,
+    "question": "The equivalent resistance between the points A\nand B :-\nΩ Ω",
+    "options": [
+      "",
+      "6 8\nΩ Ω",
+      "",
+      "16 24"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q27",
+    "questionNumber": 27,
+    "question": "Two large non conducting plates having surface\n+σ –σ,\ncharge densities and respectively, are\nfixed ‘d’ distance apart. A small test charge q of\nmass m is attached to two non conducting\nidentical springs of spring constant k as shown in\nthe adjacent figure. The charge q is now released\nfrom rest with springs in natural length. Then q\nwill [neglect gravity] :-\n√2k",
+    "options": [
+      "2\nperform SHM with angular frequency .\nm\nσq\nperform SHM with amplitude .",
+      "2k∈\n0\nnot perform SHM, but will have a periodic",
+      "motion if charges are removed on plates as\nwell as on m.\nremain stationary.",
+      ""
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q28",
+    "questionNumber": 28,
+    "question": "Two protons move parallel to each other,\nkeeping distance r between them, both moving\n→\nv.\nwith same velocity Then the ratio of electric\nand magnetic force of interaction between them\nis:\nc2",
+    "options": [
+      "v2\n2c2",
+      "v2\nc2",
+      "2v2\nNone",
+      "PHASE- ALLPHASE"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q29",
+    "questionNumber": 29,
+    "question": "Which of the following statements are correct ?\n(A) Electric monopoles do not exist whereas\nmagnetic monopoles exist.\n(B) Magnetic field lines are completely confined\nwithin a toroid.\n(C) Magnetic field lines inside bar magnet are\ndirected from North pole to South pole\n𝛘\n(D) is negative and small for a diamagnetic\n𝛘\nmaterial , where is its magnetic susceptibility.\nChoose the correct answer from the options\ngiven below :",
+    "options": [
+      "(C) and (D) only",
+      "(A) and (B) only",
+      "(B) and (D) only",
+      "(B) and (C) only"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q30",
+    "questionNumber": 30,
+    "question": "A charged particle moves in a uniform magnetic\nfield. The velocity of the particle at the instant when\nit enters in magnetic field makes an acute angle with\nthe magnetic field. The path of the particle will be",
+    "options": [
+      "A straight line",
+      "A circle",
+      "A helix with uniform pitch",
+      "A helix with non-uniform pitch"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q31",
+    "questionNumber": 31,
+    "question": "A circular loop wire of radius r rotates about\nz–axis ω.\nthe with angular velocity The\nnormal to the loop is always perpendicular to\nz–axis.\nthe At time t = 0, the normal is\ny–axis.\nparallel to the An external magnetic\n→\n^\n^\nB = B j +B k\nfield is applied. The magnitude\ny z\nof EMF e(t) induced in the loop is:\nπr2ωB πr2ωB\nsinωt cosωt",
+    "options": [
+      "",
+      "y z\nπr2ωB πr2ωB\nsinωt cosωt",
+      "",
+      "z y"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q32",
+    "questionNumber": 32,
+    "question": "Find direction of current in position I and\nposition II in the given diagram:",
+    "options": [
+      "Clockwise in position I and anticlockwise\nin position II.",
+      "Clockwise in position I as well as position II.",
+      "Anticlockwise in position I and clockwise\nin position II.",
+      "Anticlockwise in position I as well as\nposition II."
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q33",
+    "questionNumber": 33,
+    "question": "Consider following AC circuits and their\ncharacteristics :\nList-I List-II\nPurely\nCurrent leads source\n(P) resistive (i)\nvoltage\ncircuit\nL-R series Current lags source\n(Q) (ii)\ncircuit voltage\nR-C series Current may lead or\n(R) (iii)\ncircuit lag voltage\nCurrent &\nL-C series\n(S) (iv) source voltage are in\ncircuit\nsame phase.",
+    "options": [
+      "P-i, Q-ii, R-iii, S-iv",
+      "P-i, Q-iv, R-ii, S-iii",
+      "P-iv, Q-ii, R-i, S-iii",
+      "P-iii, Q-iv, R-ii, S-i\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q34",
+    "questionNumber": 34,
+    "question": "For an EM wave\n6 8\n–\nB = B sin [12 × 10 (x 2 × 10 t)] in a medium,\n0\nthe refractive index of medium is\n2 3 4 5\n(2)",
+    "options": [
+      "",
+      "",
+      "",
+      "2\n3 3 3"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q35",
+    "questionNumber": 35,
+    "question": "A point source of light is place 4m below the\nμ\nsurface of water of = 5/3. The minimum\nw\nradius of the disc which should be placed over\nthe source on the surface of water to cut-off all\nlight coming out of water is:-",
+    "options": [
+      "2 m",
+      "6 m",
+      "4 m",
+      "3 m"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q36",
+    "questionNumber": 36,
+    "question": "A thin convex lens made from crown glass\n3\n(μ )\n=\nhas focal length ƒ. When it is\n2\nmeasured in two different liquids having\n4 5\nrefractive indices and , it has the focal\n3 3\nlength ƒ and ƒ respectively. The correct\n1 2\nrelation between the focal lengths is :",
+    "options": [
+      "ƒ > ƒ and ƒ becomes negative\n2 1",
+      "ƒ and ƒ both become negative\n1 2",
+      "ƒ = ƒ < ƒ\n1 2",
+      "ƒ > ƒ and ƒ become negative\n1 2"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q37",
+    "questionNumber": 37,
+    "question": "In a Young's experiment, two coherent sources\nare placed 0.90 mm apart and the fringes are\nobserved one metre away. If it produces the\nsecond dark fringe at a distance of 1 mm from\nthe central fringe, the wavelength of\nmonochromatic light used would be\n–4 –4",
+    "options": [
+      "60 × 10 cm",
+      "10 × 10 cm\n–5 –5",
+      "10 × 10 cm",
+      "6 × 10 cm"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q38",
+    "questionNumber": 38,
+    "question": "In Bohr model of hydrogen, the force on electron\ndepends on the principal quantum number as :\n1 1\n∝ ∝\nF F",
+    "options": [
+      "",
+      "n2 n4\n1\n1\n∝ ∝\nF F",
+      "",
+      "n\nn5"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q39",
+    "questionNumber": 39,
+    "question": "The de Broglie wavelength of an electron\n8\nmoving with a velocity 1.5 × 10 m/s is equal to\nwavelength of a photon. The ratio of the kinetic\nenergy of the electron to the energy of the\nphoton is\n1 1",
+    "options": [
+      "",
+      "4 2",
+      "2",
+      "4"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q40",
+    "questionNumber": 40,
+    "question": "6Li, 4He\nThe binding energy per nucleon of and\n3 2\n3He\nare 5.3 MeV, 7.2 MeV and 2.6 MeV\n2\nrespectively. The Q-value of the reaction is\nclosest to :-\n→\n6Li 4He 3He\nP + +\n3 2 2",
+    "options": [
+      "12.9 MeV",
+      "8.2 MeV",
+      "4.8 MeV\n–12.9",
+      "MeV"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q41",
+    "questionNumber": 41,
+    "question": "σ\nElectrical conductivites of Ge and Na are and\n1\nσ\nrespectively. If these substances are heated,\n2\nthen :-\nσ σ",
+    "options": [
+      "decreases and increases\n1 2\nσ σ",
+      "Both and decreases\n1 2\nσ σ",
+      "Both and increases\n1 2\nσ σ",
+      "increases and decreases\n1 2"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q42",
+    "questionNumber": 42,
+    "question": "The following combination of gates is equivalent\nto",
+    "options": [
+      "",
+      "",
+      "",
+      "PHASE- ALLPHASE"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q43",
+    "questionNumber": 43,
+    "question": "Sound waves are passing through two routes :\none in straight path and the other along a\nsemicircular path of radius r and are again\ncombined in to one pipe and superposed as\nshown in the figure. If the velocity of sound\nwaves in the pipe is v, then frequencies of\nresultant waves of maximum amplitude will be\nintegral multiples of :-\nv v",
+    "options": [
+      "",
+      "r(π r(π\n−2) −1)\nv\n2v",
+      "",
+      "r(π\n+1)\nr(π\n−1)"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q44",
+    "questionNumber": 44,
+    "question": "Two cylindrical conductors, one of copper and other of\naluminium, have the same length and the same\nresistance. Resistivity of aluminium = 1.5 × resistivity of\n1\ncopper. Density of aluminium = × density of copper.\n3\nHow many times is copper conductor heavier than\naluminium ?\n2 times",
+    "options": [
+      "4 times",
+      "1\ntimes",
+      "2\n1\ntimes",
+      "4"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q45",
+    "questionNumber": 45,
+    "question": "In the following arrangement y = 1.0 mm, d = 0.24 mm\nand D = 1.2 m. The work function of the material of the\nemitter is 2.2 eV. The stopping potential V needed to\nstop the photo current will be :-",
+    "options": [
+      "0.9 V",
+      "0.5 V",
+      "0.4 V",
+      "0.1 V"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Physics",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q46",
+    "questionNumber": 46,
+    "question": "Match the column for molecular shape ?\nColumn-I Column-II\n(a) SF (P) Tetrahedral\n6\nNH−\n(b) (Q) V-shape\n2\n+\n(c) NH (R) Trigonal Bipyramidal\n4\n(d) XeO F (S) Octahedral\n3 2\na–P b–Q c–R d–S",
+    "options": [
+      "a–S b–Q c–P d–R",
+      "a–S b–R c–P d–Q",
+      "a–R b–S c–P d–Q",
+      ""
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q47",
+    "questionNumber": 47,
+    "question": "Which of the following are arranged in the\ndecreasing order of dipole moment.",
+    "options": [
+      "CH Cl, CH Br, CH F\n3 3 3",
+      "CH Cl, CH F, CH Br\n3 3 3",
+      "CH Br, CH Cl, CH F\n3 3 3",
+      "CH F, CH Cl, CH Br\n3 3 3"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q48",
+    "questionNumber": 48,
+    "question": "Kessome force is present between :-",
+    "options": [
+      "SO + H O",
+      "CH + H O\n2 2 4 2",
+      "SF + CO",
+      "PCl + SO\n6 2 5 3"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q49",
+    "questionNumber": 49,
+    "question": "Unpaired electron is present in :-\nNO+",
+    "options": [
+      "and CaO",
+      "KO and Na O\n2 2 2 2\n2",
+      "KO",
+      "CaO\n2 2"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q50",
+    "questionNumber": 50,
+    "question": "The correct formula of diammine\ndichlorodicyano chromate (III) ion is :-\n3+",
+    "options": [
+      "[CrCl (CN) (NH ) ]\n2 2 3 2\n3–",
+      "[CrCl (CN) (NH ) ]\n2 2 3 2",
+      "[CrCl (CN) (NH ) ]\n2 2 3 2\n–",
+      "[CrCl (CN) (NH ) ]\n2 2 3 2"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q51",
+    "questionNumber": 51,
+    "question": "–\nΔ\nIf > P then which e configuration is correct :\n0\nt4 e0 t3 e1 t3 e2 t5 e2",
+    "options": [
+      "",
+      "",
+      "",
+      "g g g g\n2g 2g 2g 2g\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q52",
+    "questionNumber": 52,
+    "question": "Which of following complex does not show\ngeometrical isomerism :",
+    "options": [
+      "[Co(NH ) (NO ) ]\n3 3 2 3\n+3",
+      "[Co(en) ]\n3",
+      "[Co(en) Cl ]\n2 2",
+      "[Pt(NH )(H O)Cl ]\n3 2 2"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q53",
+    "questionNumber": 53,
+    "question": "Choose incorrect option regarding the\nfollowing:-\nƟ\n+2",
+    "options": [
+      "E (M /M) is positive only for Cu (for 3d\nseries only)\n+2 +3",
+      "Cr act as a reducing agent and Mn act\nas an oxidising agent\nƟ\n+3 2+",
+      "E (M /M ) value is maximum +ve for\nCo\nƟ\n+3 2+\n–ve",
+      "E (M /M ) value is maximum for\nFe"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q54",
+    "questionNumber": 54,
+    "question": "Which catalyst is used in Wacker process ?",
+    "options": [
+      "V O\n2 5",
+      "PdCl\n2",
+      "CuCl\n2",
+      "[RhCl(PPh ) ]\n3 3"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q55",
+    "questionNumber": 55,
+    "question": "O–O\nThe acid having bond is :-",
+    "options": [
+      "H S O",
+      "H S O\n2 2 3 2 2 6",
+      "H S O",
+      "H S O\n2 2 8 2 4 6"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q56",
+    "questionNumber": 56,
+    "question": "The group reagent for the detection of basic\nth\nradicals in IV group.",
+    "options": [
+      "NH OH + (NH ) CO\n4 4 2 3",
+      "NH OH + Na HPO\n4 2 4",
+      "NH OH + NH Cl + H2S\n4 4 (s) (g)",
+      "dil HCl + H S gas\n2"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q57",
+    "questionNumber": 57,
+    "question": "Which of the following sulphide has the\nmaximum solubility product (K ) :\nsp",
+    "options": [
+      "ZnS",
+      "PbS",
+      "CuS",
+      "All have same"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q58",
+    "questionNumber": 58,
+    "question": "Select the correct order of I.E ?",
+    "options": [
+      "Cu > Zn\n+ 2+",
+      "Li > He > Be",
+      "N < O > F\n+ +",
+      "K > Cu > Cu > K"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q59",
+    "questionNumber": 59,
+    "question": "Which of the following configurations has\nhighest EA.\n2 1",
+    "options": [
+      "[Ne] 3s 3p\n2 5",
+      "[Ne] 3s 3p\n2 6 2 5",
+      "[Ne] 3s 3p 4s 3d\n2 5",
+      "[He] 2s 2p"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q60",
+    "questionNumber": 60,
+    "question": "Which is incorrect statement :-",
+    "options": [
+      "are conformations",
+      "is a meso-compound",
+      "are Geometrical isomers",
+      "are Enantiomers"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q61",
+    "questionNumber": 61,
+    "question": "Number of structural isomers possible with the\nmolecular formula C H O is:\n3 6",
+    "options": [
+      "6",
+      "7",
+      "8",
+      "9\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q62",
+    "questionNumber": 62,
+    "question": "The correct structure of\n2-Ethyl-3-methylhexa-1, 4-diene :-",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q63",
+    "questionNumber": 63,
+    "question": "–\nMatch the column\nColumnI ColumnII\n(Compound) (observetest)\nOxidised product\ngives yellow\n(a) (p) precipitate with\nHNO followed by\n3\n(NH ) MoO\n42 4\nSodium fusion extract\n(b) (q) gives blood\nFe+3.\nred color with\nSodium fusion extract\ngives\n(c) (r)\nblack precipitate\nwith (CH COO) Pb.\n3 2\nSodium fusion extract\ngives\nblue color when treat\n(d) (s)\nwith FeSO\n4\nfollowed by heating\nwith conc. H SO\n2 4",
+    "options": [
+      "a = s, b = p, c = q, d = r",
+      "a = q, b = s, c = p, d = r",
+      "a = r, b = p, c = q, d = s",
+      "a = s, b = q, c = p, d = r"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q64",
+    "questionNumber": 64,
+    "question": "In Duma's method for estimation of nitrogen, 0.25 g\nof an organic compound gave 40 mL of nitrogen\ncollected at 300 K temperature and 725 mm\npressure. If the aqueous tension at 300 K is 25 mm,\nthe percentage of nitrogen in the compound is :-",
+    "options": [
+      "18.20",
+      "16.76",
+      "15.76",
+      "17.36"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q65",
+    "questionNumber": 65,
+    "question": "Find the reaction in which aldehyde is obtained\nas one of the product\nH −P d\n−2−\n− −\n(i)\n→\nBaSO4\n(ii)\nPCC\n−−−→\n(iii)\ni) C H M gC l\n(\n−3−\n− − − − − −\n–CN\n(iv) CH\n→\n3\n(ii)H2O",
+    "options": [
+      "only ii,iii,iv",
+      "only i,ii,iii",
+      "only i, iii, iv",
+      "i, ii, iii, iv"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q66",
+    "questionNumber": 66,
+    "question": "The correct structure for compound B will be :",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q67",
+    "questionNumber": 67,
+    "question": "Which of the following reaction is correctly\nmatched?",
+    "options": [
+      "",
+      "–CH –O–CH",
+      "C H S 1\n6 5 2 3 N",
+      "CH -CH -O-CH -CH=CH S 2\n3 2 2 2 N\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q68",
+    "questionNumber": 68,
+    "question": "Statement-I:\nCross aldol condensation of ethanal\nand propanal gives mixture of four structural\nproducts (excluding stereoisomers).\nStatement-II :\nEthanal and propanal, both have\nα\n−H.",
+    "options": [
+      "Statement I is correct and Statement II is\nincorrect",
+      "Statement I is incorrect and Statement II is\ncorrect",
+      "Both Statement I and Statement II are\ncorrect",
+      "Both Statement I and Statement II are\nincorrect"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q69",
+    "questionNumber": 69,
+    "question": "List-I List-II\nMatch with .\nList- I List- II\nHell-Volhard\n(a) (i) - Zelinsky\nreaction\nGattermann\n(b) (ii) - Koch\nreaction\nHaloform\n(c) (iii)\nreaction\n(d) (iv) Esterification\ncorrect\nChoose the answer from the options\ngiven below.",
+    "options": [
+      "(a)-(iv), (b)-(i), (c)-(ii), (d)-(iii)",
+      "(a)-(iii), (b)-(ii), (c)-(i), (d)-(iv)",
+      "(a)-(i), (b)-(iv), (c)-(iii), (d)-(ii)",
+      "(a)-(ii), (b)-(iii), (c)-(iv), (d)-(i)"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q70",
+    "questionNumber": 70,
+    "question": "In which of the following reactions benzene is\nobtained",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q71",
+    "questionNumber": 71,
+    "question": "–\nIn Hofmann Bromamide reaction\nSlowest step of this reaction\nThen which one is correct if\nRate of reaction\nRgroup\n–\nR\n1\nR\n2\n— CH R\n3 3",
+    "options": [
+      "R > R < R\n1 2 3",
+      "R > R > R\n2 1 3",
+      "R > R > R\n3 2 1",
+      "R > R > R\n1 3 2\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q72",
+    "questionNumber": 72,
+    "question": "Find products",
+    "options": [
+      "",
+      "",
+      "",
+      "All of the above"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q73",
+    "questionNumber": 73,
+    "question": "c.\nA l K O H\nB r2 i) K C N\n(\n− − − − − − − −− − − − − −\n(A) (B) (C)\n→ → →\n(ii)H3O⊕\nCCl4\nΔ\n−→\n(D)\nIdentify D :-",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q74",
+    "questionNumber": 74,
+    "question": "C and D are :-",
+    "options": [
+      ",",
+      ", HCHO",
+      "",
+      "HCHO,"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q75",
+    "questionNumber": 75,
+    "question": "–1\nWhat is the energy (in J atom ) required for the\nfollowing process ?\n–\n2+ 3+\n→\nLi (g) Li (g) + e\n(Take the ionization energy for the H atom in the\n–18 –1\nground state as 2.18 × 10 J atom )\n–18",
+    "options": [
+      "8.72 × 10\n–18",
+      "1.962 × 10\n–17",
+      "1.962 × 10\n–17",
+      "6.54 × 10"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q76",
+    "questionNumber": 76,
+    "question": "The solubility product constants of Ag CrO and\n2 4\nAgBr are 32x and 4y respectively at 298 K.\nThe value of can be\nexpressed as :\n√\n2 x\n3",
+    "options": [
+      "y\nx\n2√",
+      "y\nx\n√",
+      "y\n√\nx\n3",
+      "√y"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q77",
+    "questionNumber": 77,
+    "question": "One mole of an alkane (x) requires 8 mole\noxygen for complete combustion. Sum of\nnumber of carbon and hydrogen atoms in the\nalkane (x) is _____.",
+    "options": [
+      "14",
+      "17",
+      "8",
+      "11"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q78",
+    "questionNumber": 78,
+    "question": "At T(K), the equilibrium constant of\n–4\n⇌\nA (g)+B (g) C(g)\nis 1.25 × 10 . What is\n2 2\nthe equilibrium constant for\n1 1 1\n⇌\nat the same\nA (g)+ B (g) C(g)\n2 2\n3 3 3\ntemperature?\n–5\n3",
+    "options": [
+      "(2.7 × 10 )\n–2",
+      "6 × 10\n√\n2.7×10−5",
+      "–2",
+      "5 × 10\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q79",
+    "questionNumber": 79,
+    "question": "→\nConsider the first order reaction R P.\nThe fraction of reactant concentration\ndecomposed in the given first order reaction can\nbe expressed as\n1−ek1t 1+ek1t",
+    "options": [
+      "",
+      "1+e−k1t 1−e−k1t",
+      "",
+      ""
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q80",
+    "questionNumber": 80,
+    "question": "Arrange the following atomic orbitals of multi\nelectron atoms in order of increasing energy.\nℓ\n(A) n = 3, = 2, m = +1\nℓ\n(B) n = 4, = 0, m = 0\nℓ\n(C) n = 6, = 1, m = 0\nℓ\n(D) n = 5, = 1, m = +1\nℓ\n(E) n = 2, = 1, m = +1\nChoose the correct answer from the options\ngiven below :",
+    "options": [
+      "C < D < B < A < E",
+      "B < A < E < C < D",
+      "E < C < D < B < A",
+      "E < B < A < D < C"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q81",
+    "questionNumber": 81,
+    "question": "What is the mole fraction of water in 10% by\nweight (w/w) of aqueous urea solution ?\n[Given : Molar mass of H, O, C and N are 1, 16,\n–1\n12 and 14 g mol respectively]",
+    "options": [
+      "0.825",
+      "0.032",
+      "0.867",
+      "0.967"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q82",
+    "questionNumber": 82,
+    "question": "Two different reactions at 300K having same\npre-exponential factor. The activation energy of\nnd\nfirst reaction is more than that of II reaction\nK\n2\nby 5.75 kJ. Then find :-\nK\n1",
+    "options": [
+      "1000",
+      "10,000",
+      "10",
+      "1"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q83",
+    "questionNumber": 83,
+    "question": "⇌\nIn the following system, PCl (g) PCl (g) + Cl (g)\n5 3 2\nat equilibrium, upon addition of xenon gas at constant\nT & P, the mole of",
+    "options": [
+      "PCl will increase\n5",
+      "Cl will decrease\n2",
+      "PCl , PCl & Cl remain constant\n5 3 2",
+      "PCl will increase\n3"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q84",
+    "questionNumber": 84,
+    "question": "How many moles of P can be produced by\n4\nreaction of 0.10 moles Ca (PO ) F, 0.36 moles\n5 4 3\nSiO and 0.90 moles C according to the\n2\nfollowing reaction ?\n→\n4Ca (PO ) F + 18SiO + 30C\n5 4 3 2\n3P + 2CaF + 18CaSiO + 30CO\n4 2 3",
+    "options": [
+      "0.060",
+      "0.030",
+      "0.045",
+      "0.075"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q85",
+    "questionNumber": 85,
+    "question": "In which of the following reactions, H O is\n2 2\nacting as a reducing agent ?\n→",
+    "options": [
+      "SO + H O H SO\n2 2 2 2 4\n→",
+      "2KI + H O 2KOH+ I\n2 2 2\n→",
+      "PbS + 4H O PbSO + 4H O\n2 2 4 2\n→",
+      "Ag O + H O 2Ag + H O + O\n2 2 2 2 2"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q86",
+    "questionNumber": 86,
+    "question": "18 gm of ice is converted into water at 0°C and\nO(ℓ)\n1 atm. The entropies of H O(s) and H are\n2 2\n38.2 and 60 J/mol K respectively. The enthalpy\nchange for this conversion is :-",
+    "options": [
+      "5951.4 J/mol",
+      "595.14 J/mol\n–5951.4",
+      "J/mol",
+      "2748.5 J/mol\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q87",
+    "questionNumber": 87,
+    "question": "Δ\nBased on the value of B.E. given, H° of\nf\nN H (g) is :\n2 4\n–1\nN–N\nGiven : = 159 kJ mol ;\n–1\nH–H\n= 436 kJ mol ;\n–1\nN≡N\n= 941 kJ mol ;\n–1\nN–H\n= 398 kJ mol\n–1 –1",
+    "options": [
+      "711 kJ mol",
+      "62 kJ mol\n–1 –1\n–98 –711",
+      "",
+      "kJ mol kJ mol"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q88",
+    "questionNumber": 88,
+    "question": "The dissociation constant of a weak monobasic\n–5\nacid is 1.6 × 10 and the molar conductivity at\n–4 –1\n2\ninfinite dilution is 380 × 10 S m mol .\nMolar conductance of 0.01 M acid solution is :-\n–5",
+    "options": [
+      "1.52 × 10 S\n–3",
+      "1.52 × 10 S\n–6",
+      "1.52 × 10 S\n–4",
+      "1.52 × 10 S"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q89",
+    "questionNumber": 89,
+    "question": "Total vapour pressure of mixture of 1 mole of volatile\no\ncomponent A (P = 100 mm Hg) and 3 mole of\nA\no\nvolatile component B (P = 80 mm Hg) is 90 mm Hg.\nB\nFor such case :",
+    "options": [
+      "there is positive deviation from Raoult's\nlaw\n(ΔH)",
+      "= +ve\nmixing",
+      "force of attraction between A and B is\nweaker than that between A and A or\nbetween B and B",
+      "all the above statements are correct"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q90",
+    "questionNumber": 90,
+    "question": "A fuel cell develops an electrical potential from\nthe combustion of butane at 1 bar and 298 K\n→\nO(ℓ)\nC H (g) + 6.5O (g) 4CO (g) + 5H ;\n4 10 2 2 2\nΔ –2746\nG° = kJ/mol\nr\nWhat is E° of a cell ?",
+    "options": [
+      "4.74 V",
+      "0.547 V",
+      "4.37 V",
+      "1.09 V"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Chemistry",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q91",
+    "questionNumber": 91,
+    "question": "When taxonomy is based on chromosome number,\nstructure and behaviour then it is called as.",
+    "options": [
+      "Chemotaxonomy",
+      "Numerical taxonomy",
+      "Cytotaxonomy",
+      "All of the above"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q92",
+    "questionNumber": 92,
+    "question": "Select the correct statements :-",
+    "options": [
+      "Order polymoniales and sapindales are\nincluded in the class dicotyledonae.",
+      "Animals, mammals and dogs are same taxa\nat different level.",
+      "Taxonomic categories are only\nmorphological aggregates.",
+      "Taxonomic categories are not distinct\nbiological entities."
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q93",
+    "questionNumber": 93,
+    "question": "Read the following statements and identify the\ncharacters related to the alga shown in the diagram.\n(a) It is a member of Chlorophyceae.\n(b) Food is stored in the form of floridean starch.\n(c) It shows dominance of pigments chlorophyll a\nand b.\n(d) It is a monoecious plant showing archegonium\nand antheridium.\n(e) Food is stored in the form of starch.",
+    "options": [
+      "(a) and (b) only",
+      "(a), (c) and (e) only",
+      "(a), (b), (c) and (d) only",
+      "(a), (c), (d) and (e) only\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q94",
+    "questionNumber": 94,
+    "question": "Which of the following statement is false?",
+    "options": [
+      "Male and female gametophyte do not have\nfree living existance in gymnosperms",
+      "Coralloid roots in Cycas are associated\nwith fungi.",
+      "Majority of pteridophytes are homosporous",
+      "Sporophylls form strobili or cones in\nEquisetum"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q95",
+    "questionNumber": 95,
+    "question": "Match the following columns.\nColumnI ColumnII\nDJ\n(A) (i) Viroids\nIvanowsky\nMW\n(B) (ii) Crystallised virus\nBeijerinck\nContagium vivum\n(C) WM Stanley (iii)\nfluidum\nMosaic disease of\n(D) T.O. Diener (iv)\ntobacco\nOptions:\n→ → → →",
+    "options": [
+      "A (i), B (iv), C (iii), D (ii)\n→ → → →",
+      "A (ii), B (i), C (iv), D (iii)\n→ → → →",
+      "A (iv), B (iii), C (ii), D (i)\n→ → → →",
+      "A (iii), B (ii), C (i), D (iv)"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q96",
+    "questionNumber": 96,
+    "question": "In the given examples below how many plants\nbelongs to Algae, Bryophyta and Pteridophyta\nrespectively ?\nSpirogyra, Salvinia, Equisetum, Sphagnum,\nPolysiphonia, Funaria, Adiantum, Polytrichum,\nPorphyra, Marchantia",
+    "options": [
+      "3, 3, 4",
+      "4, 3, 4",
+      "3, 4, 3",
+      "4, 3, 3"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q97",
+    "questionNumber": 97,
+    "question": "What are common characters in between\ngametophytes of moss and fern both.\n(A) Free living nature\n(B) Main plant body\n(C) Photosynthetic nature\n(D) Non vascular\n(E) Having root like structure",
+    "options": [
+      "A and C only",
+      "B and C only",
+      "A, C, D and E only",
+      "A, B and D only"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q98",
+    "questionNumber": 98,
+    "question": "Branched rhizoids and leafy gametophytes are\nthe characteristic of :",
+    "options": [
+      "Liverworts",
+      "Mosses",
+      "Ferns",
+      "Conifers"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q99",
+    "questionNumber": 99,
+    "question": "Find out the correct option from the following :\nHypogynous Perigynous Epigynous\nflower flower flower\nGuava, Cucumber, Plum, Mustard,",
+    "options": [
+      "sunflower Rose, Peach Brinjal, Chinarose\nPlum, Rose, Cucumber, Guava,",
+      "Brinjal Peach Sunflower\nMustard, Brinjal, Cucumber,",
+      "Guava Sunflower Chinarose\nMustard, Plum, Rose, Guava, Cucumber,",
+      "Brinjal, Chinarose Peach Sunflower"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q100",
+    "questionNumber": 100,
+    "question": "Name the petals A, B and C in vexillary\naestivation shown in the below figure.",
+    "options": [
+      "A-Standards, B-Wing, C-Perianth",
+      "A-Standard, B-Keel, C-Wing",
+      "A-Wing, B-Keel, C-Standard",
+      "A-Standard, B-wing, C-Keel\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q101",
+    "questionNumber": 101,
+    "question": "Statement - I :-\nAnatomy of seed plants by\nkatherine Esau, published in 1960 was referred\nto as webster's of plant biology.\nStatement - II :-\nAnatomically, plant is made up\nof different kinds of tissue.",
+    "options": [
+      "Both statement-I and statement-II are correct.",
+      "Both statement-I and statement-II are incorrect.",
+      "Statement-I is incorrect and statement-II is correct.",
+      "Statement-I is correct and statement-II is incorrect."
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q102",
+    "questionNumber": 102,
+    "question": "In grasses",
+    "options": [
+      "Certain adaxial epidermal cells along the veins\nmodify themselves into large, empty, colourless\ncells. These are called bulliform cells.",
+      "When the bulliform cells in the leaves\nabsorb water and become turgid, the leaf\nsurface is exposed.",
+      "When bulliform cells are flaccid due to\nwater stress, they make the leaves curl\ninwards to minimise water loss.",
+      "All of the above"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q103",
+    "questionNumber": 103,
+    "question": "How many meiotic and miotic division are\nrequire for the development of a mature male\ngametophyte from the microspore mother cell in\nan angiosperm plant?",
+    "options": [
+      "2 meiosis and 3 mitosis",
+      "1 meiosis and 2 mitosis",
+      "1 meiosis and 3 mitosis",
+      "1 meiosis and 1 mitosis"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q104",
+    "questionNumber": 104,
+    "question": "Arrange the following stages of embryo\ndevelopment in the correct sequence starting from\nthe zygote :\n(i) Heart shaped embryo\n(ii) Proembryo\n(iii) Mature embryo\n(iv) Globular embryo",
+    "options": [
+      "ii iv i iii",
+      "iv iii i iii",
+      "ii i iv iii",
+      "i ii iv iii"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q105",
+    "questionNumber": 105,
+    "question": "Which of the following correctly describes the\nstructures of a typical dicot embryo?",
+    "options": [
+      "It has one cotyledon, epicotyl ends in\nradicle, hypocotyl ends in plumule.",
+      "It has two cotyledons, epicotyl ends in\nplumule, hypocotyl ends in radicle covered\nby root cap.",
+      "It has two cotyledons, hypocotyl ends in\nplumule ; radicle forms epicotyl.",
+      "It has many cotyledons but radicle and\nplumule are absent"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q106",
+    "questionNumber": 106,
+    "question": "The correct order of chemical composition of\nliving tissues/cells in term of percentage of the\ntotal cellular mass is :-",
+    "options": [
+      "Nucleic acid > Proteins > H O >\n2\nCarbohydrates > Ions > Lipids",
+      "H O > Proteins > Nucleic acid >\n2\nCarbohydrates > Lipids > Ions",
+      "H O > Proteins > Carbohydrates > Nucleic\n2\nacid > Lipids > Ions",
+      "Lipids > Ions > Carbohydrates > H O >\n2\nProteins > Nucleic acid"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q107",
+    "questionNumber": 107,
+    "question": "Find the incorrect matching :",
+    "options": [
+      "–\nEssential oils Lemon grass oil\n–",
+      "Terpenoids Monoterpenes, diterpenes",
+      "–\nPolymeric substances Concanavalin A\n–",
+      "Pigments Carotenoids, anthocyanins\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q108",
+    "questionNumber": 108,
+    "question": "Read carefully the following steps of catalytic\ncycle of an enzyme :-\n(A) The binding of the substrate induces the\nenzyme to alter its shape\n(B) The enzyme releases the products of the\nreaction\n(C) Active site of an enzyme fitting more tightly\naround the substrate\n(D) The substrate bind to the active site of the\nenzyme\n(E) Close proximity of substrate to active site of\nenzyme and breaks the chemical bonds of the\nsubstrate\nWhat is the correct sequence of steps of catalytic\ncycle of enzyme\n→ → → →",
+    "options": [
+      "D C A E B\n→ → → →",
+      "D A C B E\n→ → → →",
+      "D A C E B\n→ → → →",
+      "A C B D E"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q109",
+    "questionNumber": 109,
+    "question": "With reference to factors affecting the rate of\nphotosynthesis, which of the following\nstatements is not correct ?",
+    "options": [
+      "Increasing atmospheric CO concentration\n2\nup to 0.05% can enhance CO fixation rate\n2",
+      "C plants respond to higher temperatures\n3\nwith enhanced photosynthesis while C\n4\nplants have much lower temperature\noptimum",
+      "Tomato is a greenhouse crop which can be\ngrown in CO - enriched atmosphere for\n2\nhigher yield",
+      "Light saturation for CO fixation occurs at\n2\n10% of full sunlight"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q110",
+    "questionNumber": 110,
+    "question": "CO fixation enzyme in bundle sheath cells in C\n2 4\nplants is.",
+    "options": [
+      "Rubisco",
+      "PEPcase",
+      "Pyruvate carboxylate",
+      "Carboxypeptidase"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q111",
+    "questionNumber": 111,
+    "question": "During glycolysis :-",
+    "options": [
+      "ATP molecules are synthesized\nbetween fructose-6-phosphate and\nfructose 1,6-diphosphate",
+      "Water molecules are released between PEP\nand pyruvate\n+",
+      "NAD is oxidized between PGAL and 1-3 Bi\nPGA",
+      "ATP molecules are synthesized in the\nconversion of BPGA to PGA"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q112",
+    "questionNumber": 112,
+    "question": "In order to increase the yield of sugarcane crop,\nwhich of the following plant growth regulators\nshould be sprayed ?",
+    "options": [
+      "Ethylene",
+      "Auxins",
+      "Gibberellins",
+      "Cytokinins"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q113",
+    "questionNumber": 113,
+    "question": "Which of the given condition is exhibited by the\ndiagrams given below?",
+    "options": [
+      "Development Heterophylly in Larkspur",
+      "Environment Heterophylly in Buttercup",
+      "Plasticity development in coriander",
+      "Redifferentiation in cotton\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q114",
+    "questionNumber": 114,
+    "question": "Which of the following is not correct for\nethylene?",
+    "options": [
+      "Promotes horizontal growth in seedings",
+      "Synchronize fruit set in pineapple",
+      "Not help to increase absorption surface of plant",
+      "Break seed and bud dormancy"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q115",
+    "questionNumber": 115,
+    "question": "Dominant Recessive\nCharacter\ntrait trait\na. Flower position Axial Terminal\nb. Pod colour Yellow Green\nc. Seed colour Green Yellow\nd. Flower colour Violet White\nmatch–\nChoose incorrect",
+    "options": [
+      "a & d",
+      "b & c",
+      "b & d",
+      "b, c, d"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q116",
+    "questionNumber": 116,
+    "question": "If enzyme phenylalanine hydroxylase is absent\nthen.",
+    "options": [
+      "Amino acid phenylalanine is converted into tyrosine",
+      "Phenyl pyruvic acid and other derivatives\naccumulate in brain causing mental retardation",
+      "Phenylalanine and it derivatives are easily\nabsorbed by kidney",
+      "Hyperpigmentation can occur"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q117",
+    "questionNumber": 117,
+    "question": "Identify the given statements are True (T) and\nFalse (F).\nA. Experimental verification of chromosomal\ntheory was done by using fruit files\nB. The two alleles of a gene pair are located on\nhomologous sites on non homologous\nchromosomes.\nC. The male flies of Drosophila are smaller in\nsize than female flies.",
+    "options": [
+      "A-T; B-F; C-T",
+      "A-F; B-F; C-T",
+      "A-T; B-F; C-F",
+      "A-T; B-T; C-T"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q118",
+    "questionNumber": 118,
+    "question": "A heterozygous round seeded pea plant is\ncrossed with wrinkled seeded pea plant. How\nmany plants produces intermediate sized starch\ngrain out of 2000 progenies obtained.",
+    "options": [
+      "1000",
+      "0",
+      "1500",
+      "750"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q119",
+    "questionNumber": 119,
+    "question": "Which of the following characteristics represent\nInheritance of blood group in human.\n(i) ABO blood groups are controlled by the gene I.\n(ii) Plasma membrane of the red blood cells has\ncholesterol that protrude from its surface\nA B\n(iii) The gene I has three alleles i.e. I , I and I.\nEach diploid person possesses all three alleles of\ngene I.\n(iv) There are eight different possible combinations\nof three alleles of gene I.\n(v) 'O' blood group is not possible in the progeny of\n'AB' blood group parents.",
+    "options": [
+      "only i and v",
+      "only ii, iii and iv",
+      "only ii and iv",
+      "only i, iii and v"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q120",
+    "questionNumber": 120,
+    "question": "Match the list-I with list-II.\nList-I List-II\n(A) Initiator codon (i) UUU\n(B) Terminator codon (ii) GGU, GGC, GGA\n(C) Phenylalanine (iii) UAA, UAG, UGA\n(D) Degenerate code (iv) AUG",
+    "options": [
+      "A-II, B-IV, C-I, D-III",
+      "A-III, B-II, C-IV, D-I",
+      "A-III, B-IV, C-I, D-II",
+      "A-IV, B-III, C-I, D-II\nAssertion :"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q121",
+    "questionNumber": 121,
+    "question": "In Tailing, adenylate residues are\nadded at 3' end in a template independent manner.\nReason :\nSplit gene arrangement represents\nprobably an ancient feature of the genome.",
+    "options": [
+      "Both Assertion and Reason are true but Reason\nis NOT the correct explanation of Assertion",
+      "Assertion is true but Reason is false",
+      "Assertion is false but Reason is true",
+      "Both Assertion and Reason are true and\nReason is the correct explanation of Assertion\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q122",
+    "questionNumber": 122,
+    "question": "Listed below are the stages in the cellular synthesis\nof a protein -\ni. Movement of mRNA from nucleus to cytoplasm\nii. Linking of adjacent amino acid molecules.\niii. Transcription of mRNA from a DNA template.\niv. Formation of the polypeptide chain.\nv. Attachement of the mRNA strand to a ribosome.\nIn which order do these stages take place -",
+    "options": [
+      "i, iii, ii, v, iv",
+      "i, v, iii, iv, ii",
+      "iii, i, v, ii, iv",
+      "iii, iv, i, ii, v"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q123",
+    "questionNumber": 123,
+    "question": "Which of the following statements about\ntranscription is correct?",
+    "options": [
+      "Both strands of DNA act as template during\ntranscription",
+      "RNA polymerase requires a primer to\ninitiate transcription\n→",
+      "Transcription occurs in 5' 3' direction",
+      "Coding strand is used as template"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q124",
+    "questionNumber": 124,
+    "question": "Statement I :\nPredators acting as conduits for\nenergy transfer across trophic levels.\nStatement II :\nThe prickly pear cactus introduced\ninto Australia in the early 1920's caused havoc by\nspreading rapidly into millions of hectares of\nrangeland.\nIn the light of above statements, choose the most\nappropriate answer from the options given below :",
+    "options": [
+      "Both statement I and statement II are correct",
+      "Both statement I and statement II are incorrect",
+      "Statement I is correct but statement II is incorrect",
+      "Statement I is incorrect but statement II is correct"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q125",
+    "questionNumber": 125,
+    "question": "In Mac Arthur's observation which of the\nfollowing means was used by warblers to avoid\ncompetition and to coexist?",
+    "options": [
+      "Difference in foraging activities",
+      "Habitat fragmentation",
+      "Competitive release",
+      "All above"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q126",
+    "questionNumber": 126,
+    "question": "The annual net primary productivity of the\noceans is about :-",
+    "options": [
+      "55 billion tons",
+      "170 billion tons",
+      "115 billion tons",
+      "70 billion tons"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q127",
+    "questionNumber": 127,
+    "question": "Pyramid of number is :",
+    "options": [
+      "Always upright",
+      "Always inverted",
+      "Either upright or inverted",
+      "Neither upright nor inverted"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q128",
+    "questionNumber": 128,
+    "question": "–\nMatch the following columns\nColumn-I Column-II\n(i) Dodo (a) Africa\n(ii) Quagga (b) Bali\n(iii) Thylacine (c) Mauritius\n(iv) sub species of tiger (d) Australia\nChoose the correct match from following :-",
+    "options": [
+      "(i) - a, (ii) - c, (iii) - b, (iv) - d",
+      "(i) - d, (ii) - c, (iii) - a, (iv) - b",
+      "(i) - c, (ii) - a, (iii) - b, (iv) - d",
+      "(i) - c, (ii) - a, (iii) - d, (iv) - b"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q129",
+    "questionNumber": 129,
+    "question": "India is the one of the 12 mega diversity\ncountries of the world. It shares what percentage\nof global species diversity ?",
+    "options": [
+      "3.4 %",
+      "12%",
+      "6%",
+      "8.1%\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q130",
+    "questionNumber": 130,
+    "question": "Match the column-I, column-II and column III\nand choose the correct options from the options\ngiven below :\nColumn-I Column-II Column-III\nA. Columbia i 12°N P 105 species of Bird\nB. New York ii 36°N Q 1400 species of Bird\nC. India iii 41°N R 56 species of Bird\nD. Greenland iv 71°N S 1200 species of Bird",
+    "options": [
+      "ABCD / iii, ii, i, iv / QPRS",
+      "ABCD / i, iii, ii, iv / QPSR",
+      "ABCD / ii, iii, iv, i / QPSR",
+      "ABCD / i, iv, iii, ii / QPRS"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q131",
+    "questionNumber": 131,
+    "question": "14\nLight DNA molecule ( N) is replicated in a\n15\nheavy medium ( N) . After the four successive\nreplication of DNA, 16 DNA molecules are\nformed. Which one of the following is true for\nthese DNA?",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q132",
+    "questionNumber": 132,
+    "question": "Which of the following statement is wrong?",
+    "options": [
+      "In settling tank, the sedimented bacterial\nflocs are called activated sludge.",
+      "A small part of the activated sludge is\npumped back into the anaerobic sludge\ndigester to serve as the inoculum.",
+      "In anaerobic sludge digesters, other kinds of\nbacteria which grow anaerobically, digest\nthe bacteria and the fungi in the sludge.",
+      "The biogas can be used as source of energy\nas it is inflammable."
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q133",
+    "questionNumber": 133,
+    "question": "Match the following pairs correctly:\nColumn-I Column-II\nA Rhizobium i Nitrogen fixation in legumes\nB Streptococcus ii Blood clot dissolving enzyme\nTrichoderma\nC iii Immunosuppressive drug\npolysporum\nMonascus\nD iv Cholesterol-lowering agent\npurpureus",
+    "options": [
+      "A-i, B-ii, C-iii, D-iv",
+      "A-ii, B-i, C-iv, D-iii",
+      "A-iii, B-iv, C-i, D-ii",
+      "A-iv, B-i, C-ii, D-iii"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q134",
+    "questionNumber": 134,
+    "question": "Which of the following bacteria was associated\nwith discovery of penicillin :",
+    "options": [
+      "Propionibacterium",
+      "Trichoderma",
+      "Monascus",
+      "Staphylococcus"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q135",
+    "questionNumber": 135,
+    "question": "correct\nHow many statement are\n(a) Mitochondria matrix have enzymes for\nKreb's cycle.\n(b) Mitochondria have double stranded circular\nDNA.\n(c) Cis-face of golgi body is forming face.\n(d) Cis-face of golgi body has 80S-type of\nribosome.",
+    "options": [
+      "4",
+      "3",
+      "2",
+      "1"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q136",
+    "questionNumber": 136,
+    "question": "A distinctive feature of the lysosome is that it\nhas :-",
+    "options": [
+      "A lower pH than cytoplasm",
+      "A higher pH than cytoplasm",
+      "Less hydrolytic activity",
+      "double membraned envelope\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q137",
+    "questionNumber": 137,
+    "question": "Match column-I with column-II and select the\ncorrect option from the codes given below:-\nColumn-I Column-II\n(A) Leeuwenhoek i First saw and described a living cell.\nRobert Presence of cell wall is unique to\n(B) ii\nBrown plant cells.\n(C) Schleiden iii Discovered the nucleus\nAll plants are composed of different\n(D) Schwann iv\nkind of cells.",
+    "options": [
+      "A-i B-iii C-ii D-iv",
+      "A-i B-iii C-iv D-ii",
+      "A-iii B-i C-iv D-ii",
+      "A-i B-iv C-ii D-iii"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q138",
+    "questionNumber": 138,
+    "question": "(A) Well defined nucleus\n(B) The genetic material is absent\n(C) Nuclear membrane absent\n(D) Presence of Mesosome\n(E) Circular DNA molecule\ncorrect\nHow many options are for Prokaryotic cell ?",
+    "options": [
+      "C,D,E",
+      "A,C,E",
+      "A,B,D",
+      "B,C,E"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q139",
+    "questionNumber": 139,
+    "question": "Identify A,B,C in the given diagram depecting\ncell cycle steps and select the correct option :-\nA B C\nG - DNA S-cell organelles G -Tubulin\n1 2",
+    "options": [
+      "Replication double protein synthesis\nG -cell organelle S-DNA G -Tubulin\n1 2",
+      "double Replication protein synthesis\nS-DNA G -cell organelle G -Tubulin\n1 2",
+      "Replication double protein synthesis\nG -Tubulin S-DNA G -cell organelle\n2 1",
+      "protein synthesis Replication double"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q140",
+    "questionNumber": 140,
+    "question": "The chromosomes in which centromere is\nsituated close to one end are:",
+    "options": [
+      "Acrocentric",
+      "Telocentric",
+      "Sub-metacentric",
+      "Metacentric"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q141",
+    "questionNumber": 141,
+    "question": "Which of the following is not true\nabout Taq-DNA polymerase?",
+    "options": [
+      "It is stable at high temperatures",
+      "It adds nucleotides to form a new DNA\nstrand",
+      "It is isolated from a thermostable bacterium",
+      "It functions for DNA extension in template\nindependent manner"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q142",
+    "questionNumber": 142,
+    "question": "Find out correct recognisation sequence of\nfollowing restriction endonuclease enzyme :-\nECoRV Eco RI",
+    "options": [
+      "GATATC GAATTC\nCTATAG CTTAAG\nBam HI Eco RI",
+      "GAATCAA TTGCAAC\nCTTAGTT AACGTTG\nBam HI Eco RI",
+      "GCATGG AGCTCC\nCGTACC TCGAGG\nBam HI ECoRI",
+      "GACTAA GAATTC\nCTGATT CTTAAG"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q143",
+    "questionNumber": 143,
+    "question": "Biolistics procedure involves :",
+    "options": [
+      "Making transient pores in the cell\nmembrane to introduce desired gene",
+      "Purification of saline water with the help of\na membrane system",
+      "Opening of stomatal pore during night by\nartificial light",
+      "Plant cells are bombarded with high\nvelocity microparticle of gold or tungsten\ncoated with DNA\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q144",
+    "questionNumber": 144,
+    "question": "Which of the following is incorrect for RNA\ninterference?",
+    "options": [
+      "RNAi takes place in all prokaryotic\norganisms as a method of cellular defence.",
+      "This method involves silencing of a specific\nmRNA due to a complementary dsRNA.",
+      "The source of complementary RNA could\nbe from a transposons that replicate via\nRNA intermediate.",
+      "Agrobacterium vectors can be used to transfer\ngene in host plant which induce RNAi."
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q145",
+    "questionNumber": 145,
+    "question": "From the list of statements below, identify the\nevents that occur in Bt pest resistance :\n(A) Bt genes are inserted into the plant genome\n(B) Sense and antisense RNA are expressed in\nplant tissue\n(C) Gut pH of the pest activates toxins\n(D) Specific genes in the pest are silenced\nChoose Answer",
+    "options": [
+      "A & B are correct",
+      "B & C are correct",
+      "C & A are correct",
+      "D & A are correct"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q146",
+    "questionNumber": 146,
+    "question": "In human body, skeletal muscles are attached to\nbones by which tissue ?",
+    "options": [
+      "Ligament",
+      "Tendons",
+      "Areolar connective tissue",
+      "Adipose connective tissue"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q147",
+    "questionNumber": 147,
+    "question": "During Aestivation and Hibernation which type\nof respiration is most commonly seen in frog ?",
+    "options": [
+      "Pulmonary Respiration",
+      "Buccopharyngeal Respiration",
+      "Cutaneous respiration",
+      "Both"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q148",
+    "questionNumber": 148,
+    "question": "Identify the given diagram A,B and C for\nphylum :-",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q149",
+    "questionNumber": 149,
+    "question": "Which one of the following options are correct\nfor “Planaria”?",
+    "options": [
+      "Bilateral symmetry, Non-chordata, high\nregeneration capacity",
+      "Radial symmetry, Non-chordata, complete\ndigestive tract",
+      "Asymmetrical, Non-chordata, complete\ndigestive tract",
+      "Radial symmetry, Non-chordata, closed\ncirculation"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q150",
+    "questionNumber": 150,
+    "question": "The state of heart when it is not pumping blood\neffectively enough to meet the needs of the body\nis",
+    "options": [
+      "Cardiac arrest",
+      "Heart failare",
+      "Heart attack",
+      "Angina pectoris"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q151",
+    "questionNumber": 151,
+    "question": "Origin of heart beat and its conduction is\nrepresented by :-\nnode→AV node→Bundle His→",
+    "options": [
+      "SA of\nPurkinje fibres\nfibres→AV node→SA node→",
+      "Purkinje\nBundle of His\nnode→Purkinje fibres→AV node→",
+      "SA\nBundle of His\nnode→Bundle His→SA node→",
+      "AV of\nPurkinje fibres\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q152",
+    "questionNumber": 152,
+    "question": "Given below are two statements :\nStatement-I :-\nIncrease in intrapulmonary\npressure above atmospheric pressure causing\nexpulsion of air during expiration.\nStatement-II :-\nIn expiration there is reduction in\nthoracic volume.",
+    "options": [
+      "Statement-I is correct but statement-II is\nincorrect.",
+      "Statement-I is incorrect but statement-I is\ncorrect.",
+      "Both statement-I and II are incorrect.",
+      "Both statement-I and II are correct."
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q153",
+    "questionNumber": 153,
+    "question": "Oxyhaemoglobin formation is favoured by",
+    "options": [
+      "Low pO and high pCO\n2 2",
+      "High pO and low pCO\n2 2\n+",
+      "High H concentration",
+      "High temperature"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q154",
+    "questionNumber": 154,
+    "question": "Which of the following statement is correct ?\n2+",
+    "options": [
+      "Parathyroid hormone decreases Ca levels\nin blood.",
+      "Hypothyroidism may cause menstrual cycle\nto become irregular in female.",
+      "Parathyroid hormone is steroid hormone.",
+      "Two parathyroid glands are present on back\nside of thyroid gland."
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q155",
+    "questionNumber": 155,
+    "question": "How many hormones from the given list are\nreleased by posterior pituitary?\nGH, ACTH, TSH, LH, FSH, Oxytocin",
+    "options": [
+      "Six",
+      "Five",
+      "Two",
+      "One"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q156",
+    "questionNumber": 156,
+    "question": "Refer to the given diagram of the structure of a\nneuron and identify A, B and C.\nSelect the correct option.\nA B C",
+    "options": [
+      "Nissle's granule Axon Schwann cell",
+      "Schwann cell Nodes of Ranvier Synaptic knob",
+      "Synaptic Knob Dendrite Synaptic Knob",
+      "Nucleus Myelin sheath Nissle's granule"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q157",
+    "questionNumber": 157,
+    "question": "Identify the correct match.\nA B C D\n+\n1 K Urea H O NaCl\n2\n+\n2 Urea NaCl K H O\n2\n+\n3 H O K NaCl Urea\n2\n+\n4 NaCl H O K Urea\n2",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q158",
+    "questionNumber": 158,
+    "question": "Which one of the following statement is correct\nwith respect to hemodialysis ?",
+    "options": [
+      "In patient of liver failure, ammonia can be\nremoved by this process.",
+      "Blood drained out from a convenient vein.",
+      "Dialysis unit contains a coiled cellophane\ntube surrounded by dialysing fluid.",
+      "Cellophane membrane of the tube is non-\nporous.\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q159",
+    "questionNumber": 159,
+    "question": "Identify the wrong statements:\n(A) The atrial wall of our heart secretes atrial\nnatriuretic factor which increase blood pressure.\n(B) Estrogen is secreted by the growing ovarian\nfollicles.\n(C) Insulin is a steroid hormone, which plays a major\nrole in the regulation of glucose homeostasis.\n(D) Prolonged hyperglycaemia leads to a complex\ndisorder called diabetes mellitus.\nChoose the most appropriate answer from the options\ngiven below:",
+    "options": [
+      "D and E only",
+      "A and B only",
+      "C and E only",
+      "A and C only"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q160",
+    "questionNumber": 160,
+    "question": "The globular head of the myosin filament acts as\nan active ATPase enzyme. It has binding sites for:",
+    "options": [
+      "ATP and Troponin",
+      "ATP and Actin",
+      "Calcium and Actin",
+      "Tropomyosin and Actin"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q161",
+    "questionNumber": 161,
+    "question": "List–II\nMatch List -I with\nList–I List–II\nA. Parturition I. Many antibodies for the newborn\nB. Placenta II. Collection of ovum after ovulation\nC. Colostrum III. Fetal ejection reflex\nD. Fimbriae IV. Secretion of hCG hormone\nChoose the correct answer from the following\noptions",
+    "options": [
+      "A-III, B-IV, C-I, D-II",
+      "A-I, B-IV, C-II, D-III",
+      "A-II, B-III, C-IV, D-I",
+      "A-III, B-IV, C-II, D-I"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q162",
+    "questionNumber": 162,
+    "question": "How many of the following structures are\npresent only in male ?\nVas deferens, Seminiferous tubule, Breast, Anus,\nUrethra, Epididymis, Bartholingland, oviduct",
+    "options": [
+      "Five",
+      "Three",
+      "Seven",
+      "Four"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q163",
+    "questionNumber": 163,
+    "question": "In which month of the gestation period , the first\nmovements of the foetus and appearance of hair\non it's head are usually observed",
+    "options": [
+      "Sixth month",
+      "Fifth months",
+      "Fourth months",
+      "Third month"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q164",
+    "questionNumber": 164,
+    "question": "What is true about saheli",
+    "options": [
+      "\"Once a week\" pill with more side effects\nand high contraceptive value",
+      "\"Once a week\" pill with very few side\neffect and low contraceptive value",
+      "\"Once a week\" pill with no side effect and\nlow contraceptive value",
+      "\"Once a week\" pill with very few side\neffects and High contraceptive value\nStatement-I"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q165",
+    "questionNumber": 165,
+    "question": ": Surgical method are generally\nadvised for the male/female partner as a terminal\nmethod to prevent any more pregnancies.\nStatement-II\n: Surgical method blocks gamete\ntransport and prevent conception.\nStatement-I statement-II",
+    "options": [
+      "is correct but is incorrect\nstatement-I II",
+      "Both & are correct\nstatement-I II",
+      "Both & are incorrect\nStatement-I statement-II",
+      "is incorrect but is correct"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q166",
+    "questionNumber": 166,
+    "question": "Given below are two statements: One is labelled as\nAssertion A and the other is labelled as Reason R.\nAssertion A :\nHIV uses reverse transcriptase to\nconvert its RNA into DNA inside the host cell.\nReason R :\nHIV is a retrovirus that contains RNA\nas its genetic material.\nIn the light of the above statements, choose the\nmost appropriate answer from the options given\nbelow.",
+    "options": [
+      "A is correct but R is not correct.",
+      "A is not correct but R is correct.",
+      "Both A and R are correct and R is the\ncorrect explanation of A.",
+      "Both A and R are correct but R is NOT the\ncorrect explanation of A.\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q167",
+    "questionNumber": 167,
+    "question": "Match column-I with column-II and choose the\ncorrect answer.\nColumn-I Column-II\nAcid in stomach Cellular\n(A) (i)\nand tears from eye immunity\n(B) Antibody (ii) Physical barrier\nHumoral\n(C) T-Lymphocyte (iii)\nimmunity\nPhysiological\n(D) Mucous coating (iv)\nBarrier\nA–iv, B–ii, C–iii, D–i",
+    "options": [
+      "A–ii, B–iv, C–i, D–iii",
+      "A–iv, B–iii, C–i, D–ii",
+      "A–iv, B–i, C–ii, D–iii",
+      ""
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q168",
+    "questionNumber": 168,
+    "question": "Select true and false statements and choose the\ncorrect answer.\n(a) AIDS is an infectious, non fatal disease\n(b) MALT constitute 60% of body tissue\n(c) Cocaine is CNS stimulant\n(d) T-lymphocytes matures in bone marrow.\n(e) Proto-oncogene cause cancer in inactive stage.",
+    "options": [
+      "F F T T F",
+      "F F T T T",
+      "T F T T T",
+      "F F T F F"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q169",
+    "questionNumber": 169,
+    "question": "The term 'Typhoid Mary' refers to :",
+    "options": [
+      "A Woman who first discovered typhoid\nbacteria",
+      "A Cook who transmitted typhoid and was a\ntyphoid carrier.",
+      "A Doctor who treated typhoid Patients",
+      "A Scientist who developed typhoid vaccine"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q170",
+    "questionNumber": 170,
+    "question": "In 1938 a fish caught in South Africa happened\nto be a Coelacanth which was though to be\nextinct. These animals called lobefins evolved\ninto the first _____.",
+    "options": [
+      "Amphibians",
+      "Jawless fish",
+      "Reptiles",
+      "Birds"
+    ],
+    "correctIndex": 0,
+    "correctAnswer": "A",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q171",
+    "questionNumber": 171,
+    "question": "Correct sequence of evolution of mammals is :-\n→ →",
+    "options": [
+      "Sauropsid Thecodont Pelycosaurus\n→ →\nTherapsid Mammals\n→ →",
+      "Synapsid Pelycosaurus Thecodont\n→ →\nTherapsid Mammals\n→ →",
+      "Synapsid Pelycosaurus Therapsid\n→\nMammals\n→ →",
+      "Sauropsid Pelycosaurus Therapsid\n→\nMammals"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q172",
+    "questionNumber": 172,
+    "question": "Identify the correct match from the column-I, II\nand III\nColumn-I Column-II Column-III\nStamens are\nEpipetalous China",
+    "options": [
+      "(a) united into (i)\nStamens rose\ntwo bundles\nStamens\nEpitepalous",
+      "(b) are attached (ii) Pea\nStamens\nto tepals\nStamens are\nMonoadelphous united into",
+      "(c) (iii) Brinjal\nstamens one bunch\nor one bundle\nStamens\nDiadelphous",
+      "(d) are attached (iv) Lily\nstamens\nto the petals"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q173",
+    "questionNumber": 173,
+    "question": "(P through U)\nThe following are the main steps of\nchemiosmotic ATP synthesis in the light reaction.\ncorrectorder\nWhich option places them in ?\n+\n(P) H concentration gradient established\n+\n(Q) H diffuses through ATP synthase\n+\n(R) Carriers use energy to move H across the\nmembrane\n(S) Electrons from PSII pass along electron\ntransport chain\n(T) Light excites electrons in PSII\n+\n(U) Energy of H flow is used by ATP synthase to\nmake ATP",
+    "options": [
+      "PQTSRU",
+      "STPQRU",
+      "TSRPQU",
+      "TSRUQP\ncorrect"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q174",
+    "questionNumber": 174,
+    "question": "How many statements are with respect to ETS ?\n+ +\n(A) ETS is helpful in restoration of NAD & FAD\n–\n(B) O is terminal e acceptor in electron transport\n2\nsystem\n(C) Ubiquinone & FMN are hydrogen carrier and\n+\nhelpful in movement of H from matrix to\nperimitochondrial space.\n(D) Complex IV is also known as cytochrome C\noxidase.\n–\n(E) Movement of e in ETS is coupled to ATP\nsynthase for formation of ATP.",
+    "options": [
+      "Three",
+      "Four",
+      "Five",
+      "Two"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q175",
+    "questionNumber": 175,
+    "question": "Which inheritance can not be represent by below\npedigree.\nA.\nAutosomal Dominant\nB.\nX linked Recessive\nC.\nX linked Dominant\nD.\nAutosomal Recessive\nE.\nMaternal Inheritance",
+    "options": [
+      "A, B and C, D",
+      "A, B and C",
+      "B, C and D",
+      "A, B, C and E"
+    ],
+    "correctIndex": 3,
+    "correctAnswer": "D",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q176",
+    "questionNumber": 176,
+    "question": "Find out the sequence of binding of the\nfollowing amino acyl-t-RNA complexes during\ntranslation to a m-RNA transcribed by a DNA\nsegment having the base sequence. 3'\nATACCCATGGGG 5'. Choose the answer\nshowing the correct order of alphabets :-\n(a) (b)\n(c) (d)",
+    "options": [
+      "a, b, c, d",
+      "d, a, b, c",
+      "a, b, d, c",
+      "b, a, c, d"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q177",
+    "questionNumber": 177,
+    "question": "incorrect\nHow many statements are ?\n(a)\nPredators help in maintaining species\ndiversity in a community.\n(b)\nDecomposition is largely an oxygen requiring\nprocess\n(c)\nNumber of trophic levels in grazing food\nchain is never restricted\n(d)\nSome of the organisms of detritus food chain\nare prey to grazing food chain's organisms",
+    "options": [
+      "Three",
+      "One",
+      "Two",
+      "Zero"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q178",
+    "questionNumber": 178,
+    "question": "Some of the steps involved in production of humulin\nare given below. Choose the correct sequence :-\n(i)Synthesis of insulin gene artificially\n(ii)Culturing of recombinant E.coli in bioreactors\n(iii)Purification of humulin\n(iv)Insertion of human insulin gene into plasmid\n(v)Introduction of recombinant plasmid into E.coli\n(vi) Extraction of recombinant gene product from\nE.coli",
+    "options": [
+      "ii, i, iv, iii, v, vi",
+      "i, iv, v, ii, vi, iii",
+      "i, iii, v, vi, ii, iv",
+      "iii, v, ii, i, vi, iv\nPHASE- ALLPHASE"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q179",
+    "questionNumber": 179,
+    "question": "Consider the following four statement (i) - (iv)\nand select the correct stating which ones are true\n(T)and which ones are false (F).\n(i) In male cockroach genital pouch or chamber\nlies at the hind end of abdomen bounded dorsally\nby 9th and 10th terga and ventrally by the 9th\nsternum.\n(ii) In cockroach the haemolymph is composed\nof colourless plasma and haemocytes.\n(iii)In female cockroach each ovary is formed of\na group of ten ovarian tubules or ovarioles,\ncontaining a chain of developing ova.\n(iv) In cockroach the nymph grows by moulting\nabout 13 times to reach the adult form.",
+    "options": [
+      "(i)-F; (ii)-T; (iii)-F; (iv)-T",
+      "(i)-F; (ii)-F; (iii)-T; (iv)-T",
+      "(i)-T; (ii)-T; (iii)-F; (iv)-T",
+      "(i)-T; (ii)-F; (iii)-T; (iv)-F"
+    ],
+    "correctIndex": 2,
+    "correctAnswer": "C",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  },
+  {
+    "id": "NEET-MAJOR-2026-Q180",
+    "questionNumber": 180,
+    "question": "Read the following statements carefully and\nanswer the question given below.\n(a) Cyclostometas have circular and sucking\nmouth without jaw.\n(b) Chondrichthyes have a gill slits without\noperculumn.\n(c) Osteichthyes have 5-7 pairs of gills covered\nby operculum.\n(d) In Amphibia alimentary canal, urinary &\nreproductive tract open in anus.\nWhich of the following options is/are incorrect?",
+    "options": [
+      "(b) & (c)",
+      "(c) & (d)",
+      "Only (d)",
+      "(b) & (d)"
+    ],
+    "correctIndex": 1,
+    "correctAnswer": "B",
+    "subject": "Biology",
+    "marks": 4,
+    "negativeMarks": 1,
+    "source": "Target Pre-Medical 2026 / Major Test 07-06-2026",
+    "solution": ""
+  }
+]

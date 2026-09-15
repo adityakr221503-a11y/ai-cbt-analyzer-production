@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>CBT Test Loader</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    .card {
+      max-width: 700px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 9px;
+      background: #4f46e5;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #64748b;
+    }
+
+    #status {
+      margin-top: 20px;
+      padding: 14px;
+      border-radius: 9px;
+      background: #f1f5f9;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <h1>CBT Test Loader</h1>
+
+    <p>
+      Use this page once to create a test and
+      questions in your browser storage.
+    </p>
+
+    <button id="loadButton">
+      Load Demo CBT Test
+    </button>
+
+    <button
+      id="clearButton"
+      class="secondary"
+    >
+      Clear Demo CBT Data
+    </button>
+
+    <button
+      id="openButton"
+      class="secondary"
+    >
+      Open CBT
+    </button>
+
+    <div id="status">
+      Ready.
+    </div>
+
+  </div>
+
+
+  <script type="module">
+
+    import {
+      createQuestion,
+      createTest
+    } from "./core/index.js";
+
+
+    import {
+      readCollection,
+      writeCollection
+    } from "./storage/storage.js";
+
+
+    const loadButton =
+      document.getElementById(
+        "loadButton"
+      );
+
+
+    const clearButton =
+      document.getElementById(
+        "clearButton"
+      );
+
+
+    const openButton =
+      document.getElementById(
+        "openButton"
+      );
+
+
+    const status =
+      document.getElementById(
+        "status"
+      );
+
+
+    /* =================================================
+       STATUS
+    ================================================= */
+
+    function showStatus(
+      message
+    ) {
+
+      status.textContent =
+        message;
+
+    }
+
+
+    /* =================================================
+       LOAD DEMO TEST
+    ================================================= */
+
+    loadButton.addEventListener(
+      "click",
+      function () {
+
+        try {
+
+          /*
+           * Create questions.
+           */
+
+          const questions = [
+
+            createQuestion({
+
+              id:
+                "demo-q1",
+
+              text:
+                "Which planet is known as the Red Planet?",
+
+              options: [
+                "Earth",
+                "Mars",
+                "Jupiter",
+                "Venus"
+              ],
+
+              correctAnswer:
+                "Mars",
+
+              subject:
+                "General Science",
+
+              chapter:
+                "Solar System",
+
+              topic:
+                "Planets",
+
+              difficulty:
+                "easy",
+
+              marks:
+                4,
+
+              negativeMarks:
+                1,
+
+              explanation:
+                "Mars appears reddish because of iron oxide on its surface.",
+
+              source:
+                "Demo"
+
+            }),
+
+
+            createQuestion({
+
+              id:
+                "demo-q2",
+
+              text:
+                "What is 2 + 2?",
+
+              options: [
+                "3",
+                "4",
+                "5",
+                "6"
+              ],
+
+              correctAnswer:
+                "4",
+
+              subject:
+                "Mathematics",
+
+              chapter:
+                "Arithmetic",
+
+              topic:
+                "Addition",
+
+              difficulty:
+                "easy",
+
+              marks:
+                4,
+
+              negativeMarks:
+                1,
+
+              explanation:
+                "Two plus two equals four.",
+
+              source:
+                "Demo"
+
+            }),
+
+
+            createQuestion({
+
+              id:
+                "demo-q3",
+
+              text:
+                "Which gas is most abundant in Earth's atmosphere?",
+
+              options: [
+                "Oxygen",
+                "Nitrogen",
+                "Carbon Dioxide",
+                "Hydrogen"
+              ],
+
+              correctAnswer:
+                "Nitrogen",
+
+              subject:
+                "General Science",
+
+              chapter:
+                "Atmosphere",
+
+              topic:
+                "Gases",
+
+              difficulty:
+                "easy",
+
+              marks:
+                4,
+
+              negativeMarks:
+                1,
+
+              explanation:
+                "Nitrogen makes up about 78% of Earth's atmosphere.",
+
+              source:
+                "Demo"
+
+            }),
+
+
+            createQuestion({
+
+              id:
+                "demo-q4",
+
+              text:
+                "Which organelle is known as the powerhouse of the cell?",
+
+              options: [
+                "Nucleus",
+                "Ribosome",
+                "Mitochondria",
+                "Golgi apparatus"
+              ],
+
+              correctAnswer:
+                "Mitochondria",
+
+              subject:
+                "Biology",
+
+              chapter:
+                "Cell",
+
+              topic:
+                "Cell Organelles",
+
+              difficulty:
+                "easy",
+
+              marks:
+                4,
+
+              negativeMarks:
+                1,
+
+              explanation:
+                "Mitochondria are the primary sites of aerobic cellular respiration and ATP production.",
+
+              source:
+                "Demo"
+
+            }),
+
+
+            createQuestion({
+
+              id:
+                "demo-q5",
+
+              text:
+                "What is the SI unit of force?",
+
+              options: [
+                "Joule",
+                "Watt",
+                "Newton",
+                "Pascal"
+              ],
+
+              correctAnswer:
+                "Newton",
+
+              subject:
+                "Physics",
+
+              chapter:
+                "Units",
+
+              topic:
+                "Force",
+
+              difficulty:
+                "easy",
+
+              marks:
+                4,
+
+              negativeMarks:
+                1,
+
+              explanation:
+                "The SI unit of force is the newton (N).",
+
+              source:
+                "Demo"
+
+            })
+
+          ];
+
+
+          /*
+           * Read existing questions.
+           */
+
+          const existingQuestions =
+            readCollection(
+              "questions"
+            );
+
+
+          /*
+           * Merge without duplicating
+           * demo questions.
+           */
+
+          const questionMap =
+            new Map();
+
+
+          existingQuestions.forEach(
+            function (item) {
+
+              if (
+                item &&
+                item.id !== undefined
+              ) {
+
+                questionMap.set(
+                  String(item.id),
+                  item
+                );
+
+              }
+
+            }
+          );
+
+
+          questions.forEach(
+            function (item) {
+
+              questionMap.set(
+                String(item.id),
+                item
+              );
+
+            }
+          );
+
+
+          const allQuestions =
+            Array.from(
+              questionMap.values()
+            );
+
+
+          writeCollection(
+            "questions",
+            allQuestions
+          );
+
+
+          /*
+           * Create test.
+           */
+
+          const test =
+            createTest({
+
+              id:
+                "demo-test-1",
+
+              title:
+                "Demo CBT Test",
+
+              subject:
+                "General",
+
+              exam:
+                "CBT",
+
+              durationMinutes:
+                30,
+
+              questions:
+                questions.map(
+                  item =>
+                    item.id
+                ),
+
+              totalMarks:
+                questions.length * 4,
+
+              negativeMarking:
+                true
+
+            });
+
+
+          /*
+           * Read existing tests.
+           */
+
+          const existingTests =
+            readCollection(
+              "tests"
+            );
+
+
+          const testMap =
+            new Map();
+
+
+          existingTests.forEach(
+            function (item) {
+
+              if (
+                item &&
+                item.id !== undefined
+              ) {
+
+                testMap.set(
+                  String(item.id),
+                  item
+                );
+
+              }
+
+            }
+          );
+
+
+          testMap.set(
+            String(test.id),
+            test
+          );
+
+
+          writeCollection(
+            "tests",
+            Array.from(
+              testMap.values()
+            )
+          );
+
+
+          showStatus(
+            "✅ Demo CBT Test loaded successfully.\n\n" +
+            `Questions: ${questions.length}\n` +
+            `Test: ${test.title}\n` +
+            `Duration: ${test.durationMinutes} minutes\n\n` +
+            "Now open CBT and select the test."
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            error
+          );
+
+
+          showStatus(
+            "❌ Failed to load test.\n\n" +
+            error.message
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =================================================
+       CLEAR DEMO DATA
+    ================================================= */
+
+    clearButton.addEventListener(
+      "click",
+      function () {
+
+        const questions =
+          readCollection(
+            "questions"
+          );
+
+
+        const tests =
+          readCollection(
+            "tests"
+          );
+
+
+        const remainingQuestions =
+          questions.filter(
+            item =>
+              !String(
+                item.id
+              ).startsWith(
+                "demo-q"
+              )
+          );
+
+
+        const remainingTests =
+          tests.filter(
+            item =>
+              String(
+                item.id
+              ) !==
+              "demo-test-1"
+          );
+
+
+        writeCollection(
+          "questions",
+          remainingQuestions
+        );
+
+
+        writeCollection(
+          "tests",
+          remainingTests
+        );
+
+
+        showStatus(
+          "Demo CBT data removed."
+        );
+
+      }
+    );
+
+
+    /* =================================================
+       OPEN CBT
+    ================================================= */
+
+    openButton.addEventListener(
+      "click",
+      function () {
+
+        window.location.href =
+          "cbt.html";
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>

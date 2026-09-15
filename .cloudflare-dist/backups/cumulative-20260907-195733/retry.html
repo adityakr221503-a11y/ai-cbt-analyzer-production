@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>CBT Analyzer Pro — Rank Booster</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:system-ui,Arial,sans-serif;
+  background:#f1f5f9;
+  color:#0f172a;
+}
+
+header{
+  background:#fff;
+  border-bottom:1px solid #e2e8f0;
+  padding:16px;
+}
+
+.header{
+  max-width:900px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:800;
+}
+
+.logo span{
+  color:#4f46e5;
+}
+
+.container{
+  max-width:900px;
+  margin:20px auto;
+  padding:0 14px;
+}
+
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 3px 14px rgba(0,0,0,.07);
+}
+
+.top-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.badge{
+  display:inline-block;
+  padding:7px 12px;
+  border-radius:20px;
+  background:#eef2ff;
+  color:#4338ca;
+  font-size:13px;
+  font-weight:800;
+}
+
+.priority{
+  font-weight:800;
+}
+
+.progress{
+  height:8px;
+  background:#e2e8f0;
+  border-radius:20px;
+  overflow:hidden;
+  margin:16px 0;
+}
+
+.progress-bar{
+  height:100%;
+  width:0;
+  background:#4f46e5;
+  transition:.25s;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.stat{
+  background:#f8fafc;
+  border-radius:12px;
+  padding:14px;
+  text-align:center;
+}
+
+.stat-value{
+  font-size:22px;
+  font-weight:800;
+}
+
+.stat-label{
+  margin-top:4px;
+  color:#64748b;
+  font-size:12px;
+}
+
+.meta{
+  color:#64748b;
+  font-size:13px;
+  margin-bottom:12px;
+}
+
+.question{
+  font-size:21px;
+  line-height:1.55;
+  font-weight:700;
+  margin:15px 0 20px;
+}
+
+.option{
+  width:100%;
+  display:block;
+  padding:14px;
+  margin:10px 0;
+  border:2px solid #e2e8f0;
+  border-radius:12px;
+  background:#fff;
+  color:#0f172a;
+  text-align:left;
+  cursor:pointer;
+  font-size:16px;
+}
+
+.option:hover{
+  border-color:#818cf8;
+}
+
+.option.selected{
+  border-color:#4f46e5;
+  background:#eef2ff;
+}
+
+.option.correct{
+  border-color:#16a34a;
+  background:#dcfce7;
+}
+
+.option.incorrect{
+  border-color:#dc2626;
+  background:#fee2e2;
+}
+
+.action{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:10px;
+  background:#4f46e5;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+  margin-top:10px;
+  font-size:15px;
+}
+
+.action:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.secondary{
+  background:#64748b;
+}
+
+.feedback{
+  padding:14px;
+  border-radius:12px;
+  margin-top:15px;
+  background:#f8fafc;
+  line-height:1.6;
+}
+
+.success{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.error{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.empty{
+  text-align:center;
+  padding:35px 10px;
+}
+
+.hidden{
+  display:none !important;
+}
+
+.error-box{
+  background:#fee2e2;
+  color:#991b1b;
+  padding:14px;
+  border-radius:12px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+@media(max-width:600px){
+
+  .question{
+    font-size:18px;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .header{
+    align-items:flex-start;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header">
+    <div class="logo">
+      CBT Analyzer <span>Pro</span>
+    </div>
+
+    <strong>🏆 Rank Booster</strong>
+  </div>
+</header>
+
+
+<div class="container">
+
+
+<!-- =====================================================
+DPP STATUS
+===================================================== -->
+
+<section class="card">
+
+  <div class="top-row">
+
+    <span
+      id="stageBadge"
+      class="badge">
+      Loading...
+    </span>
+
+    <span
+      id="priority"
+      class="priority">
+      Priority: -
+    </span>
+
+  </div>
+
+
+  <div class="progress">
+    <div
+      id="progressBar"
+      class="progress-bar">
+    </div>
+  </div>
+
+
+  <div class="stats">
+
+    <div class="stat">
+      <div
+        id="practiceCount"
+        class="stat-value">
+        0
+      </div>
+
+      <div class="stat-label">
+        Practice Attempts
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div
+        id="successRate"
+        class="stat-value">
+        0%
+      </div>
+
+      <div class="stat-label">
+        Success Rate
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div
+        id="recurrence"
+        class="stat-value">
+        0
+      </div>
+
+      <div class="stat-label">
+        Recurrences
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+QUESTION
+===================================================== -->
+
+<section
+  id="questionCard"
+  class="card">
+
+  <div id="loading">
+    Loading Rank Booster...
+  </div>
+
+
+  <div
+    id="errorBox"
+    class="error-box hidden">
+  </div>
+
+
+  <div
+    id="questionContent"
+    class="hidden">
+
+    <div
+      id="meta"
+      class="meta">
+    </div>
+
+
+    <div
+      id="question"
+      class="question">
+    </div>
+
+
+    <div id="options"></div>
+
+
+    <div
+      id="feedback"
+      class="feedback hidden">
+    </div>
+
+
+    <button
+      id="checkButton"
+      class="action"
+      disabled>
+      Check Answer
+    </button>
+
+
+    <button
+      id="nextButton"
+      class="action hidden">
+      Next DPP Question
+    </button>
+
+  </div>
+
+
+  <div
+    id="empty"
+    class="empty hidden">
+
+    <h2>🏆 DPP Complete</h2>
+
+    <p>
+      There are currently no active mistakes
+      requiring Rank Booster practice.
+    </p>
+
+    <button
+      class="action secondary"
+      id="mistakeBookButton">
+      Open Mistake Book
+    </button>
+
+  </div>
+
+</section>
+
+</div>
+
+
+<script type="module">
+
+"use strict";
+
+
+/* =====================================================
+CORE IMPORTS
+===================================================== */
+
+import {
+  getNextDPPTarget,
+  getDPPStage,
+} from "./src/core/index.js";
+
+import {
+  getMistakeForPractice,
+  recordPractice,
+  getPracticeProgress,
+  getNextPracticeType,
+} from "./src/core/index.js";
+
+import {
+  getItem,
+} from "./src/core/index.js";
+
+
+/* =====================================================
+STATE
+===================================================== */
+
+let currentTarget = null;
+
+let currentMistake = null;
+
+let currentQuestion = null;
+
+let selectedAnswer = null;
+
+let answered = false;
+
+
+/* =====================================================
+ELEMENTS
+===================================================== */
+
+const loading =
+  document.getElementById(
+    "loading"
+  );
+
+const errorBox =
+  document.getElementById(
+    "errorBox"
+  );
+
+const questionContent =
+  document.getElementById(
+    "questionContent"
+  );
+
+const empty =
+  document.getElementById(
+    "empty"
+  );
+
+const stageBadge =
+  document.getElementById(
+    "stageBadge"
+  );
+
+const priority =
+  document.getElementById(
+    "priority"
+  );
+
+const progressBar =
+  document.getElementById(
+    "progressBar"
+  );
+
+const practiceCount =
+  document.getElementById(
+    "practiceCount"
+  );
+
+const successRate =
+  document.getElementById(
+    "successRate"
+  );
+
+const recurrence =
+  document.getElementById(
+    "recurrence"
+  );
+
+const meta =
+  document.getElementById(
+    "meta"
+  );
+
+const question =
+  document.getElementById(
+    "question"
+  );
+
+const options =
+  document.getElementById(
+    "options"
+  );
+
+const feedback =
+  document.getElementById(
+    "feedback"
+  );
+
+const checkButton =
+  document.getElementById(
+    "checkButton"
+  );
+
+const nextButton =
+  document.getElementById(
+    "nextButton"
+  );
+
+const mistakeBookButton =
+  document.getElementById(
+    "mistakeBookButton"
+  );
+
+
+/* =====================================================
+SAFE STRING
+===================================================== */
+
+function text(value){
+
+  return String(
+    value ?? ""
+  );
+
+}
+
+
+/* =====================================================
+SHOW ERROR
+===================================================== */
+
+function showError(error){
+
+  console.error(
+    "Rank Booster:",
+    error
+  );
+
+  loading.classList.add(
+    "hidden"
+  );
+
+  questionContent.classList.add(
+    "hidden"
+  );
+
+  empty.classList.add(
+    "hidden"
+  );
+
+  errorBox.classList.remove(
+    "hidden"
+  );
+
+  errorBox.textContent =
+    error?.message ||
+    "Unable to load Rank Booster.";
+
+}
+
+
+/* =====================================================
+GET QUESTION
+===================================================== */
+
+function findQuestion(
+  questionId
+){
+
+  /*
+   * Primary storage.
+   */
+
+  const direct =
+    getItem(
+      "questions",
+      questionId
+    );
+
+
+  if(direct){
+
+    return direct;
+
+  }
+
+
+  /*
+   * Compatibility fallback:
+   * Some older versions may store
+   * questions in a questionBank collection.
+   */
+
+  const bank =
+    getItem(
+      "questionBank",
+      questionId
+    );
+
+
+  if(bank){
+
+    return bank;
+
+  }
+
+
+  /*
+   * Compatibility fallback for
+   * imported questions.
+   */
+
+  const imported =
+    getItem(
+      "cbtQuestions",
+      questionId
+    );
+
+
+  if(imported){
+
+    return imported;
+
+  }
+
+
+  return null;
+
+}
+
+
+/* =====================================================
+STAGE LABEL
+===================================================== */
+
+function stageLabel(
+  stage
+){
+
+  if(
+    stage === "familiar"
+  ){
+
+    return "Familiar Practice";
+
+  }
+
+  if(
+    stage === "novel"
+  ){
+
+    return "Novel Practice";
+
+  }
+
+  if(
+    stage === "transfer"
+  ){
+
+    return "Transfer Practice";
+
+  }
+
+  if(
+    stage === "mastered"
+  ){
+
+    return "Mastered";
+
+  }
+
+  return "Rank Booster";
+
+}
+
+
+/* =====================================================
+STAGE PROGRESS
+===================================================== */
+
+function calculateProgress(
+  mistake,
+  stage
+){
+
+  const progress =
+    getPracticeProgress(
+      mistake
+    );
+
+
+  if(
+    stage === "familiar"
+  ){
+
+    return Math.min(
+      100,
+      (
+        progress.attempts / 5
+      ) * 100
+    );
+
+  }
+
+
+  if(
+    stage === "novel"
+  ){
+
+    return Math.min(
+      100,
+      (
+        progress.novelAttempts / 3
+      ) * 100
+    );
+
+  }
+
+
+  if(
+    stage === "transfer"
+  ){
+
+    return Math.min(
+      100,
+      (
+        progress.transferAttempts / 2
+      ) * 100
+    );
+
+  }
+
+
+  return 100;
+
+}
+
+
+/* =====================================================
+UPDATE STATUS PANEL
+===================================================== */
+
+function updateStatus(){
+
+  const stage =
+    getDPPStage(
+      currentMistake
+    );
+
+
+  const progress =
+    getPracticeProgress(
+      currentMistake
+    );
+
+
+  stageBadge.textContent =
+    stageLabel(
+      stage
+    );
+
+
+  priority.textContent =
+    `Priority: ${
+      currentTarget.priority
+    }`;
+
+
+  practiceCount.textContent =
+    progress.attempts;
+
+
+  successRate.textContent =
+    `${progress.successRate}%`;
+
+
+  recurrence.textContent =
+    Number(
+      currentMistake.recurrenceCount ||
+      0
+    );
+
+
+  progressBar.style.width =
+    `${calculateProgress(
+      currentMistake,
+      stage
+    )}%`;
+
+}
+
+
+/* =====================================================
+RENDER QUESTION
+===================================================== */
+
+function renderQuestion(){
+
+  loading.classList.add(
+    "hidden"
+  );
+
+  errorBox.classList.add(
+    "hidden"
+  );
+
+  empty.classList.add(
+    "hidden"
+  );
+
+  questionContent.classList.remove(
+    "hidden"
+  );
+
+
+  selectedAnswer = null;
+
+  answered = false;
+
+
+  updateStatus();
+
+
+  meta.textContent =
+    [
+      currentQuestion.subject,
+      currentQuestion.chapter,
+      currentQuestion.topic,
+      currentQuestion.difficulty
+    ]
+    .filter(Boolean)
+    .map(text)
+    .join(" • ");
+
+
+  question.textContent =
+    text(
+      currentQuestion.text
+    );
+
+
+  options.innerHTML = "";
+
+
+  const questionOptions =
+    Array.isArray(
+      currentQuestion.options
+    )
+      ? currentQuestion.options
+      : [];
+
+
+  questionOptions.forEach(
+    function(optionValue){
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "option";
+
+
+      button.textContent =
+        text(
+          optionValue
+        );
+
+
+      button.addEventListener(
+        "click",
+        function(){
+
+          if(answered){
+
+            return;
+
+          }
+
+
+          selectedAnswer =
+            optionValue;
+
+
+          document
+            .querySelectorAll(
+              ".option"
+            )
+            .forEach(
+              function(item){
+
+                item.classList.remove(
+                  "selected"
+                );
+
+              }
+            );
+
+
+          button.classList.add(
+            "selected"
+          );
+
+
+          checkButton.disabled =
+            false;
+
+        }
+      );
+
+
+      options.appendChild(
+        button
+      );
+
+    }
+  );
+
+
+  feedback.classList.add(
+    "hidden"
+  );
+
+
+  feedback.classList.remove(
+    "success",
+    "error"
+  );
+
+
+  checkButton.classList.remove(
+    "hidden"
+  );
+
+  checkButton.disabled =
+    true;
+
+  nextButton.classList.add(
+    "hidden"
+  );
+
+}
+
+
+/* =====================================================
+LOAD NEXT TARGET
+===================================================== */
+
+function loadDPP(){
+
+  try{
+
+    currentTarget =
+      getNextDPPTarget();
+
+
+    if(!currentTarget){
+
+      loading.classList.add(
+        "hidden"
+      );
+
+      questionContent.classList.add(
+        "hidden"
+      );
+
+      errorBox.classList.add(
+        "hidden"
+      );
+
+      empty.classList.remove(
+        "hidden"
+      );
+
+      return;
+
+    }
+
+
+    currentMistake =
+      getMistakeForPractice(
+        currentTarget.mistakeId
+      );
+
+
+    currentQuestion =
+      findQuestion(
+        currentTarget.questionId
+      );
+
+
+    if(!currentQuestion){
+
+      throw new Error(
+        "DPP target found, but question " +
+        `"${currentTarget.questionId}" ` +
+        "was not found in the question bank."
+      );
+
+    }
+
+
+    renderQuestion();
+
+  }catch(error){
+
+    showError(
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+CHECK ANSWER
+===================================================== */
+
+function checkAnswer(){
+
+  if(
+    answered ||
+    selectedAnswer === null
+  ){
+
+    return;
+
+  }
+
+
+  answered = true;
+
+
+  const correct =
+    String(
+      selectedAnswer
+    ) ===
+    String(
+      currentQuestion.correctAnswer
+    );
+
+
+  document
+    .querySelectorAll(
+      ".option"
+    )
+    .forEach(
+      function(button){
+
+        const value =
+          button.textContent;
+
+
+        if(
+          String(value) ===
+          String(
+            currentQuestion.correctAnswer
+          )
+        ){
+
+          button.classList.add(
+            "correct"
+          );
+
+        }
+
+
+        if(
+          String(value) ===
+          String(selectedAnswer)
+          &&
+          !correct
+        ){
+
+          button.classList.add(
+            "incorrect"
+          );
+
+        }
+
+      }
+    );
+
+
+  /*
+   * Determine the stage BEFORE recording.
+   */
+
+  let practiceType =
+    getNextPracticeType(
+      currentMistake
+    );
+
+
+  if(
+    practiceType ===
+    "mastered"
+  ){
+
+    practiceType =
+      "transfer";
+
+  }
+
+
+  try{
+
+    currentMistake =
+      recordPractice({
+
+        mistakeId:
+          currentMistake.id,
+
+        successful:
+          correct,
+
+        practiceType,
+
+        timeSpent: 0,
+
+      });
+
+
+  }catch(error){
+
+    showError(
+      error
+    );
+
+    return;
+
+  }
+
+
+  updateStatus();
+
+
+  feedback.classList.remove(
+    "hidden"
+  );
+
+
+  if(correct){
+
+    feedback.classList.add(
+      "success"
+    );
+
+    feedback.innerHTML =
+      `
+      <strong>✅ Correct!</strong>
+      <br>
+      Your Rank Booster progress has
+      been updated.
+      `;
+
+  }else{
+
+    feedback.classList.add(
+      "error"
+    );
+
+    feedback.innerHTML =
+      `
+      <strong>❌ Incorrect</strong>
+      <br>
+      Correct answer:
+      <strong>
+        ${text(
+          currentQuestion.correctAnswer
+        )}
+      </strong>
+      `;
+
+  }
+
+
+  if(
+    currentQuestion.explanation
+  ){
+
+    feedback.innerHTML +=
+      `
+      <br><br>
+      <strong>Explanation:</strong>
+      <br>
+      ${text(
+        currentQuestion.explanation
+      )}
+      `;
+
+  }
+
+
+  checkButton.classList.add(
+    "hidden"
+  );
+
+  nextButton.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+/* =====================================================
+NEXT DPP
+===================================================== */
+
+function nextDPP(){
+
+  /*
+   * Always reload from the DPP engine.
+   *
+   * This means the next target can change
+   * automatically according to priority.
+   */
+
+  loading.classList.remove(
+    "hidden"
+  );
+
+  loading.textContent =
+    "Loading next Rank Booster target...";
+
+  questionContent.classList.add(
+    "hidden"
+  );
+
+  nextButton.classList.add(
+    "hidden"
+  );
+
+  loadDPP();
+
+}
+
+
+/* =====================================================
+NAVIGATION
+===================================================== */
+
+mistakeBookButton.addEventListener(
+  "click",
+  function(){
+
+    window.location.href =
+      "mistake.html";
+
+  }
+);
+
+
+checkButton.addEventListener(
+  "click",
+  checkAnswer
+);
+
+
+nextButton.addEventListener(
+  "click",
+  nextDPP
+);
+
+
+/* =====================================================
+START
+===================================================== */
+
+loadDPP();
+
+</script>
+
+</body>
+</html>

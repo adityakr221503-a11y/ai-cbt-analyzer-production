@@ -1,0 +1,157 @@
+[1mdiff --git a/cbt.html b/cbt.html[m
+[1mindex d7357fb..31189e7 100644[m
+[1m--- a/cbt.html[m
+[1m+++ b/cbt.html[m
+[36m@@ -2124,6 +2124,152 @@[m [mfunction buildTestQuestions() {[m
+ [m
+ })();[m
+ [m
+[32m+[m
+[32m+[m[32m/* =====================================================[m
+[32m+[m[32m   PCB_START_BRIDGE_V2[m
+[32m+[m[32m   PDF + RANKER -> existing CBT start pipeline[m
+[32m+[m[32m===================================================== */[m
+[32m+[m[32m(function () {[m
+[32m+[m
+[32m+[m[32m  const btn =[m
+[32m+[m[32m    document.getElementById("startButton");[m
+[32m+[m
+[32m+[m[32m  if (!btn || btn.__pcbStartBridgeV2)[m
+[32m+[m[32m    return;[m
+[32m+[m
+[32m+[m[32m  btn.__pcbStartBridgeV2 = true;[m
+[32m+[m
+[32m+[m[32m  btn.addEventListener([m
+[32m+[m[32m    "click",[m
+[32m+[m[32m    function () {[m
+[32m+[m
+[32m+[m[32m      try {[m
+[32m+[m
+[32m+[m[32m        const raw =[m
+[32m+[m[32m          localStorage.getItem([m
+[32m+[m[32m            "CBT_ACTIVE_TEST"[m
+[32m+[m[32m          );[m
+[32m+[m
+[32m+[m[32m        if (!raw)[m
+[32m+[m[32m          return;[m
+[32m+[m
+[32m+[m[32m        const active =[m
+[32m+[m[32m          JSON.parse(raw);[m
+[32m+[m
+[32m+[m[32m        if ([m
+[32m+[m[32m          !active ||[m
+[32m+[m[32m          !Array.isArray(active.questions) ||[m
+[32m+[m[32m          !active.questions.length[m
+[32m+[m[32m        )[m
+[32m+[m[32m          return;[m
+[32m+[m
+[32m+[m[32m        if ([m
+[32m+[m[32m          active.source !== "PDF Import" &&[m
+[32m+[m[32m          active.source !== "Rankers Test Series"[m
+[32m+[m[32m        )[m
+[32m+[m[32m          return;[m
+[32m+[m
+[32m+[m[32m        /*[m
+[32m+[m[32m         * IMPORTANT:[m
+[32m+[m[32m         * Update the actual CBT state used by[m
+[32m+[m[32m         * the existing start handler.[m
+[32m+[m[32m         */[m
+[32m+[m[32m        if ([m
+[32m+[m[32m          typeof selectedQuestions !==[m
+[32m+[m[32m          "undefined"[m
+[32m+[m[32m        ) {[m
+[32m+[m
+[32m+[m[32m          selectedQuestions =[m
+[32m+[m[32m            active.questions[m
+[32m+[m[32m              .map(function (q, i) {[m
+[32m+[m
+[32m+[m[32m                return[m
+[32m+[m[32m                  typeof normalizeQuestion ===[m
+[32m+[m[32m                  "function"[m
+[32m+[m[32m                    ? normalizeQuestion(q, i)[m
+[32m+[m[32m                    : q;[m
+[32m+[m
+[32m+[m[32m              })[m
+[32m+[m[32m              .filter(function (q) {[m
+[32m+[m
+[32m+[m[32m                return ([m
+[32m+[m[32m                  q &&[m
+[32m+[m[32m                  q.text &&[m
+[32m+[m[32m                  Array.isArray(q.options) &&[m
+[32m+[m[32m                  q.options.length >= 2[m
+[32m+[m[32m                );[m
+[32m+[m
+[32m+[m[32m              });[m
+[32m+[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        if ([m
+[32m+[m[32m          typeof selectedTest !==[m
+[32m+[m[32m          "undefined"[m
+[32m+[m[32m        ) {[m
+[32m+[m
+[32m+[m[32m          selectedTest = {[m
+[32m+[m[32m            id:[m
+[32m+[m[32m              active.id ||[m
+[32m+[m[32m              ([m
+[32m+[m[32m                active.source ===[m
+[32m+[m[32m                "PDF Import"[m
+[32m+[m[32m                  ? "pdf-import"[m
+[32m+[m[32m                  : "rankers-test-series"[m
+[32m+[m[32m              ),[m
+[32m+[m
+[32m+[m[32m            title:[m
+[32m+[m[32m              active.title ||[m
+[32m+[m[32m              active.source,[m
+[32m+[m
+[32m+[m[32m            duration:[m
+[32m+[m[32m              Number(active.duration) > 0[m
+[32m+[m[32m                ? Number(active.duration)[m
+[32m+[m[32m                : 180,[m
+[32m+[m
+[32m+[m[32m            questionIds:[m
+[32m+[m[32m              ([m
+[32m+[m[32m                typeof selectedQuestions !==[m
+[32m+[m[32m                "undefined" &&[m
+[32m+[m[32m                Array.isArray(selectedQuestions)[m
+[32m+[m[32m              )[m
+[32m+[m[32m                ? selectedQuestions.map([m
+[32m+[m[32m                    function (q) {[m
+[32m+[m[32m                      return q.id;[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                  )[m
+[32m+[m[32m                : [][m
+[32m+[m[32m          };[m
+[32m+[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        console.log([m
+[32m+[m[32m          "PCB START BRIDGE V2:",[m
+[32m+[m[32m          active.source,[m
+[32m+[m[32m          ([m
+[32m+[m[32m            typeof selectedQuestions !==[m
+[32m+[m[32m            "undefined" &&[m
+[32m+[m[32m            Array.isArray(selectedQuestions)[m
+[32m+[m[32m          )[m
+[32m+[m[32m            ? selectedQuestions.length[m
+[32m+[m[32m            : 0[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m      } catch (e) {[m
+[32m+[m
+[32m+[m[32m        console.error([m
+[32m+[m[32m          "PCB START BRIDGE V2 FAILED:",[m
+[32m+[m[32m          e[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m      }[m
+[32m+[m
+[32m+[m[32m    },[m
+[32m+[m[32m    true[m
+[32m+[m[32m  );[m
+[32m+[m
+[32m+[m[32m})();[m
+[32m+[m
+ startButton.addEventListener([m
+   "click",[m
+   function() {[m
