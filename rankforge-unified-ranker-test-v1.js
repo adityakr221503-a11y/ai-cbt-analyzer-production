@@ -1,38 +1,41 @@
 (function(){
 "use strict";
 
-const ACTIVE="rankforgeUnifiedRankerActiveTestV1";
+const ACTIVE="rankforgeUnifiedRankerActiveV1";
 
-function start(){
-  const subject=document.querySelector("#rfTestSubject")?.value||"Mixed";
-  const difficulty=document.querySelector("#rfTestDifficulty")?.value||"All";
+async function start(){
+  const subjectRaw=document.querySelector("#rfTestSubject")?.value||"Mixed";
+  const difficultyRaw=document.querySelector("#rfTestDifficulty")?.value||"All";
   const topic=document.querySelector("#rfTestTopic")?.value||"";
   const count=Number(document.querySelector("#rfTestCount")?.value||45);
 
+  const bridge=window.RankForgeQuestionEngineCBTBridgeV2;
+
+  if(!bridge || typeof bridge.test!=="function"){
+    alert("RankForge V2 CBT bridge is not loaded.");
+    return;
+  }
+
   try{
-    const questions=window.RankForgeMasterPoolV1.select({
-      subject,difficulty,topic,count
+    const test=await bridge.test({
+      subject:subjectRaw==="Mixed"?"":subjectRaw,
+      difficulty:difficultyRaw==="All"?"":difficultyRaw,
+      topic,
+      count,
+      title:"RankForge AI + Question Bank Test"
     });
 
-    const test={
-      id:"RF-UNIFIED-"+Date.now(),
-      title:"RankForge AI + Question Bank Test",
-      source:"rankforge-unified",
-      mode:"test",
-      questionCount:questions.length,
-      questions,
-      marking:{correct:4,wrong:-1,unanswered:0},
-      createdAt:new Date().toISOString()
-    };
+    if(!test || !Array.isArray(test.questions) || !test.questions.length){
+      alert("No validated RankForge V2 questions available for this selection.");
+      return;
+    }
 
     localStorage.setItem(ACTIVE,JSON.stringify(test));
-    localStorage.setItem("CBT_ACTIVE_TEST",JSON.stringify(test));
-    localStorage.setItem("CBT_ACTIVE_TEST_ID",test.id);
-    localStorage.setItem("CBT_ACTIVE_TEST_SOURCE","rankforge-unified");
-
     location.href="./cbt.html";
+
   }catch(e){
-    alert(e.message);
+    console.error("RankForge V2 unified test:",e);
+    alert(e?.message||String(e));
   }
 }
 

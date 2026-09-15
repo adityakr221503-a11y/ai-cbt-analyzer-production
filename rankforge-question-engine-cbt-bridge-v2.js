@@ -45,10 +45,10 @@ async function launch(config={}){
     mode
   });
 
-  if(!Array.isArray(result.questions) || !result.questions.length){
+  if(!result || !Array.isArray(result.questions) || !result.questions.length){
     throw new Error(
       "No validated questions available. Eligible: " +
-      (result.eligible || 0)
+      (result?.eligible || 0)
     );
   }
 
