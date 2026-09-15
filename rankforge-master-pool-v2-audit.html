@@ -179,5 +179,79 @@ async function audit(){
 window.addEventListener("load",audit);
 </script>
 
+
+<script>
+window.RF_AUTO_DIAGNOSTIC_V2 = async function(){
+  const out = {
+    timestamp: new Date().toISOString(),
+    topperTest180: "not checked",
+    masterPool: "not checked",
+    indexedDB: "unknown",
+    sources: {},
+    errors: []
+  };
+
+  try {
+    const keys = [
+      "TOPPER_TEST_180",
+      "rankBoosterQuestionBankV1",
+      "rankForgeQuestionBank",
+      "rankerQuestionBank",
+      "pdfCbtQuestions",
+      "pdfQuestionBank",
+      "pdfQuestions",
+      "pcbNichodCorpus",
+      "rankforgeAdaptiveDPPV1",
+      "rankForgeAIQuestionBankV1"
+    ];
+
+    for (const key of keys) {
+      const raw = localStorage.getItem(key);
+      out.sources[key] = raw ? "present" : "missing";
+    }
+
+    out.topperTest180 =
+      localStorage.getItem("TOPPER_TEST_180")
+        ? "protected/present"
+        : "missing";
+
+    if (window.RankForgeMasterPoolV2) {
+      try {
+        const pool = await window.RankForgeMasterPoolV2.getAll();
+        out.masterPool = Array.isArray(pool)
+          ? "loaded: " + pool.length
+          : "invalid";
+      } catch(e) {
+        out.errors.push("Master V2 getAll: " + e.message);
+      }
+    } else {
+      out.masterPool = "API missing";
+    }
+
+    out.indexedDB =
+      typeof indexedDB !== "undefined"
+        ? "available"
+        : "unavailable";
+
+  } catch(e) {
+    out.errors.push(e.message);
+  }
+
+  console.log("RANKFORGE V2 AUTO DIAGNOSTIC", out);
+
+  const pre=document.createElement("pre");
+  pre.id="RF_AUTO_DIAGNOSTIC_V2";
+  pre.style.cssText="white-space:pre-wrap;padding:16px;border:1px solid #888;border-radius:12px;margin:16px 0;";
+  pre.textContent=JSON.stringify(out,null,2);
+  document.body.appendChild(pre);
+
+  return out;
+};
+
+window.addEventListener("load",()=>{
+  setTimeout(()=>window.RF_AUTO_DIAGNOSTIC_V2(),500);
+});
+</script>
+
 </body>
 </html>
