@@ -10,12 +10,40 @@
     async generateQuestions(options) {
       options = options || {};
 
-      const prompt =
-        options.prompt ||
-        options.topicPrompt ||
-        options.instructions ||
-        options.query ||
-        "";
+      function toPromptString(value) {
+        if (typeof value === "string") return value;
+        if (value == null) return "";
+
+        if (Array.isArray(value)) {
+          return value.map(toPromptString)
+            .filter(Boolean)
+            .join("\n");
+        }
+
+        if (typeof value === "object") {
+          if (typeof value.text === "string") return value.text;
+          if (typeof value.prompt === "string") return value.prompt;
+          if (typeof value.instructions === "string") return value.instructions;
+          if (typeof value.content === "string") return value.content;
+
+          try {
+            return JSON.stringify(value);
+          } catch (_) {
+            return String(value);
+          }
+        }
+
+        return String(value);
+      }
+
+      const prompt = toPromptString(
+        options.prompt ??
+        options.topicPrompt ??
+        options.instructions ??
+        options.query ??
+        options.input ??
+        ""
+      );
 
       const count = Math.max(
         1,
