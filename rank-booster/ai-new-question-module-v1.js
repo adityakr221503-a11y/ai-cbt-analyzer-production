@@ -21,8 +21,24 @@ function normalize(q,i){
   ?q.options.map(x=>clean(typeof x==="object"?(x.text??x.label??x.value):x)).filter(Boolean)
   :[];
 
- let correct=q?.correctIndex;
- if(typeof correct==="string"&&/^[0-9]+$/.test(correct))correct=Number(correct);
+ let correct=q?.correctIndex ?? q?.correctAnswer ?? q?.correct ?? q?.answer;
+
+ if(typeof correct==="object" && correct!==null){
+   correct=correct.index ?? correct.indexValue ?? correct.value ?? correct.answer ?? correct.text ?? null;
+ }
+
+ if(typeof correct==="string"){
+   const raw=correct.trim();
+   if(/^[A-Da-d]$/.test(raw)){
+     correct=raw.toUpperCase().charCodeAt(0)-65;
+   }else if(/^\d+$/.test(raw)){
+     correct=Number(raw);
+   }
+ }
+
+ if(typeof correct==="number" && Number.isFinite(correct)){
+   correct=Math.trunc(correct);
+ }
 
  return {
   ...q,

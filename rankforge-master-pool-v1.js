@@ -35,14 +35,26 @@ function normalize(q,i,source){
     .filter(Boolean);
 
   let correct=q.correctIndex??q.correctAnswer??q.correct??q.answer;
+  if(typeof correct==="object" && correct!==null){
+    correct=correct.index ?? correct.indexValue ?? correct.value ?? correct.answer ?? correct.text ?? null;
+  }
+
   if(typeof correct==="string"){
-    const letter=correct.trim().toUpperCase();
-    if(/^[A-D]$/.test(letter))correct=letter.charCodeAt(0)-65;
-    else if(/^\d+$/.test(letter))correct=Number(letter);
-    else{
-      const idx=options.findIndex(x=>x.toLowerCase()===correct.toLowerCase());
+    const raw=correct.trim();
+    const letter=raw.toUpperCase();
+
+    if(/^[A-D]$/.test(letter)){
+      correct=letter.charCodeAt(0)-65;
+    }else if(/^\d+$/.test(raw)){
+      correct=Number(raw);
+    }else{
+      const idx=options.findIndex(x=>x.toLowerCase()===raw.toLowerCase());
       if(idx>=0)correct=idx;
     }
+  }
+
+  if(typeof correct==="number" && Number.isFinite(correct)){
+    correct=Math.trunc(correct);
   }
 
   if(typeof correct!=="number" || correct<0 || correct>=options.length)return null;
