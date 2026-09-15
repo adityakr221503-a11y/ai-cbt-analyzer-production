@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RankForge Master Pool V2 — QC Audit</title>
+<style>
+body{font-family:system-ui,sans-serif;margin:0;padding:20px;background:#f5f7fb;color:#172033}
+.card{background:#fff;border-radius:16px;padding:18px;margin:12px 0;box-shadow:0 2px 10px #0001}
+h1{margin-top:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{font-size:26px;font-weight:800}.muted{color:#667085;font-size:13px}
+button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;margin:4px;cursor:pointer}
+pre{white-space:pre-wrap;word-break:break-word}
+.good{color:#087443}.warn{color:#a15c00}
+</style>
+</head>
+<body>
+
+<h1>RankForge Master Pool V2</h1>
+<p class="muted">Read-only QC audit • TOPPER_TEST_180 protected</p>
+
+<div>
+<button onclick="build()">Build / Rebuild Master V2</button>
+<button onclick="audit()">Refresh Audit</button>
+</div>
+
+<div class="grid">
+<div class="card"><div class="muted">Master Pool</div><div id="total" class="stat">—</div></div>
+<div class="card"><div class="muted">Average Quality</div><div id="quality" class="stat">—</div></div>
+<div class="card"><div class="muted">Accepted</div><div id="accepted" class="stat">—</div></div>
+<div class="card"><div class="muted">Rejected</div><div id="rejected" class="stat">—</div></div>
+</div>
+
+<div class="card">
+<h2>Source Distribution</h2>
+<pre id="sources">Loading…</pre>
+</div>
+
+<div class="card">
+<h2>Quality Distribution</h2>
+<pre id="qualityDist">Loading…</pre>
+</div>
+
+<div class="card">
+<h2>Duplicate / Rejection Reasons</h2>
+<pre id="reasons">Loading…</pre>
+</div>
+
+<div class="card">
+<h2>Integrity</h2>
+<pre id="integrity">Loading…</pre>
+</div>
+
+<script src="./rankforge-master-pool-v2.js"></script>
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+async function build(){
+  $("integrity").textContent="Building Master Pool V2…";
+
+  try{
+    const result =
+      await window.RankForgeMasterPoolV2.build({
+        minQuality:35
+      });
+
+    $("accepted").textContent=result.meta.acceptedCount;
+    $("rejected").textContent=result.meta.rejectedCount;
+
+    await audit();
+
+    $("integrity").textContent =
+      "Build completed successfully.";
+  }catch(e){
+    $("integrity").textContent =
+      "Build error: "+(e?.message||e);
+  }
+}
+
+async function audit(){
+  try{
+    const pool =
+      await window.RankForgeMasterPoolV2.getAll();
+
+    const stats =
+      await window.RankForgeMasterPoolV2.stats();
+
+    $("total").textContent=pool.length;
+    $("quality").textContent=stats.averageQuality;
+
+    $("sources").textContent =
+      JSON.stringify(stats.sources,null,2);
+
+    const buckets={
+      "90–100":0,
+      "75–89":0,
+      "60–74":0,
+      "40–59":0,
+      "0–39":0
+    };
+
+    pool.forEach(q=>{
+      const s=Number(q.qualityScore||0);
+
+      if(s>=90)buckets["90–100"]++;
+      else if(s>=75)buckets["75–89"]++;
+      else if(s>=60)buckets["60–74"]++;
+      else if(s>=40)buckets["40–59"]++;
+      else buckets["0–39"]++;
+    });
+
+    $("qualityDist").textContent =
+      JSON.stringify(buckets,null,2);
+
+    let auditData={};
+
+    try{
+      auditData=
+        JSON.parse(
+          localStorage.getItem(
+            "rankForgeMasterQuestionPoolV2Audit"
+          )||"{}"
+        );
+    }catch(_){}
+
+    const rejected=auditData.rejected||[];
+
+    const reasons={};
+
+    rejected.forEach(q=>{
+      const r=q.rejectionReason||"UNKNOWN";
+      reasons[r]=(reasons[r]||0)+1;
+    });
+
+    $("rejected").textContent=rejected.length;
+
+    $("reasons").textContent =
+      JSON.stringify(reasons,null,2);
+
+    const topper =
+      localStorage.getItem("TOPPER_TEST_180");
+
+    let topperCount="not found";
+
+    if(topper){
+      try{
+        const parsed=JSON.parse(topper);
+
+        if(Array.isArray(parsed))
+          topperCount=parsed.length;
+        else if(Array.isArray(parsed.questions))
+          topperCount=parsed.questions.length;
+        else
+          topperCount="present";
+      }catch(_){
+        topperCount="present";
+      }
+    }
+
+    $("integrity").textContent =
+      [
+        "Master V2 questions: "+pool.length,
+        "TOPPER_TEST_180: "+topperCount,
+        "Master V2 uses IndexedDB: "+(
+          !!window.indexedDB
+        ),
+        "DPP parser output: NOT auto-imported",
+        "Audit mode: READ-ONLY"
+      ].join("\n");
+
+  }catch(e){
+    $("integrity").textContent =
+      "Audit error: "+(e?.message||e);
+  }
+}
+
+window.addEventListener("load",audit);
+</script>
+
+</body>
+</html>
