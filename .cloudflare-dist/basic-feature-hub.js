@@ -19,7 +19,8 @@ const FEATURES = [
     icon:"📄",
     title:"PDF → CBT",
     desc:"Upload a new PDF and convert it into CBT",
-    url:"pdf-to-cbt.html"
+    url:"pdf-to-cbt.html",
+    cls:"pdf-cbt-feature"
   },
   {
     icon:"🧬",
@@ -146,6 +147,9 @@ style.id="BASIC_FEATURE_HUB_V1_CSS";
 style.textContent=`
 .basic-feature-hub{
   margin:18px 0;
+  position:relative;
+  z-index:20;
+  isolation:isolate;
   padding:18px;
   border-radius:18px;
   background:#fff;
@@ -173,12 +177,20 @@ style.textContent=`
 
 .basic-feature-grid{
   display:grid;
+  position:relative;
+  z-index:21;
   grid-template-columns:repeat(3,1fr);
   gap:11px;
 }
 
 .basic-feature-card{
   display:block;
+  position:relative;
+  z-index:22;
+  cursor:pointer;
+  pointer-events:auto;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
   text-decoration:none;
   color:#0f172a;
   background:#f8fafc;
@@ -192,6 +204,15 @@ style.textContent=`
 .basic-feature-card:hover{
   transform:translateY(-2px);
   border-color:#6366f1;
+}
+
+.basic-feature-card.pdf-cbt-feature{
+  cursor:pointer;
+  pointer-events:auto;
+}
+
+.basic-feature-card *{
+  pointer-events:none;
 }
 
 .basic-feature-card.primary{
