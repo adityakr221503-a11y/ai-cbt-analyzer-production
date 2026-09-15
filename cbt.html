@@ -6154,6 +6154,30 @@ window.addEventListener("load", function () {
   <script src="./rankforge-result-mistake-engine-v1.js"></script>
   <script src="./rankforge-dpp-intelligence-v1.js"></script>
   <script src="./rankforge-mentor-decision-v1.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  window.addEventListener("DOMContentLoaded", function () {
+    try {
+      var raw = sessionStorage.getItem("CBT_ACTIVE_TEST");
+      if (!raw) return;
+
+      var test = JSON.parse(raw);
+      if (!test || !Array.isArray(test.questions) || !test.questions.length) return;
+
+      window.__PDF_CBT_ACTIVE_TEST__ = test;
+      window.__PDF_CBT_ACTIVE_QUESTIONS__ = test.questions;
+
+      localStorage.setItem("pdfCbtQuestions", JSON.stringify(test.questions));
+    } catch (e) {
+      console.warn("CBT active-test bridge:", e);
+    }
+  });
+})();
+</script>
+
 </body>
 
 </html>\n\n\n
