@@ -3032,23 +3032,79 @@ function openCBTWithPDFQuestions() {
 
 
   /*
-   * Store the selected pool
-   * for cbt.html.
+   * Unified PDF → CBT handoff.
+   * Keep legacy keys for compatibility,
+   * while also creating the canonical
+   * active-test object used by RankForge/CBT.
    */
 
+  const pdfTestId =
+    "pdf-test-" + Date.now();
+
+  const pdfTest = {
+    id: pdfTestId,
+    title: "Topper Test Pro — PDF Module Test",
+    source: "PDF",
+    filename:
+      window.PDF_ACTIVE_FILENAME ||
+      "Imported PDF",
+    questionCount:
+      questions.length,
+    questions: questions,
+    questionIds:
+      questions.map(function(q, i) {
+        return q.id ||
+          q.questionId ||
+          ("pdf-q-" + i);
+      }),
+    createdAt:
+      new Date().toISOString(),
+    updatedAt:
+      new Date().toISOString()
+  };
+
+  // Legacy/session compatibility.
   sessionStorage.setItem(
     "CBT_ACTIVE_SOURCE",
     "PDF"
   );
 
-
   sessionStorage.setItem(
     "CBT_ACTIVE_QUESTIONS",
-    JSON.stringify(
-      questions
-    )
+    JSON.stringify(questions)
   );
 
+  // Canonical active-test handoff.
+  sessionStorage.setItem(
+    "CBT_ACTIVE_TEST_ID",
+    pdfTestId
+  );
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_TEST_SOURCE",
+    "PDF"
+  );
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_TEST",
+    JSON.stringify(pdfTest)
+  );
+
+  // Reload-safe mirror.
+  localStorage.setItem(
+    "CBT_ACTIVE_TEST_ID",
+    pdfTestId
+  );
+
+  localStorage.setItem(
+    "CBT_ACTIVE_TEST_SOURCE",
+    "PDF"
+  );
+
+  localStorage.setItem(
+    "CBT_ACTIVE_TEST",
+    JSON.stringify(pdfTest)
+  );
 
   window.location.href =
     "./cbt.html";
@@ -4210,3 +4266,5 @@ console.log(
 <script src="./pdf-cbt-final-engine.js"></script>
 
 <script src="./pdf-cbt-careerwill-final.js"></script>
+
+<script src="./rankforge-pdf-cbt-flow-bridge-v1.js"></script>
