@@ -51,13 +51,15 @@ small{color:#667085}
 <div class="card">
 <h3>AI JSON → Validate</h3>
 <textarea id="rfAIJson" placeholder='Paste provider-generated JSON array here'></textarea>
-<button onclick="validateAI()">Validate & Add to AI Bank</button>
+<button onclick="validateAI()">Validate & Stage AI Questions</button>
+<button onclick="approveAI()">Approve Staged Questions → AI Bank</button>
 <p id="rfAIStatus"></p>
+<div id="rfAIApproval"></div>
 </div>
 </main>
 
 <script src="./rank-booster/ai-question-engine.js"></script>
-<script src="./rank-booster/ai-new-question-module-v1.js"></script>
+<script src="./rank-booster/ai-new-question-module-v1.js"></script>\n<script src="./rankforge-master-pool-v2.js"></script>
 <script>
 function generateSpec(){
  const subject=document.getElementById("rfAISubject").value;
@@ -97,13 +99,70 @@ function generateSpec(){
 function validateAI(){
  try{
    const raw=JSON.parse(document.getElementById("rfAIJson").value);
-   const result=window.RankForgeAINewQuestionModuleV1.importAndValidate(raw);
+   const result=
+     window.RankForgeAINewQuestionModuleV1.importAndValidate(raw);
+
    document.getElementById("rfAIStatus").textContent=
-     `Accepted: ${result.accepted} | Rejected: ${result.rejected} | AI Bank total: ${result.total}`;
+     `Validated: ${result.accepted} | Rejected: ${result.rejected} | Staged: ${result.staged}`;
+
+   renderStaged();
  }catch(e){
-   document.getElementById("rfAIStatus").textContent=e.message;
+   document.getElementById("rfAIStatus").textContent=
+     "Validation error: "+e.message;
  }
 }
+
+function renderStaged(){
+ const box=document.getElementById("rfAIApproval");
+ const staged=
+   window.RankForgeAINewQuestionModuleV1.getStaged();
+
+ if(!staged.length){
+   box.innerHTML="<small>No questions waiting for approval.</small>";
+   return;
+ }
+
+ box.innerHTML=
+   "<h4>Pending Approval ("+staged.length+")</h4>"+
+   "<label><input type='checkbox' id='rfApproveAll' checked> Approve all staged questions</label>";
+}
+
+function approveAI(){
+ try{
+   const staged=
+     window.RankForgeAINewQuestionModuleV1.getStaged();
+
+   if(!staged.length){
+     document.getElementById("rfAIStatus").textContent=
+       "Nothing is waiting for approval.";
+     return;
+   }
+
+   const result=
+     window.RankForgeAINewQuestionModuleV1.approveAllStaged();
+
+   document.getElementById("rfAIStatus").textContent=
+     `Approved: ${result.approved} | AI Bank total: ${result.total}`;
+
+   renderStaged();
+
+   // Rebuild Master Pool V2 after explicit approval.
+   if(window.RankForgeMasterPoolV2 &&
+      typeof window.RankForgeMasterPoolV2.build==="function"){
+     Promise.resolve(
+       window.RankForgeMasterPoolV2.build()
+     ).then(()=>{
+       document.getElementById("rfAIStatus").textContent +=
+         " | Master Pool V2 rebuilt";
+     }).catch(()=>{});
+   }
+ }catch(e){
+   document.getElementById("rfAIStatus").textContent=
+     "Approval error: "+e.message;
+ }
+}
+
+renderStaged();
 </script>
 </body>
 </html>

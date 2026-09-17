@@ -81,50 +81,169 @@ function existing(){
  return out.filter(valid);
 }
 
-function importAndValidate(input){
- const incoming=Array.isArray(input)?input:arr(input);
- const old=existing();
- const exact=new Set(old.map(fp));
- const accepted=[],history=[];
- let rejected=0;
+const STAGING_KEY="rankForgeAIQuestionStagingV2";
+const APPROVAL_KEY="rankForgeAIApprovalV2";
 
- incoming.forEach((raw,i)=>{
-   const q=normalize(raw,i);
-
-   if(!valid(q)){rejected++;return}
-
-   const f=fp(q);
-   if(exact.has(f)){rejected++;return}
-
-   if(old.some(x=>sim(q,x)>=0.88)){
-     rejected++;
-     return;
-   }
-
-   exact.add(f);
-   old.push(q);
-   accepted.push(q);
-   history.push({
-     id:q.id,
-     timestamp:new Date().toISOString(),
-     status:"approved",
-     qualityGate:"passed"
-   });
- });
-
- const bank=arr(read(AI_KEY));
- const merged=bank.concat(accepted);
- save(AI_KEY,merged);
-
- const h=arr(read(HISTORY_KEY));
- save(HISTORY_KEY,h.concat(history));
-
- return {
-   accepted:accepted.length,
-   rejected,
-   total:merged.length
- };
+function readArr(k){
+  const v=read(k);
+  return arr(v);
 }
+
+function saveStage(v){ save(STAGING_KEY,v); }
+function saveApproval(v){ save(APPROVAL_KEY,v); }
+
+function validateIncoming(input){
+  const incoming=Array.isArray(input)?input:arr(input);
+  const old=existing();
+  const exact=new Set(old.map(fp));
+  const accepted=[];
+  const rejected=[];
+  const staged=[];
+
+  incoming.forEach((raw,i)=>{
+    const q=normalize(raw,i);
+
+    if(!valid(q)){
+      rejected.push({
+        index:i,
+        reason:"INVALID_SCHEMA",
+        question:q
+      });
+      return;
+    }
+
+    const f=fp(q);
+
+    if(exact.has(f)){
+      rejected.push({
+        index:i,
+        reason:"EXACT_DUPLICATE",
+        question:q
+      });
+      return;
+    }
+
+    const dup=old.find(x=>sim(q,x)>=0.88);
+
+    if(dup){
+      rejected.push({
+        index:i,
+        reason:"NEAR_DUPLICATE",
+        against:dup.id,
+        question:q
+      });
+      return;
+    }
+
+    exact.add(f);
+    old.push(q);
+
+    q.status="STAGED";
+    q.validationStatus="PASSED";
+    q.approvalStatus="PENDING";
+    q.qualityGate="passed";
+    q.qualityScore=Number(q.qualityScore||0);
+    q.noveltyScore=Number(q.noveltyScore||0);
+    q.stagedAt=new Date().toISOString();
+
+    staged.push(q);
+    accepted.push(q);
+  });
+
+  saveStage(staged);
+
+  return {
+    accepted:accepted.length,
+    rejected:rejected.length,
+    rejectedItems:rejected,
+    staged:staged.length,
+    totalStaged:staged.length
+  };
+}
+
+function approveStaged(ids){
+  const wanted=new Set(
+    Array.isArray(ids)?ids.map(String):[]
+  );
+
+  const staged=readArr(STAGING_KEY);
+  const current=readArr(AI_KEY);
+
+  const approved=[];
+  const remaining=[];
+
+  staged.forEach(q=>{
+    if(wanted.size===0 || wanted.has(String(q.id))){
+      const cleanQ={
+        ...q,
+        status:"APPROVED",
+        validationStatus:"PASSED",
+        approvalStatus:"APPROVED",
+        approvedAt:new Date().toISOString(),
+        source:"AI Question Bank"
+      };
+
+      approved.push(cleanQ);
+    }else{
+      remaining.push(q);
+    }
+  });
+
+  const existingIds=new Set(
+    current.map(x=>String(x?.id||""))
+  );
+
+  const fresh=approved.filter(
+    q=>!existingIds.has(String(q.id))
+  );
+
+  saveStage(remaining);
+  saveApproval(
+    readArr(APPROVAL_KEY).concat(fresh)
+  );
+  save(
+    AI_KEY,
+    current.concat(fresh)
+  );
+
+  return {
+    approved:fresh.length,
+    remaining:remaining.length,
+    total:current.length+fresh.length
+  };
+}
+
+function approveAllStaged(){
+  return approveStaged([]);
+}
+
+function getStaged(){
+  return readArr(STAGING_KEY);
+}
+
+function getApproved(){
+  return readArr(AI_KEY);
+}
+
+function importAndValidate(input){
+  /*
+   * IMPORTANT:
+   * Validation NEVER directly approves questions.
+   * They enter staging first.
+   */
+  return validateIncoming(input);
+}
+
+global.RankForgeAINewQuestionModuleV1={
+  importAndValidate,
+  validateIncoming,
+  approveStaged,
+  approveAllStaged,
+  getStaged,
+  getApproved,
+  getBank:()=>arr(read(AI_KEY)),
+  getHistory:()=>arr(read(HISTORY_KEY))
+};
 
 global.RankForgeAINewQuestionModuleV1={
  importAndValidate,
