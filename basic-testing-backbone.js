@@ -1,3 +1,4 @@
+/* Dashboard presentation is centralized in index.html / RankForge Top Hub. */
 (function(){
 "use strict";
 
