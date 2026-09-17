@@ -520,3 +520,44 @@
   }
 
 })();
+
+
+/* RANKFORGE_NICHOD_E2E_UI_HIDDEN_V1
+ * E2E diagnostics remain available to the engine,
+ * but raw PASS/FAIL diagnostics are never shown to students.
+ */
+(function(){
+  "use strict";
+
+  function hideNichodE2EUI(){
+    const nodes = Array.from(document.querySelectorAll("body *"));
+
+    nodes.forEach(function(el){
+      const t = (el.textContent || "").trim();
+
+      if(
+        t.includes("PCB NICHOD E2E Test") ||
+        t.includes("Status: ATTENTION") ||
+        (
+          t.includes("NICHOD Unified") &&
+          t.includes("NICHOD Health") &&
+          t.includes("PASS:")
+        )
+      ){
+        el.style.display = "none";
+        el.setAttribute("aria-hidden","true");
+        el.setAttribute("data-rankforge-internal","nichod-e2e");
+      }
+    });
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", hideNichodE2EUI, {once:true});
+  }else{
+    hideNichodE2EUI();
+  }
+
+  window.addEventListener("load", function(){
+    setTimeout(hideNichodE2EUI, 100);
+  }, {once:true});
+})();
