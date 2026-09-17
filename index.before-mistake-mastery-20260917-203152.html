@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="./manifest.json">
+<title>RankForge AI</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#f6f7fb;color:#111827;
+ font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+button,a{font:inherit}
+a{text-decoration:none;color:inherit}
+.app{max-width:760px;margin:auto;padding:16px 14px 90px}
+
+.top{display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;gap:10px;align-items:center}
+.logo{
+ width:42px;height:42px;border-radius:13px;background:#111827;
+ color:white;display:grid;place-items:center;font-weight:900
+}
+.brand h1{font-size:19px;margin:0}
+.brand p{font-size:11px;color:#6b7280;margin:2px 0}
+.mentor{
+ background:white;border:1px solid #e5e7eb;padding:9px 11px;
+ border-radius:12px;font-size:11px;font-weight:800
+}
+
+.page{display:none}
+.page.active{display:block}
+
+.hero{
+ margin-top:16px;background:#111827;color:white;
+ border-radius:22px;padding:21px
+}
+.hero small{color:#9ca3af;font-size:10px;font-weight:800}
+.hero h2{font-size:25px;line-height:1.12;margin:7px 0}
+.hero p{color:#d1d5db;font-size:12px;line-height:1.5}
+.btn{
+ display:inline-block;border:0;border-radius:12px;
+ padding:12px 14px;font-weight:800;font-size:12px;
+ background:#111827;color:white
+}
+.hero .btn{background:white;color:#111827;margin-top:8px}
+
+.section{margin-top:20px}
+.section h3{font-size:16px;margin:0 0 10px}
+
+.grid{
+ display:grid;grid-template-columns:1fr 1fr;gap:9px
+}
+.card{
+ display:block;background:white;border:1px solid #e5e7eb;
+ border-radius:16px;padding:15px;min-height:105px
+}
+.card:active{transform:scale(.985)}
+.icon{font-size:21px;margin-bottom:8px}
+.card strong{font-size:13px}
+.card span{
+ display:block;color:#6b7280;font-size:10.5px;
+ line-height:1.4;margin-top:4px
+}
+
+.stats{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:8px
+}
+.stat{
+ background:white;border:1px solid #e5e7eb;
+ border-radius:14px;padding:12px
+}
+.stat b{font-size:19px}
+.stat small{display:block;color:#6b7280}
+
+.list{display:grid;gap:8px}
+.row{
+ display:block;background:white;border:1px solid #e5e7eb;
+ border-radius:14px;padding:13px
+}
+.row b{font-size:12px}
+.row span{
+ display:block;color:#6b7280;font-size:10px;margin-top:3px
+}
+
+.nav{
+ position:fixed;bottom:0;left:0;right:0;background:white;
+ border-top:1px solid #e5e7eb;display:grid;
+ grid-template-columns:repeat(5,1fr);z-index:10
+}
+.nav button{
+ background:none;padding:9px 2px;color:#6b7280;font-size:9px
+}
+.nav button b{
+ display:block;color:#111827;font-size:16px
+}
+
+.practice{
+ margin-top:14px;background:white;border:1px solid #e5e7eb;
+ border-radius:16px;padding:15px
+}
+.option{
+ width:100%;text-align:left;background:#f8fafc;
+ border:1px solid #e5e7eb;border-radius:11px;
+ padding:11px;margin-top:7px;font-size:11px
+}
+.option.ok{background:#eef2ff;border-color:#111827}
+.option.no{background:#f3f4f6}
+
+.note{
+ text-align:center;color:#9ca3af;font-size:9px;margin-top:22px
+}
+
+@media(max-width:420px){
+ .hero h2{font-size:22px}
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+<header class="top">
+ <div class="brand">
+  <div class="logo">R</div>
+  <div>
+   <h1>RankForge AI</h1>
+   <p>Topper-first NEET learning system</p>
+  </div>
+ </div>
+
+ <a class="mentor" href="ranker-command-center.html">
+  AI Mentor
+ </a>
+</header>
+
+
+<!-- HOME -->
+<section id="home" class="page active">
+
+ <div class="hero">
+  <small>TODAY'S #1 ACTION</small>
+
+  <h2>Turn mistakes into mastery.</h2>
+
+  <p>
+   Learn → Practise → Test → Analyse → Fix → Retest → Improve
+  </p>
+
+  <button class="btn" data-go="tests">
+   Start Today's Test
+  </button>
+ </div>
+
+
+ <div class="section">
+  <h3>Quick Progress</h3>
+
+  <div class="stats">
+
+   <div class="stat">
+    <b id="tests">0</b>
+    <small>Tests</small>
+   </div>
+
+   <div class="stat">
+    <b id="last">—</b>
+    <small>Last score</small>
+   </div>
+
+   <div class="stat">
+    <b id="practiceCount">0</b>
+    <small>Practice</small>
+   </div>
+
+  </div>
+ </div>
+
+
+ <div class="section">
+  <h3>Core Intelligence</h3>
+
+  <div class="grid">
+
+   <a class="card" href="nichod-hub.html">
+    <div class="icon">🧠</div>
+    <strong>NICHOD Hub</strong>
+    <span>
+     Pattern, concept, mistake and mastery intelligence.
+    </span>
+   </a>
+
+   <a class="card" href="mistake.html">
+    <div class="icon">🔧</div>
+    <strong>Mistake Book</strong>
+    <span>
+     Fix → Retest → Master.
+    </span>
+   </a>
+
+  </div>
+ </div>
+
+</section>
+
+
+<!-- LEARN -->
+<section id="learn" class="page">
+
+ <div class="hero">
+  <small>LEARN</small>
+  <h2>Build the base.</h2>
+  <p>NCERT-first learning and smart revision.</p>
+ </div>
+
+ <div class="section">
+
+  <div class="grid">
+
+   <a class="card" href="ranker-revision/index.html">
+    <div class="icon">📚</div>
+    <strong>Smart Revision</strong>
+    <span>Focused revision workflow.</span>
+   </a>
+
+   <a class="card" href="question-bank.html">
+    <div class="icon">🧠</div>
+    <strong>Rank Booster Bank</strong>
+    <span>High-value NEET practice.</span>
+   </a>
+
+  </div>
+
+ </div>
+
+</section>
+
+
+<!-- PRACTICE -->
+<section id="practice" class="page">
+
+ <div class="hero">
+  <small>PRACTICE</small>
+  <h2>Train weak areas.</h2>
+  <p>
+   Adaptive practice, mistakes and focused questions.
+  </p>
+
+  <button class="btn" id="quick">
+   Quick Practice
+  </button>
+ </div>
+
+ <div id="practiceBox"></div>
+
+ <div class="section">
+
+  <div class="list">
+
+   <a class="row" href="ranker-command-center.html">
+    <b>🎯 Adaptive DPP</b>
+    <span>Performance-based practice.</span>
+   </a>
+
+   <a class="row" href="ai-question-lab.html">
+    <b>✨ AI Practice</b>
+    <span>AI question generation.</span>
+   </a>
+
+   <a class="row" href="analysis.html">
+    <b>📊 Analysis</b>
+    <span>Accuracy, speed and weak areas.</span>
+   </a>
+
+  </div>
+
+ </div>
+
+</section>
+
+
+<!-- TESTS -->
+<section id="tests" class="page">
+
+ <div class="hero">
+  <small>TESTS</small>
+  <h2>Test like the exam.</h2>
+  <p>
+   Your existing production test engines remain connected.
+  </p>
+ </div>
+
+ <div class="section">
+
+  <div class="grid">
+
+   <a class="card" href="rankers-test-series.html">
+    <div class="icon">🏆</div>
+    <strong>Ranker Test Series</strong>
+    <span>Full test workflow.</span>
+   </a>
+
+   <a class="card" href="rankers-test-series.html">
+    <div class="icon">🔥</div>
+    <strong>Topper Test 180</strong>
+    <span>Protected 180-question system.</span>
+   </a>
+
+   <a class="card" href="pdf-to-cbt.html">
+    <div class="icon">📄</div>
+    <strong>PDF → CBT</strong>
+    <span>Import your own PDF.</span>
+   </a>
+
+   <a class="card" href="cbt.html">
+    <div class="icon">⏱️</div>
+    <strong>CBT</strong>
+    <span>Computer-based testing.</span>
+   </a>
+
+  </div>
+
+ </div>
+
+</section>
+
+
+<!-- PROGRESS -->
+<section id="progress" class="page">
+
+ <div class="hero">
+  <small>PROGRESS</small>
+  <h2>Your improvement loop.</h2>
+  <p>
+   History, analysis, mistakes and retests stay connected.
+  </p>
+ </div>
+
+ <div class="section">
+
+  <div class="list">
+
+   <a class="row" href="history.html">
+    <b>🕘 Test History</b>
+    <span>Review previous attempts.</span>
+   </a>
+
+   <a class="row" href="analysis.html">
+    <b>📈 Performance</b>
+    <span>Accuracy, speed and gaps.</span>
+   </a>
+
+   <a class="row" href="mistake.html">
+    <b>🔧 Mastery</b>
+    <span>Mistakes and retries.</span>
+   </a>
+
+  </div>
+
+ </div>
+
+</section>
+
+<p class="note">
+ RankForge AI • Student-first • Local/offline-first
+</p>
+
+</main>
+
+
+<!-- BOTTOM NAV -->
+
+<nav class="nav">
+
+ <button data-go="home">
+  <b>⌂</b>Home
+ </button>
+
+ <button data-go="learn">
+  <b>◫</b>Learn
+ </button>
+
+ <button data-go="practice">
+  <b>◇</b>Practice
+ </button>
+
+ <button data-go="tests">
+  <b>△</b>Tests
+ </button>
+
+ <button data-go="progress">
+  <b>◉</b>Progress
+ </button>
+
+</nav>
+
+
+<script>
+(function(){
+
+"use strict";
+
+const STATE_KEY="rankforgeBasicStateV1";
+
+let state={
+ tests:0,
+ last:null,
+ practice:0
+};
+
+try{
+
+ const saved=JSON.parse(
+  localStorage.getItem(STATE_KEY)||"{}"
+ );
+
+ if(saved && typeof saved==="object"){
+  state={...state,...saved};
+ }
+
+}catch(e){}
+
+
+const questions=[
+
+ {
+  q:"Which organelle is the major site of aerobic ATP production?",
+  o:[
+   "Ribosome",
+   "Mitochondrion",
+   "Golgi body",
+   "Lysosome"
+  ],
+  a:1
+ },
+
+ {
+  q:"The SI unit of electric charge is:",
+  o:[
+   "Volt",
+   "Coulomb",
+   "Ohm",
+   "Tesla"
+  ],
+  a:1
+ },
+
+ {
+  q:"A neutral aqueous solution at 25°C has pH approximately:",
+  o:[
+   "0",
+   "5",
+   "7",
+   "14"
+  ],
+  a:2
+ },
+
+ {
+  q:"If velocity changes from 10 to 20 m/s in 5 s, acceleration is:",
+  o:[
+   "1 m/s²",
+   "2 m/s²",
+   "4 m/s²",
+   "6 m/s²"
+  ],
+  a:1
+ }
+
+];
+
+
+function save(){
+
+ localStorage.setItem(
+  STATE_KEY,
+  JSON.stringify(state)
+ );
+
+ render();
+
+}
+
+
+function render(){
+
+ document.getElementById("tests").textContent=
+  state.tests;
+
+ document.getElementById("last").textContent=
+  state.last==null ? "—" : state.last+"%";
+
+ document.getElementById("practiceCount").textContent=
+  state.practice;
+
+}
+
+
+function go(id){
+
+ document.querySelectorAll(".page")
+ .forEach(page=>{
+  page.classList.toggle(
+   "active",
+   page.id===id
+  );
+ });
+
+ window.scrollTo({
+  top:0,
+  behavior:"smooth"
+ });
+
+}
+
+
+document
+ .querySelectorAll("[data-go]")
+ .forEach(button=>{
+
+  button.addEventListener(
+   "click",
+   ()=>go(button.dataset.go)
+  );
+
+ });
+
+
+document
+ .getElementById("quick")
+ .addEventListener("click",function(){
+
+  const q=
+   questions[
+    Math.floor(
+     Math.random()*questions.length
+    )
+   ];
+
+  const box=
+   document.getElementById("practiceBox");
+
+  box.innerHTML=
+   '<div class="practice">'+
+   '<b>'+q.q+'</b>'+
+   q.o.map((option,index)=>
+    '<button class="option" data-i="'+index+'">'+
+    String.fromCharCode(65+index)+
+    ". "+
+    option+
+    '</button>'
+   ).join("")+
+   '</div>';
+
+
+  box
+   .querySelectorAll(".option")
+   .forEach(button=>{
+
+    button.addEventListener(
+     "click",
+     function(){
+
+      const chosen=
+       Number(this.dataset.i);
+
+      const options=
+       box.querySelectorAll(".option");
+
+      options.forEach(
+       option=>option.disabled=true
+      );
+
+      this.classList.add(
+       chosen===q.a ? "ok" : "no"
+      );
+
+      if(chosen!==q.a){
+       options[q.a].classList.add("ok");
+      }
+
+      state.practice++;
+
+      save();
+
+     }
+    );
+
+   });
+
+ });
+
+
+render();
+
+
+if("serviceWorker" in navigator){
+
+ window.addEventListener(
+  "load",
+  function(){
+
+   navigator.serviceWorker
+    .register("./sw.js")
+    .catch(()=>{});
+
+  }
+ );
+
+}
+
+})();
+</script>
+
+</body>
+</html>
