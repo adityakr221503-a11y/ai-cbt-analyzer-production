@@ -8255,6 +8255,132 @@ if(document.readyState==="loading"){
 })();
 </script>
 <!-- /RANKFORGE_REAL_INTEGRATION_V1 -->
+
+<!-- RANKFORGE_CBT_RESET_V2 -->
+<script>
+(function () {
+  "use strict";
+
+  /*
+    IMPORTANT:
+    This reset clears the old Test-180/current CBT state.
+    It deliberately PRESERVES:
+      - pdfCbtQuestions
+      - cbtHistory
+      - rankBoosterAttemptHistory
+      - cbtMasteryV2
+      - rankforgeMistakes
+      - bookmarks
+    */
+
+  const OLD_TEST_KEYS = [
+    "CBT_ACTIVE_TEST",
+    "CBT_ACTIVE_TEST_ID",
+    "activeTest",
+    "activeCBTTest",
+    "currentTest",
+    "currentTestId",
+    "test180",
+    "test180Questions",
+    "test180-questions",
+    "test180QuestionsLoaded",
+    "test180Loaded",
+    "pdfQuestions",
+    "questionBank",
+    "importedQuestions"
+  ];
+
+  function clearOldTestState() {
+    for (const key of OLD_TEST_KEYS) {
+      try {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+      } catch (_) {}
+    }
+
+    /*
+      Clear only obvious Test-180 state from RankForge active
+      objects, without touching PDF pool/history/mastery.
+    */
+    const activeKeys = [
+      "CBT_ACTIVE_TEST",
+      "CBT_ACTIVE_TEST_ID"
+    ];
+
+    for (const key of activeKeys) {
+      try {
+        localStorage.removeItem(key);
+      } catch (_) {}
+    }
+
+    try {
+      sessionStorage.removeItem("CBT_ACTIVE_TEST");
+      sessionStorage.removeItem("CBT_ACTIVE_TEST_ID");
+    } catch (_) {}
+
+    location.reload();
+  }
+
+  function looksLikeReset(el) {
+    if (!el) return false;
+
+    const text = (
+      el.innerText ||
+      el.textContent ||
+      el.value ||
+      el.getAttribute("aria-label") ||
+      ""
+    ).trim().toLowerCase();
+
+    const id = (
+      el.id ||
+      el.getAttribute("name") ||
+      ""
+    ).toLowerCase();
+
+    return (
+      /^(reset|reset test|reset cbt|start over|clear test|new test)$/.test(text) ||
+      /reset/.test(id)
+    );
+  }
+
+  document.addEventListener(
+    "click",
+    function (e) {
+      let target = e.target;
+
+      if (
+        target &&
+        target.nodeType === Node.TEXT_NODE
+      ) {
+        target = target.parentElement;
+      }
+
+      const button =
+        target && target.closest
+          ? target.closest("button,input,[role='button']")
+          : null;
+
+      if (!button || !looksLikeReset(button)) {
+        return;
+      }
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      clearOldTestState();
+    },
+    true
+  );
+
+  window.RankForgeCBTResetV2 = {
+    reset: clearOldTestState
+  };
+
+})();
+</script>
+<!-- /RANKFORGE_CBT_RESET_V2 -->
+
 </body>
 
 </html>
