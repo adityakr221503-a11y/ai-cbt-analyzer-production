@@ -17,9 +17,7 @@ const ACTIVE_KEY = "CBT_ACTIVE_TEST";
 const ACTIVE_ID = "CBT_ACTIVE_TEST_ID";
 const ACTIVE_SOURCE = "CBT_ACTIVE_TEST_SOURCE";
 
-const ATTEMPT_KEY = "cbtTestSessions";
 const RETRY_KEY = "cbtRetryQuestion";
-const MASTERY_KEY = "cbtMasteryV2";
 
 function read(key, fallback){
   try{
@@ -363,17 +361,21 @@ function recordResult(result){
 
 function getLastAIResult(){
   const history =
-    array(read(HISTORY_KEY,[]));
+    array(read("cbtHistory",[]));
 
   return history.find(
-    x => x?.sourceType === "AI_GENERATED"
+    x =>
+      x?.sourceType === "AI_GENERATED" ||
+      x?.source === "RankForge Approved AI Bank"
   ) || null;
 }
 
 function getAIMistakes(){
-  return array(read(MISTAKE_KEY,[]))
+  return array(read("rankBoosterAttemptHistory",[]))
     .filter(
-      x => x?.sourceType === "AI_GENERATED"
+      x =>
+        x?.sourceType === "AI_GENERATED" ||
+        x?.source === "RankForge Approved AI Bank"
     );
 }
 
