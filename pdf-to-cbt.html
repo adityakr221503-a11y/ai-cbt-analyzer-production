@@ -10,6 +10,7 @@
       "./vendor/pdf.worker.min.js";
   }
 </script>
+<script src="./pdf-cbt-production-engine-v8.js"></script>
 <script>
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -4813,6 +4814,112 @@ window.RankForgePDFAuthorityV3={
 })();
 </script>
 <!-- /RANKFORGE_PDF_AUTHORITY_V3 -->
+
+
+<script>
+/* ============================================================
+   RANKFORGE PDF AUTHORITY V4
+   - Production v8 is the only active PDF converter
+   - current selected file always wins
+   - legacy converter handlers are bypassed
+============================================================ */
+(function(){
+  "use strict";
+
+  function install(){
+    var input = document.getElementById("pdfInput");
+    var button = document.getElementById("convertButton");
+
+    if(!input || !button){
+      console.warn("[RF PDF V4] controls not found");
+      return;
+    }
+
+    if(!window.PDFCBTProductionV8){
+      console.error("[RF PDF V4] Production v8 engine missing");
+      return;
+    }
+
+    /* Remove legacy listeners by replacing controls once. */
+    if(!input.dataset.rfV4){
+      var ni=input.cloneNode(true);
+      ni.dataset.rfV4="1";
+      ni.disabled=false;
+      ni.removeAttribute("disabled");
+      input.replaceWith(ni);
+      input=ni;
+    }
+
+    if(!button.dataset.rfV4){
+      var nb=button.cloneNode(true);
+      nb.dataset.rfV4="1";
+      nb.disabled=true;
+      button.replaceWith(nb);
+      button=nb;
+    }
+
+    input.addEventListener("change",function(){
+      var f=input.files && input.files[0];
+
+      if(!f){
+        button.disabled=true;
+        var st=document.getElementById("status");
+        if(st) st.textContent="Select a PDF first.";
+        return;
+      }
+
+      button.disabled=false;
+      sessionStorage.setItem(
+        "CBT_ACTIVE_SOURCE",
+        "PDF"
+      );
+      sessionStorage.removeItem(
+        "CBT_RESET_BLOCK_TEST180"
+      );
+
+      var st=document.getElementById("status");
+      if(st) st.textContent="📄 Selected: "+f.name;
+    },true);
+
+    button.addEventListener("click",async function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      var f=input.files && input.files[0];
+
+      if(!f){
+        var st=document.getElementById("status");
+        if(st) st.textContent="Select a PDF first.";
+        return;
+      }
+
+      button.disabled=true;
+
+      try{
+        await window.PDFCBTProductionV8.convert(f);
+      }catch(err){
+        console.error("[RF PDF V4]",err);
+        var st=document.getElementById("status");
+        if(st){
+          st.textContent=
+            "❌ PDF conversion failed\n\n"+
+            (err && err.message ? err.message : String(err));
+        }
+      }finally{
+        button.disabled=false;
+      }
+    },true);
+
+    console.log("[RF PDF V4] Production v8 authority installed");
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",install,{once:true});
+  }else{
+    install();
+  }
+})();
+</script>
 
 </body>
 </html>

@@ -2,6 +2,157 @@
 <html lang="en">
 
 <head>
+
+<script>
+/* ============================================================
+   RANKFORGE CBT SOURCE GATE V4
+   PDF session has absolute priority over Test 180 fallback.
+   Reset clears active test and blocks automatic Test 180
+   rehydration for the next boot.
+============================================================ */
+(function(){
+  "use strict";
+
+  var PDF_KEYS = [
+    "CBT_ACTIVE_QUESTIONS",
+    "CBT_ACTIVE_TEST",
+    "CBT_ACTIVE_SOURCE",
+    "CBT_ACTIVE_TEST_ID"
+  ];
+
+  function hasPDFSession(){
+    try{
+      var source =
+        sessionStorage.getItem("CBT_ACTIVE_SOURCE") || "";
+
+      var qs =
+        sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+
+      return (
+        source.toUpperCase() === "PDF" &&
+        qs &&
+        Array.isArray(JSON.parse(qs)) &&
+        JSON.parse(qs).length > 0
+      );
+    }catch(e){
+      return false;
+    }
+  }
+
+  function blockTest180(){
+    sessionStorage.setItem(
+      "CBT_RESET_BLOCK_TEST180",
+      "1"
+    );
+  }
+
+  function clearActiveOnly(){
+    PDF_KEYS.forEach(function(k){
+      sessionStorage.removeItem(k);
+    });
+
+    sessionStorage.removeItem("CBT_ACTIVE_ANSWERS");
+    sessionStorage.removeItem("CBT_ACTIVE_SELECTED");
+    sessionStorage.removeItem("CBT_ACTIVE_CURRENT_INDEX");
+
+    sessionStorage.setItem(
+      "CBT_RESET_BLOCK_TEST180",
+      "1"
+    );
+
+    /* Never delete the actual Test 180 question bank. */
+  }
+
+  /* Run immediately — before normal CBT boot logic. */
+  if(hasPDFSession()){
+    window.__RF_PDF_SOURCE_LOCK__ = true;
+
+    try{
+      window.CBT_PDF_MODE = true;
+
+      var q =
+        JSON.parse(
+          sessionStorage.getItem("CBT_ACTIVE_QUESTIONS")
+        );
+
+      window.CBT_PDF_QUESTIONS = q;
+      window.CBT_ACTIVE_QUESTIONS = q;
+
+      console.log(
+        "[RF CBT V4] PDF SOURCE LOCK:",
+        q.length,
+        "questions"
+      );
+    }catch(e){
+      console.warn("[RF CBT V4] PDF session parse failed",e);
+    }
+  }
+
+  window.addEventListener("load",function(){
+
+    /* Re-assert PDF source after all scripts have booted. */
+    if(hasPDFSession()){
+      try{
+        var q=JSON.parse(
+          sessionStorage.getItem("CBT_ACTIVE_QUESTIONS")
+        );
+
+        window.CBT_PDF_MODE=true;
+        window.CBT_PDF_QUESTIONS=q;
+        window.CBT_ACTIVE_QUESTIONS=q;
+
+        var status=document.getElementById("bankStatus");
+        if(status){
+          status.textContent =
+            "✅ PDF imported successfully — "+
+            q.length+" questions ready.";
+        }
+
+        console.log(
+          "[RF CBT V4] PDF reasserted after boot:",
+          q.length
+        );
+      }catch(e){}
+    }
+
+    /* Reset buttons: clear active runtime only. */
+    document.querySelectorAll(
+      'button,[role="button"],a'
+    ).forEach(function(el){
+
+      var txt=(el.textContent||"").trim().toLowerCase();
+
+      if(
+        txt==="reset" ||
+        txt.includes("reset test") ||
+        txt.includes("reset cbt")
+      ){
+        if(!el.dataset.rfResetV4){
+          el.dataset.rfResetV4="1";
+
+          el.addEventListener("click",function(){
+            clearActiveOnly();
+
+            console.log(
+              "[RF CBT V4] Active test reset; Test 180 auto-rehydrate blocked"
+            );
+
+            setTimeout(function(){
+              location.reload();
+            },0);
+          },true);
+        }
+      }
+    });
+  });
+
+  /* Public helper for any existing reset code. */
+  window.RFResetCBTSessionV4=clearActiveOnly;
+
+})();
+</script>
+
+
 <script>
 
 /* IMAGE_DATA_QUESTION_SUPPORT_V1
