@@ -6711,7 +6711,8 @@ window.addEventListener("load", function () {
 })();
 </script>
 <script src="./practice-experience-v1.js"></script>
-  <script src="./rankforge-result-mistake-engine-v1.js"></script>\n<script src="./rankforge-result-metadata-bridge-v2.js"></script>
+  <script src="./rankforge-result-mistake-engine-v1.js"></script>
+<script src="./rankforge-result-metadata-bridge-v2.js"></script>
   <script src="./rankforge-dpp-intelligence-v1.js"></script>
   <script src="./rankforge-mentor-decision-v1.js"></script>
 
@@ -7372,6 +7373,78 @@ if(document.readyState==="loading"){
 })();
 </script>
 <!-- /RANKFORGE_CBT_MISTAKE_AUTOCAPTURE_V2 -->
+
+
+<!-- RANKFORGE_ZERO_HISTORY_GUARD_V1 -->
+<script>
+(function(){
+  "use strict";
+
+  function validQuestionCount(record){
+    if (!record || typeof record !== "object") return 0;
+
+    if (Array.isArray(record.questions)) return record.questions.length;
+
+    const n = Number(
+      record.questionCount ??
+      record.totalQuestions ??
+      record.total ??
+      0
+    );
+
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  }
+
+  function cleanHistory(){
+    try{
+      const raw = localStorage.getItem("cbtHistory");
+      if(!raw) return;
+
+      const data = JSON.parse(raw);
+      if(!Array.isArray(data)) return;
+
+      const cleaned = data.filter(function(record){
+        return validQuestionCount(record) > 0;
+      });
+
+      if(cleaned.length !== data.length){
+        localStorage.setItem("cbtHistory", JSON.stringify(cleaned));
+      }
+    }catch(e){}
+  }
+
+  function patchHistorySetter(){
+    try{
+      const original = localStorage.setItem.bind(localStorage);
+
+      localStorage.setItem = function(key,value){
+        if(key === "cbtHistory"){
+          try{
+            const parsed = JSON.parse(value);
+
+            if(Array.isArray(parsed)){
+              parsed = parsed.filter(function(record){
+                return validQuestionCount(record) > 0;
+              });
+              value = JSON.stringify(parsed);
+            }
+          }catch(e){}
+        }
+
+        return original(key,value);
+      };
+    }catch(e){}
+  }
+
+  cleanHistory();
+
+  window.RankForgeZeroHistoryGuard = {
+    clean: cleanHistory,
+    questionCount: validQuestionCount
+  };
+})();
+</script>
+<!-- /RANKFORGE_ZERO_HISTORY_GUARD_V1 -->
 
 </body>
 

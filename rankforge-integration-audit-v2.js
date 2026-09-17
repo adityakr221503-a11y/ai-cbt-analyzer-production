@@ -203,6 +203,8 @@ function run(){
 }
 
 function render(){
+  /* Developer diagnostic only; never inject audit JSON into the student UI. */
+  return report;
   let box=document.getElementById("rankforge-integration-audit-v2");
 
   if(!box){
@@ -235,6 +237,6 @@ global.RankForgeIntegrationAuditV2={
   render:render
 };
 
-setTimeout(render,1800);
+/* Student UI: automatic integration-audit rendering disabled. Engine remains available via RankForgeIntegrationAuditV2. */
 
 })(window);
