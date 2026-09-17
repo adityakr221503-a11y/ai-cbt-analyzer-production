@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>RankForge AI</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#f7f8fc;color:#111827;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{min-height:100vh}
+button,a{font:inherit}
+a{text-decoration:none;color:inherit}
+.rf-app{width:100%;max-width:760px;margin:auto;padding:18px 16px 92px}
+.rf-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.rf-brand{display:flex;align-items:center;gap:11px}
+.rf-logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#111827;color:white;font-weight:800;font-size:19px}
+.rf-brand h1{font-size:20px;margin:0;letter-spacing:-.4px}
+.rf-brand p{margin:2px 0 0;color:#6b7280;font-size:12px}
+.rf-mentor{border:1px solid #e5e7eb;background:white;border-radius:12px;padding:9px 12px;font-weight:700;font-size:12px}
+.rf-hero{background:#111827;color:white;border-radius:22px;padding:22px;margin-bottom:16px}
+.rf-hero small{opacity:.7;font-weight:700}
+.rf-hero h2{font-size:25px;line-height:1.12;margin:8px 0}
+.rf-hero p{margin:0;color:#d1d5db;font-size:13px;line-height:1.5}
+.rf-action{display:block;margin-top:17px;background:white;color:#111827;text-align:center;padding:13px;border-radius:13px;font-weight:800}
+.rf-section{margin:22px 0}
+.rf-section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.rf-section-title h3{font-size:16px;margin:0}
+.rf-section-title span{font-size:11px;color:#6b7280}
+.rf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.rf-card{background:white;border:1px solid #e5e7eb;border-radius:16px;padding:16px;min-height:112px;transition:.15s}
+.rf-card:active{transform:scale(.98)}
+.rf-icon{font-size:22px;margin-bottom:10px}
+.rf-card strong{display:block;font-size:14px}
+.rf-card span{display:block;margin-top:5px;font-size:11px;line-height:1.4;color:#6b7280}
+.rf-progress{background:white;border:1px solid #e5e7eb;border-radius:16px;padding:16px}
+.rf-progress-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:9px}
+.rf-bar{height:7px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.rf-bar i{display:block;height:100%;width:0;background:#111827;border-radius:99px}
+.rf-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);border-top:1px solid #e5e7eb;padding:8px max(10px,calc((100vw - 760px)/2 + 10px));display:grid;grid-template-columns:repeat(5,1fr);z-index:20}
+.rf-nav a{text-align:center;font-size:10px;color:#6b7280;padding:6px 2px}
+.rf-nav b{display:block;font-size:17px;margin-bottom:2px;color:#111827}
+.rf-note{font-size:10px;color:#9ca3af;text-align:center;margin-top:22px}
+@media(max-width:420px){
+ .rf-grid{grid-template-columns:1fr 1fr}
+ .rf-hero h2{font-size:22px}
+ .rf-app{padding-left:13px;padding-right:13px}
+}
+</style>
+</head>
+
+<body>
+<main class="rf-app">
+
+<header class="rf-header">
+  <div class="rf-brand">
+    <div class="rf-logo">R</div>
+    <div>
+      <h1>RankForge AI</h1>
+      <p>Topper-first NEET learning system</p>
+    </div>
+  </div>
+  <a class="rf-mentor" href="ranker-command-center.html">AI Mentor</a>
+</header>
+
+<section class="rf-hero">
+  <small>TODAY'S #1 ACTION</small>
+  <h2>Turn mistakes into mastery.</h2>
+  <p>Learn → Practise → Test → Analyse → Fix → Retest → Improve</p>
+  <a class="rf-action" href="rankers-test-series.html">Continue to Tests →</a>
+</section>
+
+<section class="rf-section">
+  <div class="rf-section-title">
+    <h3>Learn</h3>
+    <span>Build the base</span>
+  </div>
+  <div class="rf-grid">
+    <a class="rf-card" href="ranker-revision/index.html">
+      <div class="rf-icon">📚</div>
+      <strong>Smart Revision</strong>
+      <span>Revision and exam-focused learning.</span>
+    </a>
+    <a class="rf-card" href="question-bank.html">
+      <div class="rf-icon">🧠</div>
+      <strong>Question Bank</strong>
+      <span>NCERT-first Rank Booster practice.</span>
+    </a>
+  </div>
+</section>
+
+<section class="rf-section">
+  <div class="rf-section-title">
+    <h3>Practice</h3>
+    <span>Improve weak areas</span>
+  </div>
+  <div class="rf-grid">
+    <a class="rf-card" href="ranker-command-center.html">
+      <div class="rf-icon">🎯</div>
+      <strong>Adaptive DPP</strong>
+      <span>Practice based on your performance.</span>
+    </a>
+    <a class="rf-card" href="ranker-command-center.html">
+      <div class="rf-icon">✨</div>
+      <strong>AI Practice</strong>
+      <span>Generate focused practice.</span>
+    </a>
+    <a class="rf-card" href="mistake.html">
+      <div class="rf-icon">🔧</div>
+      <strong>Mistake Book</strong>
+      <span>Find, fix and retest mistakes.</span>
+    </a>
+    <a class="rf-card" href="analysis.html">
+      <div class="rf-icon">📊</div>
+      <strong>Analysis</strong>
+      <span>Understand accuracy, speed and gaps.</span>
+    </a>
+  </div>
+</section>
+
+<section class="rf-section">
+  <div class="rf-section-title">
+    <h3>Tests</h3>
+    <span>Real exam practice</span>
+  </div>
+  <div class="rf-grid">
+    <a class="rf-card" href="rankers-test-series.html">
+      <div class="rf-icon">🏆</div>
+      <strong>Ranker Test Series</strong>
+      <span>Advanced test-series workflow.</span>
+    </a>
+    <a class="rf-card" href="rankers-test-series.html">
+      <div class="rf-icon">🔥</div>
+      <strong>Topper Test 180</strong>
+      <span>Protected 180-question test system.</span>
+    </a>
+    <a class="rf-card" href="pdf-to-cbt.html">
+      <div class="rf-icon">📄</div>
+      <strong>PDF → CBT</strong>
+      <span>Import your own question PDFs.</span>
+    </a>
+    <a class="rf-card" href="cbt.html">
+      <div class="rf-icon">⏱️</div>
+      <strong>CBT</strong>
+      <span>Take a full computer-based test.</span>
+    </a>
+  </div>
+</section>
+
+
+<section class="rf-section">
+  <div class="rf-section-title">
+    <h3>Intelligence</h3>
+    <span>Powered by NICHOD</span>
+  </div>
+  <a class="rf-card" href="nichod-hub.html" style="display:block;min-height:auto">
+    <div class="rf-icon">🧠</div>
+    <strong>NICHOD Intelligence Hub</strong>
+    <span>Patterns, novelty, concept drift, mistakes, mastery and adaptive next actions.</span>
+  </a>
+</section>
+
+<section class="rf-section">
+  <div class="rf-section-title">
+    <h3>Progress</h3>
+    <span>Keep improving</span>
+  </div>
+  <div class="rf-progress">
+    <div class="rf-progress-row">
+      <strong>Test History</strong>
+      <span id="rfHistoryCount">0 tests</span>
+    </div>
+    <div class="rf-bar"><i id="rfBar"></i></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px">
+      <a class="rf-card" style="min-height:auto;padding:12px" href="history.html">
+        <strong>History</strong>
+        <span>Past tests</span>
+      </a>
+      <a class="rf-card" style="min-height:auto;padding:12px" href="mistake.html">
+        <strong>Mastery</strong>
+        <span>Mistakes & retests</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<p class="rf-note">RankForge AI • Student-first • Local/offline-first</p>
+
+</main>
+
+<nav class="rf-nav" aria-label="Main navigation">
+  <a href="index.html"><b>⌂</b>Home</a>
+  <a href="ranker-revision/index.html"><b>◫</b>Learn</a>
+  <a href="ranker-command-center.html"><b>◇</b>Practice</a>
+  <a href="rankers-test-series.html"><b>△</b>Tests</a>
+  <a href="history.html"><b>◉</b>Progress</a>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+
+  try {
+    const raw = localStorage.getItem("cbtHistory");
+    let count = 0;
+
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (Array.isArray(data)) count = data.length;
+      else if (data && Array.isArray(data.history)) count = data.history.length;
+    }
+
+    const countEl = document.getElementById("rfHistoryCount");
+    const bar = document.getElementById("rfBar");
+
+    if (countEl) countEl.textContent = count + (count === 1 ? " test" : " tests");
+    if (bar) {
+      const width = Math.min(100, Math.max(0, count * 5));
+      bar.style.width = width + "%";
+    }
+  } catch (e) {
+    console.warn("RankForge home local state read skipped");
+  }
+})();
+</script>
+
+</body>
+</html>

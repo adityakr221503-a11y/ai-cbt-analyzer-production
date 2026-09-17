@@ -1,20 +1,19 @@
 {
-  "name": "AI CBT Analyzer",
-  "short_name": "CBT Analyzer",
+  "name": "RankForge AI",
+  "short_name": "RankForge",
+  "description": "AI-powered topper-first NEET learning, practice, testing and mastery system.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#4f46e5",
-  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "background_color": "#f6f7fb",
+  "theme_color": "#111827",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3407/3407024.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3407/3407024.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "./rankforge-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
