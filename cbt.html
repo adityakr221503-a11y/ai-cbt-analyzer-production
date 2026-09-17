@@ -8381,6 +8381,183 @@ if(document.readyState==="loading"){
 </script>
 <!-- /RANKFORGE_CBT_RESET_V2 -->
 
+
+<!-- RANKFORGE_PDF_CBT_PRIORITY_V3 -->
+<script>
+(function(){
+"use strict";
+
+const ACTIVE="CBT_ACTIVE_QUESTIONS";
+const SOURCE="CBT_ACTIVE_SOURCE";
+const TEST="CBT_ACTIVE_TEST";
+const ID="CBT_ACTIVE_TEST_ID";
+
+function getPDFQuestions(){
+  try{
+    const raw=sessionStorage.getItem(ACTIVE);
+    if(!raw)return [];
+
+    const qs=JSON.parse(raw);
+
+    return Array.isArray(qs)
+      ? qs.filter(q =>
+          q &&
+          Array.isArray(q.options) &&
+          q.options.length>=2 &&
+          String(q.question||q.text||q.questionText||"").trim()
+        )
+      : [];
+  }catch(_){
+    return [];
+  }
+}
+
+function pdfActive(){
+  const qs=getPDFQuestions();
+
+  return (
+    qs.length>0 &&
+    sessionStorage.getItem(SOURCE)==="PDF"
+  );
+}
+
+/*
+ * Prevent the old Test-180 boot path from winning when
+ * a PDF CBT session is active.
+ */
+function guard180(){
+  if(!pdfActive())return;
+
+  window.CBT_PDF_MODE=true;
+  window.CBT_IMPORTED_SOURCE="PDF Import";
+
+  /*
+   * These globals are intentionally changed only for
+   * the active PDF session.
+   */
+  window.CBT_ACTIVE_QUESTIONS=getPDFQuestions();
+
+  console.log(
+    "[RankForge CBT] PDF session priority:",
+    window.CBT_ACTIVE_QUESTIONS.length
+  );
+}
+
+/*
+ * Reset means reset the CURRENT CBT session.
+ * It does not delete:
+ *   - PDF pool
+ *   - history
+ *   - mistakes
+ *   - mastery
+ *   - bookmarks
+ */
+function resetCurrentCBT(){
+  [
+    ACTIVE,
+    SOURCE,
+    TEST,
+    ID,
+    "CBT_ACTIVE_ANSWERS",
+    "CBT_ACTIVE_SELECTED",
+    "CBT_ACTIVE_INDEX",
+    "CBT_ACTIVE_TIMER",
+    "CBT_CURRENT_QUESTION",
+    "CBT_CURRENT_TEST"
+  ].forEach(k=>{
+    try{
+      sessionStorage.removeItem(k);
+    }catch(_){}
+  });
+
+  [
+    "CBT_ACTIVE_TEST",
+    "CBT_ACTIVE_TEST_ID"
+  ].forEach(k=>{
+    try{
+      localStorage.removeItem(k);
+    }catch(_){}
+  });
+
+  try{
+    delete window.CBT_ACTIVE_QUESTIONS;
+    delete window.CBT_CURRENT_QUESTION;
+  }catch(_){}
+
+  location.reload();
+}
+
+function isResetButton(e){
+  const text=(
+    e.innerText||
+    e.textContent||
+    e.value||
+    e.getAttribute("aria-label")||
+    ""
+  ).trim().toLowerCase();
+
+  const id=(
+    e.id||
+    e.getAttribute("name")||
+    ""
+  ).toLowerCase();
+
+  return (
+    /^(reset|reset test|reset cbt|start over|clear test|new test)$/.test(text) ||
+    /(^|[-_])reset($|[-_])/.test(id)
+  );
+}
+
+document.addEventListener(
+  "click",
+  function(ev){
+    let e=ev.target;
+
+    if(e && e.closest){
+      e=e.closest(
+        "button,input,[role='button']"
+      );
+    }
+
+    if(!e || !isResetButton(e))return;
+
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+
+    resetCurrentCBT();
+  },
+  true
+);
+
+/*
+ * Run before/after existing boot code.
+ */
+guard180();
+
+if(document.readyState==="loading"){
+  document.addEventListener(
+    "DOMContentLoaded",
+    guard180,
+    true
+  );
+}else{
+  guard180();
+}
+
+setTimeout(guard180,0);
+setTimeout(guard180,300);
+setTimeout(guard180,1000);
+
+window.RankForgePDFCBTPriorityV3={
+  isPDF:pdfActive,
+  questions:getPDFQuestions,
+  reset:resetCurrentCBT
+};
+
+})();
+</script>
+<!-- /RANKFORGE_PDF_CBT_PRIORITY_V3 -->
+
 </body>
 
 </html>

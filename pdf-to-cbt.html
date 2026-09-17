@@ -4612,399 +4612,207 @@ console.log(
 <!-- RANKFORGE PDF POOL CONVERT HOTFIX END -->
 
 
-<!-- RANKFORGE_PDF_CONVERTER_V2 -->
+
+
+
+<!-- RANKFORGE_PDF_AUTHORITY_V3 -->
 <script>
-(function () {
-  "use strict";
-
-  const POOL_KEY = "pdfCbtQuestions";
-
-  function el(id) {
-    return document.getElementById(id);
-  }
-
-  function getPool() {
-    try {
-      const x = JSON.parse(localStorage.getItem(POOL_KEY) || "[]");
-      return Array.isArray(x) ? x : [];
-    } catch (_) {
-      return [];
-    }
-  }
-
-  function savePool(pool) {
-    localStorage.setItem(POOL_KEY, JSON.stringify(pool));
-  }
-
-  function setStatus(msg) {
-    const x = el("status");
-    if (x) x.textContent = msg;
-    console.log("[PDF CBT]", msg);
-  }
-
-  function cleanText(x) {
-    return String(x || "")
-      .replace(/\u00a0/g, " ")
-      .replace(/\r/g, "")
-      .replace(/[ \t]+/g, " ")
-      .trim();
-  }
-
-  function normalize(q, index) {
-    const options = Array.isArray(q.options)
-      ? q.options.map(cleanText).filter(Boolean).slice(0, 6)
-      : [];
-
-    if (!q.text || options.length < 2) return null;
-
-    let ans = Number.isInteger(q.correctAnswer)
-      ? q.correctAnswer
-      : Number.isInteger(q.correctIndex)
-        ? q.correctIndex
-        : 0;
-
-    if (ans < 0 || ans >= options.length) ans = 0;
-
-    return {
-      id: q.id || ("PDF-" + Date.now() + "-" + index),
-      text: cleanText(q.text),
-      question: cleanText(q.text),
-      options,
-      correctAnswer: ans,
-      correctIndex: ans,
-      subject: q.subject || "",
-      topic: q.topic || "",
-      source: "PDF",
-      createdAt: q.createdAt || Date.now()
-    };
-  }
-
-  function parseMCQ(text) {
-    const lines = text
-      .split("\n")
-      .map(cleanText)
-      .filter(Boolean);
-
-    const out = [];
-    let current = null;
-
-    function flush() {
-      if (!current) return;
-
-      const q = normalize(current, out.length);
-      if (q) out.push(q);
-      current = null;
-    }
-
-    /*
-      Supports common PDF layouts:
-
-      1. Question text
-      (A) option
-      (B) option
-      (C) option
-      (D) option
-
-      and
-
-      1. Question text
-      A. option
-      B. option
-      C. option
-      D. option
-    */
-
-    const qStart =
-      /^(?:Q(?:uestion)?\s*)?(\d{1,3})[\s.)\-:]+(.+)$/i;
-
-    const opt =
-      /^(?:[\(\[]?\s*([A-F])\s*[\)\].:\-])\s*(.+)$/i;
-
-    for (const line of lines) {
-      const qm = line.match(qStart);
-
-      if (qm) {
-        flush();
-        current = {
-          id: "PDF-Q-" + qm[1],
-          text: qm[2],
-          options: []
-        };
-        continue;
-      }
-
-      const om = line.match(opt);
-
-      if (current && om) {
-        current.options.push(om[2]);
-        continue;
-      }
-
-      if (current && current.options.length === 0) {
-        current.text += " " + line;
-      } else if (current && current.options.length > 0) {
-        const last = current.options.length - 1;
-        current.options[last] += " " + line;
-      }
-    }
-
-    flush();
-
-    /*
-      Fallback parser for PDFs where question numbering is split
-      from the question text.
-    */
-    if (out.length === 0) {
-      const chunks = text.split(
-        /(?=(?:^|\n)\s*(?:Q(?:uestion)?\s*)?\d{1,3}[\s.)\-:])/im
-      );
-
-      let n = 0;
-
-      for (const chunk of chunks) {
-        const ls = chunk
-          .split("\n")
-          .map(cleanText)
-          .filter(Boolean);
-
-        if (ls.length < 3) continue;
-
-        const first = ls[0].match(
-          /^(?:Q(?:uestion)?\s*)?\d{1,3}[\s.)\-:]+(.*)$/i
-        );
-
-        let textPart = first ? first[1] : ls[0];
-        const opts = [];
-
-        for (let i = 1; i < ls.length; i++) {
-          const m = ls[i].match(opt);
-          if (m) opts.push(m[2]);
-        }
-
-        if (opts.length >= 2) {
-          const q = normalize({
-            id: "PDF-FB-" + (++n),
-            text: textPart,
-            options: opts
-          }, n);
-
-          if (q) out.push(q);
-        }
-      }
-    }
-
-    return out;
-  }
-
-  async function extractPDF(file) {
-    if (!window.pdfjsLib) {
-      throw new Error("PDF.js library is not loaded");
-    }
-
-    const buffer = await file.arrayBuffer();
-
-    const pdf = await window.pdfjsLib.getDocument({
-      data: new Uint8Array(buffer)
-    }).promise;
-
-    let all = "";
-
-    for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
-      const page = await pdf.getPage(pageNo);
-      const content = await page.getTextContent();
-
-      const pageText = content.items
-        .map(x => x.str || "")
-        .join(" ");
-
-      all += "\n" + pageText + "\n";
-    }
-
-    return all;
-  }
-
-  function renderPool(pool) {
-    const total = el("totalQuestions");
-    if (total) total.textContent = pool.length;
-
-    const preview = el("questionPreview");
-
-    if (!preview) return;
-
-    if (!pool.length) {
-      preview.innerHTML =
-        '<div>No questions found in pool.</div>';
-      return;
-    }
-
-    preview.innerHTML =
-      '<div><b>' + pool.length +
-      ' questions loaded into pool.</b></div>' +
-      pool.slice(0, 10).map((q, i) =>
-        '<div style="margin:10px 0;padding:10px;border:1px solid #ddd;border-radius:10px">' +
-        '<b>Q' + (i + 1) + '.</b> ' +
-        String(q.text || "").replace(/</g, "&lt;") +
-        '<br><small>' + q.options.length +
-        ' options</small></div>'
-      ).join("");
-  }
-
-  async function convertNow() {
-    const input = el("pdfInput");
-
-    if (!input || !input.files || !input.files[0]) {
-      setStatus("Please select a PDF first.");
-      return;
-    }
-
-    const file = input.files[0];
-
-    if (!/\.pdf$/i.test(file.name) && file.type !== "application/pdf") {
-      setStatus("Selected file is not a PDF.");
-      return;
-    }
-
-    const button = el("convertButton");
-    if (button) button.disabled = true;
-
-    try {
-      setStatus("Reading PDF...");
-
-      const raw = await extractPDF(file);
-
-      if (!raw.trim()) {
-        throw new Error(
-          "PDF text extraction returned empty text. This PDF may be scanned/image-only."
-        );
-      }
-
-      setStatus("Parsing questions...");
-
-      let questions = parseMCQ(raw);
-
-      /*
-        Prefer an existing parser if the page already provides one
-        and it returns valid questions.
-      */
-      try {
-        if (typeof window.parsePlainTextQuestions === "function") {
-          const parsed =
-            window.parsePlainTextQuestions(raw);
-
-          if (Array.isArray(parsed) && parsed.length) {
-            const normalized = parsed
-              .map(normalize)
-              .filter(Boolean);
-
-            if (normalized.length > questions.length) {
-              questions = normalized;
-            }
-          }
-        }
-      } catch (_) {}
-
-      if (!questions.length) {
-        throw new Error(
-          "PDF opened successfully, but no MCQ structure was detected."
-        );
-      }
-
-      const old = getPool();
-      const byId = new Map();
-
-      for (const q of old) {
-        const n = normalize(q, byId.size);
-        if (n) byId.set(n.id, n);
-      }
-
-      for (const q of questions) {
-        byId.set(q.id, q);
-      }
-
-      const pool = Array.from(byId.values());
-
-      savePool(pool);
-      renderPool(pool);
-
-      setStatus(
-        "Conversion complete: " +
-        questions.length +
-        " new questions parsed. Pool total: " +
-        pool.length
-      );
-
-      window.dispatchEvent(
-        new CustomEvent("rankforge:pdf-pool-updated", {
-          detail: { count: pool.length }
-        })
-      );
-
-    } catch (err) {
-      console.error(err);
-      setStatus("Conversion failed: " + (err.message || err));
-      alert(
-        "PDF conversion failed.\n\n" +
-        (err.message || err)
-      );
-    } finally {
-      if (button) button.disabled = false;
-    }
-  }
-
-  function install() {
-    const input = el("pdfInput");
-    const button = el("convertButton");
-
-    if (!input || !button) {
-      setTimeout(install, 500);
-      return;
-    }
-
-    input.addEventListener("change", function () {
-      button.disabled = !input.files.length;
-
-      if (input.files.length) {
-        setStatus(
-          "PDF selected: " +
-          input.files[0].name +
-          ". Click Convert PDF to CBT."
-        );
-      }
+(function(){
+"use strict";
+
+const KEY="pdfCbtQuestions";
+const ACTIVE="CBT_ACTIVE_QUESTIONS";
+const SOURCE="CBT_ACTIVE_SOURCE";
+const TEST="CBT_ACTIVE_TEST";
+const ID="CBT_ACTIVE_TEST_ID";
+
+function read(k,f){
+  try{
+    const x=localStorage.getItem(k);
+    return x==null?f:JSON.parse(x);
+  }catch(_){return f;}
+}
+
+function write(k,v){
+  try{localStorage.setItem(k,JSON.stringify(v));}catch(_){}
+}
+
+function pool(){
+  const x=read(KEY,[]);
+  return Array.isArray(x)?x:[];
+}
+
+function valid(q){
+  return q &&
+    typeof q==="object" &&
+    String(q.question||q.text||q.questionText||"").trim().length>5 &&
+    Array.isArray(q.options) &&
+    q.options.length>=2;
+}
+
+function clean(list){
+  const out=[];
+  const seen=new Set();
+
+  for(const q of Array.isArray(list)?list:[]){
+    if(!valid(q))continue;
+
+    const text=String(
+      q.question||q.text||q.questionText
+    ).trim();
+
+    const opts=q.options.map(x=>String(x??"").trim());
+
+    const key=(text+"|"+opts.join("|"))
+      .toLowerCase()
+      .replace(/\s+/g," ");
+
+    if(seen.has(key))continue;
+    seen.add(key);
+
+    out.push({
+      ...q,
+      question:q.question||text,
+      text:q.text||text,
+      questionText:q.questionText||text,
+      options:opts
     });
-
-    button.disabled = !input.files.length;
-
-    /*
-      Capture phase makes this handler work even if an older
-      inline handler/script is broken.
-    */
-    button.addEventListener(
-      "click",
-      function (e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        convertNow();
-      },
-      true
-    );
-
-    renderPool(getPool());
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", install);
-  } else {
-    install();
+  return out;
+}
+
+function activate(list){
+  const qs=clean(list);
+
+  if(!qs.length){
+    console.warn("[RankForge PDF] No valid questions to activate");
+    return false;
   }
 
-  window.RankForgePDFConverterV2 = {
-    convert: convertNow,
-    getPool
-  };
+  sessionStorage.setItem(
+    ACTIVE,
+    JSON.stringify(qs)
+  );
+
+  sessionStorage.setItem(
+    SOURCE,
+    "PDF"
+  );
+
+  sessionStorage.removeItem(TEST);
+  sessionStorage.removeItem(ID);
+
+  window.CBT_PDF_MODE=true;
+  window.CBT_IMPORTED_SOURCE="PDF Import";
+  window.CBT_IMPORTED_QUESTIONS=qs.slice();
+
+  console.log(
+    "[RankForge PDF] ACTIVE QUESTIONS:",
+    qs.length
+  );
+
+  return true;
+}
+
+function updateUI(){
+  const qs=clean(pool());
+
+  const countIds=[
+    "totalQuestions",
+    "questionCount",
+    "poolCount"
+  ];
+
+  for(const id of countIds){
+    const e=document.getElementById(id);
+    if(e)e.textContent=qs.length;
+  }
+
+  const status=document.getElementById("status");
+
+  if(status && qs.length){
+    status.textContent=
+      "PDF ready — "+qs.length+
+      " questions available for CBT.";
+  }
+
+  return qs;
+}
+
+/*
+ * Use the existing production engine API when present.
+ */
+function syncFromEngine(){
+  try{
+    if(window.CBTPDFIsolation &&
+       typeof window.CBTPDFIsolation.getPool==="function"){
+
+      const qs=clean(
+        window.CBTPDFIsolation.getPool()
+      );
+
+      if(qs.length){
+        write(KEY,qs);
+        activate(qs);
+        updateUI();
+        return qs;
+      }
+    }
+  }catch(e){
+    console.warn("[RankForge PDF] engine sync:",e);
+  }
+
+  const qs=updateUI();
+
+  if(qs.length){
+    activate(qs);
+  }
+
+  return qs;
+}
+
+/*
+ * Do NOT replace the production parser.
+ * Only bridge its completed pool into the CBT session.
+ */
+function bridge(){
+  syncFromEngine();
+
+  window.addEventListener(
+    "storage",
+    function(e){
+      if(e.key===KEY){
+        syncFromEngine();
+      }
+    }
+  );
+
+  window.addEventListener(
+    "rankforge:pdf-pool-updated",
+    syncFromEngine
+  );
+
+  setTimeout(syncFromEngine,500);
+  setTimeout(syncFromEngine,1500);
+  setTimeout(syncFromEngine,3000);
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",bridge);
+}else{
+  bridge();
+}
+
+window.RankForgePDFAuthorityV3={
+  pool,
+  activate,
+  sync:syncFromEngine
+};
 
 })();
 </script>
-<!-- /RANKFORGE_PDF_CONVERTER_V2 -->
+<!-- /RANKFORGE_PDF_AUTHORITY_V3 -->
 
 </body>
 </html>
