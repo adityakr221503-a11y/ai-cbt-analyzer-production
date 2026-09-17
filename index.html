@@ -2403,5 +2403,64 @@ if(document.readyState === "loading"){
 </script>
 <!-- /RANKFORGE_FRESH_STATE_RESET_V1 -->
 
+
+<!-- RANKFORGE_RESET_ALL_DATA_V1 -->
+<section id="rankforgeResetCard" style="margin:16px 0;padding:16px;border:1px solid #ddd;border-radius:16px;background:#fff">
+  <h3 style="margin:0 0 6px">Reset App Data</h3>
+  <p style="margin:0 0 12px;font-size:14px;color:#666">
+    Clear saved questions, imported PDF data, CBT history, attempts, mistakes, progress and local RankForge data.
+    GitHub files are not affected.
+  </p>
+  <button id="rankforgeResetAllBtn" type="button"
+    style="padding:12px 16px;border:0;border-radius:12px;font-weight:700;cursor:pointer">
+    Reset All Data
+  </button>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  const btn = document.getElementById("rankforgeResetAllBtn");
+  if (!btn) return;
+
+  btn.addEventListener("click", function () {
+    const ok = window.confirm(
+      "Reset RankForge data on this browser?\\n\\n" +
+      "Saved questions, imported PDF questions, CBT history, attempts, mistakes, " +
+      "progress and local app data will be cleared.\\n\\n" +
+      "GitHub files will NOT be deleted."
+    );
+
+    if (!ok) return;
+
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {
+      console.error("RankForge reset error:", e);
+    }
+
+    try {
+      indexedDB.databases?.().then(function (dbs) {
+        return Promise.all(
+          (dbs || []).map(function (db) {
+            return db && db.name
+              ? new Promise(function (resolve) {
+                  const req = indexedDB.deleteDatabase(db.name);
+                  req.onsuccess = req.onerror = req.onblocked = resolve;
+                })
+              : Promise.resolve();
+          })
+        );
+      }).catch(function () {});
+    } catch (e) {}
+
+    alert("RankForge local data reset complete.");
+    location.reload();
+  });
+})();
+</script>
+
 </body>
 </html>
