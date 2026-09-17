@@ -1,0 +1,19 @@
+{
+  "name": "RankForge AI",
+  "short_name": "RankForge",
+  "description": "AI-powered topper-first NEET learning, practice, testing and mastery system.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f7fb",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "./rankforge-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

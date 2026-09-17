@@ -1586,28 +1586,6 @@ if(document.readyState === "loading"){
 })();
 </script>
 
-
-<style id="rankforge-student-diagnostic-clean-v1">
-/* Student build: developer/E2E diagnostics stay out of the UI. */
-#rankforgeE2E,
-#pcbNichodE2E,
-#nichodE2E,
-.nichod-e2e,
-.nichod-e2e-harness,
-.nichod-live-monitor,
-.nichod-live-flow-monitor,
-[id*="e2e" i],
-[class*="e2e" i],
-[id*="diagnostic" i],
-[class*="diagnostic" i],
-[id*="live-monitor" i],
-[class*="live-monitor" i]{
-  display:none !important;
-  visibility:hidden !important;
-  pointer-events:none !important;
-}
-</style>
-
 </head>
 
 <body>
@@ -7467,52 +7445,6 @@ if(document.readyState==="loading"){
 })();
 </script>
 <!-- /RANKFORGE_ZERO_HISTORY_GUARD_V1 -->
-
-
-<script id="rankforge-student-ui-clean-v1">
-(function(){
-  "use strict";
-
-  function cleanStudentDiagnostics(){
-    const selectors = [
-      "#rankforgeE2E",
-      "#pcbNichodE2E",
-      "#nichodE2E",
-      ".nichod-e2e",
-      ".nichod-e2e-harness",
-      ".nichod-live-monitor",
-      ".nichod-live-flow-monitor"
-    ];
-
-    document.querySelectorAll(selectors.join(",")).forEach(function(el){
-      el.remove();
-    });
-
-    document.querySelectorAll("body *").forEach(function(el){
-      if(el.id === "rankforge-student-ui-clean-v1") return;
-
-      const t = (el.textContent || "").replace(/\s+/g," ").trim();
-
-      if(
-        /🧪\s*PCB\s*NICHOD\s*E2E\s*Test/i.test(t) ||
-        /⚡\s*RankForge\s*AI\s*Question/i.test(t)
-      ){
-        if(el.children.length < 8){
-          el.remove();
-        }
-      }
-    });
-  }
-
-  if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", cleanStudentDiagnostics, {once:true});
-  }else{
-    cleanStudentDiagnostics();
-  }
-
-  window.addEventListener("load", cleanStudentDiagnostics, {once:true});
-})();
-</script>
 
 </body>
 
