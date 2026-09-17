@@ -87,14 +87,14 @@
       title: "PCB NICHOD",
       sub: "Physics + Chemistry + Biology unified intelligence",
       href: "ranker-command-center.html",
-      count: c => `${c.pdf} PDF • ${c.ranker} Ranker`
+      count: c => `${c.pdf} PDF Questions • ${c.ranker} Ranker Questions`
     },
     {
       icon: "🎯",
       title: "Adaptive AI / Weak-Topic DPP",
       sub: "Mistakes decide priority and next practice",
       href: "ranker-command-center.html",
-      count: c => `15Q / 20Q • ${c.weak}`
+      count: c => `Weak Area: ${c.weak}`
     },
     {
       icon: "📚",
@@ -107,7 +107,7 @@
       icon: "🤖",
       title: "AI Question Practice",
       sub: "AI-generated practice and adaptive flow",
-      href: "rankforge-ai-new-questions.html",
+      href: "ai-question-lab.html",
       count: () => "AI Practice"
     },
     {

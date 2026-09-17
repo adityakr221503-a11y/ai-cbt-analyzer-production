@@ -291,6 +291,35 @@
     });
 
     write(MISTAKES, store);
+
+    // Keep the existing Mistake Intelligence page compatible.
+    // mistake.html currently reads cbtMistakes as an array.
+    const legacy = Object.values(store).map(function (m) {
+      return {
+        id: m.id,
+        questionId: m.questionId,
+        question: m.question,
+        text: m.text,
+        options: Array.isArray(m.options) ? m.options : [],
+        subject: m.subject,
+        topic: m.topic,
+        chapter: m.topic,
+        userAnswer: m.userAnswer,
+        selectedAnswer: m.userAnswer,
+        correctAnswer: m.correctAnswer,
+        solution: m.solution || m.explanation || "",
+        mistakeType: m.reason || "Concept Gap",
+        mistakeReason: m.reason || "Concept Gap",
+        source: m.source || "PDF CBT",
+        testId: m.testId,
+        testTitle: m.testTitle,
+        status: m.status || "active",
+        updatedAt: m.updatedAt || Date.now()
+      };
+    });
+
+    write("cbtMistakes", legacy);
+
     return out;
   }
 
