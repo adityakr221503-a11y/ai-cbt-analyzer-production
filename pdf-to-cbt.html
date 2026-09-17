@@ -4245,5 +4245,371 @@ console.log(
 <script src="./pdf-cbt-careerwill-final.js"></script>
 
 <script src="./rankforge-pdf-cbt-flow-bridge-v1.js"></script>
+
+
+<!-- RANKFORGE PDF POOL CONVERT HOTFIX START -->
+<script>
+(function () {
+  "use strict";
+
+  function bootPDFPoolHotfix() {
+    const input = document.getElementById("pdfInput");
+    const button = document.getElementById("convertButton");
+    const status = document.getElementById("status");
+    const preview = document.getElementById("questionPreview");
+    const total = document.getElementById("totalQuestions");
+    const physics = document.getElementById("physicsQuestions");
+    const chemistry = document.getElementById("chemistryQuestions");
+    const biology = document.getElementById("biologyQuestions");
+
+    if (!input || !button) {
+      console.error("PDF HOTFIX: required elements missing");
+      return;
+    }
+
+    const KEY = "pdfCbtQuestions";
+
+    function readPool() {
+      try {
+        const x = JSON.parse(localStorage.getItem(KEY) || "[]");
+        return Array.isArray(x) ? x : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function savePool(pool) {
+      localStorage.setItem(KEY, JSON.stringify(pool));
+      return pool;
+    }
+
+    function escapeHTML(x) {
+      return String(x == null ? "" : x)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderPool() {
+      const pool = readPool();
+
+      if (total) total.textContent = pool.length;
+
+      let p = 0, c = 0, b = 0;
+
+      pool.forEach(function (q) {
+        const subject = String(q.subject || "").toLowerCase();
+        if (subject.includes("physics")) p++;
+        else if (subject.includes("chem")) c++;
+        else if (subject.includes("bio")) b++;
+      });
+
+      if (physics) physics.textContent = p;
+      if (chemistry) chemistry.textContent = c;
+      if (biology) biology.textContent = b;
+
+      if (preview) {
+        if (!pool.length) {
+          preview.textContent = "No questions in the PDF pool yet.";
+          return;
+        }
+
+        preview.innerHTML = pool.slice(0, 5).map(function (q, i) {
+          return (
+            '<div style="margin:10px 0;padding:12px;border:1px solid #e2e8f0;border-radius:10px">' +
+            "<strong>Q" + (i + 1) + ".</strong> " +
+            escapeHTML(q.text || q.question || "") +
+            "<br><small>" +
+            (Array.isArray(q.options) ? q.options : []).map(function (o, j) {
+              return String.fromCharCode(65 + j) + ") " + escapeHTML(o);
+            }).join(" &nbsp; ") +
+            "</small></div>"
+          );
+        }).join("") +
+        (pool.length > 5
+          ? "<div>Showing first 5 of " + pool.length + " questions.</div>"
+          : "");
+      }
+    }
+
+    function normalizeQuestion(q, index, fileName) {
+      if (!q || typeof q !== "object") return null;
+
+      const text = String(
+        q.text || q.question || q.questionText || q.prompt || ""
+      ).trim();
+
+      let options = Array.isArray(q.options)
+        ? q.options
+        : Array.isArray(q.choices)
+          ? q.choices
+          : [];
+
+      options = options.map(function (x) {
+        return String(x)
+          .replace(/^[A-D][.)]\s*/i, "")
+          .trim();
+      }).filter(Boolean).slice(0, 4);
+
+      if (text.length < 5 || options.length < 2) return null;
+
+      let answer = q.correctAnswer;
+      if (answer == null || answer === "") answer = q.correctIndex;
+
+      if (typeof answer === "number" && options[answer] !== undefined) {
+        answer = options[answer];
+      }
+
+      answer = answer == null ? "" : String(answer).trim();
+
+      const letter = answer.match(/^[A-D]$/i);
+      if (letter) {
+        const idx = letter[0].toUpperCase().charCodeAt(0) - 65;
+        if (options[idx] !== undefined) answer = options[idx];
+      }
+
+      return {
+        id: q.id || ("PDF-HOTFIX-" + Date.now() + "-" + index),
+        text: text,
+        question: text,
+        questionText: text,
+        options: options,
+        correctAnswer: answer,
+        subject: q.subject || "Unknown",
+        chapter: q.chapter || "",
+        topic: q.topic || "",
+        difficulty: q.difficulty || "Medium",
+        marks: Number(q.marks) || 4,
+        negativeMarks: Number(q.negativeMarks) || 1,
+        explanation: q.explanation || q.solution || "",
+        source: q.source || fileName || "PDF Module"
+      };
+    }
+
+    function parseText(text, fileName) {
+      const clean = String(text || "")
+        .replace(/\r/g, "")
+        .replace(/\u00a0/g, " ")
+        .replace(/[ \t]+/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+
+      const starts = [];
+      const re = /(?:^|\s)(?:Q(?:uestion)?\s*)?(\d{1,3})\s*[.)-]\s+/gi;
+      let m;
+
+      while ((m = re.exec(clean)) !== null) {
+        starts.push({
+          index: m.index + (m[0].startsWith(" ") ? 1 : 0),
+          contentStart: re.lastIndex,
+          number: Number(m[1])
+        });
+      }
+
+      const good = [];
+      let last = 0;
+
+      starts.forEach(function (x) {
+        if (
+          x.number >= 1 &&
+          x.number <= 1000 &&
+          (good.length === 0 || x.number >= last)
+        ) {
+          good.push(x);
+          last = x.number;
+        }
+      });
+
+      const result = [];
+
+      good.forEach(function (start, i) {
+        const end = i + 1 < good.length
+          ? good[i + 1].index
+          : clean.length;
+
+        const block = clean.slice(start.contentStart, end).trim();
+
+        const optRe =
+          /(?:^|\s)(?:\(([A-D1-4])\)|([A-D1-4]))\s*[.)-]?\s+([\s\S]*?)(?=\s+(?:\([A-D1-4]\)|[A-D1-4])\s*[.)-]?\s+|\s+(?:Answer|Ans(?:wer)?|Correct\s*Answer)\s*[:.-]?\s*[A-D1-4]|\s*$)/gi;
+
+        const matches = Array.from(block.matchAll(optRe));
+
+        const options = matches.map(function (x) {
+          return x[3].replace(/\s+/g, " ").trim();
+        }).filter(Boolean).slice(0, 4);
+
+        if (options.length < 2 || !matches.length) return;
+
+        const qtext = block.slice(0, matches[0].index)
+          .replace(/\s+/g, " ")
+          .trim();
+
+        if (qtext.length < 5) return;
+
+        const ans = block.match(
+          /(?:Answer|Ans(?:wer)?|Correct\s*Answer)\s*[:.-]?\s*([A-D1-4])/i
+        );
+
+        const q = normalizeQuestion({
+          text: qtext,
+          options: options,
+          correctAnswer: ans ? ans[1].toUpperCase() : "",
+          subject: "Unknown"
+        }, result.length, fileName);
+
+        if (q) result.push(q);
+      });
+
+      return result;
+    }
+
+    async function extractText(file) {
+      if (!window.pdfjsLib) {
+        throw new Error(
+          "PDF.js is not available. Please refresh the page once and try again."
+        );
+      }
+
+      const buffer = await file.arrayBuffer();
+
+      const pdf = await window.pdfjsLib.getDocument({
+        data: buffer
+      }).promise;
+
+      let text = "";
+
+      for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+        const page = await pdf.getPage(pageNo);
+        const content = await page.getTextContent();
+
+        text += "\n" + content.items.map(function (x) {
+          return x.str || "";
+        }).join(" ") + "\n";
+      }
+
+      return text.trim();
+    }
+
+    async function convert() {
+      const file = input.files && input.files[0];
+
+      if (!file) {
+        status.textContent = "📄 Select a PDF first.";
+        return;
+      }
+
+      button.disabled = true;
+      status.textContent = "⏳ Reading PDF...\nPlease wait.";
+
+      try {
+        const text = await extractText(file);
+
+        if (!text) {
+          throw new Error(
+            "No readable text found. This PDF may be scanned/image-only and needs OCR."
+          );
+        }
+
+        status.textContent =
+          "🔎 PDF text extracted.\nPreparing questions...";
+
+        let questions = [];
+
+        // Prefer the existing project parser if available.
+        try {
+          if (typeof window.parsePlainTextQuestions === "function") {
+            questions = window.parsePlainTextQuestions(text) || [];
+          }
+        } catch (_) {}
+
+        // Independent fallback parser.
+        if (!questions.length) {
+          questions = parseText(text, file.name);
+        } else {
+          questions = questions.map(function (q, i) {
+            return normalizeQuestion(q, i, file.name);
+          }).filter(Boolean);
+        }
+
+        if (!questions.length) {
+          throw new Error(
+            "PDF text was extracted, but no MCQ questions were detected. Check that the PDF contains numbered questions with options."
+          );
+        }
+
+        const existing = readPool();
+        const ids = new Set(existing.map(function (q) {
+          return String(q.id || "");
+        }));
+
+        const fresh = questions.filter(function (q) {
+          const id = String(q.id || "");
+          if (!id || ids.has(id)) return false;
+          ids.add(id);
+          return true;
+        });
+
+        const updated = savePool(existing.concat(fresh));
+
+        renderPool();
+
+        status.textContent =
+          "✅ PDF converted successfully.\n\n" +
+          "Questions detected: " + questions.length + "\n" +
+          "New questions added: " + fresh.length + "\n" +
+          "Duplicates skipped: " + (questions.length - fresh.length) + "\n" +
+          "Total PDF pool: " + updated.length;
+
+        console.log("RANKFORGE PDF HOTFIX:", {
+          detected: questions.length,
+          added: fresh.length,
+          total: updated.length
+        });
+
+      } catch (err) {
+        console.error("RANKFORGE PDF HOTFIX ERROR:", err);
+        status.textContent =
+          "❌ Conversion failed.\n\n" +
+          (err && err.message ? err.message : String(err));
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    // Always restore the button behavior.
+    input.addEventListener("change", function () {
+      const file = input.files && input.files[0];
+
+      button.disabled = !file;
+
+      status.textContent = file
+        ? "📄 Selected:\n" + file.name
+        : "Select a PDF to begin.";
+
+      if (file) {
+        button.focus();
+      }
+    });
+
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      convert();
+    });
+
+    renderPool();
+
+    console.log("✅ RankForge PDF Pool/Convert Hotfix loaded.");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootPDFPoolHotfix);
+  } else {
+    bootPDFPoolHotfix();
+  }
+})();
+</script>
+<!-- RANKFORGE PDF POOL CONVERT HOTFIX END -->
+
 </body>
 </html>
