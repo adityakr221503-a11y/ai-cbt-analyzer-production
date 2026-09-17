@@ -1,376 +1,97 @@
-(function () {
-  "use strict";
+(function(){
+"use strict";
 
-  function read(key, fallback) {
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return fallback;
-      const value = JSON.parse(raw);
-      return value == null ? fallback : value;
-    } catch (_) {
-      return fallback;
-    }
-  }
+function hideLegacy(){
+  ["rfConnectedShell","rfFeatureDrawer","revisionSheet","rankersTestSeriesDashboard"]
+    .forEach(function(id){var e=document.getElementById(id);if(e)e.style.display="none";});
+  document.querySelectorAll(".rf-quick,.rf-all").forEach(function(e){e.style.display="none";});
+}
 
-  function arr(key) {
-    const v = read(key, []);
-    return Array.isArray(v) ? v : [];
-  }
+var phases=[
+["🔵","PRE-TEST","Prepare → practise → revise → enter the test",
+[
+["📚","Question Bank","Rank Booster + NCERT-first practice","question-bank.html"],
+["⚡","Adaptive DPP","Weak-topic targeted practice","ranker-command-center.html"],
+["🎯","Topic / Chapter Practice","Focused concept practice","question-bank.html"],
+["📖","Smart Revision","NCERT, formulas, reactions & key facts","ranker-revision/index.html"],
+["🤖","AI Practice","New variations and focused practice","rankforge-ai-new-questions.html"],
+["⏱️","Exam Strategy","Attempt, skip and time planning","ranker-command-center.html"]
+]],
+["🟣","TEST","Distraction-free serious CBT",
+[
+["🏆","Ranker Tests","Full Syllabus • Part Test • Subject Test • Custom","rankers-test-series.html"],
+["📝","Full Syllabus","Complete-syllabus simulation","rankers-test-series.html"],
+["📑","Part Test","Selected portions / units","rankers-test-series.html"],
+["🧪","Subject Test","Physics • Chemistry • Biology","rankers-test-series.html"],
+["⚙️","Custom Test","Choose your own configuration","rankers-test-series.html"]
+]],
+["🟢","POST-TEST","Every attempt becomes measurable improvement",
+[
+["📊","Result","Score • accuracy • time • attempts","analysis.html"],
+["🧠","Analysis","Subject • chapter • topic • speed • accuracy","analysis.html"],
+["🔍","Question Review","Understand correct, wrong and skipped","analysis.html"],
+["📕","Mistake Book","Reason-based mistake intelligence","mistake.html"],
+["🔄","Retry / Mastery","Retry mistakes until mastery","retry.html"],
+["📈","Test History","Track improvement across attempts","history.html"]
+]]
+];
 
-  function countQuestions(key) {
-    const v = arr(key);
-    return v.length;
-  }
+var support=[
+["🤖","AI Mentor","Next-best action from your performance","ranker-command-center.html"],
+["📖","Revision","Structured chapter-wise revision","ranker-revision/index.html"],
+["🎯","720 Approach","Score-gap and target planning","ranker-command-center.html"],
+["🧰","Tools","PDF → CBT • NICHOD • Reports","ranker-command-center.html"]
+];
 
-  function getCounts() {
-    const pdf =
-      countQuestions("pdfCbtQuestions") ||
-      countQuestions("pdfQuestionBank") ||
-      countQuestions("pdfQuestions");
+function card(x){
+return '<a class="rfp-card" href="'+x[2]+'"><span class="rfp-icon">'+x[0]+
+'</span><span class="rfp-title">'+x[1]+'<small>'+x[3]+'</small></span><b class="rfp-arrow">›</b></a>';
+}
 
-    const ranker =
-      countQuestions("rankBoosterQuestionBankV1") ||
-      countQuestions("rankForgeQuestionBank") ||
-      countQuestions("rankerQuestionBank");
+function render(){
+if(document.getElementById("rankforgePremiumHomeV2"))return;
+hideLegacy();
 
-    const history = arr("cbtHistory");
+var root=document.createElement("section");
+root.id="rankforgePremiumHomeV2";
 
-    const mistakes =
-      arr("rankBoosterAttemptHistory").length ||
-      arr("cbtMistakes").length ||
-      0;
+root.innerHTML=
+'<style>'+
+'#rankforgePremiumHomeV2{max-width:980px;margin:18px auto 34px;padding:0 14px;color:#0f172a;font-family:Arial,sans-serif}'+
+'.rfp-hero{padding:22px 20px;border-radius:24px;background:linear-gradient(135deg,#eef2ff,#fff);border:1px solid #dbe3ff;box-shadow:0 10px 30px rgba(15,23,42,.07);margin-bottom:18px}'+
+'.rfp-brand{font-size:30px;font-weight:900;letter-spacing:-1px}.rfp-brand em{font-style:normal;opacity:.5}'+
+'.rfp-tag{margin-top:6px;color:#64748b;font-size:14px;line-height:1.5}'+
+'.rfp-flow{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}.rfp-flow span{padding:7px 10px;border-radius:999px;background:#fff;border:1px solid #dbe3ff;font-size:11px;font-weight:800}'+
+'.rfp-section{margin:16px 0;padding:16px;border-radius:22px;background:#fff;border:1px solid rgba(100,116,139,.14);box-shadow:0 7px 24px rgba(15,23,42,.055)}'+
+'.rfp-head{display:flex;align-items:center;gap:10px;margin-bottom:3px}.rfp-phase{font-size:25px}.rfp-head h2{margin:0;font-size:19px}.rfp-sub{margin:0 0 13px;color:#64748b;font-size:12px}'+
+'.rfp-grid,.rfp-support{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}'+
+'.rfp-card{position:relative;display:flex;align-items:center;gap:10px;min-height:65px;padding:12px 32px 12px 12px;text-decoration:none;color:inherit;border:1px solid #e5e7eb;border-radius:15px;background:#f8fafc;transition:.15s}'+
+'.rfp-card:hover{transform:translateY(-1px);border-color:#a5b4fc;box-shadow:0 5px 16px rgba(15,23,42,.07)}'+
+'.rfp-icon{font-size:22px}.rfp-title{font-size:13px;font-weight:800;line-height:1.35}.rfp-title small{display:block;margin-top:3px;color:#64748b;font-weight:500;font-size:11px}.rfp-arrow{position:absolute;right:12px;font-size:21px;opacity:.4}'+
+'.rfp-note{margin-top:13px;padding:12px 13px;border-radius:14px;background:#f8fafc;border:1px dashed #cbd5e1;color:#475569;font-size:11px;line-height:1.55}'+
+'@media(max-width:560px){.rfp-brand{font-size:25px}.rfp-grid,.rfp-support{grid-template-columns:1fr}.rfp-section{padding:13px}.rfp-hero{padding:19px 16px}}'+
+'</style>'+
+'<div class="rfp-hero"><div class="rfp-brand">🏆 RankForge <em>AI</em></div>'+
+'<div class="rfp-tag">Topper-first learning system — prepare, test, analyse, fix, master and improve.</div>'+
+'<div class="rfp-flow"><span>PREPARE</span><span>TEST</span><span>RESULT</span><span>ANALYSE</span><span>FIX</span><span>MASTER</span><span>RETEST</span></div></div>'+
+phases.map(function(p){
+return '<section class="rfp-section"><div class="rfp-head"><span class="rfp-phase">'+p[0]+
+'</span><h2>'+p[1]+'</h2></div><p class="rfp-sub">'+p[2]+
+'</p><div class="rfp-grid">'+p[3].map(card).join("")+'</div></section>';
+}).join("")+
+'<section class="rfp-section"><div class="rfp-head"><span class="rfp-phase">🧩</span><h2>SUPPORT SYSTEM</h2></div>'+
+'<p class="rfp-sub">Always available without disturbing the main topper workflow.</p>'+
+'<div class="rfp-support">'+support.map(card).join("")+'</div>'+
+'<div class="rfp-note">PDF → CBT and NICHOD remain available as tools. Internal LIVE status, BUG labels, diagnostics, raw JSON, test IDs and duplicate navigation are hidden from the student interface.</div></section>';
 
-    const retry =
-      arr("rankforgeRetryQueueV2").length ||
-      arr("retryQueue").length ||
-      0;
+var h=document.querySelector("header");
+if(h&&h.parentNode)h.parentNode.insertBefore(root,h.nextSibling);
+else document.body.prepend(root);
+}
 
-    const adaptive =
-      read("rankforgeAdaptiveDecisionV2", {}) || {};
+if(document.readyState==="loading")
+document.addEventListener("DOMContentLoaded",render,{once:true});
+else render();
 
-    const dpp =
-      read("rankforgeAdaptiveDPPV1", {}) || {};
-
-    const weak =
-      adaptive.topic ||
-      adaptive.weakTopic ||
-      dpp.topic ||
-      "Mixed Weak Areas";
-
-    return {
-      pdf,
-      ranker,
-      history: history.length,
-      mistakes,
-      retry,
-      weak
-    };
-  }
-
-  const features = [
-    {
-      icon: "🏆",
-      title: "Rankers Test Series",
-      sub: "Pre-Test → Actual CBT → Analysis → Retry → Mastery",
-      href: "rankers-test-series.html",
-      count: c => c.ranker ? `${c.ranker} Ranker Questions` : "Ranker CBT"
-    },
-    {
-      icon: "📄",
-      title: "PDF → CBT",
-      sub: "Import any PDF → Preview → Start CBT",
-      href: "pdf-to-cbt.html",
-      count: c => `${c.pdf} PDF Questions`
-    },
-    {
-      icon: "🧠",
-      title: "PCB NICHOD",
-      sub: "Physics + Chemistry + Biology unified intelligence",
-      href: "ranker-command-center.html",
-      count: c => `${c.pdf} PDF Questions • ${c.ranker} Ranker Questions`
-    },
-    {
-      icon: "🎯",
-      title: "Adaptive AI / Weak-Topic DPP",
-      sub: "Mistakes decide priority and next practice",
-      href: "ranker-command-center.html",
-      count: c => `Weak Area: ${c.weak}`
-    },
-    {
-      icon: "📚",
-      title: "Ranker Question Bank",
-      sub: "Chapter • Topic • New • Weak • Adaptive",
-      href: "question-bank.html",
-      count: c => `${c.ranker} questions`
-    },
-    {
-      icon: "🤖",
-      title: "AI Question Practice",
-      sub: "AI-generated practice and adaptive flow",
-      href: "ai-question-lab.html",
-      count: () => "AI Practice"
-    },
-    {
-      icon: "📕",
-      title: "Mistake Bank",
-      sub: "Mistake → Reason → Revision → Retry → Mastery",
-      href: "mistake.html",
-      count: c => `${c.mistakes} recorded mistakes`
-    },
-    {
-      icon: "🔄",
-      title: "Retry / Mastery",
-      sub: "Previously missed questions become practice",
-      href: "retry.html",
-      count: c => `${c.retry} retry queue`
-    },
-    {
-      icon: "📊",
-      title: "Test History",
-      sub: "All previous CBT attempts and records",
-      href: "history.html",
-      count: c => `${c.history} tests`
-    },
-    {
-      icon: "🧠",
-      title: "Orbit Analysis",
-      sub: "Detailed post-test performance analysis",
-      href: "analysis.html",
-      count: () => "Performance Intelligence"
-    },
-    {
-      icon: "🧭",
-      title: "Mentor / Next Best Action",
-      sub: "Evidence-based next study action",
-      href: "ranker-command-center.html",
-      count: () => "AI Mentor"
-    },
-    {
-      icon: "🎯",
-      title: "720 Approach",
-      sub: "Score-gap planning and target strategy",
-      href: "ranker-command-center.html",
-      count: () => "Score Strategy"
-    },
-    {
-      icon: "⏱️",
-      title: "Skip / Attempt Strategy",
-      sub: "Attempt order, skipping and time control",
-      href: "ranker-command-center.html",
-      count: () => "Exam Strategy"
-    },
-    {
-      icon: "📖",
-      title: "Revision",
-      sub: "Subject → Chapter → Quick revision",
-      href: "ranker-revision/index.html",
-      count: () => "NCERT Revision"
-    },
-    {
-      icon: "🚀",
-      title: "Start Learning",
-      sub: "Direct entry into the complete CBT learning flow",
-      href: "cbt.html",
-      count: () => "Start CBT"
-    }
-  ];
-
-  function render() {
-    if (document.getElementById("rankforgeTopAllFeaturesV1")) return;
-
-    const anchor =
-      document.getElementById("rfConnectedShell") ||
-      document.querySelector("main") ||
-      document.body.firstElementChild ||
-      document.body;
-
-    const counts = getCounts();
-
-    const section = document.createElement("section");
-    section.id = "rankforgeTopAllFeaturesV1";
-
-    section.innerHTML = `
-      <style>
-        #rankforgeTopAllFeaturesV1{
-          max-width:1100px;
-          margin:18px auto 22px;
-          padding:0 15px;
-          position:relative;
-          z-index:100;
-        }
-
-        .rfhub-shell{
-          background:#fff;
-          border:1px solid rgba(100,116,139,.16);
-          border-radius:24px;
-          padding:20px;
-          box-shadow:0 8px 28px rgba(15,23,42,.07);
-        }
-
-        .rfhub-head{
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          gap:12px;
-          margin-bottom:6px;
-        }
-
-        .rfhub-title{
-          font-size:26px;
-          font-weight:900;
-          letter-spacing:-.5px;
-          margin:0;
-        }
-
-        .rfhub-sub{
-          color:#64748b;
-          font-size:14px;
-          line-height:1.5;
-          margin-bottom:16px;
-        }
-
-        .rfhub-badge{
-          white-space:nowrap;
-          padding:8px 11px;
-          border-radius:999px;
-          background:#eef2ff;
-          color:#3730a3;
-          font-weight:800;
-          font-size:12px;
-        }
-
-        .rfhub-grid{
-          display:grid;
-          grid-template-columns:repeat(3,1fr);
-          gap:11px;
-        }
-
-        .rfhub-card{
-          display:block;
-          text-decoration:none;
-          color:#0f172a;
-          background:#f8fafc;
-          border:1px solid rgba(100,116,139,.14);
-          border-radius:17px;
-          padding:15px;
-          min-height:126px;
-          transition:.15s;
-        }
-
-        .rfhub-card:hover{
-          transform:translateY(-2px);
-          border-color:#818cf8;
-          box-shadow:0 7px 20px rgba(15,23,42,.08);
-        }
-
-        .rfhub-icon{
-          font-size:25px;
-          margin-bottom:8px;
-        }
-
-        .rfhub-card b{
-          display:block;
-          font-size:15px;
-          line-height:1.3;
-        }
-
-        .rfhub-card span{
-          display:block;
-          margin-top:5px;
-          color:#64748b;
-          font-size:12px;
-          line-height:1.4;
-        }
-
-        .rfhub-count{
-          margin-top:9px !important;
-          color:#3730a3 !important;
-          font-weight:800;
-        }
-
-        .rfhub-primary{
-          background:#eef2ff;
-          border-color:#c7d2fe;
-        }
-
-        @media(max-width:700px){
-          #rankforgeTopAllFeaturesV1{
-            margin-top:10px;
-          }
-
-          .rfhub-shell{
-            padding:15px;
-            border-radius:20px;
-          }
-
-          .rfhub-title{
-            font-size:22px;
-          }
-
-          .rfhub-grid{
-            grid-template-columns:1fr 1fr;
-            gap:9px;
-          }
-
-          .rfhub-card{
-            min-height:122px;
-            padding:13px;
-          }
-        }
-
-        @media(max-width:430px){
-          .rfhub-grid{
-            grid-template-columns:1fr;
-          }
-        }
-
-        /* Remove duplicate navigation/drawer from old connected view.
-           Search remains available below the unified hub. */
-        #rfConnectedShell .rf-quick,
-        #rfConnectedShell .rf-all,
-        #rfFeatureDrawer{
-          display:none !important;
-        }
-      </style>
-
-      <div class="rfhub-shell">
-        <div class="rfhub-head">
-          <h2 class="rfhub-title">⚡ RankForge AI — All Features</h2>
-          <div class="rfhub-badge">ONE-CLICK HUB</div>
-        </div>
-
-        <div class="rfhub-sub">
-          Tests, PDF CBT, PCB NICHOD, Adaptive AI, mistakes, retry,
-          analysis, mentor and revision — everything organized in one place.
-        </div>
-
-        <div class="rfhub-grid">
-          ${features.map((f, i) => `
-            <a
-              class="rfhub-card ${i < 4 ? "rfhub-primary" : ""}"
-              href="${f.href}"
-            >
-              <div class="rfhub-icon">${f.icon}</div>
-              <b>${f.title}</b>
-              <span>${f.sub}</span>
-              <span class="rfhub-count">${f.count(counts)}</span>
-            </a>
-          `).join("")}
-        </div>
-      </div>
-    `;
-
-    anchor.parentNode.insertBefore(section, anchor);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", render, { once:true });
-  } else {
-    render();
-  }
-
-  window.RankForgeTopAllFeaturesV1 = {
-    render,
-    getCounts
-  };
+window.RankForgePremiumHomeV2={render};
 })();
