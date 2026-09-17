@@ -1196,5 +1196,750 @@ if("serviceWorker" in navigator){
 })();
 </script>
 
+
+<!-- RANKFORGE_NICHOD_NEXT_ACTION_V1 -->
+<style>
+.rf-nba{
+  margin:14px 0;
+  padding:16px;
+  border:1px solid rgba(127,127,127,.22);
+  border-radius:18px;
+  background:rgba(127,127,127,.07);
+}
+.rf-nba-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+}
+.rf-nba-kicker{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  opacity:.62;
+  text-transform:uppercase;
+}
+.rf-nba-title{
+  font-size:19px;
+  font-weight:850;
+  margin-top:3px;
+}
+.rf-nba-reason{
+  margin-top:7px;
+  font-size:13px;
+  line-height:1.45;
+  opacity:.76;
+}
+.rf-nba-chip{
+  white-space:nowrap;
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  background:rgba(127,127,127,.13);
+}
+.rf-nba-action{
+  margin-top:13px;
+  width:100%;
+  border:0;
+  border-radius:13px;
+  padding:12px 14px;
+  font-weight:800;
+  cursor:pointer;
+}
+.rf-nba-meta{
+  margin-top:9px;
+  font-size:11px;
+  opacity:.58;
+}
+</style>
+
+<section id="rankforgeNichodNextActionV1" class="rf-nba" aria-live="polite">
+  <div class="rf-nba-head">
+    <div>
+      <div class="rf-nba-kicker">🧠 NICHOD Intelligence</div>
+      <div id="rfNBAAction" class="rf-nba-title">Analysing your progress…</div>
+      <div id="rfNBAReason" class="rf-nba-reason">Finding the highest-value next action.</div>
+    </div>
+    <div id="rfNBAPriority" class="rf-nba-chip">AI</div>
+  </div>
+
+  <button type="button" id="rfNBAButton" class="rf-nba-action">
+    Open Next Action
+  </button>
+
+  <div id="rfNBAMeta" class="rf-nba-meta">NICHOD updates this recommendation from local progress.</div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+
+  const NEXT_KEY = "rankforgeNextActionV1";
+  const MISTAKE_KEY = "rankforgeMistakeMasteryV1";
+
+  function parse(key){
+    try{
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function arr(x){
+    return Array.isArray(x) ? x : [];
+  }
+
+  function countMistakes(){
+    const db = parse(MISTAKE_KEY);
+    if(!db || typeof db !== "object"){
+      return {active:0, mastered:0, items:[]};
+    }
+
+    return {
+      active:arr(db.active).length,
+      mastered:arr(db.mastered).length,
+      items:arr(db.active)
+    };
+  }
+
+  function collectHistory(){
+    const candidates = [
+      "cbtHistory",
+      "rankforgeHistory",
+      "testHistory",
+      "history"
+    ];
+
+    let all = [];
+
+    candidates.forEach(function(key){
+      const x = parse(key);
+      if(Array.isArray(x)) all = all.concat(x);
+      else if(x && Array.isArray(x.history)) all = all.concat(x.history);
+    });
+
+    return all;
+  }
+
+  function recentWrongCount(history){
+    let wrong = 0;
+
+    history.slice(-5).forEach(function(t){
+      const n = Number(
+        t.wrong ??
+        t.incorrect ??
+        t.wrongAnswers ??
+        t.errors ??
+        0
+      );
+
+      if(Number.isFinite(n)) wrong += Math.max(0,n);
+    });
+
+    return wrong;
+  }
+
+  function findWeakTopic(mistakes){
+    const map = {};
+
+    mistakes.forEach(function(m){
+      const topic = String(
+        m.topic ||
+        m.chapter ||
+        m.subject ||
+        "Mixed"
+      ).trim() || "Mixed";
+
+      map[topic] = (map[topic] || 0) + 1;
+    });
+
+    let best = "Weak Areas";
+    let score = 0;
+
+    Object.keys(map).forEach(function(k){
+      if(map[k] > score){
+        score = map[k];
+        best = k;
+      }
+    });
+
+    return {
+      topic:best,
+      count:score
+    };
+  }
+
+  function decide(){
+    const mistakes = countMistakes();
+    const history = collectHistory();
+    const weak = findWeakTopic(mistakes);
+    const recentWrong = recentWrongCount(history);
+
+    /*
+      Priority order:
+      1. Active mistakes waiting to be fixed/retested
+      2. Repeated weak topic
+      3. Recent test errors
+      4. Practice
+      5. Revision
+    */
+
+    if(mistakes.active > 0){
+      const repeated = mistakes.items
+        .slice()
+        .sort(function(a,b){
+          return Number(b.attempts||1) - Number(a.attempts||1);
+        })[0];
+
+      const topic = String(
+        repeated?.topic || weak.topic || "your weak area"
+      );
+
+      return {
+        type:"mistake-fix",
+        title:"Fix your highest-impact mistake",
+        reason:
+          "You have " + mistakes.active +
+          " active mistake" +
+          (mistakes.active === 1 ? "" : "s") +
+          ". Fixing these before new learning prevents repeat errors.",
+        priority:"HIGH",
+        label:"FIX",
+        topic:topic,
+        questionId:String(repeated?.id || ""),
+        button:"Fix Mistakes"
+      };
+    }
+
+    if(weak.count >= 2){
+      return {
+        type:"weak-topic",
+        title:"Strengthen " + weak.topic,
+        reason:
+          weak.count +
+          " active errors are connected to this area. " +
+          "Do focused practice before moving on.",
+        priority:"HIGH",
+        label:"WEAK AREA",
+        topic:weak.topic,
+        button:"Practice Weak Area"
+      };
+    }
+
+    if(recentWrong >= 3){
+      return {
+        type:"analysis",
+        title:"Analyse your recent test errors",
+        reason:
+          "Your recent test history shows " +
+          recentWrong +
+          " recorded wrong/error responses. Find the pattern before the next test.",
+        priority:"MEDIUM",
+        label:"ANALYSE",
+        button:"Open Analysis"
+      };
+    }
+
+    if(history.length > 0){
+      return {
+        type:"practice",
+        title:"Do a focused practice session",
+        reason:
+          "No urgent mistake queue is detected. Build consistency with targeted practice.",
+        priority:"MEDIUM",
+        label:"PRACTICE",
+        topic:"Mixed",
+        button:"Start Practice"
+      };
+    }
+
+    return {
+      type:"learn",
+      title:"Start your first focused session",
+      reason:
+        "NICHOD needs a little performance data first. Begin with one focused learning or practice session.",
+      priority:"START",
+      label:"START",
+      topic:"Mixed",
+      button:"Start Learning"
+    };
+  }
+
+  function save(action){
+    try{
+      localStorage.setItem(
+        NEXT_KEY,
+        JSON.stringify({
+          ...action,
+          generatedAt:Date.now(),
+          source:"NICHOD"
+        })
+      );
+    }catch(e){}
+  }
+
+  function navigate(action){
+    save(action);
+
+    const type = action.type;
+
+    const routes = {
+      "mistake-fix":[
+        "mistake.html",
+        "retry.html"
+      ],
+      "weak-topic":[
+        "question-bank.html",
+        "practice.html"
+      ],
+      "analysis":[
+        "analysis.html",
+        "history.html"
+      ],
+      "practice":[
+        "question-bank.html",
+        "practice.html"
+      ],
+      "learn":[
+        "learn.html",
+        "question-bank.html"
+      ]
+    };
+
+    const list = routes[type] || [];
+
+    for(let i=0;i<list.length;i++){
+      const path = list[i];
+
+      try{
+        window.location.href = path;
+        return;
+      }catch(e){}
+    }
+
+    alert(
+      action.title +
+      "\\n\\n" +
+      action.reason
+    );
+  }
+
+  function render(){
+    const action = decide();
+
+    const title = document.getElementById("rfNBAAction");
+    const reason = document.getElementById("rfNBAReason");
+    const priority = document.getElementById("rfNBAPriority");
+    const button = document.getElementById("rfNBAButton");
+    const meta = document.getElementById("rfNBAMeta");
+
+    if(title) title.textContent = action.title;
+    if(reason) reason.textContent = action.reason;
+    if(priority) priority.textContent = action.label;
+    if(button) button.textContent = action.button;
+    if(meta){
+      meta.textContent =
+        "NICHOD priority: " +
+        action.priority +
+        " • Updated from local progress";
+    }
+
+    if(button){
+      button.onclick = function(){
+        navigate(action);
+      };
+    }
+
+    save(action);
+
+    window.RankForgeNichodNextAction = {
+      get:function(){ return decide(); },
+      refresh:render,
+      open:function(){ navigate(decide()); }
+    };
+  }
+
+  function boot(){
+    if(window.__RF_NBA_BOOTED) return;
+    window.__RF_NBA_BOOTED = true;
+    render();
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded",boot,{once:true});
+  }else{
+    boot();
+  }
+
+})();
+</script>
+<!-- /RANKFORGE_NICHOD_NEXT_ACTION_V1 -->
+
+
+<!-- RANKFORGE_RUNTIME_REPAIR_V1 -->
+<script>
+(function(){
+"use strict";
+
+const REPAIR_VERSION = "RankForgeRuntimeRepairV1";
+const PDF_POOL_KEYS = [
+  "pdfCbtQuestions",
+  "pdfQuestions",
+  "pdfQuestionBank",
+  "importedQuestions",
+  "questionBank"
+];
+const HISTORY_KEYS = [
+  "cbtHistory",
+  "rankforgeHistory",
+  "testHistory",
+  "history"
+];
+
+function readJSON(key){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){
+    return null;
+  }
+}
+
+function isQuestion(q){
+  if(!q || typeof q !== "object") return false;
+
+  const text = String(
+    q.question ??
+    q.text ??
+    q.questionText ??
+    q.prompt ??
+    ""
+  ).trim();
+
+  const options = Array.isArray(q.options)
+    ? q.options.filter(x => String(x ?? "").trim())
+    : [];
+
+  return Boolean(text && options.length >= 2);
+}
+
+function normalizeQuestion(q, index, source){
+  const text = String(
+    q.question ??
+    q.text ??
+    q.questionText ??
+    q.prompt ??
+    ""
+  ).trim();
+
+  const options = Array.isArray(q.options)
+    ? q.options.map(x => String(x ?? "").trim()).filter(Boolean)
+    : [];
+
+  let correct =
+    q.correctAnswer ??
+    q.answer ??
+    q.correct ??
+    "";
+
+  if(
+    (correct === "" || correct == null) &&
+    Number.isInteger(q.correctIndex) &&
+    options[q.correctIndex] !== undefined
+  ){
+    correct = options[q.correctIndex];
+  }
+
+  if(typeof correct === "number" && options[correct] !== undefined){
+    correct = options[correct];
+  }
+
+  return {
+    ...q,
+    id:String(q.id || q.questionId || ("pdf-recovered-" + index)),
+    question:text,
+    text:text,
+    options:options,
+    correctAnswer:String(correct ?? "").trim(),
+    subject:String(q.subject || "").trim(),
+    chapter:String(q.chapter || "").trim(),
+    topic:String(q.topic || "").trim(),
+    source:String(q.source || source || "PDF Import")
+  };
+}
+
+function collectQuestions(value, out, source){
+  if(!value) return;
+
+  if(Array.isArray(value)){
+    value.forEach((x,i) => {
+      if(isQuestion(x)){
+        out.push(normalizeQuestion(x,out.length+i,source));
+      }else if(x && typeof x === "object"){
+        collectQuestions(x,out,source);
+      }
+    });
+    return;
+  }
+
+  if(typeof value === "object"){
+    const preferred = [
+      "questions",
+      "questionPool",
+      "questionBank",
+      "items",
+      "data",
+      "testQuestions"
+    ];
+
+    preferred.forEach(key => {
+      if(value[key]) collectQuestions(value[key],out,source);
+    });
+  }
+}
+
+function uniqueQuestions(list){
+  const seen = new Set();
+  const result = [];
+
+  list.forEach(q => {
+    const fingerprint =
+      String(
+        q.id ||
+        q.questionId ||
+        q.question ||
+        q.text ||
+        ""
+      )
+      .toLowerCase()
+      .replace(/\s+/g," ")
+      .trim();
+
+    if(!fingerprint || seen.has(fingerprint)) return;
+
+    seen.add(fingerprint);
+    result.push(q);
+  });
+
+  return result;
+}
+
+function recoverPDFPool(){
+  let pool = [];
+
+  // 1. Existing PDF pool.
+  PDF_POOL_KEYS.forEach(key => {
+    const value = readJSON(key);
+    if(value) collectQuestions(value,pool,"PDF Import");
+  });
+
+  // 2. Recover from saved CBT/test history.
+  HISTORY_KEYS.forEach(key => {
+    const history = readJSON(key);
+    if(!history) return;
+
+    collectQuestions(history,pool,"PDF Import");
+  });
+
+  pool = uniqueQuestions(pool).filter(isQuestion);
+
+  if(pool.length){
+    try{
+      localStorage.setItem(
+        "pdfCbtQuestions",
+        JSON.stringify(pool)
+      );
+
+      localStorage.setItem(
+        "PDF_CBT_STORAGE_KEY",
+        "pdfCbtQuestions"
+      );
+    }catch(e){}
+  }
+
+  return pool;
+}
+
+function repairActiveTest(){
+  const keys = [
+    "CBT_ACTIVE_TEST",
+    "cbtActiveTest",
+    "activeCBTTest"
+  ];
+
+  for(const key of keys){
+    const value = readJSON(key);
+
+    if(!value || typeof value !== "object") continue;
+
+    const questions =
+      Array.isArray(value.questions)
+        ? value.questions.filter(isQuestion)
+        : [];
+
+    if(!questions.length) continue;
+
+    const repaired = {
+      ...value,
+      questions:questions,
+      questionCount:questions.length,
+      validated:true,
+      repairedBy:REPAIR_VERSION,
+      repairedAt:Date.now()
+    };
+
+    try{
+      localStorage.setItem(
+        "CBT_ACTIVE_TEST",
+        JSON.stringify(repaired)
+      );
+
+      localStorage.setItem(
+        "CBT_ACTIVE_TEST_ID",
+        String(repaired.id || repaired.testId || "")
+      );
+
+      localStorage.setItem(
+        "CBT_ACTIVE_SOURCE",
+        String(repaired.source || "PDF Import")
+      );
+    }catch(e){}
+
+    return repaired;
+  }
+
+  return null;
+}
+
+function hideInternalDiagnostics(){
+  const selectors = [
+    "#rankforgeIntegrationAudit",
+    "#integrationAudit",
+    "#nichodAudit",
+    ".rankforge-integration-audit",
+    ".nichod-health-debug",
+    ".runtime-health-debug",
+    "[data-rankforge-audit]",
+    "[data-nichod-debug]"
+  ];
+
+  selectors.forEach(sel => {
+    try{
+      document.querySelectorAll(sel).forEach(el => {
+        el.style.display = "none";
+        el.setAttribute("aria-hidden","true");
+      });
+    }catch(e){}
+  });
+
+  // Do not remove the engine. Hide only obvious student-facing
+  // diagnostic blocks containing internal audit wording.
+  document.querySelectorAll("body *").forEach(el => {
+    if(el.children.length) return;
+
+    const t = String(el.textContent || "").trim();
+
+    if(
+      /RANKFORGE INTEGRATION AUDIT V2/i.test(t) ||
+      /NICHOD HEALTH DEBUG/i.test(t) ||
+      /masterAudit\s*:/i.test(t)
+    ){
+      el.style.display = "none";
+      el.setAttribute("aria-hidden","true");
+    }
+  });
+}
+
+function publishHealth(pool,active){
+  const health = {
+    version:REPAIR_VERSION,
+    pdfPoolCount:pool.length,
+    activeTestCount:
+      active && Array.isArray(active.questions)
+        ? active.questions.length
+        : 0,
+    pdfBridge:
+      pool.length > 0 || Boolean(active),
+    status:
+      pool.length > 0 || active
+        ? "READY"
+        : "NO_DATA",
+    updatedAt:Date.now()
+  };
+
+  try{
+    localStorage.setItem(
+      "rankforgeRuntimeHealthV1",
+      JSON.stringify(health)
+    );
+  }catch(e){}
+
+  window.RankForgeRuntimeHealth = health;
+}
+
+function run(){
+  const pool = recoverPDFPool();
+  const active = repairActiveTest();
+
+  hideInternalDiagnostics();
+  publishHealth(pool,active);
+
+  window.RankForgeRuntimeRepair = {
+    version:REPAIR_VERSION,
+    pdfPoolCount:pool.length,
+    activeTestCount:
+      active && Array.isArray(active.questions)
+        ? active.questions.length
+        : 0,
+    repair:run
+  };
+
+  try{
+    window.dispatchEvent(
+      new CustomEvent(
+        "rankforge:runtime-repaired",
+        {
+          detail:{
+            pdfPoolCount:pool.length,
+            activeTestCount:
+              active && Array.isArray(active.questions)
+                ? active.questions.length
+                : 0
+          }
+        }
+      )
+    );
+  }catch(e){}
+}
+
+function boot(){
+  if(window.__RF_RUNTIME_REPAIR_DONE) return;
+  window.__RF_RUNTIME_REPAIR_DONE = true;
+
+  run();
+
+  // Re-run once after existing app modules finish their
+  // localStorage initialization.
+  setTimeout(run,700);
+  setTimeout(run,1800);
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener(
+    "DOMContentLoaded",
+    boot,
+    {once:true}
+  );
+}else{
+  boot();
+}
+
+})();
+</script>
+<!-- /RANKFORGE_RUNTIME_REPAIR_V1 -->
+
 </body>
 </html>
