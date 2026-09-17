@@ -530,31 +530,85 @@
   "use strict";
 
   function hideNichodE2EUI(){
-    const nodes = Array.from(document.querySelectorAll("body *"));
+    function hideNode(el){
+      if(!el || el.nodeType !== 1) return;
 
-    nodes.forEach(function(el){
-      const t = (el.textContent || "").trim();
+      el.style.setProperty("display","none","important");
+      el.style.setProperty("visibility","hidden","important");
+      el.style.setProperty("opacity","0","important");
+      el.setAttribute("aria-hidden","true");
+      el.setAttribute("data-rankforge-internal","nichod-e2e");
 
-      if(
-        t.includes("PCB NICHOD E2E Test") ||
-        t.includes("Status: ATTENTION") ||
-        (
-          t.includes("NICHOD Unified") &&
-          t.includes("NICHOD Health") &&
-          t.includes("PASS:")
-        )
-      ){
-        el.style.display = "none";
-        el.setAttribute("aria-hidden","true");
-        el.setAttribute("data-rankforge-internal","nichod-e2e");
+      /*
+       * The harness may create the visible diagnostic card inside
+       * another wrapper. Hide the nearest meaningful container too.
+       */
+      let parent = el.parentElement;
+      for(let i=0; i<4 && parent; i++){
+        const text = (parent.innerText || parent.textContent || "").trim();
+        if(
+          text.includes("PCB NICHOD E2E Test") ||
+          (
+            text.includes("NICHOD Unified") &&
+            text.includes("NICHOD Health") &&
+            (text.includes("PASS:") || text.includes("FAIL:"))
+          )
+        ){
+          parent.style.setProperty("display","none","important");
+          parent.style.setProperty("visibility","hidden","important");
+          parent.style.setProperty("opacity","0","important");
+          parent.setAttribute("aria-hidden","true");
+          parent.setAttribute("data-rankforge-internal","nichod-e2e");
+        }
+        parent = parent.parentElement;
       }
-    });
-  }
+    }
 
-  if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", hideNichodE2EUI, {once:true});
-  }else{
-    hideNichodE2EUI();
+    function scan(){
+      const selectors = [
+        "#nichod-e2e-overlay",
+        ".nichod-e2e",
+        ".nichod-e2e-panel",
+        ".nichod-e2e-overlay",
+        ".pcb-nichod-e2e",
+        "[data-nichod-e2e]",
+        '[data-testid="nichod-e2e"]',
+        '[id*="nichod-e2e"]',
+        '[class*="nichod-e2e"]'
+      ];
+
+      document.querySelectorAll(selectors.join(",")).forEach(hideNode);
+
+      document.querySelectorAll("body *").forEach(el=>{
+        const text = (el.innerText || el.textContent || "").trim();
+        if(
+          text === "PCB NICHOD E2E Test" ||
+          text.includes("PCB NICHOD E2E Test") ||
+          (
+            text.includes("NICHOD Unified") &&
+            text.includes("NICHOD Health") &&
+            text.includes("PASS:")
+          )
+        ){
+          hideNode(el);
+        }
+      });
+    }
+
+    scan();
+
+    if(!window.__RANKFORGE_NICHOD_HIDE_OBSERVER__){
+      window.__RANKFORGE_NICHOD_HIDE_OBSERVER__ = new MutationObserver(function(){
+        scan();
+      });
+
+      if(document.body){
+        window.__RANKFORGE_NICHOD_HIDE_OBSERVER__.observe(document.body,{
+          childList:true,
+          subtree:true
+        });
+      }
+    }
   }
 
   window.addEventListener("load", function(){
