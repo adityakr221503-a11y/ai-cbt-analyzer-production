@@ -246,8 +246,50 @@ window.CBT_MAIN_DASHBOARD = true;
 </script>
 <script src="./cbt-strategy-v7.js"></script>
 <!-- END CBT_STRATEGY_V7 -->
+<!-- Legacy dashboard controllers retained for compatibility; UI shell is centralized below. -->
 <script src="./basic-standard-dashboard-v1.js"></script>
 <script src="./rankforge-top-hub-v1.js"></script>
+
+
+<style id="RANKFORGE_FINAL_UI_V1">
+body{background:#f6f7fb!important}
+#rfConnectedShell{
+  max-width:900px!important;
+  margin:18px auto 28px!important;
+  padding:0 16px!important;
+}
+.rf-brand{
+  font-size:28px!important;
+  letter-spacing:-.8px!important;
+}
+.rf-search{
+  margin-top:4px;
+}
+.rf-quick{
+  grid-template-columns:repeat(2,1fr)!important;
+  gap:12px!important;
+}
+.rf-q{
+  min-height:92px!important;
+  padding:16px!important;
+}
+.rf-q strong{
+  font-size:15px!important;
+}
+.rf-all{
+  margin-top:12px!important;
+  min-height:50px;
+}
+.rf-drawer{
+  max-width:680px!important;
+}
+@media(max-width:520px){
+  #rfConnectedShell{padding:0 12px!important}
+  .rf-brand{font-size:23px!important}
+  .rf-quick{grid-template-columns:1fr 1fr!important}
+  .rf-q{min-height:86px!important}
+}
+</style>
 </head>
 
 <body>
