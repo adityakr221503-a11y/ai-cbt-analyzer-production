@@ -1642,6 +1642,36 @@ if(document.readyState === "loading"){
 @media(max-width:600px){.rf-feature-grid{grid-template-columns:1fr 1fr}}
 /* /RANKFORGE_FEATURE_PACK_V1 */
 
+
+/* RANKFORGE_REAL_INTEGRATION_V1 */
+.rf-ai-panel{
+  margin:14px 0;
+  padding:16px;
+  border:1px solid rgba(127,127,127,.22);
+  border-radius:16px;
+}
+.rf-ai-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+.rf-ai-stat{
+  padding:12px;
+  border-radius:12px;
+  background:rgba(127,127,127,.07);
+}
+.rf-ai-stat b{display:block;font-size:18px}
+.rf-ai-stat span{font-size:12px;opacity:.7}
+.rf-ai-action{
+  margin-top:8px;
+  padding:9px 12px;
+  border:0;
+  border-radius:9px;
+  cursor:pointer;
+  font-weight:600;
+}
+/* /RANKFORGE_REAL_INTEGRATION_V1 */
 </head>
 
 <body>
@@ -7924,6 +7954,304 @@ if(document.readyState==="loading"){
 </script>
 <!-- /RANKFORGE_FEATURE_PACK_V1 -->
 
+
+<!-- RANKFORGE_REAL_INTEGRATION_V1 -->
+<script>
+(function(){
+"use strict";
+
+const RF_REAL={
+  version:"1",
+
+  keys:{
+    history:"cbtHistory",
+    rankerHistory:"rankBoosterAttemptHistory",
+    mastery:"cbtMasteryV2",
+    retry:"cbtRetryQuestion",
+    retryQueue:"cbtAnalyzer.retryQueue",
+    bookmarks:"rankforgeBookmarks",
+    progress:"rankforgeProgress",
+    actions:"rankforgeNextActions"
+  },
+
+  read(k,fallback){
+    try{
+      const v=JSON.parse(localStorage.getItem(k)||"null");
+      return v==null?fallback:v;
+    }catch(e){return fallback}
+  },
+
+  arr(v){return Array.isArray(v)?v:[]},
+
+  history(){
+    const a=this.arr(this.read(this.keys.history,[]));
+    const b=this.arr(this.read(this.keys.rankerHistory,[]));
+    return [...a,...b];
+  },
+
+  mastery(){
+    const v=this.read(this.keys.mastery,{});
+    return v && typeof v==="object" ? v : {};
+  },
+
+  bookmarks(){
+    return this.arr(this.read(this.keys.bookmarks,[]));
+  },
+
+  retryQueue(){
+    return this.arr(this.read(this.keys.retryQueue,[]));
+  },
+
+  number(o,keys){
+    for(const k of keys){
+      if(o && o[k]!==undefined){
+        const n=Number(o[k]);
+        if(Number.isFinite(n))return n;
+      }
+    }
+    return null;
+  },
+
+  analyze(){
+    const history=this.history();
+    let tests=history.length;
+    let questions=0;
+    let correct=0;
+    let attempted=0;
+    let marks=0;
+
+    const topicMistakes={};
+
+    for(const t of history){
+      questions+=this.number(t,[
+        "questionCount","totalQuestions","total","questions"
+      ]) || (Array.isArray(t.questions)?t.questions.length:0);
+
+      const c=this.number(t,["correct","correctCount","right"]);
+      const w=this.number(t,["wrong","wrongCount","incorrect"]);
+
+      if(c!==null)correct+=c;
+      if(c!==null || w!==null)attempted+=(c||0)+(w||0);
+
+      const m=this.number(t,["score","marks","totalMarks"]);
+      if(m!==null)marks+=m;
+
+      const ms=this.arr(t.mistakes||t.wrongQuestions);
+      ms.forEach(q=>{
+        const topic=String(
+          q.topic||q.chapter||q.subject||q.unit||"Unclassified"
+        ).trim();
+
+        topicMistakes[topic]=(topicMistakes[topic]||0)+1;
+      });
+    }
+
+    const mastery=this.mastery();
+    const masteryValues=Object.values(mastery);
+    const mastered=masteryValues.filter(x=>{
+      if(!x)return false;
+      if(typeof x==="string")return x.toLowerCase()==="mastered";
+      return x.mastered===true || x.status==="mastered";
+    }).length;
+
+    const accuracy=attempted ? (correct/attempted)*100 : 0;
+
+    const weak=Object.entries(topicMistakes)
+      .map(([topic,count])=>({topic,count}))
+      .sort((a,b)=>b.count-a.count)
+      .slice(0,8);
+
+    let next;
+
+    if(this.retryQueue().length){
+      next={
+        type:"retry",
+        title:"Retry your pending mistakes",
+        reason:"Your retry queue already contains questions."
+      };
+    }else if(weak.length){
+      next={
+        type:"weak-topic",
+        title:"Practice "+weak[0].topic,
+        reason:weak[0].count+" mistake(s) recorded in this topic."
+      };
+    }else if(this.bookmarks().length){
+      next={
+        type:"bookmark",
+        title:"Review bookmarked questions",
+        reason:this.bookmarks().length+" bookmarked question(s) waiting."
+      };
+    }else if(tests===0){
+      next={
+        type:"baseline",
+        title:"Take your first CBT",
+        reason:"A baseline is needed for adaptive recommendations."
+      };
+    }else{
+      next={
+        type:"continue",
+        title:"Continue your next practice session",
+        reason:"Keep building consistent performance."
+      };
+    }
+
+    return{
+      tests,
+      questions,
+      correct,
+      attempted,
+      accuracy,
+      marks,
+      mastered,
+      retry:this.retryQueue().length,
+      bookmarks:this.bookmarks().length,
+      weak,
+      next
+    };
+  },
+
+  save(){
+    const a=this.analyze();
+    localStorage.setItem(this.keys.progress,JSON.stringify({
+      version:1,
+      updatedAt:new Date().toISOString(),
+      tests:a.tests,
+      questions:a.questions,
+      accuracy:a.accuracy,
+      mastered:a.mastered,
+      weakTopics:a.weak,
+      retryCount:a.retry,
+      bookmarkCount:a.bookmarks
+    }));
+
+    localStorage.setItem(this.keys.actions,JSON.stringify([{
+      ...a.next,
+      generatedAt:new Date().toISOString()
+    }]));
+
+    return a;
+  },
+
+  navigate(type){
+    const maps={
+      retry:["./retry.html","./mistake.html"],
+      bookmark:["./bookmarks.html","./bookmark.html"],
+      "weak-topic":["./ranker.html","./practice.html"],
+      baseline:["./ranker.html","./cbt.html"]
+    };
+
+    const candidates=maps[type]||[];
+
+    for(const href of candidates){
+      try{
+        window.location.href=href;
+        return;
+      }catch(e){}
+    }
+
+    alert("Next action: "+this.analyze().next.title);
+  },
+
+  render(){
+    if(document.querySelector("[data-rf-real-integration]"))return;
+
+    const a=this.save();
+
+    const panel=document.createElement("section");
+    panel.className="rf-ai-panel";
+    panel.dataset.rfRealIntegration="true";
+
+    panel.innerHTML=`
+      <b>RankForge AI Insights</b>
+
+      <div class="rf-ai-grid">
+        <div class="rf-ai-stat">
+          <b>${a.tests}</b><span>Tests</span>
+        </div>
+
+        <div class="rf-ai-stat">
+          <b>${a.questions}</b><span>Questions</span>
+        </div>
+
+        <div class="rf-ai-stat">
+          <b>${a.accuracy.toFixed(1)}%</b><span>Accuracy</span>
+        </div>
+
+        <div class="rf-ai-stat">
+          <b>${a.retry}</b><span>Retry Queue</span>
+        </div>
+
+        <div class="rf-ai-stat">
+          <b>${a.bookmarks}</b><span>Bookmarks</span>
+        </div>
+
+        <div class="rf-ai-stat">
+          <b>${a.mastered}</b><span>Mastered</span>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <b>Next Best Action</b>
+        <div style="margin-top:5px">${a.next.title}</div>
+        <small>${a.next.reason}</small>
+        <br>
+        <button class="rf-ai-action" type="button">
+          Continue
+        </button>
+      </div>
+
+      <div style="margin-top:14px">
+        <b>Weak Topic Signals</b>
+        <div id="rfWeakSignals"></div>
+      </div>
+    `;
+
+    const weak=panel.querySelector("#rfWeakSignals");
+
+    if(!a.weak.length){
+      weak.innerHTML="<small>No recorded weak-topic signal yet.</small>";
+    }else{
+      a.weak.slice(0,5).forEach(x=>{
+        const d=document.createElement("div");
+        d.style.marginTop="6px";
+        d.textContent=x.topic+" — "+x.count+" mistake(s)";
+        weak.appendChild(d);
+      });
+    }
+
+    panel.querySelector("button").addEventListener("click",()=>{
+      RF_REAL.navigate(a.next.type);
+    });
+
+    const target=
+      document.querySelector("main") ||
+      document.querySelector("#app") ||
+      document.querySelector(".container") ||
+      document.body;
+
+    target.appendChild(panel);
+  },
+
+  boot(){
+    try{
+      this.render();
+    }catch(e){
+      console.warn("RankForge real integration:",e);
+    }
+  }
+};
+
+window.RankForgeRealIntegration=RF_REAL;
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",()=>RF_REAL.boot(),{once:true});
+}else{
+  RF_REAL.boot();
+}
+
+})();
+</script>
+<!-- /RANKFORGE_REAL_INTEGRATION_V1 -->
 </body>
 
 </html>
