@@ -1316,5 +1316,59 @@ loadDPP();
 <script src="./cbt-unified-core.js"></script>
   <script src="./rankforge-result-mistake-engine-v1.js"></script>
 <script src="./rankforge-pdf-result-mastery-bridge-v1.js"></script>
+
+<!-- RANKFORGE_RETRY_MASTERY_BRIDGE_V1 -->
+<script src="./rankforge-learning-loop-v1.js"></script>
+<script>
+(function(){
+"use strict";
+
+function installRetryBridge(){
+  const L=window.RankForgeLearningLoop;
+  if(!L)return;
+
+  document.addEventListener("click",function(e){
+    const b=e.target.closest("button");
+    if(!b)return;
+
+    const text=(b.innerText||b.textContent||"").toLowerCase();
+
+    if(
+      text.includes("correct") ||
+      text.includes("master") ||
+      text.includes("got it")
+    ){
+      const q=window.CBT_CURRENT_QUESTION||
+              window.currentQuestion||
+              window.activeQuestion;
+
+      if(q){
+        L.completeRetry(q.id||q.questionId||q.qid,true);
+      }
+    }
+
+    if(
+      text.includes("wrong") ||
+      text.includes("retry")
+    ){
+      const q=window.CBT_CURRENT_QUESTION||
+              window.currentQuestion||
+              window.activeQuestion;
+
+      if(q){
+        L.completeRetry(q.id||q.questionId||q.qid,false);
+      }
+    }
+  });
+}
+
+if(document.readyState==="loading")
+  document.addEventListener("DOMContentLoaded",installRetryBridge,{once:true});
+else
+  installRetryBridge();
+
+})();
+</script>
+<!-- /RANKFORGE_RETRY_MASTERY_BRIDGE_V1 -->
 </body>
 </html>

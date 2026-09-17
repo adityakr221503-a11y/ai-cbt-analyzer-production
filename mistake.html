@@ -1333,5 +1333,77 @@ showActive();
   <script src="./rankforge-dpp-intelligence-v1.js"></script>
   <script src="./rankforge-mentor-decision-v1.js"></script>
 <script src="./rankforge-pdf-result-mastery-bridge-v1.js"></script>
+
+<!-- RANKFORGE_MISTAKE_BOOK_BRIDGE_V1 -->
+<script src="./rankforge-learning-loop-v1.js"></script>
+<script>
+(function(){
+"use strict";
+
+function renderLearningBridge(){
+  if(document.querySelector("[data-rf-learning-bridge]"))return;
+
+  const L=window.RankForgeLearningLoop;
+  if(!L)return;
+
+  L.syncHistory();
+
+  const mistakes=L.read(L.keys.mistakes,[]);
+  const active=mistakes.filter(x=>x.status!=="mastered");
+  const mastered=mistakes.filter(x=>x.status==="mastered");
+
+  const box=document.createElement("section");
+  box.dataset.rfLearningBridge="true";
+  box.style.cssText=
+    "margin:16px 0;padding:16px;border:1px solid rgba(127,127,127,.22);border-radius:16px";
+
+  box.innerHTML=`
+    <b>RankForge Learning Loop</b>
+    <div style="margin-top:8px">
+      Active: <b>${active.length}</b>
+      &nbsp;•&nbsp;
+      Mastered: <b>${mastered.length}</b>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" data-rf-retry>Retry Mistakes</button>
+      <button type="button" data-rf-review>Review Mastered</button>
+    </div>
+  `;
+
+  box.querySelector("[data-rf-retry]").onclick=function(){
+    if(active.length){
+      const first=active[0];
+      L.write(L.keys.retry,active);
+      L.write(L.keys.queue,active);
+      location.href="./retry.html";
+    }else{
+      alert("No active mistakes to retry.");
+    }
+  };
+
+  box.querySelector("[data-rf-review]").onclick=function(){
+    if(mastered.length){
+      alert("Mastered questions: "+mastered.length);
+    }else{
+      alert("No mastered questions yet.");
+    }
+  };
+
+  const target=
+    document.querySelector("main")||
+    document.querySelector(".container")||
+    document.body;
+
+  target.prepend(box);
+}
+
+if(document.readyState==="loading")
+  document.addEventListener("DOMContentLoaded",renderLearningBridge,{once:true});
+else
+  renderLearningBridge();
+
+})();
+</script>
+<!-- /RANKFORGE_MISTAKE_BOOK_BRIDGE_V1 -->
 </body>
 </html>
