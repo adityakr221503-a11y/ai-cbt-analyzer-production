@@ -17,9 +17,7 @@ const ACTIVE_KEY = "CBT_ACTIVE_TEST";
 const ACTIVE_ID = "CBT_ACTIVE_TEST_ID";
 const ACTIVE_SOURCE = "CBT_ACTIVE_TEST_SOURCE";
 
-const HISTORY_KEY = "cbtHistory";
 const ATTEMPT_KEY = "cbtTestSessions";
-const MISTAKE_KEY = "rankBoosterAttemptHistory";
 const RETRY_KEY = "cbtRetryQuestion";
 const MASTERY_KEY = "cbtMasteryV2";
 
@@ -306,225 +304,61 @@ function startAITest(config={}){
  * Accepts common CBT result shapes and creates a stable
  * RankForge attempt record.
  */
-function recordResult(result={}){
-  const active =
-    read(ACTIVE_KEY,null);
+function recordResult(result){
+  /*
+   * SINGLE-SOURCE-OF-TRUTH:
+   *
+   * CBT itself owns:
+   *   scoring
+   *   cbtHistory
+   *   rankBoosterAttemptHistory
+   *   mistake creation
+   *   mastery
+   *   retry queue
+   *
+   * The AI integration must NEVER create a second
+   * scoring/mistake pipeline.
+   *
+   * This function only stores a lightweight AI result
+   * marker for diagnostics/metadata consumers.
+   */
+  try{
+    const active=read(ACTIVE_KEY,null);
 
-  if(!active ||
-     active.sourceType !== "AI_GENERATED"){
+    if(!active || active.sourceType!=="AI_GENERATED"){
+      return {
+        ok:false,
+        ignored:true,
+        reason:"Not an approved AI CBT session"
+      };
+    }
+
+    const marker={
+      version:"AI-CBT-V1",
+      timestamp:Date.now(),
+      testId:active.id || active.testId || "",
+      sourceType:"AI_GENERATED",
+      source:"RankForge Approved AI Bank",
+      questionCount:Array.isArray(active.questions)
+        ? active.questions.length
+        : 0,
+      delegatedToExistingCBT:true
+    };
+
+    write("rankforgeAICBTResultMarkerV1",marker);
+
+    return {
+      ok:true,
+      delegated:true,
+      marker
+    };
+  }catch(error){
+    console.error("AI CBT result marker error:",error);
     return {
       ok:false,
-      reason:"Not an approved AI CBT session"
+      error:String(error && error.message || error)
     };
   }
-
-  const questions =
-    array(active.questions);
-
-  const answers =
-    result.answers ||
-    result.userAnswers ||
-    result.responses ||
-    {};
-
-  const mistakes=[];
-  let correct=0;
-  let wrong=0;
-  let skipped=0;
-
-  questions.forEach((q,i)=>{
-    let user =
-      Array.isArray(answers)
-        ? answers[i]
-        : answers[q.id];
-
-    if(user === undefined)
-      user = result[i];
-
-    const hasAnswer =
-      user !== undefined &&
-      user !== null &&
-      String(user) !== "";
-
-    if(!hasAnswer){
-      skipped++;
-      return;
-    }
-
-    const ui = Number(user);
-
-    if(Number.isInteger(ui) &&
-       ui === Number(q.correctIndex)){
-      correct++;
-    }else{
-      wrong++;
-
-      mistakes.push({
-        id:
-          "AI-MISTAKE-" +
-          Date.now() +
-          "-" +
-          i,
-        questionId:q.id,
-        question:q.text,
-        options:q.options,
-        correctIndex:q.correctIndex,
-        userAnswer:
-          Number.isInteger(ui) ? ui : user,
-        subject:q.subject,
-        chapter:q.chapter,
-        topic:q.topic,
-        difficulty:q.difficulty,
-        trapType:q.trapType ||
-          "AI_GENERATED",
-        sourceType:"AI_GENERATED",
-        source:"RankForge Approved AI Bank",
-        reason:"Not classified yet",
-        status:"ACTIVE",
-        firstSeenAt:new Date().toISOString()
-      });
-    }
-  });
-
-  const score =
-    correct * 4 -
-    wrong;
-
-  const total =
-    questions.length;
-
-  const percentage =
-    total
-      ? (correct / total) * 100
-      : 0;
-
-  const attempt = {
-    id:
-      "AI-ATTEMPT-" +
-      Date.now().toString(36),
-    testId:active.id,
-    title:active.title,
-    sourceType:"AI_GENERATED",
-    source:"RankForge Approved AI Bank",
-    mode:active.mode,
-    total,
-    correct,
-    wrong,
-    skipped,
-    score,
-    percentage,
-    questions:questions.map((q,i)=>({
-      id:q.id,
-      text:q.text,
-      options:q.options,
-      correctIndex:q.correctIndex,
-      userAnswer:
-        Array.isArray(answers)
-          ? answers[i]
-          : answers[q.id],
-      subject:q.subject,
-      chapter:q.chapter,
-      topic:q.topic,
-      difficulty:q.difficulty,
-      trapType:q.trapType,
-      sourceType:"AI_GENERATED"
-    })),
-    mistakes,
-    completedAt:new Date().toISOString()
-  };
-
-  const history =
-    array(read(HISTORY_KEY,[]));
-
-  history.unshift(attempt);
-  write(HISTORY_KEY,history.slice(0,200));
-
-  const sessions =
-    array(read(ATTEMPT_KEY,[]));
-
-  sessions.unshift(attempt);
-  write(ATTEMPT_KEY,sessions.slice(0,200));
-
-  const oldMistakes =
-    array(read(MISTAKE_KEY,[]));
-
-  write(
-    MISTAKE_KEY,
-    oldMistakes
-      .concat(mistakes)
-      .slice(-1000)
-  );
-
-  mistakes.forEach(m=>{
-    write(
-      RETRY_KEY,
-      m
-    );
-  });
-
-  /*
-   * Mastery bookkeeping.
-   */
-  const mastery =
-    read(MASTERY_KEY,{});
-
-  mistakes.forEach(m=>{
-    const key =
-      m.topic ||
-      m.chapter ||
-      m.subject ||
-      m.questionId;
-
-    mastery[key] =
-      mastery[key] || {
-        attempts:0,
-        mistakes:0,
-        mastered:false,
-        lastSeenAt:null
-      };
-
-    mastery[key].mistakes++;
-    mastery[key].lastSeenAt =
-      new Date().toISOString();
-  });
-
-  questions.forEach(q=>{
-    const key =
-      q.topic ||
-      q.chapter ||
-      q.subject ||
-      q.id;
-
-    mastery[key] =
-      mastery[key] || {
-        attempts:0,
-        mistakes:0,
-        mastered:false,
-        lastSeenAt:null
-      };
-
-    mastery[key].attempts++;
-
-    if(
-      mastery[key].attempts >= 2 &&
-      mastery[key].mistakes === 0
-    ){
-      mastery[key].mastered=true;
-    }
-  });
-
-  write(MASTERY_KEY,mastery);
-
-  return {
-    ok:true,
-    attempt,
-    correct,
-    wrong,
-    skipped,
-    score,
-    percentage,
-    mistakes:mistakes.length
-  };
 }
 
 function getLastAIResult(){
