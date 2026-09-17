@@ -251,6 +251,326 @@ window.CBT_MAIN_DASHBOARD = true;
 
 <body>
 
+<!-- RANKFORGE_CONNECTED_VIEW_V1 -->
+<style id="RANKFORGE_CONNECTED_VIEW_CSS">
+#rfConnectedShell{
+  max-width:1100px;
+  margin:0 auto 22px;
+  padding:0 15px;
+  position:relative;
+  z-index:50;
+}
+.rf-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.rf-brand{
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:-.4px;
+}
+.rf-brand span{opacity:.55}
+.rf-search{
+  width:100%;
+  padding:15px 17px;
+  border:1px solid rgba(100,116,139,.22);
+  border-radius:16px;
+  background:var(--card,#fff);
+  color:inherit;
+  outline:none;
+  font-size:15px;
+  box-shadow:0 5px 20px rgba(15,23,42,.06);
+}
+.rf-search:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 4px rgba(99,102,241,.10);
+}
+.rf-search-results{
+  display:none;
+  margin-top:8px;
+  background:var(--card,#fff);
+  border:1px solid rgba(100,116,139,.18);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 12px 30px rgba(15,23,42,.10);
+}
+.rf-search-results.show{display:block}
+.rf-result{
+  display:block;
+  padding:13px 15px;
+  color:inherit;
+  text-decoration:none;
+  border-bottom:1px solid rgba(100,116,139,.10);
+}
+.rf-result:last-child{border-bottom:0}
+.rf-result:hover{background:rgba(99,102,241,.07)}
+.rf-result b{display:block}
+.rf-result small{opacity:.6}
+.rf-quick{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+.rf-q{
+  min-height:72px;
+  border:1px solid rgba(100,116,139,.16);
+  border-radius:16px;
+  padding:13px;
+  background:var(--card,#fff);
+  color:inherit;
+  text-decoration:none;
+  box-shadow:0 4px 15px rgba(15,23,42,.045);
+  transition:.15s;
+}
+.rf-q:hover{transform:translateY(-2px)}
+.rf-q strong{display:block;font-size:14px}
+.rf-q small{display:block;margin-top:5px;opacity:.6}
+.rf-all{
+  width:100%;
+  margin-top:12px;
+  padding:13px;
+  border:1px solid rgba(99,102,241,.25);
+  border-radius:15px;
+  background:rgba(99,102,241,.08);
+  color:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
+#rfFeatureDrawer{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(15,23,42,.48);
+  padding:20px;
+  overflow:auto;
+}
+#rfFeatureDrawer.show{display:block}
+.rf-drawer{
+  max-width:760px;
+  margin:30px auto;
+  padding:20px;
+  border-radius:22px;
+  background:var(--card,#fff);
+  color:inherit;
+  box-shadow:0 25px 70px rgba(0,0,0,.25);
+}
+.rf-drawer-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.rf-close{
+  border:0;
+  background:rgba(100,116,139,.12);
+  border-radius:10px;
+  padding:9px 12px;
+  cursor:pointer;
+  color:inherit;
+}
+.rf-feature-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+.rf-feature{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  padding:15px;
+  border:1px solid rgba(100,116,139,.16);
+  border-radius:15px;
+  background:rgba(100,116,139,.035);
+}
+.rf-feature:hover{background:rgba(99,102,241,.08)}
+.rf-feature b{display:block}
+.rf-feature small{display:block;margin-top:5px;opacity:.62}
+@media(max-width:700px){
+  .rf-quick{grid-template-columns:repeat(2,1fr)}
+  .rf-feature-grid{grid-template-columns:1fr}
+  .rf-brand{font-size:21px}
+}
+</style>
+
+<section id="rfConnectedShell" aria-label="RankForge AI navigation">
+  <div class="rf-top">
+    <div class="rf-brand">RankForge <span>AI</span></div>
+  </div>
+
+  <input
+    id="rfGlobalSearch"
+    class="rf-search"
+    type="search"
+    autocomplete="off"
+    placeholder="🔍 Search tests, practice, revision, mistakes, features..."
+    aria-label="Search RankForge AI"
+  >
+
+  <div id="rfSearchResults" class="rf-search-results"></div>
+
+  <div class="rf-quick">
+    <a class="rf-q" href="rankers-test-series.html">
+      🏆 <strong>Rankers Tests</strong>
+      <small>Independent test series</small>
+    </a>
+    <a class="rf-q" href="pdf-to-cbt.html">
+      📄 <strong>PDF → CBT</strong>
+      <small>Import & practice</small>
+    </a>
+    <a class="rf-q" href="rankforge-ai-new-questions.html">
+      🤖 <strong>AI Practice</strong>
+      <small>AI question flow</small>
+    </a>
+    <a class="rf-q" href="mistake.html">
+      📕 <strong>Mistake Book</strong>
+      <small>Retry & improve</small>
+    </a>
+  </div>
+
+  <button id="rfOpenFeatures" class="rf-all">
+    ☰ All Features — Open RankForge AI
+  </button>
+</section>
+
+<div id="rfFeatureDrawer" role="dialog" aria-modal="true" aria-label="RankForge AI features">
+  <div class="rf-drawer">
+    <div class="rf-drawer-head">
+      <div>
+        <h2 style="margin:0">RankForge AI</h2>
+        <small style="opacity:.6">Everything connected. Data stays independent.</small>
+      </div>
+      <button id="rfCloseFeatures" class="rf-close">✕</button>
+    </div>
+
+    <div class="rf-feature-grid">
+      <a class="rf-feature" href="rankers-test-series.html">
+        🏆 <b>Rankers Test Series</b>
+        <small>Independent Ranker questions & CBT</small>
+      </a>
+      <a class="rf-feature" href="pdf-to-cbt.html">
+        📄 <b>PDF → CBT</b>
+        <small>Independent imported-PDF CBT</small>
+      </a>
+      <a class="rf-feature" href="rankforge-ai-new-questions.html">
+        🤖 <b>AI Question Practice</b>
+        <small>Independent AI question flow</small>
+      </a>
+      <a class="rf-feature" href="question-bank.html">
+        📚 <b>Question Bank</b>
+        <small>Browse and practice questions</small>
+      </a>
+      <a class="rf-feature" href="mistake.html">
+        📕 <b>Mistake Book</b>
+        <small>Mistakes, retry and mastery</small>
+      </a>
+      <a class="rf-feature" href="history.html">
+        📊 <b>Test History</b>
+        <small>Past attempts and results</small>
+      </a>
+      <a class="rf-feature" href="analysis.html">
+        🧠 <b>AI / Performance Analysis</b>
+        <small>Understand performance patterns</small>
+      </a>
+      <a class="rf-feature" href="retry.html">
+        🔄 <b>Retry Practice</b>
+        <small>Practice mistakes again</small>
+      </a>
+      <a class="rf-feature" href="ranker-command-center.html">
+        🎯 <b>Ranker Command Center</b>
+        <small>Mentor, strategy and controls</small>
+      </a>
+      <a class="rf-feature" href="ranker-revision/index.html">
+        📖 <b>Revision</b>
+        <small>Chapter-wise revision</small>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script id="RANKFORGE_CONNECTED_VIEW_JS">
+(function(){
+  const features = [
+    ["🏆 Rankers Test Series","rankers-test-series.html","ranker test test series"],
+    ["📄 PDF → CBT","pdf-to-cbt.html","pdf cbt import"],
+    ["🤖 AI Question Practice","rankforge-ai-new-questions.html","ai practice ai questions"],
+    ["📚 Question Bank","question-bank.html","question bank"],
+    ["📕 Mistake Book","mistake.html","mistake mistakes retry"],
+    ["📊 Test History","history.html","history attempts"],
+    ["🧠 Performance Analysis","analysis.html","analysis performance"],
+    ["🔄 Retry Practice","retry.html","retry practice"],
+    ["🎯 Ranker Command Center","ranker-command-center.html","command center mentor"],
+    ["📖 Revision","ranker-revision/index.html","revision chapters"]
+  ];
+
+  const search=document.getElementById("rfGlobalSearch");
+  const results=document.getElementById("rfSearchResults");
+  const drawer=document.getElementById("rfFeatureDrawer");
+  const open=document.getElementById("rfOpenFeatures");
+  const close=document.getElementById("rfCloseFeatures");
+
+  function render(query){
+    const q=(query||"").trim().toLowerCase();
+    if(!q){
+      results.innerHTML="";
+      results.classList.remove("show");
+      return;
+    }
+
+    const hits=features.filter(x =>
+      (x[0]+" "+x[2]).toLowerCase().includes(q)
+    );
+
+    results.innerHTML=hits.length
+      ? hits.map(x =>
+          '<a class="rf-result" href="'+x[1]+'">'+
+          '<b>'+x[0]+'</b><small>Open module →</small></a>'
+        ).join("")
+      : '<div class="rf-result"><b>No direct match</b><small>Try test, PDF, AI, mistake, revision, history...</small></div>';
+
+    results.classList.add("show");
+  }
+
+  search.addEventListener("input",()=>render(search.value));
+
+  open.addEventListener("click",()=>{
+    drawer.classList.add("show");
+    document.body.style.overflow="hidden";
+  });
+
+  close.addEventListener("click",()=>{
+    drawer.classList.remove("show");
+    document.body.style.overflow="";
+  });
+
+  drawer.addEventListener("click",e=>{
+    if(e.target===drawer){
+      drawer.classList.remove("show");
+      document.body.style.overflow="";
+    }
+  });
+
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){
+      drawer.classList.remove("show");
+      document.body.style.overflow="";
+    }
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){
+      e.preventDefault();
+      search.focus();
+    }
+  });
+})();
+</script>
+<!-- END RANKFORGE_CONNECTED_VIEW_V1 -->
+
+
+
 <section class="revision-box" id="revisionSheet">
   <div class="revision-head">
     <div>
