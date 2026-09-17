@@ -6318,6 +6318,7 @@ window.addEventListener(
 window.addEventListener("load", function () {
   setTimeout(function () {
     var bridgeReady =
+      !!window.RankForgePDFCBTFlowV1 ||
       !!window.PCBNICHODPDF ||
       !!window.PCBPDFLiveImportBridge;
 
@@ -7023,6 +7024,354 @@ if(document.readyState==="loading"){
 })();
 </script>
 <!-- /RANKFORGE_CBT_MISTAKE_BRIDGE_V1 -->
+
+
+<!-- RANKFORGE_CBT_MISTAKE_AUTOCAPTURE_V2 -->
+<script>
+(function(){
+  "use strict";
+
+  const KEY="rankforgeMistakeMasteryV1";
+  const DONE="rankforgeCBTMistakeCaptureIdsV2";
+
+  function read(key,fallback){
+    try{
+      const x=JSON.parse(localStorage.getItem(key)||"");
+      return x==null?fallback:x;
+    }catch(e){
+      return fallback;
+    }
+  }
+
+  function write(key,value){
+    try{
+      localStorage.setItem(key,JSON.stringify(value));
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  function clean(v){
+    return String(v==null?"":v)
+      .replace(/\u0000/g,"")
+      .replace(/\s+/g," ")
+      .trim();
+  }
+
+  function idOf(q,i){
+    return clean(
+      q && (
+        q.id ||
+        q.questionId ||
+        q.uid ||
+        q._id
+      )
+    ) || ("cbt-question-"+i);
+  }
+
+  function textOf(q){
+    return clean(q && (
+      q.question ||
+      q.text ||
+      q.questionText ||
+      q.prompt ||
+      q.title
+    ));
+  }
+
+  function answerOf(q){
+    if(!q) return null;
+
+    if(q.userAnswer!=null) return q.userAnswer;
+    if(q.selectedAnswer!=null) return q.selectedAnswer;
+    if(q.selectedOption!=null) return q.selectedOption;
+    if(q.selectedIndex!=null) return q.selectedIndex;
+    if(q.answer!=null) return q.answer;
+
+    return null;
+  }
+
+  function correctOf(q){
+    if(!q) return null;
+
+    if(q.correctAnswer!=null) return q.correctAnswer;
+    if(q.correctIndex!=null) return q.correctIndex;
+    if(q.correctOption!=null) return q.correctOption;
+    if(q.answerKey!=null) return q.answerKey;
+    if(q.correct!=null && typeof q.correct!=="boolean") return q.correct;
+
+    return null;
+  }
+
+  function isWrong(q){
+    if(!q) return false;
+
+    if(q.isCorrect===false) return true;
+    if(q.correct===false) return true;
+    if(String(q.result||"").toLowerCase()==="wrong") return true;
+    if(String(q.status||"").toLowerCase()==="wrong") return true;
+
+    const a=answerOf(q);
+    const c=correctOf(q);
+
+    if(a==null || a==="") return false;
+    if(c==null || c==="") return false;
+
+    if(typeof a==="number" && typeof c==="number"){
+      return a!==c;
+    }
+
+    return clean(a).toLowerCase()!==clean(c).toLowerCase();
+  }
+
+  function reasonOf(q){
+    return clean(q && (
+      q.mistakeReason ||
+      q.reason ||
+      q.errorType ||
+      q.mistakeType
+    )) || "Conceptual";
+  }
+
+  function topicOf(q){
+    return clean(q && (
+      q.topic ||
+      q.chapter ||
+      q.unit
+    )) || "Mixed";
+  }
+
+  function subjectOf(q){
+    return clean(q && q.subject) || "Mixed";
+  }
+
+  function capture(q,index,source){
+    if(!q || !isWrong(q)) return false;
+
+    const id=idOf(q,index);
+    const db=read(KEY,{active:[],mastered:[]});
+
+    if(!Array.isArray(db.active)) db.active=[];
+    if(!Array.isArray(db.mastered)) db.mastered=[];
+
+    const done=read(DONE,{});
+    if(done[id]){
+      return false;
+    }
+
+    const now=Date.now();
+
+    const existing=db.active.find(x=>String(x.id)===id);
+
+    if(existing){
+      existing.attempts=Math.max(
+        1,
+        Number(existing.attempts||1)+1
+      );
+      existing.lastSeen=now;
+      existing.source=source||existing.source||"CBT";
+      existing.reason=reasonOf(q);
+    }else{
+      db.active.push({
+        id:id,
+        question:textOf(q),
+        subject:subjectOf(q),
+        topic:topicOf(q),
+        reason:reasonOf(q),
+        attempts:1,
+        source:source||"CBT",
+        lastSeen:now,
+        status:"active"
+      });
+    }
+
+    db.mastered=db.mastered.filter(
+      x=>String(x.id)!==id
+    );
+
+    done[id]=now;
+
+    write(KEY,db);
+    write(DONE,done);
+
+    return true;
+  }
+
+  function arrays(root,seen){
+    if(!root || typeof root!=="object") return [];
+
+    if(!seen) seen=new Set();
+
+    if(seen.has(root)) return [];
+    seen.add(root);
+
+    const out=[];
+
+    if(Array.isArray(root)){
+      out.push(root);
+
+      root.forEach(x=>{
+        if(x && typeof x==="object"){
+          out.push(...arrays(x,seen));
+        }
+      });
+
+      return out;
+    }
+
+    const keys=[
+      "questions",
+      "questionResults",
+      "results",
+      "answers",
+      "attempts",
+      "items",
+      "review",
+      "questionList"
+    ];
+
+    keys.forEach(k=>{
+      if(Array.isArray(root[k])){
+        out.push(root[k]);
+      }
+    });
+
+    return out;
+  }
+
+  function scanObject(root,source){
+    let captured=0;
+
+    arrays(root).forEach(arr=>{
+      arr.forEach((q,i)=>{
+        if(capture(q,i,source)){
+          captured++;
+        }
+      });
+    });
+
+    return captured;
+  }
+
+  function scanStorage(){
+    let captured=0;
+
+    const keys=[
+      "CBT_RESULT",
+      "CBT_RESULT_DATA",
+      "cbtResult",
+      "cbtResults",
+      "currentCBTResult",
+      "lastCBTResult",
+      "testResult",
+      "attemptResult",
+      "CBT_ACTIVE_TEST",
+      "CBT_ACTIVE_RESULT",
+      "CBT_CURRENT_RESULT",
+      "pdfCbtQuestions"
+    ];
+
+    keys.forEach(key=>{
+      try{
+        const raw=localStorage.getItem(key);
+        if(!raw) return;
+
+        const parsed=JSON.parse(raw);
+        captured+=scanObject(parsed,key);
+      }catch(e){}
+    });
+
+    return captured;
+  }
+
+  function scanGlobals(){
+    let captured=0;
+
+    const names=[
+      "CBT_RESULT",
+      "CBT_RESULT_DATA",
+      "cbtResult",
+      "currentCBTResult",
+      "lastCBTResult",
+      "testResult"
+    ];
+
+    names.forEach(name=>{
+      try{
+        if(window[name]){
+          captured+=scanObject(window[name],"CBT");
+        }
+      }catch(e){}
+    });
+
+    return captured;
+  }
+
+  function run(){
+    const a=scanStorage();
+    const b=scanGlobals();
+    const total=a+b;
+
+    try{
+      window.RankForgeCBTMistakeAutoCapture={
+        scan:run,
+        captured:total,
+        read:function(){
+          return read(KEY,{active:[],mastered:[]});
+        }
+      };
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "rankforge:mistakes-captured",
+          {detail:{count:total}}
+        )
+      );
+    }catch(e){}
+
+    return total;
+  }
+
+  function schedule(){
+    run();
+
+    [500,1200,2500,5000].forEach(ms=>{
+      setTimeout(run,ms);
+    });
+  }
+
+  window.RankForgeCBTMistakeAutoCapture={
+    scan:run,
+    captured:0,
+    read:function(){
+      return read(KEY,{active:[],mastered:[]});
+    }
+  };
+
+  if(document.readyState==="loading"){
+    document.addEventListener(
+      "DOMContentLoaded",
+      schedule,
+      {once:true}
+    );
+  }else{
+    schedule();
+  }
+
+  window.addEventListener(
+    "load",
+    function(){
+      [500,1500,3000].forEach(ms=>{
+        setTimeout(run,ms);
+      });
+    },
+    {once:true}
+  );
+
+})();
+</script>
+<!-- /RANKFORGE_CBT_MISTAKE_AUTOCAPTURE_V2 -->
 
 </body>
 
