@@ -1626,6 +1626,22 @@ if(document.readyState === "loading"){
 }
 </style>
 
+
+/* RANKFORGE_FEATURE_PACK_V1 */
+.rf-feature-pack{font-family:inherit}
+.rf-feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:14px 0}
+.rf-feature-card{border:1px solid rgba(127,127,127,.22);border-radius:14px;padding:13px;background:rgba(127,127,127,.06)}
+.rf-feature-card b{display:block;font-size:15px;margin-bottom:5px}
+.rf-feature-card span{font-size:12px;opacity:.72}
+.rf-action-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.rf-action{border:0;border-radius:10px;padding:9px 12px;cursor:pointer;font-weight:600}
+.rf-panel{border:1px solid rgba(127,127,127,.2);border-radius:16px;padding:16px;margin:14px 0}
+.rf-small{font-size:12px;opacity:.72}
+.rf-progress{height:8px;border-radius:99px;background:rgba(127,127,127,.18);overflow:hidden}
+.rf-progress>i{display:block;height:100%;width:0}
+@media(max-width:600px){.rf-feature-grid{grid-template-columns:1fr 1fr}}
+/* /RANKFORGE_FEATURE_PACK_V1 */
+
 </head>
 
 <body>
@@ -7635,6 +7651,278 @@ if(document.readyState==="loading"){
 })();
 </script>
 <!-- /RANKFORGE_HIDE_NICHOD_E2E_UI_V1 -->
+
+
+<!-- RANKFORGE_FEATURE_PACK_V1 -->
+<script>
+(function(){
+"use strict";
+
+const RF={
+  version:"1",
+  keys:{
+    history:"cbtHistory",
+    mistakes:"rankforgeMistakes",
+    bookmarks:"rankforgeBookmarks",
+    progress:"rankforgeProgress",
+    actions:"rankforgeNextActions"
+  },
+
+  read(key,fallback){
+    try{
+      const v=JSON.parse(localStorage.getItem(key)||"null");
+      return v==null?fallback:v;
+    }catch(e){return fallback}
+  },
+
+  write(key,value){
+    try{localStorage.setItem(key,JSON.stringify(value));return true}
+    catch(e){return false}
+  },
+
+  history(){
+    const candidates=["cbtHistory","testHistory","cbt_history"];
+    for(const k of candidates){
+      const v=this.read(k,[]);
+      if(Array.isArray(v)&&v.length)return v;
+    }
+    return [];
+  },
+
+  mistakes(){
+    const v=this.read(this.keys.mistakes,[]);
+    return Array.isArray(v)?v:[];
+  },
+
+  bookmarks(){
+    const v=this.read(this.keys.bookmarks,[]);
+    return Array.isArray(v)?v:[];
+  },
+
+  extractScore(t){
+    if(!t||typeof t!=="object")return null;
+    for(const k of ["score","marks","percentage","percent","accuracy"]){
+      const n=Number(t[k]);
+      if(Number.isFinite(n))return n;
+    }
+    return null;
+  },
+
+  extractQuestions(t){
+    if(!t||typeof t!=="object")return 0;
+    for(const k of ["questionCount","totalQuestions","total","questionsAttempted"]){
+      const n=Number(t[k]);
+      if(Number.isFinite(n))return n;
+    }
+    if(Array.isArray(t.questions))return t.questions.length;
+    return 0;
+  },
+
+  stats(){
+    const h=this.history();
+    const scores=h.map(x=>this.extractScore(x)).filter(Number.isFinite);
+    const questions=h.reduce((a,x)=>a+this.extractQuestions(x),0);
+    const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:0;
+
+    return{
+      tests:h.length,
+      avg,
+      questions,
+      mistakes:this.mistakes().length,
+      bookmarks:this.bookmarks().length
+    };
+  },
+
+  weakTopics(){
+    const m=this.mistakes();
+    const map={};
+
+    for(const x of m){
+      const topic=String(
+        x.topic||x.chapter||x.subject||x.unit||"Unclassified"
+      ).trim();
+
+      if(!map[topic])map[topic]={topic,count:0};
+      map[topic].count++;
+    }
+
+    return Object.values(map).sort((a,b)=>b.count-a.count);
+  },
+
+  nextActions(){
+    const out=[];
+    const st=this.stats();
+    const weak=this.weakTopics();
+
+    if(st.mistakes>0)
+      out.push({
+        type:"mistake-retest",
+        title:"Retry your mistakes",
+        reason:`${st.mistakes} mistake${st.mistakes===1?"":"s"} available for review.`,
+        priority:1
+      });
+
+    if(weak.length)
+      out.push({
+        type:"weak-topic",
+        title:`Practice ${weak[0].topic}`,
+        reason:`Most recorded mistakes: ${weak[0].count}`,
+        priority:2
+      });
+
+    if(st.bookmarks>0)
+      out.push({
+        type:"bookmark-review",
+        title:"Review bookmarked questions",
+        reason:`${st.bookmarks} bookmarked question${st.bookmarks===1?"":"s"}.`,
+        priority:3
+      });
+
+    if(st.tests===0)
+      out.push({
+        type:"first-test",
+        title:"Start your first CBT",
+        reason:"Build your baseline performance.",
+        priority:1
+      });
+
+    if(!out.length)
+      out.push({
+        type:"practice",
+        title:"Continue practice",
+        reason:"Keep building consistent accuracy and speed.",
+        priority:4
+      });
+
+    return out;
+  },
+
+  saveAction(action){
+    const a=this.read(this.keys.actions,[]);
+    const arr=Array.isArray(a)?a:[];
+    arr.unshift({...action,createdAt:new Date().toISOString()});
+    this.write(this.keys.actions,arr.slice(0,100));
+  },
+
+  render(){
+    if(document.querySelector("[data-rf-feature-pack]"))return;
+
+    const root=document.createElement("section");
+    root.className="rf-feature-pack";
+    root.dataset.rfFeaturePack="true";
+
+    const st=this.stats();
+    const actions=this.nextActions();
+    const weak=this.weakTopics();
+
+    root.innerHTML=`
+      <div class="rf-panel">
+        <b>RankForge AI Progress</b>
+        <div class="rf-feature-grid">
+          <div class="rf-feature-card"><b>${st.tests}</b><span>Tests</span></div>
+          <div class="rf-feature-card"><b>${st.questions}</b><span>Questions</span></div>
+          <div class="rf-feature-card"><b>${Math.round(st.avg*10)/10}</b><span>Avg. Performance</span></div>
+          <div class="rf-feature-card"><b>${st.mistakes}</b><span>Mistakes</span></div>
+          <div class="rf-feature-card"><b>${st.bookmarks}</b><span>Bookmarks</span></div>
+        </div>
+      </div>
+
+      <div class="rf-panel">
+        <b>Next Best Actions</b>
+        <div id="rfNextActions"></div>
+      </div>
+
+      <div class="rf-panel">
+        <b>Weak Topic Signals</b>
+        <div id="rfWeakTopics"></div>
+      </div>
+    `;
+
+    const actionsEl=root.querySelector("#rfNextActions");
+    actions.forEach(a=>{
+      const card=document.createElement("div");
+      card.className="rf-feature-card";
+      card.innerHTML=`
+        <b>${a.title}</b>
+        <span>${a.reason}</span>
+        <div class="rf-action-row">
+          <button class="rf-action" type="button">Open</button>
+        </div>
+      `;
+
+      card.querySelector("button").addEventListener("click",()=>{
+        RF.saveAction(a);
+
+        const type=a.type;
+
+        if(type==="mistake-retest"){
+          const el=document.querySelector(
+            'a[href*="mistake"],button[data-action*="mistake"],button[id*="mistake"]'
+          );
+          if(el)el.click();
+          else alert("Mistake Book is available from your app navigation.");
+        }else if(type==="bookmark-review"){
+          const el=document.querySelector(
+            'a[href*="bookmark"],button[data-action*="bookmark"],button[id*="bookmark"]'
+          );
+          if(el)el.click();
+          else alert("Bookmarks are available from your app navigation.");
+        }else{
+          const el=document.querySelector(
+            'a[href*="practice"],button[data-action*="practice"],button[id*="practice"]'
+          );
+          if(el)el.click();
+          else alert(a.reason);
+        }
+      });
+
+      actionsEl.appendChild(card);
+    });
+
+    const weakEl=root.querySelector("#rfWeakTopics");
+    if(!weak.length){
+      weakEl.innerHTML='<div class="rf-small">No weak-topic signal yet. Complete a test to generate one.</div>';
+    }else{
+      weak.slice(0,5).forEach((w,i)=>{
+        const card=document.createElement("div");
+        card.className="rf-feature-card";
+        card.innerHTML=`
+          <b>${i+1}. ${w.topic}</b>
+          <span>${w.count} recorded mistake${w.count===1?"":"s"}</span>
+        `;
+        weakEl.appendChild(card);
+      });
+    }
+
+    const targets=[
+      document.querySelector("main"),
+      document.querySelector("#app"),
+      document.querySelector(".container"),
+      document.body
+    ];
+
+    (targets.find(Boolean)||document.body).appendChild(root);
+  },
+
+  boot(){
+    try{
+      this.render();
+    }catch(e){
+      console.warn("RankForge feature pack:",e);
+    }
+  }
+};
+
+window.RankForgeFeaturePack=RF;
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",()=>RF.boot(),{once:true});
+}else{
+  RF.boot();
+}
+})();
+</script>
+<!-- /RANKFORGE_FEATURE_PACK_V1 -->
 
 </body>
 
