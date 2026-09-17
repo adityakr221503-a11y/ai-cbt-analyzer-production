@@ -8709,6 +8709,292 @@ window.RankForgePDFCBTPriorityV3={
 </script>
 <!-- /RANKFORGE_PDF_CBT_PRIORITY_V3 -->
 
+
+<script>
+/* ============================================================
+   RANKFORGE PDF FINAL RUNTIME OVERRIDE V5
+   PDF import has priority over Test 180 everywhere.
+============================================================ */
+(function(){
+
+  "use strict";
+
+  function getPDFQuestions(){
+    try{
+      var source =
+        sessionStorage.getItem("CBT_ACTIVE_SOURCE") || "";
+
+      var raw =
+        sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+
+      if(source.toUpperCase() === "PDF" && raw){
+        var q = JSON.parse(raw);
+
+        if(Array.isArray(q) && q.length){
+          return q;
+        }
+      }
+
+      var lsSource =
+        localStorage.getItem("CBT_ACTIVE_SOURCE") || "";
+
+      var lsTest =
+        localStorage.getItem("CBT_ACTIVE_TEST");
+
+      if(
+        lsSource.toUpperCase().indexOf("PDF") >= 0 &&
+        lsTest
+      ){
+        var test = JSON.parse(lsTest);
+
+        if(
+          test &&
+          Array.isArray(test.questions) &&
+          test.questions.length
+        ){
+          sessionStorage.setItem(
+            "CBT_ACTIVE_SOURCE",
+            "PDF"
+          );
+
+          sessionStorage.setItem(
+            "CBT_ACTIVE_QUESTIONS",
+            JSON.stringify(test.questions)
+          );
+
+          return test.questions;
+        }
+      }
+    }catch(e){
+      console.error(
+        "[RF PDF V5] recovery error",
+        e
+      );
+    }
+
+    return [];
+  }
+
+  function activatePDF(){
+
+    var questions = getPDFQuestions();
+
+    if(!questions.length){
+      return false;
+    }
+
+    window.__RF_PDF_ACTIVE__ = true;
+    window.CBT_PDF_MODE = true;
+    window.CBT_PDF_QUESTIONS = questions;
+    window.CBT_ACTIVE_QUESTIONS = questions;
+
+    /* --------------------------------------------------------
+       Replace test selector with imported PDF test
+    -------------------------------------------------------- */
+
+    var select =
+      document.getElementById("testSelect");
+
+    if(select){
+
+      select.innerHTML = "";
+
+      var option =
+        document.createElement("option");
+
+      option.value = "__PDF_IMPORT__";
+
+      option.textContent =
+        "📄 PDF Imported Test (" +
+        questions.length +
+        " Questions)";
+
+      option.selected = true;
+
+      select.appendChild(option);
+
+      select.disabled = true;
+    }
+
+    /* --------------------------------------------------------
+       Replace visible Test 180 labels
+    -------------------------------------------------------- */
+
+    var replacements = [
+      "Adaptive CBT Test Series — Test 180",
+      "Adaptive CBT Test Series - Test 180",
+      "Test 180 loaded successfully — 180 questions ready.",
+      "Test 180 loaded successfully - 180 questions ready.",
+      "Topper Test Pro — 180 Question Starter Test",
+      "Topper Test Pro - 180 Question Starter Test"
+    ];
+
+    function cleanText(root){
+
+      if(!root) return;
+
+      var walker =
+        document.createTreeWalker(
+          root,
+          NodeFilter.SHOW_TEXT
+        );
+
+      var nodes = [];
+      var n;
+
+      while(n = walker.nextNode()){
+        nodes.push(n);
+      }
+
+      nodes.forEach(function(node){
+
+        var text = node.nodeValue;
+
+        replacements.forEach(function(oldText){
+          if(text.indexOf(oldText) >= 0){
+            text =
+              text.split(oldText).join(
+                "PDF Imported Test"
+              );
+          }
+        });
+
+        node.nodeValue = text;
+      });
+    }
+
+    cleanText(document.body);
+
+    /* --------------------------------------------------------
+       Known status/info elements
+    -------------------------------------------------------- */
+
+    [
+      "bankStatus",
+      "testInfo",
+      "testTitle",
+      "selectedTestTitle",
+      "testDescription"
+    ].forEach(function(id){
+
+      var el =
+        document.getElementById(id);
+
+      if(!el) return;
+
+      if(id === "bankStatus"){
+        el.className = "status success";
+        el.textContent =
+          "✅ PDF imported successfully — " +
+          questions.length +
+          " questions ready.";
+      }
+
+      else if(id === "testInfo"){
+        el.textContent =
+          "PDF Imported Test • " +
+          questions.length +
+          " questions";
+      }
+
+      else{
+        el.textContent =
+          "📄 PDF Imported Test";
+      }
+    });
+
+    /* --------------------------------------------------------
+       Force question-count UI
+    -------------------------------------------------------- */
+
+    var count =
+      document.getElementById("questionCount");
+
+    if(count){
+
+      count.innerHTML = "";
+
+      var opt =
+        document.createElement("option");
+
+      opt.value = String(questions.length);
+      opt.textContent =
+        "All Questions (" +
+        questions.length +
+        ")";
+
+      opt.selected = true;
+
+      count.appendChild(opt);
+    }
+
+    /* --------------------------------------------------------
+       Prevent accidental Test 180 selection
+    -------------------------------------------------------- */
+
+    if(select){
+
+      select.addEventListener(
+        "change",
+        function(e){
+
+          if(
+            window.__RF_PDF_ACTIVE__ &&
+            select.value !== "__PDF_IMPORT__"
+          ){
+            e.preventDefault();
+
+            select.value =
+              "__PDF_IMPORT__";
+          }
+
+        },
+        true
+      );
+    }
+
+    console.log(
+      "[RF PDF V5] PDF ACTIVE:",
+      questions.length
+    );
+
+    return true;
+  }
+
+  function boot(){
+
+    if(activatePDF()){
+      return;
+    }
+
+    console.log(
+      "[RF PDF V5] No active PDF session"
+    );
+  }
+
+  if(document.readyState === "loading"){
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      {once:true}
+    );
+
+  }else{
+    boot();
+  }
+
+  window.addEventListener(
+    "load",
+    function(){
+      setTimeout(activatePDF, 50);
+      setTimeout(activatePDF, 300);
+    }
+  );
+
+})();
+</script>
+
 </body>
 
 </html>
