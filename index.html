@@ -289,9 +289,101 @@ body{background:#f6f7fb!important}
   .rf-q{min-height:86px!important}
 }
 </style>
+<style>
+
+/* RankForge Premium: legacy My Tests UI is preserved in DOM/data,
+   but hidden from the primary student-facing Home experience. */
+#myTests,
+#my-tests,
+.my-tests,
+.myTests,
+[data-section="my-tests"],
+[data-page="my-tests"],
+[id*="myTests"],
+[class*="my-tests"] {
+  display: none !important;
+}
+
+</style>
+
+<style id="rankforge-clean-home-v1">
+/* =========================================================
+   RANKFORGE CLEAN HOME V1
+   New premium shell owns the Home UI.
+   Legacy Home/Test-list markup is NOT deleted.
+   ========================================================= */
+
+html body.rf-rankforge-clean-home > *:not(#rankforgePremiumHomeV4):not(script):not(style) {
+  display: none !important;
+}
+
+/* Never allow legacy test-list UI to appear inside the new Home. */
+#myTests,
+#my-tests,
+.myTests,
+.my-tests,
+[data-section="my-tests"],
+[data-page="my-tests"],
+[id*="myTests"],
+[class*="my-tests"] {
+  display: none !important;
+}
+
+/* Old dashboard shells */
+#rfConnectedShell,
+#rfFeatureDrawer,
+#revisionSheet,
+#rankersTestSeriesDashboard,
+#rankforgeLegacyHome,
+.rf-quick,
+.rf-all {
+  display: none !important;
+}
+</style>
+
 </head>
 
 <body>
+
+<!-- RANKFORGE PREMIUM HOME V3 PRIMARY MOUNT -->
+<div id="rankforgePremiumPrimaryMount"></div>
+<style>
+  /* Keep legacy homepage shells available in DOM for compatibility,
+     but do not let them compete with the new primary home. */
+  #rfConnectedShell,
+  #rfFeatureDrawer,
+  #revisionSheet,
+  #rankersTestSeriesDashboard,
+  #rankforgeLegacyHome,
+  .rf-quick,
+  .rf-all {
+    display:none !important;
+  }
+</style>
+<script>
+(function(){
+  function bootRankForgePremiumHome(){
+    try{
+      if(window.RankForgePremiumHomeV3 &&
+         typeof window.RankForgePremiumHomeV3.render === "function"){
+        window.RankForgePremiumHomeV3.render();
+        return true;
+      }
+    }catch(e){
+      console.error("RankForge Premium Home boot error:", e);
+    }
+    return false;
+  }
+
+  if(!bootRankForgePremiumHome()){
+    window.addEventListener("load", function(){
+      setTimeout(bootRankForgePremiumHome, 50);
+    }, {once:true});
+  }
+})();
+</script>
+
+
 
 <!-- RANKFORGE_CONNECTED_VIEW_V1 -->
 <style id="RANKFORGE_CONNECTED_VIEW_CSS">
@@ -1514,5 +1606,20 @@ back.addEventListener("click",function(){
   <script src="./rankforge-dpp-intelligence-v1.js"></script>
   <script src="./rankforge-mentor-decision-v1.js"></script>
   <script src="./rankforge-daily-loop-v1.js"></script>
+
+<script id="rankforge-clean-home-boot">
+(function () {
+  function apply() {
+    if (document.body) {
+      document.body.classList.add("rf-rankforge-clean-home");
+    }
+  }
+  apply();
+  if (!document.body) {
+    document.addEventListener("DOMContentLoaded", apply, {once:true});
+  }
+})();
+</script>
+
 </body>
 </html>
