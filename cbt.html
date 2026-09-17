@@ -6178,6 +6178,41 @@ window.addEventListener("load", function () {
 })();
 </script>
 
+<script src="./rankforge-approved-ai-cbt-integration-v1.js"></script>\n
+<script>
+(function(){
+"use strict";
+
+function rfWireAIResult(){
+  const api=window.RankForgeApprovedAICBTIntegrationV1;
+  if(!api || typeof api.recordResult!=="function") return;
+
+  /*
+   * Expose a stable hook for the existing CBT result engine.
+   * Existing result rendering remains untouched.
+   */
+  window.RankForgeRecordAIResult=function(result){
+    try{
+      return api.recordResult(result||{});
+    }catch(e){
+      return {
+        ok:false,
+        reason:e.message
+      };
+    }
+  };
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener(
+    "DOMContentLoaded",
+    rfWireAIResult
+  );
+}else{
+  rfWireAIResult();
+}
+})();
+</script>
 </body>
 
 </html>\n\n\n
