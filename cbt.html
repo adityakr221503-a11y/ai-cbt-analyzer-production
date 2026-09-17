@@ -1832,6 +1832,273 @@ if(document.readyState === "loading"){
 
 <body>
 
+<script>
+/* ============================================================
+   RANKFORGE CBT ROOT PDF AUTHORITY V6
+   PDF session is checked immediately and repeatedly.
+   It cannot be replaced by stale Test 180 UI/runtime.
+============================================================ */
+(function(){
+
+  "use strict";
+
+  if(window.__RF_CBT_ROOT_PDF_V6__) return;
+  window.__RF_CBT_ROOT_PDF_V6__ = true;
+
+  function readPDF(){
+
+    try{
+
+      var source =
+        sessionStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ) || "";
+
+      var raw =
+        sessionStorage.getItem(
+          "CBT_ACTIVE_QUESTIONS"
+        );
+
+      if(
+        source.toUpperCase() === "PDF" &&
+        raw
+      ){
+
+        var q =
+          JSON.parse(raw);
+
+        if(
+          Array.isArray(q) &&
+          q.length
+        ){
+          return q;
+        }
+      }
+
+      /*
+       * Recovery from V8 localStorage mirror.
+       */
+      var lsSource =
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ) || "";
+
+      var lsRaw =
+        localStorage.getItem(
+          "CBT_ACTIVE_TEST"
+        );
+
+      if(
+        lsSource.toUpperCase().indexOf("PDF") >= 0 &&
+        lsRaw
+      ){
+
+        var test =
+          JSON.parse(lsRaw);
+
+        if(
+          test &&
+          Array.isArray(test.questions) &&
+          test.questions.length
+        ){
+
+          sessionStorage.setItem(
+            "CBT_ACTIVE_SOURCE",
+            "PDF"
+          );
+
+          sessionStorage.setItem(
+            "CBT_ACTIVE_QUESTIONS",
+            JSON.stringify(
+              test.questions
+            )
+          );
+
+          return test.questions;
+        }
+      }
+
+    }catch(err){
+
+      console.error(
+        "[RF CBT V6] PDF read error:",
+        err
+      );
+    }
+
+    return [];
+  }
+
+  function apply(){
+
+    var q = readPDF();
+
+    if(!q.length) return;
+
+    window.__RF_PDF_ROOT_ACTIVE__ = true;
+    window.CBT_PDF_MODE = true;
+    window.CBT_PDF_QUESTIONS = q;
+    window.CBT_ACTIVE_QUESTIONS = q;
+
+    /*
+     * Never allow reset-block flag to interfere
+     * with an intentionally imported PDF.
+     */
+    sessionStorage.removeItem(
+      "CBT_RESET_BLOCK_TEST180"
+    );
+
+    var status =
+      document.getElementById(
+        "bankStatus"
+      );
+
+    if(status){
+
+      status.className =
+        "status success";
+
+      status.textContent =
+        "✅ PDF imported successfully — " +
+        q.length +
+        " questions ready.";
+    }
+
+    /*
+     * Change every visible Test 180 label.
+     */
+    var oldTexts = [
+      "Adaptive CBT Test Series — Test 180",
+      "Adaptive CBT Test Series - Test 180",
+      "Test 180 loaded successfully — 180 questions ready.",
+      "Test 180 loaded successfully - 180 questions ready.",
+      "Topper Test Pro — 180 Question Starter Test",
+      "Topper Test Pro - 180 Question Starter Test"
+    ];
+
+    var walker =
+      document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT
+      );
+
+    var nodes = [];
+    var node;
+
+    while(node = walker.nextNode()){
+      nodes.push(node);
+    }
+
+    nodes.forEach(function(n){
+
+      var text = n.nodeValue;
+
+      oldTexts.forEach(function(oldText){
+
+        if(text.indexOf(oldText) >= 0){
+
+          text =
+            text.split(oldText).join(
+              "PDF Imported Test"
+            );
+        }
+
+      });
+
+      n.nodeValue = text;
+    });
+
+    /*
+     * Disable Test 180 selector while PDF is active.
+     */
+    var select =
+      document.getElementById(
+        "testSelect"
+      );
+
+    if(select){
+
+      select.disabled = true;
+
+      var pdfOption =
+        Array.from(
+          select.options || []
+        ).find(function(o){
+          return (
+            String(o.value) ===
+            "__PDF_ROOT_V6__"
+          );
+        });
+
+      if(!pdfOption){
+
+        select.innerHTML = "";
+
+        pdfOption =
+          document.createElement(
+            "option"
+          );
+
+        pdfOption.value =
+          "__PDF_ROOT_V6__";
+
+        pdfOption.textContent =
+          "📄 PDF Imported Test (" +
+          q.length +
+          " Questions)";
+
+        pdfOption.selected = true;
+
+        select.appendChild(
+          pdfOption
+        );
+      }
+    }
+
+    console.log(
+      "[RF CBT V6] PDF SOURCE LOCK:",
+      q.length
+    );
+  }
+
+  function boot(){
+
+    apply();
+
+    /*
+     * Other legacy engines can mutate the UI after boot,
+     * so reassert a few times.
+     */
+    setTimeout(apply, 50);
+    setTimeout(apply, 250);
+    setTimeout(apply, 750);
+    setTimeout(apply, 1500);
+  }
+
+  if(document.readyState === "loading"){
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      {once:true}
+    );
+
+  }else{
+    boot();
+  }
+
+  window.addEventListener(
+    "load",
+    function(){
+      setTimeout(apply,100);
+      setTimeout(apply,500);
+    }
+  );
+
+})();
+</script>
+
+
 <script id="rankforge-premium-cbt-js">
 /* RANKFORGE_PREMIUM_CBT_SHELL_V1 */
 (function(){

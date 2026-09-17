@@ -1202,6 +1202,407 @@
 
 <body>
 
+<script>
+/* ============================================================
+   RANKFORGE PDF ROOT AUTHORITY V6
+   ROOT FIX:
+   - no input cloning
+   - no button cloning
+   - document capture survives legacy handlers
+   - selected File object is retained independently
+============================================================ */
+(function(){
+
+  "use strict";
+
+  if(window.__RF_PDF_ROOT_V6__) return;
+  window.__RF_PDF_ROOT_V6__ = true;
+
+  var selectedFile = null;
+  var converting = false;
+
+  function status(text){
+    var el = document.getElementById("status");
+    if(el) el.textContent = text;
+    console.log("[RF PDF V6]", text);
+  }
+
+  function isPDFInput(el){
+    return el &&
+      el.tagName === "INPUT" &&
+      el.type === "file" &&
+      (
+        el.id === "pdfInput" ||
+        String(el.accept || "").toLowerCase().indexOf("pdf") >= 0
+      );
+  }
+
+  function isConvertButton(el){
+    if(!el) return false;
+
+    if(el.id === "convertButton") return true;
+
+    var text =
+      String(el.textContent || "")
+        .trim()
+        .toLowerCase();
+
+    return (
+      text.indexOf("convert pdf") >= 0 ||
+      text.indexOf("pdf → cbt") >= 0 ||
+      text.indexOf("pdf -> cbt") >= 0
+    );
+  }
+
+  /* ----------------------------------------------------------
+     FILE SELECTION
+  ---------------------------------------------------------- */
+
+  document.addEventListener(
+    "change",
+    function(e){
+
+      var input = e.target;
+
+      if(!isPDFInput(input)) return;
+
+      var file =
+        input.files &&
+        input.files.length
+          ? input.files[0]
+          : null;
+
+      if(!file){
+        selectedFile = null;
+        status("Select a PDF to begin.");
+        return;
+      }
+
+      selectedFile = file;
+
+      try{
+        sessionStorage.setItem(
+          "CBT_ACTIVE_SOURCE",
+          "PDF"
+        );
+
+        sessionStorage.removeItem(
+          "CBT_RESET_BLOCK_TEST180"
+        );
+
+        sessionStorage.setItem(
+          "PDF_ACTIVE_FILENAME",
+          file.name
+        );
+      }catch(_){}
+
+      var button =
+        document.getElementById("convertButton");
+
+      if(button){
+        button.disabled = false;
+        button.removeAttribute("disabled");
+      }
+
+      status(
+        "📄 PDF selected: " +
+        file.name
+      );
+
+      console.log(
+        "[RF PDF V6] FILE CAPTURED:",
+        file.name,
+        file.size
+      );
+
+    },
+    true
+  );
+
+  /* ----------------------------------------------------------
+     CONVERSION
+  ---------------------------------------------------------- */
+
+  document.addEventListener(
+    "click",
+    async function(e){
+
+      var target = e.target;
+
+      var button =
+        target &&
+        target.closest
+          ? target.closest("button")
+          : null;
+
+      if(!button || !isConvertButton(button)){
+        return;
+      }
+
+      /*
+       * IMPORTANT:
+       * Stop every old PDF handler.
+       */
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      if(converting) return;
+
+      if(!selectedFile){
+
+        /*
+         * Recover directly from the CURRENT input.
+         */
+        var input =
+          document.getElementById("pdfInput");
+
+        if(
+          input &&
+          input.files &&
+          input.files.length
+        ){
+          selectedFile = input.files[0];
+        }
+      }
+
+      if(!selectedFile){
+
+        status(
+          "❌ No PDF selected. Please choose a PDF first."
+        );
+
+        return;
+      }
+
+      if(
+        !window.PDFCBTProductionV8 ||
+        typeof window.PDFCBTProductionV8.convert !==
+          "function"
+      ){
+
+        status(
+          "❌ PDF engine V8 is not available."
+        );
+
+        console.error(
+          "[RF PDF V6] V8 engine missing"
+        );
+
+        return;
+      }
+
+      converting = true;
+      button.disabled = true;
+
+      try{
+
+        sessionStorage.setItem(
+          "CBT_ACTIVE_SOURCE",
+          "PDF"
+        );
+
+        sessionStorage.removeItem(
+          "CBT_RESET_BLOCK_TEST180"
+        );
+
+        sessionStorage.setItem(
+          "PDF_ACTIVE_FILENAME",
+          selectedFile.name
+        );
+
+        status(
+          "⏳ Converting PDF: " +
+          selectedFile.name
+        );
+
+        console.log(
+          "[RF PDF V6] START CONVERSION"
+        );
+
+        await window.PDFCBTProductionV8.convert(
+          selectedFile
+        );
+
+        /*
+         * V8 has now written the authoritative
+         * PDF question pool/session.
+         */
+        var raw =
+          sessionStorage.getItem(
+            "CBT_ACTIVE_QUESTIONS"
+          );
+
+        var questions = [];
+
+        try{
+          questions =
+            raw ? JSON.parse(raw) : [];
+        }catch(_){
+          questions = [];
+        }
+
+        if(
+          !Array.isArray(questions) ||
+          !questions.length
+        ){
+
+          status(
+            "❌ Conversion finished but no questions were saved."
+          );
+
+          console.error(
+            "[RF PDF V6] EMPTY SESSION AFTER CONVERSION"
+          );
+
+          return;
+        }
+
+        status(
+          "✅ PDF imported successfully — " +
+          questions.length +
+          " questions ready."
+        );
+
+        console.log(
+          "[RF PDF V6] QUESTIONS SAVED:",
+          questions.length
+        );
+
+        /*
+         * Give user a direct Open CBT button.
+         */
+        var open =
+          document.getElementById(
+            "rfV6OpenCBT"
+          );
+
+        if(!open){
+
+          open =
+            document.createElement("button");
+
+          open.id =
+            "rfV6OpenCBT";
+
+          open.type =
+            "button";
+
+          open.className =
+            "primary";
+
+          open.style.marginTop =
+            "10px";
+
+          open.textContent =
+            "🚀 Open Imported PDF in CBT";
+
+          var row =
+            document.querySelector(".button-row");
+
+          if(row){
+            row.appendChild(open);
+          }
+
+          open.addEventListener(
+            "click",
+            function(ev){
+
+              ev.preventDefault();
+              ev.stopPropagation();
+
+              try{
+
+                var activeRaw =
+                  sessionStorage.getItem(
+                    "CBT_ACTIVE_QUESTIONS"
+                  );
+
+                var qs =
+                  activeRaw
+                    ? JSON.parse(activeRaw)
+                    : [];
+
+                if(
+                  !Array.isArray(qs) ||
+                  !qs.length
+                ){
+                  status(
+                    "❌ No imported PDF questions found."
+                  );
+                  return;
+                }
+
+                sessionStorage.setItem(
+                  "CBT_ACTIVE_SOURCE",
+                  "PDF"
+                );
+
+                sessionStorage.setItem(
+                  "CBT_ACTIVE_QUESTIONS",
+                  JSON.stringify(qs)
+                );
+
+                window.location.href =
+                  "./cbt.html?source=pdf&rfv6=1";
+
+              }catch(err){
+
+                console.error(err);
+
+                status(
+                  "❌ Could not open PDF CBT."
+                );
+              }
+
+            },
+            true
+          );
+        }
+
+      }catch(err){
+
+        console.error(
+          "[RF PDF V6] CONVERSION ERROR:",
+          err
+        );
+
+        status(
+          "❌ PDF conversion failed: " +
+          (
+            err &&
+            err.message
+              ? err.message
+              : String(err)
+          )
+        );
+
+      }finally{
+
+        converting = false;
+
+        var currentButton =
+          document.getElementById(
+            "convertButton"
+          );
+
+        if(currentButton){
+          currentButton.disabled = false;
+        }
+      }
+
+    },
+    true
+  );
+
+  console.log(
+    "[RF PDF V6] ROOT AUTHORITY ACTIVE"
+  );
+
+})();
+</script>
+
+
 <header>
 
   <div class="header">
