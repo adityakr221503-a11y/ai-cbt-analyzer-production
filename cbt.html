@@ -1219,9 +1219,351 @@
 })();
 </script>
 
+
+<style id="rankforge-premium-cbt-css">
+/* RANKFORGE_PREMIUM_CBT_SHELL_V1 */
+:root{
+ --rf-bg:#f5f7fb;
+ --rf-card:#fff;
+ --rf-text:#101828;
+ --rf-muted:#667085;
+ --rf-border:#e4e7ec;
+ --rf-brand:#4f46e5;
+ --rf-brand2:#7c3aed;
+ --rf-shadow:0 12px 35px rgba(16,24,40,.08);
+}
+body{
+ background:
+ radial-gradient(circle at 10% 0%,rgba(79,70,229,.07),transparent 30%),
+ radial-gradient(circle at 90% 0%,rgba(124,58,237,.06),transparent 30%),
+ var(--rf-bg)!important;
+ color:var(--rf-text);
+}
+#rf-premium-cbt{
+ position:sticky;
+ top:0;
+ z-index:9999;
+ width:min(1180px,calc(100% - 20px));
+ margin:8px auto 10px;
+ padding:10px 12px;
+ border:1px solid var(--rf-border);
+ border-radius:17px;
+ background:rgba(255,255,255,.94);
+ backdrop-filter:blur(14px);
+ box-shadow:var(--rf-shadow);
+ display:flex;
+ align-items:center;
+ gap:9px;
+ flex-wrap:wrap;
+}
+.rf-logo{
+ width:34px;height:34px;
+ display:grid;place-items:center;
+ border-radius:11px;
+ color:#fff;
+ font-weight:900;
+ background:linear-gradient(135deg,var(--rf-brand),var(--rf-brand2));
+}
+.rf-brand{
+ display:flex;
+ align-items:center;
+ gap:9px;
+ margin-right:auto;
+ font-weight:900;
+}
+.rf-brand small{
+ display:block;
+ font-size:9px;
+ letter-spacing:.08em;
+ color:var(--rf-muted);
+}
+.rf-pill{
+ padding:8px 11px;
+ border:1px solid var(--rf-border);
+ border-radius:10px;
+ background:#fff;
+ color:#344054;
+ font-size:12px;
+ font-weight:800;
+}
+#rf-palette-open{
+ border:0;
+ border-radius:10px;
+ padding:9px 13px;
+ color:#fff;
+ font-weight:900;
+ cursor:pointer;
+ background:linear-gradient(135deg,var(--rf-brand),var(--rf-brand2));
+}
+#rf-progress{
+ width:min(1180px,calc(100% - 20px));
+ height:5px;
+ margin:0 auto 12px;
+ overflow:hidden;
+ border-radius:99px;
+ background:#e4e7ec;
+}
+#rf-progress span{
+ display:block;
+ width:0%;
+ height:100%;
+ border-radius:inherit;
+ background:linear-gradient(90deg,var(--rf-brand),var(--rf-brand2));
+ transition:width .25s ease;
+}
+#rf-palette{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:10000;
+ background:rgba(16,24,40,.4);
+ backdrop-filter:blur(3px);
+}
+#rf-palette.open{display:block}
+#rf-palette-card{
+ position:absolute;
+ top:70px;
+ right:12px;
+ width:min(390px,calc(100% - 24px));
+ max-height:calc(100vh - 85px);
+ overflow:auto;
+ padding:15px;
+ border-radius:19px;
+ background:#fff;
+ box-shadow:0 25px 70px rgba(16,24,40,.2);
+}
+#rf-palette-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:12px;
+}
+#rf-palette-close{
+ border:0;
+ width:34px;height:34px;
+ border-radius:10px;
+ background:#f2f4f7;
+ font-size:22px;
+ cursor:pointer;
+}
+#rf-palette-grid{
+ display:grid;
+ grid-template-columns:repeat(5,1fr);
+ gap:7px;
+}
+.rf-q{
+ min-height:40px;
+ border:1px solid var(--rf-border);
+ border-radius:9px;
+ background:#fff;
+ font-weight:800;
+ cursor:pointer;
+}
+.rf-q.done{background:#eef2ff;border-color:#c7d2fe}
+.rf-q.current{box-shadow:0 0 0 2px rgba(79,70,229,.18);border-color:var(--rf-brand)}
+@media(max-width:650px){
+ #rf-premium-cbt{width:calc(100% - 10px);margin:5px auto 8px}
+ .rf-brand{width:100%;margin-right:0}
+ .rf-pill{flex:1;text-align:center}
+ #rf-palette-open{flex:1}
+ #rf-progress{width:calc(100% - 10px)}
+}
+</style>
 </head>
 
 <body>
+
+<script id="rankforge-premium-cbt-js">
+/* RANKFORGE_PREMIUM_CBT_SHELL_V1 */
+(function(){
+"use strict";
+
+function el(id){return document.getElementById(id)}
+
+function readQuestions(){
+ try{
+  var active=JSON.parse(localStorage.getItem("CBT_ACTIVE_TEST")||"null");
+  if(active && Array.isArray(active.questions) && active.questions.length)
+   return active.questions;
+
+  var raw=sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+  if(raw){
+   var q=JSON.parse(raw);
+   if(Array.isArray(q)) return q;
+  }
+
+  var keys=["pdfCbtQuestions","rankForgeAIQuestionBankV1","rankBoosterQuestionBankV1"];
+  for(var i=0;i<keys.length;i++){
+   var x=localStorage.getItem(keys[i]);
+   if(!x) continue;
+   var v=JSON.parse(x);
+   if(Array.isArray(v)&&v.length) return v;
+   if(v&&Array.isArray(v.questions)&&v.questions.length) return v.questions;
+  }
+ }catch(e){}
+ return [];
+}
+
+function source(){
+ try{
+  var a=JSON.parse(localStorage.getItem("CBT_ACTIVE_TEST")||"null");
+  if(a){
+   if(a.sourceType==="AI_GENERATED") return "AI Practice";
+   if(a.source) return String(a.source);
+   if(a.title) return String(a.title);
+  }
+ }catch(e){}
+ return sessionStorage.getItem("CBT_ACTIVE_SOURCE")||"CBT Test";
+}
+
+function findCurrent(total){
+ var t=document.body.innerText||"";
+ var m=t.match(/Question\s+(\d+)\s*(?:of|\/)\s*(\d+)/i);
+ if(m) return Math.max(0,Math.min(total-1,parseInt(m[1],10)-1));
+
+ if(typeof window.currentQuestionIndex==="number")
+  return Math.max(0,Math.min(total-1,window.currentQuestionIndex));
+
+ if(typeof window.currentIndex==="number")
+  return Math.max(0,Math.min(total-1,window.currentIndex));
+
+ return -1;
+}
+
+function go(index){
+ var fns=["goToQuestion","jumpToQuestion","navigateToQuestion","loadQuestion","showQuestion"];
+ for(var i=0;i<fns.length;i++){
+  if(typeof window[fns[i]]==="function"){
+   try{window[fns[i]](index);return true}catch(e){}
+  }
+ }
+ return false;
+}
+
+function build(){
+ if(el("rf-premium-cbt")) return;
+
+ var bar=document.createElement("div");
+ bar.id="rf-premium-cbt";
+ bar.innerHTML=
+ '<div class="rf-brand"><div class="rf-logo">R</div>'+
+ '<div>RankForge AI<small>PREMIUM CBT</small></div></div>'+
+ '<div class="rf-pill" id="rf-count">CBT</div>'+
+ '<div class="rf-pill" id="rf-timer">⏱ Test</div>'+
+ '<button id="rf-palette-open" type="button">☷ Questions</button>';
+
+ document.body.insertBefore(bar,document.body.firstChild);
+
+ var prog=document.createElement("div");
+ prog.id="rf-progress";
+ prog.innerHTML="<span></span>";
+ bar.after(prog);
+
+ var drawer=document.createElement("div");
+ drawer.id="rf-palette";
+ drawer.innerHTML=
+ '<div id="rf-palette-card">'+
+ '<div id="rf-palette-head"><strong>Question Palette</strong>'+
+ '<button id="rf-palette-close" type="button">×</button></div>'+
+ '<div id="rf-palette-grid"></div></div>';
+
+ document.body.appendChild(drawer);
+
+ el("rf-palette-open").onclick=function(){
+  renderPalette();
+  drawer.classList.add("open");
+ };
+ el("rf-palette-close").onclick=function(){
+  drawer.classList.remove("open");
+ };
+ drawer.onclick=function(e){
+  if(e.target===drawer) drawer.classList.remove("open");
+ };
+}
+
+function renderPalette(){
+ var grid=el("rf-palette-grid");
+ var qs=readQuestions();
+ var total=qs.length;
+
+ if(!total){
+  grid.innerHTML='<div style="grid-column:1/-1;padding:12px;color:#667085">Questions loading…</div>';
+  return;
+ }
+
+ var current=findCurrent(total);
+ grid.innerHTML="";
+
+ for(var i=0;i<total;i++){
+  var b=document.createElement("button");
+  b.type="button";
+  b.className="rf-q";
+  b.textContent=i+1;
+
+  if(i===current) b.classList.add("current");
+
+  try{
+   if(window.answers && window.answers[i]!==undefined &&
+      window.answers[i]!==null && window.answers[i]!=="")
+    b.classList.add("done");
+  }catch(e){}
+
+  b.onclick=(function(n){
+   return function(){
+    go(n);
+    el("rf-palette").classList.remove("open");
+   };
+  })(i);
+
+  grid.appendChild(b);
+ }
+}
+
+function refresh(){
+ var qs=readQuestions();
+ if(!qs.length) return;
+
+ var current=findCurrent(qs.length);
+
+ if(current>=0){
+  el("rf-count").textContent=(current+1)+" / "+qs.length;
+  el("rf-progress").firstElementChild.style.width=
+   (((current+1)/qs.length)*100)+"%";
+ }
+
+ var timers=document.querySelectorAll(
+  "#timer,.timer,#countdown,.countdown,[id*='timer' i],[class*='timer' i]"
+ );
+ for(var i=0;i<timers.length;i++){
+  var x=timers[i];
+  if(x.id==="rf-timer") continue;
+  if(x.offsetParent!==null){
+   var tx=(x.innerText||x.textContent||"").trim();
+   if(tx && tx.length<40){
+    el("rf-timer").textContent="⏱ "+tx;
+    break;
+   }
+  }
+ }
+}
+
+function init(){
+ build();
+ refresh();
+ setInterval(refresh,700);
+ document.addEventListener("keydown",function(e){
+  if(e.key==="Escape" && el("rf-palette"))
+   el("rf-palette").classList.remove("open");
+ });
+}
+
+if(document.readyState==="loading")
+ document.addEventListener("DOMContentLoaded",init);
+else init();
+
+})();
+</script>
+
 
 <header>
 
