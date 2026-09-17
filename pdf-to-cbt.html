@@ -3012,103 +3012,80 @@ function exportPDFTestData() {
 ===================================================== */
 
 function openCBTWithPDFQuestions() {
+  try {
+    const questions =
+      typeof getQuestionsForCBT === "function"
+        ? getQuestionsForCBT()
+        : (typeof getPDFQuestionPool === "function"
+            ? getPDFQuestionPool()
+            : []);
 
-  const questions =
-    getQuestionsForCBT();
+    if (!Array.isArray(questions) || !questions.length) {
+      alert("No PDF questions available. Please import a PDF first.");
+      return;
+    }
 
+    const filename =
+      window.PDF_ACTIVE_FILENAME ||
+      localStorage.getItem("PDF_ACTIVE_FILENAME") ||
+      sessionStorage.getItem("PDF_ACTIVE_FILENAME") ||
+      "Imported PDF";
 
-  if (
-    questions.length === 0
-  ) {
+    const testId = "pdf-test-" + Date.now();
 
-    alert(
-      "No PDF questions are available yet.\n\n" +
-      "Convert a PDF module first."
+    const activeTest = {
+      id: testId,
+      title: "Topper Test Pro — PDF Module Test",
+      source: "PDF",
+      filename: filename,
+      questionCount: questions.length,
+      questions: questions,
+      questionIds: questions.map((q, i) =>
+        String(q.id || q.questionId || ("PDF-Q-" + (i + 1)))
+      ),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    /* Canonical RankForge/CBT handoff */
+    sessionStorage.setItem(
+      "CBT_ACTIVE_TEST",
+      JSON.stringify(activeTest)
+    );
+    sessionStorage.setItem(
+      "CBT_ACTIVE_TEST_ID",
+      testId
+    );
+    sessionStorage.setItem(
+      "CBT_ACTIVE_TEST_SOURCE",
+      "PDF"
     );
 
-    return;
+    /* Legacy PDF → CBT compatibility */
+    sessionStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "PDF"
+    );
+    sessionStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      JSON.stringify(questions)
+    );
 
+    /* Keep PDF pool available for history/retry/reload paths */
+    if (typeof savePDFQuestionPool === "function") {
+      savePDFQuestionPool(questions);
+    }
+
+    /* Optional global bridge for same-page integrations */
+    window.CBT_ACTIVE_TEST = activeTest;
+
+    window.location.href = "./cbt.html";
+  } catch (error) {
+    console.error("PDF → CBT handoff failed:", error);
+    alert(
+      "Could not start PDF CBT. Please try importing the PDF again."
+    );
   }
-
-
-  /*
-   * Unified PDF → CBT handoff.
-   * Keep legacy keys for compatibility,
-   * while also creating the canonical
-   * active-test object used by RankForge/CBT.
-   */
-
-  const pdfTestId =
-    "pdf-test-" + Date.now();
-
-  const pdfTest = {
-    id: pdfTestId,
-    title: "Topper Test Pro — PDF Module Test",
-    source: "PDF",
-    filename:
-      window.PDF_ACTIVE_FILENAME ||
-      "Imported PDF",
-    questionCount:
-      questions.length,
-    questions: questions,
-    questionIds:
-      questions.map(function(q, i) {
-        return q.id ||
-          q.questionId ||
-          ("pdf-q-" + i);
-      }),
-    createdAt:
-      new Date().toISOString(),
-    updatedAt:
-      new Date().toISOString()
-  };
-
-  // Legacy/session compatibility.
-  sessionStorage.setItem(
-    "CBT_ACTIVE_SOURCE",
-    "PDF"
-  );
-
-  sessionStorage.setItem(
-    "CBT_ACTIVE_QUESTIONS",
-    JSON.stringify(questions)
-  );
-
-  // Canonical active-test handoff.
-  sessionStorage.setItem(
-    "CBT_ACTIVE_TEST_ID",
-    pdfTestId
-  );
-
-  sessionStorage.setItem(
-    "CBT_ACTIVE_TEST_SOURCE",
-    "PDF"
-  );
-
-  sessionStorage.setItem(
-    "CBT_ACTIVE_TEST",
-    JSON.stringify(pdfTest)
-  );
-
-  // Reload-safe mirror.
-  localStorage.setItem(
-    "CBT_ACTIVE_TEST_ID",
-    pdfTestId
-  );
-
-  localStorage.setItem(
-    "CBT_ACTIVE_TEST_SOURCE",
-    "PDF"
-  );
-
-  localStorage.setItem(
-    "CBT_ACTIVE_TEST",
-    JSON.stringify(pdfTest)
-  );
-
-  window.location.href =
-    "./cbt.html";
-
 }
 
 
