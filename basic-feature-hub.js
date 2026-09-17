@@ -93,6 +93,15 @@ function esc(v){
 }
 
 function render(){
+  const path=location.pathname.toLowerCase();
+
+  // RankForge Top Hub is the single dashboard navigation layer.
+  // Keep this legacy feature grid available on other pages, but never stack it on the main dashboard.
+  if(
+    path.endsWith("/") ||
+    path.includes("index.html")
+  )return;
+
   if(document.getElementById("basicFeatureHubV1")) return;
 
   const section=document.createElement("section");

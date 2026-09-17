@@ -328,9 +328,8 @@ function progress(){
 function render(){
   const path=location.pathname.toLowerCase();
 
+  // Daily Loop is a command-center component, not a second dashboard action card.
   if(
-    !path.endsWith("/") &&
-    !path.includes("index.html") &&
     !path.includes("ranker-command-center")
   )return;
 
