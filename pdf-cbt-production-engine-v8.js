@@ -42,12 +42,6 @@
     const s=text(v), latin=(s.match(/[A-Za-z]/g)||[]).length, hindi=(s.match(/[\u0900-\u097F]/g)||[]).length;
     return latin+ hindi ? latin/(latin+hindi) : 0;
   }
-  function englishOK(q){
-    const s=clean(q.question||q.text), opts=q.options||[];
-    if(s.length<8 || opts.length!==4)return false;
-    if(englishRatio(s)<0.45)return false;
-    return opts.every(o=>englishRatio(o)>=0.35 && clean(o).length>0);
-  }
 
   function isInstruction(line){
     const s=clean(line).toLowerCase();
@@ -109,111 +103,365 @@
     return pages;
   }
 
-  function qCandidate(row, page, margin){
-    const s=clean(row.text); if(!s || isInstruction(s))return null;
-    let m=s.match(/^(?:Question\s*|Q\s*)(\d{1,4})\s*[.)\-:]?\s*(.+)$/i);
-    if(m)return {number:Number(m[1]),text:clean(m[2]),explicit:true,row};
-    m=s.match(/^(\d{1,4})\s*[.)\-:]\s+(.+)$/);
-    if(!m)return null;
-    const n=Number(m[1]), rest=clean(m[2]);
-    if(n<1||n>999||rest.length<8)return null;
-    if(/^[A-D1-4](?:[.)]|\s*$)/i.test(rest))return null;
-    // numeric option rows are not question starts unless they occur at a plausible left margin.
-    if(row.x > Math.max(36, margin+20))return null;
-    return {number:n,text:rest,explicit:false,row};
+
+  /* ============================================================
+     RANKFORGE CLEAN PDF PARSER V9
+     - preserves complete stems/options
+     - handles wrapped question lines
+     - handles A-D, (A), [A], 1-4 options
+     - removes page/header/footer noise
+     - does NOT reject valid questions merely because of
+       bilingual / legacy-font garbage
+     - keeps diagnostic counts
+     ============================================================ */
+
+  function rfCleanLine(v){
+    return String(v == null ? '' : v)
+      .replace(/[\u200B-\u200F\uFEFF]/g,'')
+      .replace(/\u00AD/g,'')
+      .replace(/\u00A0/g,' ')
+      .replace(/[ \t]+/g,' ')
+      .trim();
   }
 
-  function optionStart(s){
-    let m=clean(s).match(/^\(\s*([A-D1-4])\s*\)\s*(.*)$/i); if(m)return {letter:answerLetter(m[1]),text:clean(m[2])};
-    m=clean(s).match(/^\[\s*([A-D1-4])\s*\]\s*(.*)$/i); if(m)return {letter:answerLetter(m[1]),text:clean(m[2])};
-    m=clean(s).match(/^([A-D1-4])\s*[.)\-:]\s+(.+)$/i); if(m)return {letter:answerLetter(m[1]),text:clean(m[2])};
+  function rfLooksGarbage(v){
+    const s=rfCleanLine(v);
+    if(!s) return true;
+
+    if(/^(page|pg\.?)\s*\d+(\s*(of|\/)\s*\d+)?$/i.test(s))
+      return true;
+
+    if(/^(instructions?|general instructions?|important instructions?|directions?|notes?|section|part)\b/i.test(s))
+      return true;
+
+    if(/^(time allowed|maximum marks?|total marks?|candidate|negative marking|do not|all questions|each question|rough work)\b/i.test(s))
+      return true;
+
+    return false;
+  }
+
+  function rfQuestionStart(s){
+    const x=rfCleanLine(s);
+
+    let m=x.match(/^(?:question|ques\.?|q\.?)\s*(\d{1,4})\s*[\)\.\-:]?\s*(.*)$/i);
+    if(m && m[2] && m[2].length >= 3)
+      return {number:Number(m[1]),text:rfCleanLine(m[2])};
+
+    m=x.match(/^(\d{1,4})\s*[\)\.\-:]\s*(.*)$/);
+    if(m && m[2] && m[2].length >= 3)
+      return {number:Number(m[1]),text:rfCleanLine(m[2])};
+
     return null;
   }
 
-  function parseGroup(lines, number, page, hasImages){
-    let stem=[], opts={}, current=null, answer='';
-    for(const raw of lines){
-      const line=clean(raw); if(!line)continue;
-      if(/^(?:answer|ans|correct\s*answer|answer\s*key)\b/i.test(line)){
-        const am=line.match(/([A-D1-4])\s*$/i); if(am)answer=answerLetter(am[1]);
-        continue;
-      }
-      const os=optionStart(line);
-      if(os){
-        if(os.letter && !opts[os.letter]){opts[os.letter]=os.text;current=os.letter;}
-        else if(current)opts[current]=clean(opts[current]+' '+line);
-        continue;
-      }
-      if(current)opts[current]=clean(opts[current]+' '+line);
-      else stem.push(line);
-    }
-    const ordered=['A','B','C','D'];
-    const options=ordered.map(k=>opts[k]||'');
-    const qtext=englishClean(stem.join(' '));
-    if(qtext.length<8 || options.some(o=>clean(o).length<1))return null;
-    const q={number,question:qtext,text:qtext,options:options.map(englishClean),correctAnswer:answer,correctIndex:answer?ordered.indexOf(answer):-1,sourcePage:page,hasVisual:Boolean(hasImages)||/(figure|diagram|graph|shown|image|following)/i.test(qtext),language:'English'};
-    if(!englishOK(q))return null;
-    return q;
+  function rfOptionStart(s){
+    const x=rfCleanLine(s);
+
+    let m=x.match(/^\(\s*([A-D])\s*\)\s*(.*)$/i);
+    if(m) return {letter:m[1].toUpperCase(),text:rfCleanLine(m[2])};
+
+    m=x.match(/^\[\s*([A-D])\s*\]\s*(.*)$/i);
+    if(m) return {letter:m[1].toUpperCase(),text:rfCleanLine(m[2])};
+
+    m=x.match(/^([A-D])\s*[\)\.\-:]\s*(.*)$/i);
+    if(m) return {letter:m[1].toUpperCase(),text:rfCleanLine(m[2])};
+
+    return null;
   }
 
-  function parseNumericOptionsGroup(lines,number,page,hasImages){
-    let stem=[], opts=[], current=-1, answer='';
-    for(const raw of lines){
-      const line=clean(raw);if(!line)continue;
-      const am=line.match(/(?:answer|ans|correct\s*answer|answer\s*key)\s*[:=-]?\s*([1-4A-D])/i);if(am){answer=answerLetter(am[1]);continue;}
-      const m=line.match(/^(?:\(\s*([1-4])\s*\)|\[\s*([1-4])\s*\]|([1-4])\s*[.)\-:])\s*(.*)$/);
-      if(m){const n=Number(m[1]||m[2]||m[3]);if(n>=1&&n<=4){opts[n-1]=englishClean(m[4]);current=n-1;continue;}}
-      if(current>=0)opts[current]=englishClean((opts[current]||'')+' '+line);else stem.push(line);
+  function rfNumericOptionStart(s){
+    const x=rfCleanLine(s);
+
+    let m=x.match(/^\(\s*([1-4])\s*\)\s*(.*)$/);
+    if(m) return {index:Number(m[1])-1,text:rfCleanLine(m[2])};
+
+    m=x.match(/^\[\s*([1-4])\s*\]\s*(.*)$/);
+    if(m) return {index:Number(m[1])-1,text:rfCleanLine(m[2])};
+
+    m=x.match(/^([1-4])\s*[\)\.\-:]\s*(.*)$/);
+    if(m) return {index:Number(m[1])-1,text:rfCleanLine(m[2])};
+
+    return null;
+  }
+
+  function rfStripMojibake(s){
+    return rfCleanLine(s)
+      .replace(/[\u0080-\u009F]/g,' ')
+      .replace(/(?:â€™|â€œ|â€|â€“|â€”|â€¦|Â)/g,' ')
+      .replace(/[\uFFFD]/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+
+  function rfEnglishClean(s){
+    let x=rfStripMojibake(s);
+
+    /*
+     * Legacy-font Hindi sometimes appears as strings such as
+     * vfHkdFku / dkj.k etc. Do not allow those fragments to
+     * pollute the clean English question.
+     *
+     * Only remove obvious legacy-font runs when English text
+     * is also present. This avoids deleting legitimate symbols.
+     */
+    const latin=(x.match(/[A-Za-z]/g)||[]).length;
+    const devan=(x.match(/[\u0900-\u097F]/g)||[]).length;
+
+    if(latin >= 8 && devan > 0){
+      x=x.replace(/[\u0900-\u097F]+/g,' ');
     }
-    const options=[0,1,2,3].map(i=>clean(opts[i]||''));
-    const qtext=englishClean(stem.join(' '));
-    if(qtext.length<8||options.some(o=>!o))return null;
-    const q={number,question:qtext,text:qtext,options,correctAnswer:answer,correctIndex:answer?'ABCD'.indexOf(answer):-1,sourcePage:page,hasVisual:Boolean(hasImages)||/(figure|diagram|graph|shown|image|following)/i.test(qtext),language:'English'};
-    return englishOK(q)?q:null;
+
+    /*
+     * Common PDF legacy-encoding garbage: keep punctuation,
+     * numbers, units and mathematical symbols.
+     */
+    x=x.replace(/\s{2,}/g,' ').trim();
+
+    return x;
+  }
+
+  function rfValidStem(s){
+    const x=rfEnglishClean(s);
+    if(x.length < 8) return false;
+    if(rfLooksGarbage(x)) return false;
+
+    const letters=(x.match(/[A-Za-z]/g)||[]).length;
+    const digits=(x.match(/\d/g)||[]).length;
+
+    /*
+     * Accept numerical questions too.
+     * Reject only lines that are overwhelmingly noise.
+     */
+    if(letters < 3 && digits < 2) return false;
+
+    return true;
+  }
+
+  function rfMakeQuestion(number,stem,options,page,hasImages){
+    const cleanStem=rfEnglishClean(stem);
+    const cleanOptions=options.map(rfEnglishClean);
+
+    if(!rfValidStem(cleanStem)) return null;
+    if(cleanOptions.length!==4) return null;
+    if(cleanOptions.some(x=>x.length<1)) return null;
+
+    return {
+      number:number,
+      question:cleanStem,
+      text:cleanStem,
+      options:cleanOptions,
+      correctAnswer:'',
+      correctIndex:-1,
+      sourcePage:page,
+      hasVisual:Boolean(hasImages) ||
+        /(figure|diagram|graph|shown|image|following|given below)/i.test(cleanStem),
+      language:'English'
+    };
+  }
+
+  function parseGroup(lines,number,page,hasImages){
+    let stem=[];
+    const opts={A:'',B:'',C:'',D:''};
+    let current='';
+
+    for(const raw of lines){
+      let line=rfCleanLine(raw);
+      if(!line) continue;
+
+      /*
+       * Ignore obvious page-level noise.
+       */
+      if(rfLooksGarbage(line)) continue;
+
+      /*
+       * Answer keys are NOT part of the visible test question.
+       */
+      if(/^(answer|ans|correct\s*answer|answer\s*key)\b/i.test(line))
+        continue;
+
+      const os=rfOptionStart(line);
+
+      if(os){
+        current=os.letter;
+        if(!opts[current]) opts[current]=os.text;
+        else opts[current]=rfCleanLine(opts[current]+' '+os.text);
+        continue;
+      }
+
+      if(current){
+        opts[current]=rfCleanLine(opts[current]+' '+line);
+      }else{
+        stem.push(line);
+      }
+    }
+
+    return rfMakeQuestion(
+      number,
+      stem.join(' '),
+      ['A','B','C','D'].map(k=>opts[k]),
+      page,
+      hasImages
+    );
+  }
+
+  function parseNumericGroup(lines,number,page,hasImages){
+    let stem=[];
+    const opts=['','','',''];
+    let current=-1;
+
+    for(const raw of lines){
+      const line=rfCleanLine(raw);
+      if(!line) continue;
+      if(rfLooksGarbage(line)) continue;
+
+      if(/^(answer|ans|correct\s*answer|answer\s*key)\b/i.test(line))
+        continue;
+
+      const os=rfNumericOptionStart(line);
+
+      if(os && os.index>=0 && os.index<4){
+        current=os.index;
+        opts[current]=os.text;
+        continue;
+      }
+
+      if(current>=0)
+        opts[current]=rfCleanLine(opts[current]+' '+line);
+      else
+        stem.push(line);
+    }
+
+    return rfMakeQuestion(
+      number,
+      stem.join(' '),
+      opts,
+      page,
+      hasImages
+    );
   }
 
   function parsePages(pages){
     const all=[];
-    for(const pg of pages){
-      const rows=pg.rows||[];
-      const margin=rows.length?Math.min(...rows.map(r=>r.x)):0;
+    const diagnostics={
+      pages:Array.isArray(pages)?pages.length:0,
+      questionStarts:0,
+      candidates:0,
+      valid:0,
+      rejected:0
+    };
+
+    for(const pg of (pages||[])){
+      const rows=Array.isArray(pg.rows)?pg.rows:[];
+      if(!rows.length) continue;
+
       const candidates=[];
+
       for(let i=0;i<rows.length;i++){
-        const c=qCandidate(rows[i],pg.page,margin);if(c)candidates.push({i,c});
-      }
-      // Detect numeric option runs such as 1. 2. 3. 4. so they cannot become fake questions.
-      const optionCandidateIndex=new Set();
-      for(let ci=0;ci<candidates.length-3;ci++){
-        const nums=candidates.slice(ci,ci+4).map(x=>x.c.number);
-        if(nums.join(',')==='1,2,3,4') {
-          const base=candidates[ci];
-          // If the previous candidate is an actual question start, this is its numeric option run.
-          if(ci>0) optionCandidateIndex.add(ci);
-          else if(base.c.number===1 && !base.c.explicit) optionCandidateIndex.add(ci);
-          optionCandidateIndex.add(ci+1); optionCandidateIndex.add(ci+2); optionCandidateIndex.add(ci+3);
+        const row=rows[i]||{};
+        const text=rfCleanLine(row.text);
+
+        if(!text) continue;
+
+        const q=rfQuestionStart(text);
+
+        if(q){
+          diagnostics.questionStarts++;
+          candidates.push({
+            index:i,
+            number:q.number,
+            first:q.text
+          });
         }
       }
-      const chosen=[];
-      for(let ci=0;ci<candidates.length;ci++){
-        if(optionCandidateIndex.has(ci)) continue;
-        const x=candidates[ci];
-        if(!chosen.length || x.i>chosen[chosen.length-1].i) chosen.push(x);
-      }
-      for(let k=0;k<chosen.length;k++){
-        const a=chosen[k], b=chosen[k+1];
-        const block=rows.slice(a.i+0,b?b.i:rows.length).map(r=>r.text);
-        // Remove question prefix but retain wrapped stem.
-        if(block.length)block[0]=a.c.text;
-        let q=parseGroup(block,a.c.number,pg.page,pg.hasImages);
-        if(!q)q=parseNumericOptionsGroup(block,a.c.number,pg.page,pg.hasImages);
-        if(q)all.push(q);
+
+      for(let i=0;i<candidates.length;i++){
+        const a=candidates[i];
+        const b=candidates[i+1];
+
+        let block=rows
+          .slice(a.index,b ? b.index : rows.length)
+          .map(r=>rfCleanLine(r.text))
+          .filter(Boolean);
+
+        if(!block.length) continue;
+
+        block[0]=a.first;
+
+        /*
+         * First try A-D.
+         */
+        let q=parseGroup(
+          block,
+          a.number,
+          pg.page,
+          pg.hasImages
+        );
+
+        /*
+         * Then numeric 1-4.
+         */
+        if(!q){
+          q=parseNumericGroup(
+            block,
+            a.number,
+            pg.page,
+            pg.hasImages
+          );
+        }
+
+        if(q){
+          diagnostics.valid++;
+          all.push(q);
+        }else{
+          diagnostics.rejected++;
+        }
+
+        diagnostics.candidates++;
       }
     }
-    // final sequential de-duplication; do not require numbering to be perfect.
-    const out=[],seen=new Set();
-    for(const q of all){const key=norm(q.question)+'|'+q.options.map(norm).join('|');if(seen.has(key))continue;seen.add(key);out.push(q);}
-    out.sort((a,b)=>a.sourcePage-b.sourcePage || a.number-b.number);
-    out.forEach((q,i)=>{q.sequence=i+1;q.id='PDF8-'+Date.now()+'-'+i+'-'+Math.random().toString(36).slice(2,8);});
+
+    /*
+     * Remove exact duplicates but DO NOT require numbering
+     * to be continuous. PDFs frequently restart numbering
+     * inside sections.
+     */
+    const seen=new Set();
+    const out=[];
+
+    for(const q of all){
+      const key=
+        rfEnglishClean(q.question).toLowerCase()+
+        '||'+
+        q.options.map(x=>rfEnglishClean(x).toLowerCase()).join('|');
+
+      if(seen.has(key)) continue;
+      seen.add(key);
+      out.push(q);
+    }
+
+    out.sort(function(a,b){
+      return (a.sourcePage-b.sourcePage) ||
+             (a.number-b.number);
+    });
+
+    const now=Date.now();
+
+    out.forEach(function(q,i){
+      q.sequence=i+1;
+      q.id='PDF9-'+now+'-'+i+'-'+
+        Math.random().toString(36).slice(2,8);
+    });
+
+    diagnostics.final=out.length;
+    diagnostics.duplicatesRemoved=diagnostics.valid-out.length;
+
+    window.__RANKFORGE_PDF_PARSE_DIAGNOSTICS__=diagnostics;
+
+    console.log(
+      '[RankForge PDF V9]',
+      JSON.stringify(diagnostics,null,2)
+    );
+
     return out;
   }
 
@@ -285,11 +533,29 @@
       status('⚠️ Text layer did not produce complete questions. Trying OCR…');
       try{qs=await ocrFallback(file)}catch(e){console.warn('[PDF8] OCR unavailable/failed',e)}
     }
-    if(!qs.length)throw new Error('No complete English 4-option questions were safely detected.');
+    if(!qs.length){
+      const d=window.__RANKFORGE_PDF_PARSE_DIAGNOSTICS__||{};
+      throw new Error(
+        'No complete questions detected. Starts='+
+        (d.questionStarts||0)+
+        ', candidates='+(d.candidates||0)+
+        ', valid='+(d.valid||0)
+      );
+    }
     // Hard rejection of obvious instruction fragments.
     qs=qs.filter(q=>!isInstruction(q.question)&&q.options.every(o=>!isInstruction(o)));
     if(!qs.length)throw new Error('Questions were detected but all candidates were rejected as instructions/invalid content.');
-    const fresh=await saveCurrent(qs,name,file);preview(fresh);
+    const fresh=await saveCurrent(qs,name,file);
+    preview(fresh);
+
+    const diag=window.__RANKFORGE_PDF_PARSE_DIAGNOSTICS__||{};
+    console.log('[RankForge PDF V9 FINAL]',{
+      detectedStarts:diag.questionStarts||0,
+      candidates:diag.candidates||0,
+      valid:diag.valid||0,
+      duplicatesRemoved:diag.duplicatesRemoved||0,
+      final:fresh.length
+    });
     status('✅ PDF CBT READY\n\nFile: '+name+'\nQuestions: '+fresh.length+'\nLanguage: English only\nInstructions: filtered\nOld PDF: replaced for CBT\n\nOpen Imported Test in CBT.');
     document.dispatchEvent(new CustomEvent('pdfCbtPoolUpdated',{detail:{questions:fresh}}));
     return fresh;
