@@ -9350,6 +9350,129 @@ window.addEventListener("load",function(){
 })();
 </script>
 
+
+<script>
+/* RANKFORGE PDF VISUAL RENDER V10 VERIFIED */
+(function(){
+  "use strict";
+
+  if (window.__RF_PDF_VISUAL_V10_VERIFIED__) return;
+  window.__RF_PDF_VISUAL_V10_VERIFIED__ = true;
+
+  function getQuestions(){
+    try{
+      const raw=sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
+      const q=JSON.parse(raw||"[]");
+      return Array.isArray(q)?q:[];
+    }catch(e){
+      return [];
+    }
+  }
+
+  function getIndex(){
+    const candidates=[
+      window.currentQuestionIndex,
+      window.currentIndex,
+      window.questionIndex
+    ];
+
+    for(const x of candidates){
+      if(Number.isInteger(x) && x>=0) return x;
+    }
+
+    return 0;
+  }
+
+  function cleanText(v){
+    return String(v||"")
+      .replace(/\u0900-\u097F/g," ")
+      .replace(/\bvfHkdFku\b/gi," ")
+      .replace(/\bdkj\.?\.?\b/gi," ")
+      .replace(/\blaosx\b/gi," ")
+      .replace(/[ \t]{2,}/g," ")
+      .trim();
+  }
+
+  function findQuestionBox(){
+    return document.querySelector(
+      ".question-text, #questionText, [data-question-text], .question-content"
+    );
+  }
+
+  function removeOld(){
+    document.querySelectorAll(".rf-pdf-original-graphic")
+      .forEach(x=>x.remove());
+  }
+
+  function render(){
+    try{
+      const qs=getQuestions();
+      if(!qs.length) return;
+
+      const i=getIndex();
+      const q=qs[i];
+      if(!q) return;
+
+      const box=findQuestionBox();
+      if(!box) return;
+
+      removeOld();
+
+      /*
+        If the imported question already carries an image/data URL,
+        display it directly. Otherwise leave the CBT question untouched.
+      */
+      const src =
+        q.image ||
+        q.imageUrl ||
+        q.figure ||
+        q.figureUrl ||
+        q.graphic ||
+        q.graphicUrl ||
+        q.imageData ||
+        "";
+
+      if(!src) return;
+
+      const img=document.createElement("img");
+      img.className="rf-pdf-original-graphic";
+      img.src=src;
+      img.alt="Original PDF graphic";
+      img.loading="lazy";
+
+      box.insertAdjacentElement("afterend",img);
+    }catch(e){
+      console.debug("[RankForge] visual bridge:",e);
+    }
+  }
+
+  const style=document.createElement("style");
+  style.textContent=`
+    .rf-pdf-original-graphic{
+      display:block;
+      max-width:100%;
+      height:auto;
+      margin:14px auto;
+      border-radius:8px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  document.addEventListener("DOMContentLoaded",function(){
+    render();
+    setTimeout(render,300);
+    setTimeout(render,800);
+    setTimeout(render,1500);
+  });
+
+  document.addEventListener("click",function(){
+    setTimeout(render,50);
+  },true);
+
+  window.RankForgePDFVisualV10={render};
+})();
+</script>
+
 </body>
 
 </html>

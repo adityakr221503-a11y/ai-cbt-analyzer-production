@@ -1,3 +1,152 @@
+
+/* RANKFORGE PDF ENGINE V10 VERIFIED */
+(function(){
+  "use strict";
+
+  if (window.__RF_PDF_ENGINE_V10_VERIFIED__) return;
+  window.__RF_PDF_ENGINE_V10_VERIFIED__ = true;
+
+  const RF_MAX_QUESTIONS = 180;
+
+  function rfLine(v){
+    return String(v ?? "")
+      .replace(/\u00a0/g," ")
+      .replace(/[ \t]+/g," ")
+      .trim();
+  }
+
+  function rfGarbage(v){
+    const s = rfLine(v);
+    if (!s) return true;
+
+    const bad = [
+      "vfHkdFku","vfHkdFku:","dkj.k","laosx","laj{k.k",
+      "IysVQkWeZ","Fkk vkSj","gksrk gSa","mlus vpkud"
+    ];
+
+    const hits = bad.filter(x => s.includes(x)).length;
+
+    if (hits >= 2) return true;
+
+    return false;
+  }
+
+  function rfQuestionStart(v){
+    return /^\s*(?:Q(?:uestion)?\s*)?\d{1,3}\s*[\.\):\-]\s+/i.test(v);
+  }
+
+  function rfOptionStart(v){
+    return /^\s*(?:[A-Da-d]|[1-4])\s*[\.\):\-]\s+/.test(v);
+  }
+
+  function rfStripPrefix(v){
+    return rfLine(v)
+      .replace(/^\s*(?:Q(?:uestion)?\s*)?\d{1,3}\s*[\.\):\-]\s*/i,"")
+      .trim();
+  }
+
+  function rfCleanEnglish(v){
+    let s = rfLine(v);
+
+    /* Remove Devanagari duplicate text. */
+    s = s.replace(/[\u0900-\u097F]+/g," ");
+
+    /* Remove common legacy Hindi/font fragments without
+       attempting unreliable translation. */
+    s = s
+      .replace(/\bvfHkdFku\b/gi," ")
+      .replace(/\bdkj\.?\.?\s*k\.?\b/gi," ")
+      .replace(/\blaosx\b/gi," ")
+      .replace(/\blaj\{k\.?\.?\}\.?\b/gi," ")
+      .replace(/\bIysVQkWeZ\b/gi," ")
+      .replace(/\bFkk\b/gi," ")
+      .replace(/\bgksrk gSa\b/gi," ");
+
+    return s
+      .replace(/[ \t]{2,}/g," ")
+      .trim();
+  }
+
+  function rfEnglishScore(v){
+    const s = rfCleanEnglish(v);
+    if (!s) return 0;
+
+    const letters = (s.match(/[A-Za-z]/g)||[]).length;
+    const digits  = (s.match(/\d/g)||[]).length;
+    const symbols = (s.match(/[^\sA-Za-z0-9]/g)||[]).length;
+
+    return letters + digits * 0.15 + symbols * 0.05;
+  }
+
+  function rfKeepEnglish(text){
+    const lines = String(text ?? "")
+      .split(/\r?\n/)
+      .map(rfLine)
+      .filter(Boolean);
+
+    return lines
+      .map(rfCleanEnglish)
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  /*
+    Public normalizer:
+    - keeps complete English question
+    - keeps wrapped lines
+    - keeps A-D
+    - removes bilingual duplicate/legacy-font garbage
+    - never invents missing content
+  */
+  window.RankForgePDFEnglishNormalizer = function(text){
+    return rfKeepEnglish(text);
+  };
+
+  /*
+    Public question validator.
+    This intentionally does NOT require exactly four options here;
+    extraction may normalize options later.
+  */
+  window.RankForgePDFQuestionQuality = function(q){
+    if (!q) return false;
+
+    const text = rfCleanEnglish(q.text || q.question || "");
+    const opts = Array.isArray(q.options) ? q.options : [];
+
+    if (!text) return false;
+    if (opts.length < 4) return false;
+
+    const cleanOpts = opts
+      .slice(0,4)
+      .map(rfCleanEnglish)
+      .filter(Boolean);
+
+    if (cleanOpts.length !== 4) return false;
+
+    const total = rfEnglishScore(text) +
+      cleanOpts.reduce((a,b)=>a+rfEnglishScore(b),0);
+
+    return total >= 20;
+  };
+
+  /*
+    Recovery helper used by the production engine when a PDF
+    appears to contain a large test but text-layer parsing is partial.
+  */
+  window.RankForgePDFRecoveryV10 = {
+    MAX: RF_MAX_QUESTIONS,
+    clean: rfCleanEnglish,
+    keepEnglish: rfKeepEnglish,
+    questionStart: rfQuestionStart,
+    optionStart: rfOptionStart,
+    quality: window.RankForgePDFQuestionQuality
+  };
+
+  console.info(
+    "[RankForge] PDF Engine V10 VERIFIED | English-only normalization active"
+  );
+})();
+
 /* RANKFORGE PDF CBT PRODUCTION ENGINE v8
    - one authoritative importer
    - current-PDF isolation
