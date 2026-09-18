@@ -9473,6 +9473,273 @@ window.addEventListener("load",function(){
 })();
 </script>
 
+
+<script>
+/* RANKFORGE PDF CBT VISUAL V11 AUTHORITATIVE */
+(function(){
+
+"use strict";
+
+if(window.__RF_CBT_VISUAL_V11__) return;
+window.__RF_CBT_VISUAL_V11__=true;
+
+const DB="RankForgePDFStoreV1";
+const STORE="files";
+
+function openDB(){
+
+  return new Promise(function(resolve,reject){
+
+    const r=indexedDB.open(DB,1);
+
+    r.onupgradeneeded=function(){
+
+      if(!r.result.objectStoreNames.contains(STORE))
+        r.result.createObjectStore(STORE);
+    };
+
+    r.onsuccess=function(){
+      resolve(r.result);
+    };
+
+    r.onerror=function(){
+      reject(r.error);
+    };
+  });
+}
+
+async function getVisual(testId,page){
+
+  try{
+
+    const db=await openDB();
+
+    const blob=
+      await new Promise(function(resolve,reject){
+
+        const tx=db.transaction(
+          STORE,
+          "readonly"
+        );
+
+        const req=
+          tx.objectStore(STORE).get(
+            testId+"::page::"+page
+          );
+
+        req.onsuccess=function(){
+          resolve(req.result||null);
+        };
+
+        req.onerror=function(){
+          reject(req.error);
+        };
+      });
+
+    db.close();
+
+    return blob;
+
+  }catch(e){
+
+    console.debug(
+      "[RankForge V11] visual lookup failed",
+      e
+    );
+
+    return null;
+  }
+}
+
+function getQuestions(){
+
+  try{
+
+    const raw=
+      sessionStorage.getItem(
+        "CBT_ACTIVE_QUESTIONS"
+      );
+
+    const q=
+      JSON.parse(raw||"[]");
+
+    return Array.isArray(q)?q:[];
+
+  }catch(e){
+
+    return [];
+  }
+}
+
+function getTestId(){
+
+  return(
+    sessionStorage.getItem(
+      "CBT_ACTIVE_TEST_ID"
+    )||""
+  );
+}
+
+function getIndex(){
+
+  const candidates=[
+    window.currentQuestionIndex,
+    window.currentIndex,
+    window.questionIndex
+  ];
+
+  for(const x of candidates){
+
+    if(
+      Number.isInteger(x) &&
+      x>=0
+    )
+      return x;
+  }
+
+  return 0;
+}
+
+function questionBox(){
+
+  return document.querySelector(
+    ".question-text,#questionText,[data-question-text],.question-content"
+  );
+}
+
+function removeOld(){
+
+  document.querySelectorAll(
+    ".rf-pdf-v11-original-page"
+  ).forEach(
+    x=>x.remove()
+  );
+}
+
+async function render(){
+
+  const qs=getQuestions();
+
+  if(!qs.length) return;
+
+  const q=qs[getIndex()];
+
+  if(!q) return;
+
+  const page=
+    Number(q.sourcePage||0);
+
+  if(!page) return;
+
+  const testId=getTestId();
+
+  if(!testId) return;
+
+  const box=questionBox();
+
+  if(!box) return;
+
+  removeOld();
+
+  const blob=
+    await getVisual(
+      testId,
+      page
+    );
+
+  if(!blob) return;
+
+  const url=
+    URL.createObjectURL(blob);
+
+  const wrap=
+    document.createElement("div");
+
+  wrap.className=
+    "rf-pdf-v11-original-page";
+
+  const label=
+    document.createElement("div");
+
+  label.textContent=
+    "Original PDF figure / graphic";
+
+  label.className=
+    "rf-pdf-v11-visual-label";
+
+  const img=
+    document.createElement("img");
+
+  img.src=url;
+  img.alt=
+    "Original graphic from imported PDF";
+  img.loading="lazy";
+
+  wrap.appendChild(label);
+  wrap.appendChild(img);
+
+  box.insertAdjacentElement(
+    "afterend",
+    wrap
+  );
+}
+
+const style=
+  document.createElement("style");
+
+style.textContent=`
+.rf-pdf-v11-original-page{
+  margin:16px 0;
+  padding:10px;
+  border:1px solid #dbe2ea;
+  border-radius:12px;
+  background:#fff;
+  overflow:hidden;
+}
+.rf-pdf-v11-visual-label{
+  font-size:12px;
+  font-weight:800;
+  color:#64748b;
+  margin-bottom:8px;
+}
+.rf-pdf-v11-original-page img{
+  display:block;
+  width:100%;
+  height:auto;
+  max-width:100%;
+  object-fit:contain;
+}
+`;
+
+document.head.appendChild(style);
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    render();
+
+    setTimeout(render,300);
+    setTimeout(render,800);
+    setTimeout(render,1500);
+  }
+);
+
+document.addEventListener(
+  "click",
+  function(){
+    setTimeout(render,80);
+  },
+  true
+);
+
+window.RankForgePDFVisualV11={
+  render:render
+};
+
+})();
+</script>
+
 </body>
 
 </html>

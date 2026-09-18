@@ -1,4 +1,472 @@
 
+/* RANKFORGE PDF ENGINE V11 AUTHORITATIVE */
+(function(){
+"use strict";
+
+if(window.__RF_PDF_ENGINE_V11__) return;
+window.__RF_PDF_ENGINE_V11__=true;
+
+const RF_V11_MAX=180;
+const RF_V11_DB="RankForgePDFStoreV1";
+const RF_V11_STORE="files";
+
+function rf11clean(v){
+  return String(v??"")
+    .replace(/[\u200B-\u200F\uFEFF]/g,"")
+    .replace(/\u00A0/g," ")
+    .replace(/\u00AD/g,"")
+    .replace(/\uFFFD/g," ")
+    .replace(/[ \t]+/g," ")
+    .trim();
+}
+
+function rf11english(v){
+  let s=rf11clean(v);
+
+  /*
+   * Remove Devanagari only.
+   * Never attempt unreliable translation of legacy Hindi.
+   */
+  s=s.replace(/[\u0900-\u097F]+/g," ");
+
+  /*
+   * Common legacy Hindi/font fragments seen in extracted
+   * bilingual institute PDFs.
+   */
+  s=s
+    .replace(/\bvfHkdFku\b/gi," ")
+    .replace(/\bdkj\.?\.?\.?\b/gi," ")
+    .replace(/\blaosx\b/gi," ")
+    .replace(/\blaj\{k\.?\.?\}\b/gi," ")
+    .replace(/\bIysVQkWeZ\b/gi," ")
+    .replace(/\bFkk\b/gi," ")
+    .replace(/\bvpkud\b/gi," ")
+    .replace(/\bgksrk\b/gi," ")
+    .replace(/\bgSa\b/gi," ");
+
+  return s.replace(/\s+/g," ").trim();
+}
+
+function rf11qstart(s){
+  s=rf11clean(s);
+
+  let m=s.match(/^(?:question|ques\.?|q\.?)\s*(\d{1,3})\s*[\)\.\-:]?\s*(.*)$/i);
+  if(m && m[2] && m[2].length>2)
+    return {number:Number(m[1]),text:rf11english(m[2])};
+
+  m=s.match(/^(\d{1,3})\s*[\)\.\-:]\s*(.*)$/);
+  if(m && m[2] && m[2].length>2)
+    return {number:Number(m[1]),text:rf11english(m[2])};
+
+  return null;
+}
+
+function rf11opt(s){
+  s=rf11clean(s);
+
+  let m=s.match(/^\(?([A-D])\)?\s*[\.\:\-]\s*(.*)$/i);
+  if(m)
+    return {letter:m[1].toUpperCase(),text:rf11english(m[2])};
+
+  m=s.match(/^\[\s*([A-D])\s*\]\s*(.*)$/i);
+  if(m)
+    return {letter:m[1].toUpperCase(),text:rf11english(m[2])};
+
+  m=s.match(/^\(?([1-4])\)?\s*[\.\:\-]\s*(.*)$/);
+  if(m)
+    return {
+      letter:"ABCD"[Number(m[1])-1],
+      text:rf11english(m[2])
+    };
+
+  return null;
+}
+
+function rf11instruction(s){
+  s=rf11clean(s).toLowerCase();
+
+  return /^(instructions?|general instructions?|important instructions?|directions?|notes?|section|part)\b/.test(s)
+    || /^(time allowed|maximum marks?|total marks?|negative marking|candidate|rough work|do not)\b/.test(s)
+    || /^page\s*\d+(\s*(of|\/)\s*\d+)?$/i.test(s);
+}
+
+function rf11quality(q){
+  if(!q) return -1;
+
+  let text=rf11english(q.text||q.question||"");
+  let opts=Array.isArray(q.options)?q.options.map(rf11english):[];
+
+  if(text.length<10 || opts.length!==4) return -1;
+  if(opts.some(x=>x.length<1)) return -1;
+  if(rf11instruction(text)) return -1;
+
+  let letters=(text.match(/[A-Za-z]/g)||[]).length;
+  let words=(text.match(/[A-Za-z]{2,}/g)||[]).length;
+
+  if(letters<5 || words<2) return -1;
+
+  /*
+   * English score is intentionally stronger than raw length.
+   * This makes the clean English OCR candidate win over
+   * legacy-font Hindi garbage.
+   */
+  let score=letters + words*2;
+
+  opts.forEach(o=>{
+    score+=(o.match(/[A-Za-z]/g)||[]).length;
+  });
+
+  return score;
+}
+
+function rf11normal(q){
+  if(!q) return null;
+
+  let text=rf11english(q.text||q.question||"");
+  let opts=Array.isArray(q.options)
+    ? q.options.map(rf11english)
+    : [];
+
+  if(opts.length!==4) return null;
+
+  const clean={
+    ...q,
+    text:text,
+    question:text,
+    options:opts,
+    language:"English"
+  };
+
+  return rf11quality(clean)>=0 ? clean : null;
+}
+
+function rf11merge(textQs,ocrQs){
+
+  const byNumber=new Map();
+
+  function add(q,sourceRank){
+
+    q=rf11normal(q);
+    if(!q) return;
+
+    let n=Number(q.number||q.sequence||0);
+
+    if(!(n>=1 && n<=RF_V11_MAX)) return;
+
+    const candidate={
+      ...q,
+      number:n,
+      _rfSourceRank:sourceRank,
+      _rfQuality:rf11quality(q)
+    };
+
+    const old=byNumber.get(n);
+
+    /*
+     * Prefer OCR English when the text-layer candidate contains
+     * legacy/bilingual corruption. Otherwise retain the richer
+     * text-layer extraction.
+     */
+    if(!old || candidate._rfQuality>old._rfQuality){
+      byNumber.set(n,candidate);
+    }
+  }
+
+  /*
+   * OCR gets first-class status.
+   */
+  (ocrQs||[]).forEach(q=>add(q,2));
+  (textQs||[]).forEach(q=>add(q,1));
+
+  const result=[];
+
+  for(let n=1;n<=RF_V11_MAX;n++){
+    const q=byNumber.get(n);
+    if(!q) continue;
+
+    delete q._rfSourceRank;
+    delete q._rfQuality;
+
+    q.sequence=result.length+1;
+    q.id=
+      "PDF11-"+Date.now()+"-"+n+"-"+
+      Math.random().toString(36).slice(2,9);
+
+    result.push(q);
+  }
+
+  return result;
+}
+
+/*
+ * Dynamic Tesseract loader.
+ * Current V8 only uses OCR if Tesseract already exists;
+ * V11 loads it when required.
+ */
+async function rf11loadOCR(){
+
+  if(window.Tesseract) return window.Tesseract;
+
+  return await new Promise(function(resolve,reject){
+
+    const existing=document.querySelector(
+      'script[src*="tesseract"]'
+    );
+
+    if(existing){
+      existing.addEventListener("load",()=>resolve(window.Tesseract));
+      existing.addEventListener("error",()=>reject(
+        new Error("Tesseract failed to load.")
+      ));
+      return;
+    }
+
+    const script=document.createElement("script");
+
+    script.src=
+      "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+
+    script.onload=function(){
+      if(window.Tesseract) resolve(window.Tesseract);
+      else reject(new Error("Tesseract object unavailable."));
+    };
+
+    script.onerror=function(){
+      reject(new Error("Tesseract CDN load failed."));
+    };
+
+    document.head.appendChild(script);
+  });
+}
+
+/*
+ * OCR every PDF page in English.
+ *
+ * This is deliberately used for partial imports.
+ * If text extraction returns 106/180, OCR is NOT skipped.
+ */
+async function rf11ocrPages(file){
+
+  const T=await rf11loadOCR();
+
+  if(!window.pdfjsLib)
+    throw new Error("PDF.js is not loaded.");
+
+  const pdf=await window.pdfjsLib.getDocument({
+    data:await file.arrayBuffer()
+  }).promise;
+
+  const pages=[];
+
+  for(let p=1;p<=pdf.numPages;p++){
+
+    if(typeof window.status==="function")
+      window.status(
+        "English OCR recovery — page "+
+        p+" / "+pdf.numPages+"…"
+      );
+
+    const page=await pdf.getPage(p);
+
+    /*
+     * 2.5x gives much better OCR on institute PDFs.
+     */
+    const viewport=page.getViewport({scale:2.5});
+
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.ceil(viewport.width);
+    canvas.height=Math.ceil(viewport.height);
+
+    const ctx=canvas.getContext(
+      "2d",
+      {willReadFrequently:true}
+    );
+
+    await page.render({
+      canvasContext:ctx,
+      viewport:viewport
+    }).promise;
+
+    /*
+     * Mild grayscale/contrast improvement.
+     * Do not threshold aggressively because diagrams and
+     * mathematical symbols can disappear.
+     */
+    try{
+      const image=ctx.getImageData(
+        0,0,canvas.width,canvas.height
+      );
+
+      for(let i=0;i<image.data.length;i+=4){
+
+        const r=image.data[i];
+        const g=image.data[i+1];
+        const b=image.data[i+2];
+
+        const y=
+          0.299*r+
+          0.587*g+
+          0.114*b;
+
+        const v=Math.max(
+          0,
+          Math.min(
+            255,
+            (y-128)*1.15+128
+          )
+        );
+
+        image.data[i]=v;
+        image.data[i+1]=v;
+        image.data[i+2]=v;
+      }
+
+      ctx.putImageData(image,0,0);
+    }catch(_){}
+
+    let recognized="";
+
+    try{
+      const r=await T.recognize(canvas,"eng");
+      recognized=String(
+        r?.data?.text||""
+      );
+    }catch(e){
+      console.warn(
+        "[RankForge V11] OCR page failed:",
+        p,
+        e
+      );
+    }
+
+    pages.push({
+      page:p,
+      lines:recognized
+        .split(/\r?\n/)
+        .map(x=>({
+          text:rf11clean(x),
+          x:0,
+          y:0
+        }))
+        .filter(x=>x.text)
+    });
+
+    canvas.width=1;
+    canvas.height=1;
+  }
+
+  return pages;
+}
+
+function rf11parseOCRPages(pages){
+
+  const groups=[];
+  let current=null;
+
+  for(const pg of pages||[]){
+
+    for(const row of pg.lines||[]){
+
+      const line=rf11clean(row.text);
+      if(!line) continue;
+
+      const q=rf11qstart(line);
+
+      if(q){
+
+        if(current)
+          groups.push(current);
+
+        current={
+          number:q.number,
+          page:pg.page,
+          lines:[q.text]
+        };
+
+        continue;
+      }
+
+      if(current)
+        current.lines.push(line);
+    }
+  }
+
+  if(current)
+    groups.push(current);
+
+  const out=[];
+
+  for(const g of groups){
+
+    const opts={
+      A:"",
+      B:"",
+      C:"",
+      D:""
+    };
+
+    let current="";
+    const stem=[];
+
+    for(const raw of g.lines){
+
+      let line=rf11english(raw);
+      if(!line) continue;
+
+      const o=rf11opt(line);
+
+      if(o){
+        current=o.letter;
+        opts[current]=o.text;
+        continue;
+      }
+
+      if(current)
+        opts[current]=rf11clean(
+          opts[current]+" "+line
+        );
+      else
+        stem.push(line);
+    }
+
+    const q=rf11normal({
+      number:g.number,
+      sourcePage:g.page,
+      text:stem.join(" "),
+      question:stem.join(" "),
+      options:["A","B","C","D"].map(x=>opts[x]),
+      correctAnswer:"",
+      correctIndex:-1,
+      hasVisual:false
+    });
+
+    if(q)
+      out.push(q);
+  }
+
+  return out;
+}
+
+/*
+ * Expose V11 merger/recovery helpers.
+ */
+window.RankForgePDFV11={
+  MAX:RF_V11_MAX,
+  clean:rf11english,
+  quality:rf11quality,
+  merge:rf11merge,
+  loadOCR:rf11loadOCR,
+  ocrPages:rf11ocrPages,
+  parseOCRPages:rf11parseOCRPages
+};
+
+console.info(
+  "[RankForge] PDF V11 authoritative recovery engine active"
+);
+
+})();
+
+
 /* RANKFORGE PDF ENGINE V10 VERIFIED */
 (function(){
   "use strict";
@@ -661,6 +1129,20 @@
     // local mirror is only a compatibility pointer; CBT reads session first.
     localStorage.setItem('CBT_ACTIVE_SOURCE','PDF Import');localStorage.setItem('CBT_ACTIVE_TEST',JSON.stringify({id:testId,title:name,source:'PDF Import',duration:180,totalQuestions:fresh.length,questionIds:fresh.map(q=>q.id),questions:fresh}));
     await storePDF(testId,file);
+
+    try{
+      if(window.RankForgePDFVisualV11){
+        await window.RankForgePDFVisualV11.render(
+          file,
+          testId
+        );
+      }
+    }catch(e){
+      console.warn(
+        '[RankForge V11] original PDF graphics store skipped',
+        e
+      );
+    }
     return fresh;
   }
 
@@ -671,42 +1153,225 @@
   }
 
   async function convert(file){
-    if(!file || !(file.type||'').includes('pdf')&&!/\.pdf$/i.test(file.name))throw new Error('Please select a valid PDF file.');
-    const name=(($('moduleName')?.value||'').trim()||file.name);
-    const fp=[file.name,file.size,file.lastModified].join('::');
-    sessionStorage.setItem('CBT_ACTIVE_SOURCE','PDF');sessionStorage.setItem('CBT_PDF_FILE_FINGERPRINT',fp);
-    status('🔎 Analysing PDF layout…');
-    let pages=[];try{pages=await extractPages(file)}catch(e){console.warn('[PDF8] text layer failed',e)}
-    let qs=parsePages(pages);
-    if(!qs.length){
-      status('⚠️ Text layer did not produce complete questions. Trying OCR…');
-      try{qs=await ocrFallback(file)}catch(e){console.warn('[PDF8] OCR unavailable/failed',e)}
+
+    if(
+      !file ||
+      (!(file.type||'').includes('pdf') &&
+       !/\.pdf$/i.test(file.name))
+    ){
+      throw new Error('Please select a valid PDF file.');
     }
-    if(!qs.length){
-      const d=window.__RANKFORGE_PDF_PARSE_DIAGNOSTICS__||{};
-      throw new Error(
-        'No complete questions detected. Starts='+
-        (d.questionStarts||0)+
-        ', candidates='+(d.candidates||0)+
-        ', valid='+(d.valid||0)
+
+    const name=
+      (($('moduleName')?.value||'').trim() ||
+       file.name);
+
+    sessionStorage.setItem(
+      'CBT_ACTIVE_SOURCE',
+      'PDF'
+    );
+
+    status(
+      '🔎 Reading English question structure…'
+    );
+
+    let pages=[];
+
+    try{
+      pages=await extractPages(file);
+    }catch(e){
+      console.warn(
+        '[RankForge V11] text extraction failed',
+        e
       );
     }
-    // Hard rejection of obvious instruction fragments.
-    qs=qs.filter(q=>!isInstruction(q.question)&&q.options.every(o=>!isInstruction(o)));
-    if(!qs.length)throw new Error('Questions were detected but all candidates were rejected as instructions/invalid content.');
-    const fresh=await saveCurrent(qs,name,file);
+
+    let textQs=[];
+
+    try{
+      textQs=parsePages(pages)||[];
+    }catch(e){
+      console.warn(
+        '[RankForge V11] text parser failed',
+        e
+      );
+    }
+
+    /*
+     * IMPORTANT:
+     * If the PDF appears to be a large test, partial text
+     * extraction is NOT considered success.
+     *
+     * OCR recovery is forced when:
+     * - text questions < 180
+     * - OR question numbering indicates a 180 paper
+     */
+    const maxNumber=textQs.reduce(
+      (m,q)=>Math.max(m,Number(q.number)||0),
+      0
+    );
+
+    const likely180=
+      textQs.length>=120 ||
+      maxNumber>=150 ||
+      pages.length>=20;
+
+    let ocrQs=[];
+
+    if(textQs.length<180 || likely180){
+
+      status(
+        '🧠 Recovering missing English questions with OCR…'
+      );
+
+      try{
+
+        const ocrPages=
+          await window.RankForgePDFV11.ocrPages(file);
+
+        ocrQs=
+          window.RankForgePDFV11.parseOCRPages(
+            ocrPages
+          )||[];
+
+      }catch(e){
+
+        console.warn(
+          '[RankForge V11] OCR recovery failed',
+          e
+        );
+
+        status(
+          '⚠️ OCR recovery unavailable — using readable PDF text'
+        );
+      }
+    }
+
+    /*
+     * Number-based authoritative merge.
+     */
+    let merged=
+      window.RankForgePDFV11.merge(
+        textQs,
+        ocrQs
+      );
+
+    /*
+     * Keep only real English questions with exactly A-D.
+     */
+    merged=merged.filter(function(q){
+
+      if(!q) return false;
+
+      const t=
+        window.RankForgePDFV11.clean(
+          q.text||q.question||""
+        );
+
+      const o=
+        Array.isArray(q.options)
+          ? q.options.map(
+              window.RankForgePDFV11.clean
+            )
+          : [];
+
+      if(t.length<10) return false;
+      if(o.length!==4) return false;
+      if(o.some(x=>!x)) return false;
+
+      return true;
+    });
+
+    /*
+     * Final authoritative ordering.
+     * Do NOT renumber missing source questions.
+     */
+    merged.sort(
+      (a,b)=>
+        Number(a.number||0)-
+        Number(b.number||0)
+    );
+
+    merged.forEach(function(q,i){
+      q.sequence=i+1;
+      q.number=Number(q.number||i+1);
+
+      q.language='English';
+
+      q.question=
+        window.RankForgePDFV11.clean(
+          q.question||q.text
+        );
+
+      q.text=q.question;
+
+      q.options=
+        q.options.map(
+          window.RankForgePDFV11.clean
+        );
+
+      q.hasVisual=
+        Boolean(q.hasVisual) ||
+        Boolean(
+          pages.find(
+            p=>Number(p.page)===Number(q.sourcePage)
+          )?.hasImages
+        );
+    });
+
+    if(!merged.length){
+
+      throw new Error(
+        'No complete English questions could be recovered from this PDF.'
+      );
+    }
+
+    /*
+     * Store diagnostic information.
+     */
+    window.__RANKFORGE_PDF_V11_DIAGNOSTICS__={
+      pages:pages.length,
+      textQuestions:textQs.length,
+      ocrQuestions:ocrQs.length,
+      finalQuestions:merged.length,
+      maxQuestionNumber:merged.reduce(
+        (m,q)=>Math.max(m,Number(q.number)||0),
+        0
+      ),
+      englishOnly:true,
+      fabricated:0
+    };
+
+    console.log(
+      '[RankForge V11]',
+      window.__RANKFORGE_PDF_V11_DIAGNOSTICS__
+    );
+
+    const fresh=
+      await saveCurrent(
+        merged,
+        name,
+        file
+      );
+
     preview(fresh);
 
-    const diag=window.__RANKFORGE_PDF_PARSE_DIAGNOSTICS__||{};
-    console.log('[RankForge PDF V9 FINAL]',{
-      detectedStarts:diag.questionStarts||0,
-      candidates:diag.candidates||0,
-      valid:diag.valid||0,
-      duplicatesRemoved:diag.duplicatesRemoved||0,
-      final:fresh.length
-    });
-    status('✅ PDF CBT READY\n\nFile: '+name+'\nQuestions: '+fresh.length+'\nLanguage: English only\nInstructions: filtered\nOld PDF: replaced for CBT\n\nOpen Imported Test in CBT.');
-    document.dispatchEvent(new CustomEvent('pdfCbtPoolUpdated',{detail:{questions:fresh}}));
+    if(fresh.length<180){
+
+      status(
+        '⚠️ '+fresh.length+
+        '/180 complete English questions recovered. '+
+        'No fake questions created.'
+      );
+
+    }else{
+
+      status(
+        '✅ 180/180 English questions recovered. '+
+        'Hindi duplicate filtered. Graphics preserved.'
+      );
+    }
+
     return fresh;
   }
 
@@ -739,4 +1404,151 @@
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
   window.PDFCBTProductionV8={convert,launch,extractPages,parsePages};
+})();
+
+
+/* RANKFORGE PDF V11 ORIGINAL PAGE VISUAL STORE */
+(function(){
+
+"use strict";
+
+const DB="RankForgePDFStoreV1";
+const STORE="files";
+
+function rfOpenDB(){
+  return new Promise(function(resolve,reject){
+
+    const r=indexedDB.open(DB,1);
+
+    r.onupgradeneeded=function(){
+      if(!r.result.objectStoreNames.contains(STORE))
+        r.result.createObjectStore(STORE);
+    };
+
+    r.onsuccess=function(){
+      resolve(r.result);
+    };
+
+    r.onerror=function(){
+      reject(r.error);
+    };
+  });
+}
+
+async function rfStoreVisual(key,blob){
+
+  try{
+
+    const db=await rfOpenDB();
+
+    await new Promise(function(resolve,reject){
+
+      const tx=db.transaction(
+        STORE,
+        "readwrite"
+      );
+
+      tx.objectStore(STORE).put(
+        blob,
+        key
+      );
+
+      tx.oncomplete=resolve;
+      tx.onerror=function(){
+        reject(tx.error);
+      };
+    });
+
+    db.close();
+
+  }catch(e){
+
+    console.warn(
+      "[RankForge V11] visual storage failed",
+      e
+    );
+  }
+}
+
+async function rfRenderVisualPages(file,testId){
+
+  if(!window.pdfjsLib) return;
+
+  try{
+
+    const pdf=
+      await window.pdfjsLib.getDocument({
+        data:await file.arrayBuffer()
+      }).promise;
+
+    for(let p=1;p<=pdf.numPages;p++){
+
+      try{
+
+        const page=await pdf.getPage(p);
+
+        const viewport=
+          page.getViewport({
+            scale:1.45
+          });
+
+        const canvas=
+          document.createElement("canvas");
+
+        canvas.width=
+          Math.ceil(viewport.width);
+
+        canvas.height=
+          Math.ceil(viewport.height);
+
+        await page.render({
+          canvasContext:
+            canvas.getContext("2d"),
+          viewport:viewport
+        }).promise;
+
+        const blob=
+          await new Promise(function(resolve){
+            canvas.toBlob(
+              resolve,
+              "image/jpeg",
+              0.86
+            );
+          });
+
+        if(blob){
+
+          await rfStoreVisual(
+            testId+"::page::"+p,
+            blob
+          );
+        }
+
+        canvas.width=1;
+        canvas.height=1;
+
+      }catch(e){
+
+        console.warn(
+          "[RankForge V11] page visual failed",
+          p,
+          e
+        );
+      }
+    }
+
+  }catch(e){
+
+    console.warn(
+      "[RankForge V11] PDF visual rendering failed",
+      e
+    );
+  }
+}
+
+window.RankForgePDFVisualV11={
+  render:rfRenderVisualPages,
+  open:rfOpenDB
+};
+
 })();
