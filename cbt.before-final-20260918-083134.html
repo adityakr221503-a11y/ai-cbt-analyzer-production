@@ -1968,9 +1968,9 @@ if(document.readyState === "loading"){
      * Change every visible Test 180 label.
      */
     var oldTexts = [
-      "Adaptive CBT Test Series",
+      "Adaptive CBT Test Series — Test 180",
       "Adaptive CBT Test Series - Test 180",
-      "Question bank ready.",
+      "Test 180 loaded successfully — 180 questions ready.",
       "Test 180 loaded successfully - 180 questions ready.",
       "Topper Test Pro — 180 Question Starter Test",
       "Topper Test Pro - 180 Question Starter Test"
@@ -2323,7 +2323,7 @@ else init();
     </h1>
 
     <p class="subtitle">
-      Adaptive CBT Test Series
+      Adaptive CBT Test Series — Test 180
     </p>
 
     <div
@@ -2857,17 +2857,8 @@ function normalizeQuestion(
    RANKER PRO — PDF CBT SOURCE PRIORITY
 ===================================================== */
 
-const CBT_PDF_MODE = (() => {
-  try {
-    const source = String(sessionStorage.getItem("CBT_ACTIVE_SOURCE") || "").toUpperCase();
-    const urlPDF = new URLSearchParams(location.search).get("source") === "pdf";
-    const raw = sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
-    const q = raw ? JSON.parse(raw) : [];
-    return (source === "PDF" || urlPDF) && Array.isArray(q) && q.length > 0;
-  } catch (_) {
-    return false;
-  }
-})();
+const CBT_PDF_MODE =
+  sessionStorage.getItem("CBT_ACTIVE_SOURCE") === "PDF";
 
 const CBT_PDF_QUESTIONS =
   CBT_PDF_MODE
@@ -2911,7 +2902,7 @@ const TEST180_CANONICAL_SOURCE =
 const ACTIVE_QUESTION_SOURCE =
   CBT_PDF_MODE
     ? CBT_PDF_QUESTIONS
-    : [];
+    : TEST180_CANONICAL_SOURCE;
 
 const NORMALIZED_QUESTION_BANK =
   ACTIVE_QUESTION_SOURCE
@@ -3060,7 +3051,7 @@ if (
     "status success";
 
   bankStatus.textContent =
-    "✅ Question bank ready.";
+    "✅ Test 180 loaded successfully — 180 questions ready.";
 
 }
 else if (
@@ -9097,9 +9088,9 @@ window.RankForgePDFCBTPriorityV3={
     -------------------------------------------------------- */
 
     var replacements = [
-      "Adaptive CBT Test Series",
+      "Adaptive CBT Test Series — Test 180",
       "Adaptive CBT Test Series - Test 180",
-      "Question bank ready.",
+      "Test 180 loaded successfully — 180 questions ready.",
       "Test 180 loaded successfully - 180 questions ready.",
       "Topper Test Pro — 180 Question Starter Test",
       "Topper Test Pro - 180 Question Starter Test"
@@ -9267,85 +9258,6 @@ window.RankForgePDFCBTPriorityV3={
       setTimeout(activatePDF, 300);
     }
   );
-
-})();
-</script>
-
-
-<!-- RANKFORGE FINAL CBT PDF AUTHORITY V7 -->
-<script>
-(function(){
-"use strict";
-if(window.__RANKFORGE_FINAL_CBT_V7__)return;
-window.__RANKFORGE_FINAL_CBT_V7__=true;
-
-function apply(){
-try{
-let source=String(sessionStorage.getItem("CBT_ACTIVE_SOURCE")||"").toUpperCase();
-let q=[];
-
-try{
-q=JSON.parse(sessionStorage.getItem("CBT_ACTIVE_QUESTIONS")||"[]");
-}catch(_){}
-
-if((source!=="PDF"||!Array.isArray(q)||!q.length)){
-try{
-const t=JSON.parse(sessionStorage.getItem("CBT_ACTIVE_TEST")||"null");
-if(t&&String(t.source||"").toUpperCase()==="PDF"&&Array.isArray(t.questions)&&t.questions.length){
-q=t.questions;
-source="PDF";
-}
-}catch(_){}
-}
-
-if(source!=="PDF"||!Array.isArray(q)||!q.length)return;
-
-sessionStorage.setItem("CBT_ACTIVE_SOURCE","PDF");
-sessionStorage.setItem("CBT_ACTIVE_QUESTIONS",JSON.stringify(q));
-
-const s=document.getElementById("bankStatus");
-if(s){
-s.className="status success";
-s.textContent="PDF Imported Test - "+q.length+" questions ready.";
-}
-
-const sel=document.getElementById("testSelect");
-if(sel){
-sel.innerHTML="";
-const o=document.createElement("option");
-o.value="__PDF_IMPORTED__";
-o.textContent="PDF Imported Test ("+q.length+" Questions)";
-o.selected=true;
-sel.appendChild(o);
-sel.disabled=true;
-}
-
-document.querySelectorAll("body *").forEach(function(el){
-if(el.children.length)return;
-let t=String(el.textContent||"");
-
-if(/Adaptive CBT Test Series\s*[—-]\s*Test 180/i.test(t))
-el.textContent=t.replace(
-/Adaptive CBT Test Series\s*[—-]\s*Test 180/ig,
-"PDF Imported Test"
-);
-
-if(/Test 180 loaded successfully/i.test(t))
-el.textContent="PDF Imported Test - "+q.length+" questions ready.";
-
-if(/Topper Test Pro\s*[—-]\s*180 Question Starter Test/i.test(t))
-el.textContent="Topper Test Pro - PDF Imported Test";
-});
-
-}catch(e){
-console.warn("RankForge CBT PDF guard:",e);
-}
-}
-
-[0,50,150,300,600,1000,1800].forEach(x=>setTimeout(apply,x));
-window.addEventListener("load",function(){
-[0,100,500,1200].forEach(x=>setTimeout(apply,x));
-});
 
 })();
 </script>
