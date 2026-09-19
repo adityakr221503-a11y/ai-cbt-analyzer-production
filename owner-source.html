@@ -43,7 +43,8 @@ Select PDF / ZIP / Scan / Data
 <input id="sourceFile" type="file"
 accept=".pdf,.zip,.png,.jpg,.jpeg,.webp,.json,.jsonl,.ndjson,.csv,.tsv,.txt,.md,.xlsx,.xls,.docx">
 </label>
-<button onclick="runImport()">Import to Owner Inbox</button>
+<span id="selectedFile" class="small">No file selected</span>
+<button id="importBtn" type="button" onclick="runImport()">Import to Owner Inbox</button>
 <button onclick="refresh()">Refresh</button>
 </div>
 <div class="small">
@@ -117,8 +118,19 @@ function refresh(){
 }
 
 async function runImport(){
-  const f=document.getElementById("sourceFile").files[0];
-  if(!f){out("Select a source file first.");return}
+  const input=document.getElementById("sourceFile");
+  const f=input && input.files && input.files[0];
+
+  if(!f){
+    out("No source selected. Choose a PDF, ZIP, scan, or supported data file first.");
+    return;
+  }
+
+  out(
+    "Selected: " + f.name +
+    "\nSize: " + Math.round(f.size/1024) + " KB" +
+    "\n\nStarting V10/V11 Owner import..."
+  );
 
   const ext=f.name.split(".").pop().toLowerCase();
   out("Starting V10/V11 owner import: "+f.name);
@@ -232,6 +244,48 @@ window.approveClean=approveClean;
 window.recheck=recheck;
 window.rebuild=rebuild;
 window.refresh=refresh;
+
+/* OWNER SOURCE HUB FILE PICKER FIX */
+(function(){
+  const input = document.getElementById("sourceFile");
+  const selected = document.getElementById("selectedFile");
+  const button = document.getElementById("importBtn");
+
+  if (!input) {
+    console.error("Owner Hub: sourceFile input missing");
+    return;
+  }
+
+  input.addEventListener("change", function(){
+    const file = input.files && input.files[0];
+
+    if (!file) {
+      if (selected) selected.textContent = "No file selected";
+      if (button) button.disabled = true;
+      return;
+    }
+
+    if (selected) {
+      selected.textContent =
+        file.name + " • " +
+        Math.round(file.size / 1024) + " KB";
+    }
+
+    if (button) button.disabled = false;
+
+    const outEl = document.getElementById("output");
+    if (outEl) {
+      outEl.textContent =
+        "Selected source:\n" +
+        file.name +
+        "\n\nReady for V10/V11 Owner import.";
+    }
+  });
+
+  if (button) {
+    button.disabled = !(input.files && input.files.length);
+  }
+})();
 
 refresh();
 })();
