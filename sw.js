@@ -1,4 +1,4 @@
-const CACHE_NAME = "rankforge-ai-v3";
+const CACHE_NAME = "rankforge-ai-v4";
 
 const CORE = [
   "./",
@@ -17,7 +17,11 @@ const CORE = [
   "./ai-question-lab.html",
   "./ai-test-generator.html",
   "./nichod-hub.html",
-  "./ranker-revision/index.html"
+  "./ranker-revision/index.html",
+  "./study-vault/",
+  "./study-vault/index.html",
+  "./study-vault/study-vault.css",
+  "./study-vault/study-vault.js"
 ];
 
 self.addEventListener("install", event => {
