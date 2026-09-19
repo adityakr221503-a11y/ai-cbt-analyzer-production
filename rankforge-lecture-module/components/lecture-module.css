@@ -427,3 +427,59 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+.lecture-practice-panel {
+  margin-bottom: 18px;
+  padding: 18px;
+  background: white;
+  border: 1px solid #eaecf0;
+  border-radius: 20px;
+}
+
+.practice-head span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .8px;
+}
+
+.practice-head h2 {
+  margin: 7px 0 4px;
+  font-size: 18px;
+}
+
+.practice-head p {
+  margin: 0 0 13px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.practice-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.practice-actions button {
+  padding: 12px;
+  border: 0;
+  border-radius: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.practice-status {
+  margin-top: 11px;
+  padding: 12px;
+  border-radius: 13px;
+  background: #f8f9fb;
+  color: #475467;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 420px) {
+  .practice-actions {
+    grid-template-columns: 1fr;
+  }
+}
