@@ -3,6 +3,7 @@ window.RANKFORGE_LECTURE_DATA = {
     {
       id: "physics",
       name: "Physics",
+<<<<<<< HEAD
       icon: "⚡",
       chapters: [
         {
@@ -22,10 +23,14 @@ window.RANKFORGE_LECTURE_DATA = {
           ]
         }
       ]
+=======
+      chapters: []
+>>>>>>> 6e3efad (Add RankForge Lecture Module foundation)
     },
     {
       id: "chemistry",
       name: "Chemistry",
+<<<<<<< HEAD
       icon: "🧪",
       chapters: [
         {
@@ -45,10 +50,14 @@ window.RANKFORGE_LECTURE_DATA = {
           ]
         }
       ]
+=======
+      chapters: []
+>>>>>>> 6e3efad (Add RankForge Lecture Module foundation)
     },
     {
       id: "biology",
       name: "Biology",
+<<<<<<< HEAD
       icon: "🧬",
       chapters: [
         {
@@ -71,3 +80,9 @@ window.RANKFORGE_LECTURE_DATA = {
     }
   ]
 };
+=======
+      chapters: []
+    }
+  ]
+};
+>>>>>>> 6e3efad (Add RankForge Lecture Module foundation)
