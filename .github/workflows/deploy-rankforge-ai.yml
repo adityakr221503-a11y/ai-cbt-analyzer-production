@@ -108,8 +108,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: rankforge-ai-worker
-          command: deploy
+          command: deploy rankforge-ai-worker/src/index.js --config rankforge-ai-worker/wrangler.jsonc
 
       - name: Deployment result
         run: |
