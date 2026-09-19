@@ -96,10 +96,104 @@ Biology:[
 
 };
 
-let items=readItems();
-let collections=readCollections();
+let items=[];
+let collections=[];
 
 let activeFilter="all";
+let vaultReady=false;
+
+const VAULT_DB="RankForgeStudyVaultDB";
+const VAULT_DB_VERSION=1;
+
+function openVaultDB(){
+return new Promise((resolve,reject)=>{
+try{
+const req=indexedDB.open(VAULT_DB,VAULT_DB_VERSION);
+
+req.onupgradeneeded=()=>{
+const db=req.result;
+if(!db.objectStoreNames.contains("items"))
+db.createObjectStore("items",{keyPath:"id"});
+if(!db.objectStoreNames.contains("collections"))
+db.createObjectStore("collections",{keyPath:"id"});
+};
+
+req.onsuccess=()=>resolve(req.result);
+req.onerror=()=>reject(req.error);
+}catch(e){reject(e)}
+});
+}
+
+async function readDurable(){
+try{
+const db=await openVaultDB();
+
+const result=await new Promise((resolve,reject)=>{
+const tx=db.transaction(["items","collections"],"readonly");
+const a=tx.objectStore("items").getAll();
+const b=tx.objectStore("collections").getAll();
+
+tx.oncomplete=()=>resolve({
+items:Array.isArray(a.result)?a.result:[],
+collections:Array.isArray(b.result)?b.result:[]
+});
+tx.onerror=()=>reject(tx.error);
+});
+
+db.close();
+
+const localItems=readItems();
+const localCollections=readCollections();
+
+if(result.items.length){
+items=result.items;
+}else{
+items=localItems;
+}
+
+if(result.collections.length){
+collections=result.collections;
+}else{
+collections=localCollections;
+}
+
+localStorage.setItem(ITEM_KEY,JSON.stringify(items));
+localStorage.setItem(COLLECTION_KEY,JSON.stringify(collections));
+
+return true;
+}catch(e){
+items=readItems();
+collections=readCollections();
+return false;
+}
+}
+
+async function writeDurable(){
+try{
+const db=await openVaultDB();
+
+await new Promise((resolve,reject)=>{
+const tx=db.transaction(["items","collections"],"readwrite");
+const itemStore=tx.objectStore("items");
+const collectionStore=tx.objectStore("collections");
+
+itemStore.clear();
+collectionStore.clear();
+
+items.forEach(x=>itemStore.put(x));
+collections.forEach(x=>collectionStore.put(x));
+
+tx.oncomplete=resolve;
+tx.onerror=()=>reject(tx.error);
+});
+
+db.close();
+}catch(e){
+console.warn("Study Vault IndexedDB save failed:",e);
+}
+}
+
+
 let activeSubject="";
 let searchText="";
 
@@ -122,6 +216,7 @@ return Array.isArray(x)?x:[];
 function persist(){
 localStorage.setItem(ITEM_KEY,JSON.stringify(items));
 localStorage.setItem(COLLECTION_KEY,JSON.stringify(collections));
+writeDurable();
 }
 
 function uid(prefix="sv"){
@@ -189,6 +284,64 @@ const NCERT_CHAPTERS = {
 
 let chapterBrowserState = {subject:"",className:"",chapter:""};
 
+function saveNavigation(){
+try{
+const parts=[
+chapterBrowserState.subject,
+chapterBrowserState.className,
+chapterBrowserState.chapter
+].filter(Boolean);
+
+location.hash=parts.map(encodeURIComponent).join("/");
+}catch(e){}
+}
+
+function restoreNavigation(){
+try{
+const raw=location.hash.replace(/^#/,"");
+if(!raw)return;
+
+const parts=raw.split("/").map(decodeURIComponent);
+
+chapterBrowserState={
+subject:parts[0]||"",
+className:parts[1]||"",
+chapter:parts[2]||""
+};
+
+if(chapterBrowserState.subject &&
+!NCERT_CHAPTERS[chapterBrowserState.subject]){
+chapterBrowserState={subject:"",className:"",chapter:""};
+}
+
+if(
+chapterBrowserState.subject &&
+chapterBrowserState.className &&
+!NCERT_CHAPTERS[chapterBrowserState.subject]?.[chapterBrowserState.className]
+){
+chapterBrowserState.className="";
+chapterBrowserState.chapter="";
+}
+
+if(
+chapterBrowserState.subject &&
+chapterBrowserState.className &&
+chapterBrowserState.chapter &&
+!NCERT_CHAPTERS[chapterBrowserState.subject][chapterBrowserState.className]
+.includes(chapterBrowserState.chapter)
+){
+chapterBrowserState.chapter="";
+}
+}catch(e){
+chapterBrowserState={subject:"",className:"",chapter:""};
+}
+}
+
+window.addEventListener("hashchange",()=>{
+restoreNavigation();
+renderChapterBrowser();
+});
+
 function renderChapterBrowser(){
   const box=document.getElementById("chapterBrowserContent");
   const title=document.getElementById("chapterBrowserTitle");
@@ -212,6 +365,7 @@ function renderChapterBrowser(){
         chapterBrowserState.subject=x;
         chapterBrowserState.className="";
         chapterBrowserState.chapter="";
+        saveNavigation();
         renderChapterBrowser();
       });
       box.appendChild(b);
@@ -231,6 +385,7 @@ function renderChapterBrowser(){
       b.addEventListener("click",()=>{
         chapterBrowserState.className=x;
         chapterBrowserState.chapter="";
+        saveNavigation();
         renderChapterBrowser();
       });
       box.appendChild(b);
@@ -249,6 +404,7 @@ function renderChapterBrowser(){
       b.innerHTML="<strong>"+(i+1)+". "+x+"</strong><small>Open chapter →</small>";
       b.addEventListener("click",()=>{
         chapterBrowserState.chapter=x;
+        saveNavigation();
         renderChapterBrowser();
       });
       box.appendChild(b);
@@ -489,6 +645,10 @@ ${x.body?
 ${tags}
 ${x.priority==="high"?'<span class="chip">⭐ High</span>':""}
 ${attachment}
+${x.attachment?.stored && x.attachment?.type?.startsWith("image/")
+?'<span class="chip">🖼️ Stored inside material</span>':""}
+${x.attachment?.type==="application/pdf"
+?'<span class="chip">📄 Stored inside material</span>':""}
 </div>
 
 <div class="materialActions">
@@ -576,6 +736,98 @@ Number(item.revisionStep||0)+1
 
 }
 
+const quickScreenshot=document.createElement("input");
+quickScreenshot.type="file";
+quickScreenshot.accept="image/*";
+quickScreenshot.style.display="none";
+quickScreenshot.id="quickScreenshotInput";
+document.body.appendChild(quickScreenshot);
+
+function quickScreenshotSave(){
+quickScreenshot.value="";
+quickScreenshot.onchange=async()=>{
+const file=quickScreenshot.files[0];
+if(!file)return;
+
+const title=prompt("Screenshot title:");
+if(!title?.trim())return;
+
+let subject=chapterBrowserState.subject;
+let className=chapterBrowserState.className;
+let chapter=chapterBrowserState.chapter;
+
+if(!subject){
+subject=prompt("Subject: Physics / Chemistry / Biology");
+}
+if(!["Physics","Chemistry","Biology"].includes(subject))return;
+
+if(!className){
+className=prompt("Class: Class 11 / Class 12");
+}
+if(!["Class 11","Class 12"].includes(className))return;
+
+if(!chapter){
+const list=NCERT_CHAPTERS[subject]?.[className]||[];
+const names=list.map((x,i)=>(i+1)+". "+x).join("\n");
+const n=Number(prompt("Select chapter number:\n\n"+names))-1;
+chapter=list[n];
+}
+if(!chapter)return;
+
+const candidate={
+id:uid(),
+version:VERSION,
+title:title.trim(),
+subject,
+className,
+chapter,
+topic:"",
+type:"screenshot",
+tags:["screenshot"],
+priority:"high",
+revisionState:"new",
+revisionStep:0,
+body:"",
+why:"Quick screenshot capture",
+attachment:await attachment(file),
+createdAt:Date.now(),
+updatedAt:Date.now(),
+archived:false,
+collectionIds:[],
+pinned:true,
+pdfBookmarks:[],
+relatedIds:[]
+};
+
+const dup=duplicate(candidate);
+if(dup){
+alert("This screenshot/material already exists.");
+return;
+}
+
+items.unshift(candidate);
+persist();
+
+chapterBrowserState={subject,className,chapter};
+saveNavigation();
+
+render();
+renderChapterBrowser();
+
+alert("Screenshot saved inside Study Vault → "+subject+" → "+className+" → "+chapter);
+};
+quickScreenshot.click();
+}
+
+if(!document.getElementById("quickScreenshotSaveBtn")){
+const b=document.createElement("button");
+b.id="quickScreenshotSaveBtn";
+b.className="secondary";
+b.textContent="📸 Quick Screenshot";
+b.onclick=quickScreenshotSave;
+document.querySelector(".top")?.appendChild(b);
+}
+
 $("quickSave").onclick=()=>{
 $("dialog").showModal();
 $("subject").value="Inbox";
@@ -615,6 +867,7 @@ document.querySelectorAll("[data-subject]").forEach(btn=>{
       className:"",
       chapter:""
     };
+    saveNavigation();
     renderChapterBrowser();
 
     const browser=document.getElementById("chapterBrowser");
@@ -860,6 +1113,7 @@ if(action==="chapter"){
     className:item.className||"",
     chapter:item.chapter||""
   };
+  saveNavigation();
   renderChapterBrowser();
   const browser=document.getElementById("chapterBrowser");
   if(browser) browser.scrollIntoView({behavior:"smooth",block:"start"});
@@ -1019,7 +1273,13 @@ e.target.value="";
 
 };
 
+async function bootStudyVault(){
+restoreNavigation();
+await readDurable();
+vaultReady=true;
 render();
+renderChapterBrowser();
+}
 
 window.RankForgeStudyVault={
 
@@ -1094,5 +1354,7 @@ return true;
 }
 
 };
+
+bootStudyVault();
 
 })();

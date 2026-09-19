@@ -340,3 +340,33 @@ text-overflow:ellipsis
 @media(max-width:620px){
 .vaultDashboard{grid-template-columns:repeat(2,1fr)}
 }
+
+
+.vaultNavigation{
+margin-top:14px;
+padding:12px 14px;
+background:linear-gradient(135deg,#101b31,#0d1424);
+border:1px solid var(--line);
+border-radius:14px
+}
+.vaultNavigation strong{
+display:block;
+font-size:13px
+}
+.vaultNavigation small{
+display:block;
+margin-top:4px;
+color:var(--muted);
+font-size:11px
+}
+
+#quickScreenshotSaveBtn{
+margin-left:8px
+}
+
+@media(max-width:620px){
+#quickScreenshotSaveBtn{
+margin-left:0;
+width:100%;
+}
+}
