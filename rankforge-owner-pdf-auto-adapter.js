@@ -305,76 +305,144 @@ function detectQuestionStarts(text){
 }
 
 function parseQuestions(text){
-  const lines=String(text||"")
-    .split(/\r?\n/)
-    .map(function(x){return x.trim();});
+  const raw=String(text||"")
+    .replace(/\u00a0/g," ")
+    .replace(/[ \t]+/g," ")
+    .replace(/\r/g,"\n");
 
-  const starts=detectQuestionStarts(text);
-  const blocks=[];
+  /*
+   * PDF.js often returns a whole page as one flattened line.
+   * Therefore question detection must NOT depend on newline boundaries.
+   * We only accept explicit numbered question starts followed by text.
+   */
+  const starts=[];
+  const startRe=/(?:^|\s)(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\).:\-]\s+/gi;
+  let m;
 
-  if(!starts.length){
-    return [];
+  while((m=startRe.exec(raw))!==null){
+    starts.push({
+      index:m.index+(m[0].length-m[0].trimStart().length),
+      number:Number(m[1])
+    });
   }
 
-  for(let i=0;i<starts.length;i++){
-    const a=starts[i];
-    const b=i+1<starts.length ? starts[i+1] : lines.length;
-    const block=lines.slice(a,b).filter(Boolean);
+  if(!starts.length) return [];
 
-    if(block.length){
-      blocks.push(block);
-    }
+  const blocks=[];
+
+  for(let i=0;i<starts.length;i++){
+    const a=starts[i].index;
+    const b=i+1<starts.length ? starts[i+1].index : raw.length;
+    const body=raw.slice(a,b).trim();
+
+    if(body) blocks.push({
+      number:starts[i].number,
+      body:body
+    });
   }
 
   const questions=[];
 
   for(let bi=0;bi<blocks.length;bi++){
-    const block=blocks[bi];
+    const item=blocks[bi];
 
-    let qLines=[];
-    const options=[];
-    let currentOption=-1;
+    /*
+     * Stop at the first A/B/C/D option marker.
+     * Supports inline PDF extraction as well as newline extraction.
+     */
+    const optionRe=/(?:^|\s)([A-D])\s*[\).:\-]\s*/gi;
+    const matches=[];
+    let om;
 
-    for(const line of block){
-      const m=line.match(/^([A-D])[\).:\-]\s*(.*)$/i);
-
-      if(m){
-        currentOption="ABCD".indexOf(m[1].toUpperCase());
-        options[currentOption]=m[2].trim();
-        continue;
-      }
-
-      if(currentOption!==-1){
-        options[currentOption]=(options[currentOption]+" "+line).trim();
-      }else{
-        qLines.push(line);
-      }
-    }
-
-    const q=qLines.join(" ").replace(/\s+/g," ").trim();
-
-    if(
-      q &&
-      options.length===4 &&
-      options.every(function(x){return typeof x==="string" && x.length>0;})
-    ){
-      questions.push({
-        id:"RF-OCR-"+Date.now()+"-"+bi,
-        question:q,
-        text:q,
-        options:options,
-        correctAnswer:null,
-        subject:"",
-        chapter:"",
-        sourceId:"",
-        status:"quarantine",
-        origin:"module",
-        extraction:"ocr"
+    while((om=optionRe.exec(item.body))!==null){
+      matches.push({
+        letter:om[1].toUpperCase(),
+        index:om.index+(om[0].length-om[0].trimStart().length),
+        end:optionRe.lastIndex
       });
     }
+
+    const unique=[];
+    const seen={};
+
+    for(const x of matches){
+      if(!seen[x.letter]){
+        seen[x.letter]=true;
+        unique.push(x);
+      }
+    }
+
+    if(unique.length<4) continue;
+
+    const first=unique[0];
+    const stem=item.body.slice(0,first.index).trim()
+      .replace(/^(?:Q(?:uestion)?\s*)?\d{1,4}\s*[\).:\-]\s*/i,"")
+      .replace(/\s+/g," ")
+      .trim();
+
+    const options=["","","",""];
+
+    for(let oi=0;oi<4;oi++){
+      const cur=unique[oi];
+      const next=oi+1<unique.length
+        ? unique[oi+1].index
+        : item.body.length;
+
+      const value=item.body
+        .slice(cur.end,next)
+        .replace(/\s+/g," ")
+        .trim();
+
+      const idx="ABCD".indexOf(cur.letter);
+
+      if(idx>=0) options[idx]=value;
+    }
+
+    if(
+      !stem ||
+      options.length!==4 ||
+      options.some(x=>!x || x.length<1)
+    ){
+      continue;
+    }
+
+    /*
+     * Do not import obvious answer-key-only blocks.
+     * A real question must have a meaningful stem.
+     */
+    if(stem.length<8) continue;
+
+    questions.push({
+      id:"RF-OCR-"+Date.now()+"-"+bi,
+      question:stem,
+      text:stem,
+      options:options,
+      correctAnswer:null,
+      subject:"",
+      chapter:"",
+      sourceId:"",
+      status:"quarantine",
+      origin:"module",
+      extraction:"pdf-text-or-ocr",
+      sourceQuestionNumber:item.number
+    });
   }
 
-  return questions;
+  /*
+   * Remove duplicate question numbers produced by repeated headers/pages.
+   * Never merge/reword questions.
+   */
+  const out=[];
+  const seenNumbers=new Set();
+
+  for(const q of questions){
+    const key=String(q.sourceQuestionNumber);
+    if(seenNumbers.has(key)) continue;
+    seenNumbers.add(key);
+    out.push(q);
+  }
+
+  return out;
 }
 
 function parseAnswerKey(text){
@@ -508,6 +576,12 @@ async function importPDF(file,meta,callbacks){
     pageTexts.push(text);
     fullText+=text+"\n";
   }
+
+  log("PARSE INPUT", {
+    chars:fullText.length,
+    pages:pageTexts.length,
+    answerKeyCandidates:(fullText.match(/(?:Q(?:uestion)?\\s*)?\\d{1,4}\\s*[\\).:\\-]?\\s*[A-D]\\b/gi)||[]).length
+  });
 
   const questions=parseQuestions(fullText);
   const answerKey=parseAnswerKey(fullText);
