@@ -1,3 +1,73 @@
+
+/* RANKFORGE OWNER APPROVED -> MASTER POOL V2 BRIDGE */
+(function () {
+  "use strict";
+
+  const APPROVED_KEY = "rankforgeCanonicalQuestionPoolV1";
+  const MASTER_KEY = "rankForgeMasterQuestionPoolV2";
+
+  function getApproved() {
+    try {
+      const raw = localStorage.getItem(APPROVED_KEY);
+      if (!raw) return [];
+
+      const data = JSON.parse(raw);
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data.questions)
+          ? data.questions
+          : [];
+
+      return list.filter(function (q) {
+        return q &&
+          (q.question || q.text) &&
+          Array.isArray(q.options) &&
+          q.options.length === 4;
+      });
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function normalize(q, index) {
+    return {
+      id: q.id || q.questionId || ("OWNER-APPROVED-" + index),
+      question: q.question || q.text || "",
+      text: q.text || q.question || "",
+      options: q.options.slice(0, 4),
+      correctAnswer:
+        q.correctAnswer !== undefined
+          ? q.correctAnswer
+          : q.correctIndex,
+      correctIndex:
+        q.correctIndex !== undefined
+          ? q.correctIndex
+          : (
+              typeof q.correctAnswer === "number"
+                ? q.correctAnswer
+                : undefined
+            ),
+      subject: q.subject || "",
+      chapter: q.chapter || "",
+      topic: q.topic || "",
+      difficulty: q.difficulty || "",
+      source: "owner-approved",
+      sourceType: "OWNER_APPROVED_REFERENCE",
+      ownerApproved: true
+    };
+  }
+
+  function getOwnerApprovedForMasterPool() {
+    return getApproved().map(normalize);
+  }
+
+  window.RankForgeOwnerApprovedMasterPoolBridge = {
+    version: "V1",
+    masterKey: MASTER_KEY,
+    getOwnerApprovedForMasterPool
+  };
+})();
+
 (function (global) {
   "use strict";
 
