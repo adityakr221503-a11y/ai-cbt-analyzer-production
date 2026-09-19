@@ -186,14 +186,16 @@
     return snapshot;
   }
 
-  window.CBTAnalyzerCore = {
+  const PREVIOUS_CBT_ANALYZER_CORE = window.CBTAnalyzerCore || {};
+
+  window.CBTAnalyzerCore = Object.assign({}, PREVIOUS_CBT_ANALYZER_CORE, {
     recordAttempt,
     recordMistake,
     markMastered,
     setRetry,
     mentorSnapshot,
     getStats: mentorSnapshot
-  };
+  });
 
   // Safe event bridge. Existing application logic remains untouched.
   document.addEventListener("cbt:attempt-complete", e => {

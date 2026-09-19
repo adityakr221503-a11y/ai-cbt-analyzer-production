@@ -223,26 +223,14 @@ a{text-decoration:none;color:inherit}
   "use strict";
 
   function cleanDuplicateVault(){
-    const cards=document.querySelectorAll(
+    const cards=[...document.querySelectorAll(
       'a[href="./study-vault/"],a[href="study-vault/"]'
-    );
+    )];
 
-    let kept=null;
+    const canonical=document.getElementById("rankforgeStudyVaultCard");
 
     cards.forEach(function(card){
-      if(card.id==="rankforgeStudyVaultCard"){
-        kept=card;
-        return;
-      }
-
-      if(
-        card.id==="rankforgeStudyVaultEntry" ||
-        /Study Vault/i.test(card.textContent||"")
-      ){
-        if(kept && card!==kept){
-          card.remove();
-        }
-      }
+      if(card!==canonical) card.remove();
     });
   }
 
@@ -250,14 +238,8 @@ a{text-decoration:none;color:inherit}
     cleanDuplicateVault();
 
     try{
-      const observer=new MutationObserver(function(){
-        cleanDuplicateVault();
-      });
-
-      observer.observe(document.body,{
-        childList:true,
-        subtree:true
-      });
+      const observer=new MutationObserver(cleanDuplicateVault);
+      observer.observe(document.body,{childList:true,subtree:true});
     }catch(e){}
   }
 
@@ -272,15 +254,6 @@ a{text-decoration:none;color:inherit}
 </head>
 
 <body>
-<!-- RANKFORGE_OWNER_ACCESS_ENTRY_V2 -->
-<a class="card" href="owner-access.html" style="display:block!important;">
-  <div class="icon">🔐</div>
-  <strong>Owner Access</strong>
-  <span>Private module management.</span>
-</a>
-<!-- /RANKFORGE_OWNER_ACCESS_ENTRY_V2 -->
-
-
 <main class="app">
 
 <header class="top">

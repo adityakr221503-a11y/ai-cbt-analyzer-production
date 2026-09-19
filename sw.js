@@ -1,4 +1,4 @@
-const CACHE_NAME = "rankforge-ai-v4";
+const CACHE_NAME = "rankforge-ai-v5";
 
 const CORE = [
   "./",
