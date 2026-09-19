@@ -202,7 +202,74 @@ a{text-decoration:none;color:inherit}
 }
 </style>
 
-<script src="./owner-imports/rankforge-owner-access.js"></script><script src="./owner-imports/rankforge-student-source-guard.js"></script><script src="./owner-imports/rankforge-practice-source-policy.js"></script></head>
+<script src="./owner-imports/rankforge-owner-access.js"></script><script src="./owner-imports/rankforge-student-source-guard.js"></script><script src="./owner-imports/rankforge-practice-source-policy.js"></script><style id="rankforge-home-navigation-fix-v1">
+#rankforgeStudyVaultEntry{
+  display:none !important;
+}
+.app{
+  padding-bottom:calc(110px + env(safe-area-inset-bottom));
+}
+.nav{
+  min-height:64px;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+#rankforgeMistakeMasteryV1{
+  margin-bottom:calc(110px + env(safe-area-inset-bottom)) !important;
+}
+</style>
+
+<script id="rankforge-home-navigation-fix-script-v1">
+(function(){
+  "use strict";
+
+  function cleanDuplicateVault(){
+    const cards=document.querySelectorAll(
+      'a[href="./study-vault/"],a[href="study-vault/"]'
+    );
+
+    let kept=null;
+
+    cards.forEach(function(card){
+      if(card.id==="rankforgeStudyVaultCard"){
+        kept=card;
+        return;
+      }
+
+      if(
+        card.id==="rankforgeStudyVaultEntry" ||
+        /Study Vault/i.test(card.textContent||"")
+      ){
+        if(kept && card!==kept){
+          card.remove();
+        }
+      }
+    });
+  }
+
+  function boot(){
+    cleanDuplicateVault();
+
+    try{
+      const observer=new MutationObserver(function(){
+        cleanDuplicateVault();
+      });
+
+      observer.observe(document.body,{
+        childList:true,
+        subtree:true
+      });
+    }catch(e){}
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",boot,{once:true});
+  }else{
+    boot();
+  }
+})();
+</script>
+
+</head>
 
 <body>
 <!-- RANKFORGE_OWNER_ACCESS_ENTRY_V2 -->
