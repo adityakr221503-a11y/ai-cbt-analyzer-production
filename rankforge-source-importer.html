@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RankForge AI — Source Importer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+body{font-family:system-ui,sans-serif;background:#f5f7fb;margin:0;color:#172033}
+main{max-width:1000px;margin:auto;padding:18px}
+.card{background:#fff;border:1px solid #dfe4ee;border-radius:16px;padding:18px;margin:12px 0;box-shadow:0 3px 12px #0000000a}
+h1{margin:0 0 6px}.muted{color:#687386}
+button{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;margin:4px}
+button:disabled{opacity:.5}
+input[type=file]{width:100%;padding:12px;border:1px dashed #9aa6b8;border-radius:10px}
+.progress{height:12px;background:#e8ecf3;border-radius:20px;overflow:hidden}
+#bar{height:100%;width:0%;background:#315bea;transition:.2s}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{padding:14px;border:1px solid #e2e6ee;border-radius:12px}
+.stat b{display:block;font-size:24px}
+pre{white-space:pre-wrap;max-height:360px;overflow:auto;background:#101522;color:#dbe5ff;padding:14px;border-radius:10px}
+.good{color:#167a43}.warn{color:#9a6500}.bad{color:#b42318}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:8px;border-bottom:1px solid #e5e8ef;text-align:left;vertical-align:top}
+</style>
+</head>
+<body>
+<main>
+<div class="card">
+<h1>RankForge AI Source Importer</h1>
+<div class="muted">PDF • Scanned PDF • ZIP only</div>
+<p class="muted">Strict fail-safe import: uncertain questions are never guessed.</p>
+<input id="file" type="file" accept=".pdf,.zip,application/pdf,application/zip">
+<div>
+<button id="dry">Dry Run</button>
+<button id="process">Process & Review</button>
+<button id="approve" disabled>Approve Clean</button>
+<button id="clear">Clear</button>
+</div>
+</div>
+
+<div class="card">
+<div id="status">Waiting for source file.</div>
+<div class="progress"><div id="bar"></div></div>
+</div>
+
+<div class="card">
+<h3>Import Report</h3>
+<div class="grid">
+<div class="stat"><b id="pages">0</b>Pages</div>
+<div class="stat"><b id="questions">0</b>Questions</div>
+<div class="stat"><b id="clean">0</b>Clean</div>
+<div class="stat"><b id="review">0</b>Review</div>
+<div class="stat"><b id="quarantine">0</b>Quarantine</div>
+<div class="stat"><b id="duplicates">0</b>Duplicates</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Detected Questions</h3>
+<div id="preview" class="muted">No questions yet.</div>
+</div>
+
+<div class="card">
+<h3>Diagnostics</h3>
+<pre id="log">RankForge Source Importer ready.</pre>
+</div>
+</main>
+
+<script>
+"use strict";
+
+const VERSION="RANKFORGE_SOURCE_IMPORTER_V1";
+const MAX_PAGES=5000;
+const MAX_ZIP_FILES=1000;
+const OCR_MIN_TEXT=100;
+const OCR_CONFIDENCE=72;
+const REVIEW_CONFIDENCE=82;
+
+let results=[];
+let dryRun=false;
+let sourceFile=null;
+
+const $=id=>document.getElementById(id);
+
+function log(x){
+  const p=$("log");
+  p.textContent += "\n"+x;
+  p.scrollTop=p.scrollHeight;
+}
+
+function status(x){$("status").textContent=x}
+
+function progress(n){
+  $("bar").style.width=Math.max(0,Math.min(100,n))+"%";
+}
+
+function resetStats(){
+  ["pages","questions","clean","review","quarantine","duplicates"]
+    .forEach(x=>$(x).textContent="0");
+  $("preview").innerHTML='<span class="muted">No questions yet.</span>';
+}
+
+function setStats(){
+  $("questions").textContent=results.length;
+  $("clean").textContent=results.filter(x=>x.status==="clean").length;
+  $("review").textContent=results.filter(x=>x.status==="review").length;
+  $("quarantine").textContent=results.filter(x=>x.status==="quarantine").length;
+  $("duplicates").textContent=results.filter(x=>x.duplicate).length;
+  renderPreview();
+}
+
+function normalizeText(s){
+  return String(s||"")
+    .replace(/\u00ad/g,"")
+    .replace(/[ \t]+/g," ")
+    .replace(/\n[ \t]+/g,"\n")
+    .replace(/\n{3,}/g,"\n\n")
+    .trim();
+}
+
+function fingerprint(s){
+  return normalizeText(s)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g," ")
+    .trim()
+    .split(/\s+/)
+    .slice(0,160)
+    .join(" ");
+}
+
+function garbageScore(s){
+  if(!s) return 1;
+  const chars=s.replace(/\s/g,"");
+  if(!chars.length) return 1;
+  const bad=(s.match(/[�□]{2,}|[^A-Za-z0-9.,;:?!%()+\-=/<>()[\]'" ]/g)||[]).length;
+  return bad/Math.max(chars.length,1);
+}
+
+function quality(q){
+  const issues=[];
+  if(!q.question || q.question.length<8) issues.push("short question");
+  if(q.options.length!==4) issues.push("options != 4");
+  if(q.options.some(x=>!x || x.length<1)) issues.push("empty option");
+  if(new Set(q.options.map(fingerprint)).size!==4) issues.push("duplicate options");
+  if(q.correctAnswer<0 || q.correctAnswer>3) issues.push("invalid answer");
+  if(garbageScore(q.question)>.08) issues.push("OCR corruption");
+  if(q.options.some(x=>garbageScore(x)>.12)) issues.push("option OCR corruption");
+  if(!q.subject) issues.push("subject missing");
+  if(!q.chapter) issues.push("chapter missing");
+  if(q.confidence < OCR_CONFIDENCE) issues.push("low OCR confidence");
+
+  let status="clean";
+  if(issues.length) status="review";
+  if(issues.some(x=>x==="invalid answer"||x==="options != 4"||x==="OCR corruption"))
+    status="quarantine";
+
+  return {status,issues};
+}
+
+function parseAnswerKey(text){
+  const map={};
+  const re=/\b(?:Q\s*)?(\d{1,4})\s*[\).:\-]?\s*([ABCD])\b/gi;
+  let m;
+  while((m=re.exec(text))){
+    map[Number(m[1])]=m[2].toUpperCase().charCodeAt(0)-65;
+  }
+  return map;
+}
+
+function parseQuestions(text, pageNo, answerKey, confidence){
+  text=normalizeText(text);
+  if(!text) return [];
+
+  const lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const starts=[];
+  const startRe=/^(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\).:\-]\s*(.+)$/i;
+
+  for(let i=0;i<lines.length;i++){
+    const m=lines[i].match(startRe);
+    if(m) starts.push({i,n:Number(m[1]),text:m[2]});
+  }
+
+  const out=[];
+  for(let z=0;z<starts.length;z++){
+    const a=starts[z];
+    const b=starts[z+1];
+    const block=lines.slice(a.i,b?b.i:lines.length);
+
+    let question=a.text;
+    const opts=["","","",""];
+    let current=-1;
+
+    for(let i=1;i<block.length;i++){
+      const line=block[i];
+      const om=line.match(/^\s*([A-D])\s*[\).:\-]\s*(.+)$/i);
+      if(om){
+        current=om[1].toUpperCase().charCodeAt(0)-65;
+        opts[current]=om[2].trim();
+      }else if(current>=0){
+        opts[current]+=" "+line;
+      }else{
+        question+=" "+line;
+      }
+    }
+
+    const ans=answerKey[a.n] ?? -1;
+    const q={
+      id:`RF-SRC-${Date.now()}-${pageNo}-${a.n}-${z}`,
+      sourceType:"pdf",
+      sourcePage:pageNo,
+      question:normalizeText(question),
+      options:opts.map(normalizeText),
+      correctAnswer:ans,
+      confidence:Number(confidence||0),
+      subject:"",
+      chapter:"",
+      status:"review",
+      issues:[]
+    };
+
+    const gate=quality(q);
+    q.status=gate.status;
+    q.issues=gate.issues;
+    out.push(q);
+  }
+  return out;
+}
+
+async function pdfTextPage(pdf,pageNo){
+  const page=await pdf.getPage(pageNo);
+  const content=await page.getTextContent();
+  /* Preserve PDF layout instead of destroying line boundaries. */
+  const items = content.items || [];
+  const rows = [];
+
+  for (const item of items) {
+    const str = String(item.str || "").trim();
+    if (!str) continue;
+
+    const y = Math.round((item.transform && item.transform[5]) || 0);
+    const x = Math.round((item.transform && item.transform[4]) || 0);
+
+    let row = rows.find(r => Math.abs(r.y - y) <= 3);
+    if (!row) {
+      row = { y, items: [] };
+      rows.push(row);
+    }
+    row.items.push({ x, str });
+  }
+
+  rows.sort((a,b) => b.y - a.y);
+
+  const lines = rows.map(row =>
+    row.items
+      .sort((a,b) => a.x - b.x)
+      .map(x => x.str)
+      .join(" ")
+      .replace(/\\s+/g," ")
+      .trim()
+  ).filter(Boolean);
+
+  return normalizeText(lines.join("\\n"));
+}
+
+async function renderPage(pdf,pageNo,scale=3){
+  const page=await pdf.getPage(pageNo);
+  const viewport=page.getViewport({scale});
+  const canvas=document.createElement("canvas");
+  canvas.width=Math.ceil(viewport.width);
+  canvas.height=Math.ceil(viewport.height);
+  const ctx=canvas.getContext("2d",{willReadFrequently:true});
+  await page.render({canvasContext:ctx,viewport}).promise;
+  return canvas;
+}
+
+function preprocess(canvas,mode){
+  const c=document.createElement("canvas");
+  c.width=canvas.width;c.height=canvas.height;
+  const x=c.getContext("2d",{willReadFrequently:true});
+  x.drawImage(canvas,0,0);
+  const img=x.getImageData(0,0,c.width,c.height);
+  const d=img.data;
+
+  for(let i=0;i<d.length;i+=4){
+    const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+    let v=g;
+    if(mode==="contrast") v=Math.max(0,Math.min(255,(g-128)*1.65+128));
+    if(mode==="binary") v=g>165?255:0;
+    d[i]=d[i+1]=d[i+2]=v;
+  }
+  x.putImageData(img,0,0);
+  return c;
+}
+
+async function ocrPage(canvas,pageNo){
+  const worker=await Tesseract.createWorker("eng",1,{
+    logger:m=>{
+      if(m.status){
+        status(`OCR page ${pageNo}: ${m.status} ${m.progress?Math.round(m.progress*100)+"%":""}`);
+      }
+    }
+  });
+
+  const texts=[];
+  for(const mode of ["gray","contrast","binary"]){
+    const img=preprocess(canvas,mode);
+    const r=await worker.recognize(img);
+    texts.push({
+      mode,
+      text:normalizeText(r.data.text),
+      confidence:Number(r.data.confidence||0)
+    });
+  }
+
+  await worker.terminate();
+
+  texts.sort((a,b)=>{
+    const score=t=>t.confidence+(t.text.length>100?10:0)-garbageScore(t.text)*100;
+    return score(b)-score(a);
+  });
+
+  return texts[0];
+}
+
+async function processPDF(file){
+  const data=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data}).promise;
+  $("pages").textContent=pdf.numPages;
+  log(`PDF loaded: ${pdf.numPages} pages`);
+
+  if(pdf.numPages>MAX_PAGES) throw new Error("PDF exceeds safety page limit");
+
+  let allText="";
+  for(let p=1;p<=pdf.numPages;p++){
+    status(`Reading PDF text layer: page ${p}/${pdf.numPages}`);
+    progress(p/pdf.numPages*35);
+
+    const text=await pdfTextPage(pdf,p);
+    allText+="\n"+text;
+
+    if(text.length>=OCR_MIN_TEXT){
+      const parsed=parseQuestions(text,p,{},100);
+      results.push(...parsed);
+      continue;
+    }
+
+    status(`OCR recovery: page ${p}/${pdf.numPages}`);
+    const canvas=await renderPage(pdf,p,3);
+    const o=await ocrPage(canvas,p);
+    log(`Page ${p}: OCR confidence ${o.confidence.toFixed(1)}`);
+
+    const parsed=parseQuestions(o.text,p,{},o.confidence);
+    results.push(...parsed);
+  }
+
+  const key=parseAnswerKey(allText);
+  if(Object.keys(key).length){
+    log(`Answer-key candidates detected: ${Object.keys(key).length}`);
+    for(const q of results){
+      const n=Number(q.id.split("-")[4]);
+      if(key[n]!==undefined) q.correctAnswer=key[n];
+      const gate=quality(q);
+      q.status=gate.status;
+      q.issues=gate.issues;
+    }
+  }
+
+  $("pages").textContent=pdf.numPages;
+}
+
+async function processZIP(file){
+  const zip=await JSZip.loadAsync(file);
+  const entries=Object.values(zip.files)
+    .filter(x=>!x.dir)
+    .filter(x=>/\.pdf$/i.test(x.name));
+
+  if(entries.length>MAX_ZIP_FILES)
+    throw new Error("ZIP contains too many PDF entries");
+
+  if(!entries.length)
+    throw new Error("ZIP contains no supported PDF files");
+
+  log(`ZIP: ${entries.length} PDF files found`);
+
+  for(let i=0;i<entries.length;i++){
+    status(`ZIP PDF ${i+1}/${entries.length}: ${entries[i].name}`);
+    const blob=await entries[i].async("blob");
+    await processPDF(blob);
+  }
+}
+
+function duplicateGate(){
+  const seen=new Map();
+  for(const q of results){
+    const fp=fingerprint(q.question);
+    if(!fp) continue;
+    if(seen.has(fp)){
+      q.duplicate=true;
+      q.status="quarantine";
+      q.issues=[...(q.issues||[]),"exact duplicate"];
+    }else{
+      seen.set(fp,q.id);
+      q.duplicate=false;
+    }
+  }
+}
+
+function renderPreview(){
+  if(!results.length){
+    $("preview").innerHTML='<span class="muted">No questions detected.</span>';
+    return;
+  }
+
+  const rows=results.slice(0,100).map((q,i)=>`
+  <tr>
+    <td>${i+1}</td>
+    <td>${escapeHTML(q.question)}</td>
+    <td>${q.options.map((x,j)=>`${String.fromCharCode(65+j)}. ${escapeHTML(x)}`).join("<br>")}</td>
+    <td>${q.correctAnswer>=0?String.fromCharCode(65+q.correctAnswer):"—"}</td>
+    <td class="${q.status==="clean"?"good":q.status==="review"?"warn":"bad"}">${q.status}</td>
+    <td>${escapeHTML((q.issues||[]).join(", "))}</td>
+  </tr>`).join("");
+
+  $("preview").innerHTML=`
+  <div style="overflow:auto">
+  <table>
+  <thead><tr><th>#</th><th>Question</th><th>Options</th><th>Ans</th><th>Status</th><th>Issues</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  </div>`;
+}
+
+function escapeHTML(s){
+  return String(s||"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+function detect(file){
+  if(!file) return "none";
+  if(/\.zip$/i.test(file.name)) return "zip";
+  if(/\.pdf$/i.test(file.name)||file.type==="application/pdf") return "pdf";
+  return "unsupported";
+}
+
+function saveToVault(){
+  const clean=results.filter(q=>q.status==="clean"&&!q.duplicate);
+  if(!clean.length){
+    log("No clean questions available for approval.");
+    return;
+  }
+
+  if(!window.RankForgeSourceEngine){
+    log("V4 Source Engine not loaded on this standalone page.");
+    log("Safe behavior: questions remain in local review state and are NOT silently inserted.");
+    return;
+  }
+
+  try{
+    const meta={
+      sourceId:"OWNER-"+Date.now(),
+      moduleName:sourceFile?.name||"Standalone Import",
+      type:"owner-module",
+      year:"",
+      privateNote:"Imported through RankForge standalone source importer"
+    };
+
+    const r=window.RankForgeSourceEngine.submitModuleQuestions(clean,meta);
+    log("V4 handoff complete: "+JSON.stringify(r));
+  }catch(e){
+    log("V4 handoff failed safely: "+e.message);
+  }
+}
+
+$("file").addEventListener("change",e=>{
+  sourceFile=e.target.files[0]||null;
+  resetStats();
+  results=[];
+  $("approve").disabled=true;
+  if(sourceFile){
+    const t=detect(sourceFile);
+    status(`Selected: ${sourceFile.name} | detected: ${t}`);
+    log(`Input detected as ${t}`);
+  }
+});
+
+$("dry").onclick=async()=>{
+  dryRun=true;
+  await runImport();
+};
+
+$("process").onclick=async()=>{
+  dryRun=false;
+  await runImport();
+};
+
+$("approve").onclick=()=>{
+  saveToVault();
+};
+
+$("clear").onclick=()=>{
+  results=[];
+  sourceFile=null;
+  $("file").value="";
+  resetStats();
+  progress(0);
+  status("Waiting for source file.");
+  $("approve").disabled=true;
+  $("log").textContent="RankForge Source Importer ready.";
+};
+
+async function runImport(){
+  if(!sourceFile){
+    status("Select a PDF or ZIP first.");
+    return;
+  }
+
+  results=[];
+  resetStats();
+  $("approve").disabled=true;
+
+  const type=detect(sourceFile);
+
+  if(type==="unsupported"){
+    status("Unsupported format rejected. Only PDF and ZIP are allowed.");
+    log("REJECTED: unsupported source type");
+    return;
+  }
+
+  try{
+    status("Starting safe import...");
+    progress(1);
+
+    if(type==="pdf") await processPDF(sourceFile);
+    else await processZIP(sourceFile);
+
+    duplicateGate();
+    setStats();
+    progress(100);
+
+    const clean=results.filter(q=>q.status==="clean"&&!q.duplicate).length;
+
+    if(dryRun){
+      status(`DRY RUN COMPLETE | Pages: ${$("pages").textContent} | Questions: ${results.length} | Clean: ${clean} | Review: ${$("review").textContent} | Quarantine: ${$("quarantine").textContent}`);
+      log("DRY RUN: nothing was written to the Master pool.");
+    }else{
+      $("approve").disabled=clean===0;
+      status(`IMPORT COMPLETE | Pages: ${$("pages").textContent} | Questions: ${results.length} | Clean: ${clean} | Review: ${$("review").textContent} | Quarantine: ${$("quarantine").textContent}`);
+      log("Import completed. Clean questions are awaiting owner approval.");
+    }
+  }catch(e){
+    console.error(e);
+    status("IMPORT STOPPED SAFELY: "+e.message);
+    log("ERROR: "+e.stack);
+    progress(0);
+  }
+}
+
+window.RankForgeStandaloneImporter={
+  version:VERSION,
+  runImport,
+  results:()=>results
+};
+
+</script>
+
+
+<script>
+/* RANKFORGE_OWNER_UNIFIED_SOURCE_INPUT_V1 */
+(function () {
+  "use strict";
+
+  const MAX_ZIP_FILES = 500;
+
+  function ext(name) {
+    const m = String(name || "").toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m ? m[1] : "";
+  }
+
+  function isImage(name) {
+    return ["png","jpg","jpeg","webp"].includes(ext(name));
+  }
+
+  function isPDF(name) {
+    return ext(name) === "pdf";
+  }
+
+  function isQuestionData(name) {
+    return [
+      "json","jsonl","ndjson","csv","tsv","txt","md","markdown",
+      "xml","qti"
+    ].includes(ext(name));
+  }
+
+  function sourceKind(file) {
+    const e = ext(file && file.name);
+    if (e === "zip") return "zip";
+    if (e === "pdf") return "pdf";
+    if (isImage(file && file.name)) return "scan-image";
+    if (isQuestionData(file && file.name)) return "question-data";
+    return "unsupported";
+  }
+
+  async function readImage(file) {
+    if (!file) throw new Error("Image source missing");
+
+    if (!window.Tesseract) {
+      throw new Error(
+        "OCR engine unavailable. Scanned source requires OCR."
+      );
+    }
+
+    const result = await Tesseract.recognize(file, "eng", {
+      logger: function (m) {
+        try {
+          if (typeof window.status === "function") {
+            window.status(
+              "OCR " +
+              String(m.status || "") +
+              " " +
+              Math.round((m.progress || 0) * 100) +
+              "%"
+            );
+          }
+        } catch (_) {}
+      }
+    });
+
+    return {
+      text: result &&
+            result.data &&
+            result.data.text
+        ? result.data.text
+        : "",
+      confidence:
+        result &&
+        result.data &&
+        typeof result.data.confidence === "number"
+          ? result.data.confidence
+          : 0
+    };
+  }
+
+  async function processScannedImage(file) {
+    const ocr = await readImage(file);
+
+    if (!ocr.text.trim()) {
+      return {
+        questions: [],
+        status: "quarantine",
+        reason: "empty_ocr"
+      };
+    }
+
+    return {
+      questions: window.rankForgeParseOCRQuestions
+        ? await window.rankForgeParseOCRQuestions(
+            ocr.text,
+            {
+              sourceName: file.name,
+              sourceType: "scanned-image",
+              ocrConfidence: ocr.confidence
+            }
+          )
+        : [],
+      status: "ocr-complete",
+      ocrConfidence: ocr.confidence
+    };
+  }
+
+  async function processZip(file) {
+    if (!window.JSZip) {
+      throw new Error("ZIP engine unavailable");
+    }
+
+    const zip = await JSZip.loadAsync(file);
+    const entries = Object.values(zip.files || {})
+      .filter(function (x) {
+        return x &&
+          !x.dir &&
+          !String(x.name || "").startsWith("__MACOSX/");
+      })
+      .slice(0, MAX_ZIP_FILES);
+
+    const results = [];
+
+    for (const entry of entries) {
+      const name = String(entry.name || "");
+      const e = ext(name);
+
+      if (!(isPDF(name) || isImage(name) || isQuestionData(name))) {
+        continue;
+      }
+
+      const blob = await entry.async("blob");
+
+      const child = new File(
+        [blob],
+        name,
+        {
+          type:
+            e === "pdf"
+              ? "application/pdf"
+              : isImage(name)
+                ? ("image/" + (e === "jpg" ? "jpeg" : e))
+                : "text/plain"
+        }
+      );
+
+      results.push({
+        name: name,
+        kind: sourceKind(child),
+        file: child
+      });
+    }
+
+    return results;
+  }
+
+  window.RankForgeOwnerUnifiedSourceInput = {
+    version: "V1",
+    sourceKind,
+    processScannedImage,
+    processZip
+  };
+})();
+</script>
+
+
+<script>
+/* RANKFORGE_OWNER_ZIP_V4_PIPELINE */
+(function () {
+  "use strict";
+
+  const SUPPORTED = [
+    "pdf", "png", "jpg", "jpeg", "webp"
+  ];
+
+  function extension(name) {
+    const m = String(name || "").toLowerCase().match(/\.([a-z0-9]+)$/);
+    return m ? m[1] : "";
+  }
+
+  function supported(name) {
+    return SUPPORTED.indexOf(extension(name)) !== -1;
+  }
+
+  async function importZIP(file, meta, callbacks) {
+    if (!window.JSZip) {
+      throw new Error("ZIP engine unavailable");
+    }
+
+    const zip = await JSZip.loadAsync(file);
+    const entries = Object.values(zip.files || {})
+      .filter(function (e) {
+        return e &&
+          !e.dir &&
+          !String(e.name || "").startsWith("__MACOSX/");
+      });
+
+    const accepted = entries.filter(function (e) {
+      return supported(e.name);
+    });
+
+    const results = [];
+    let index = 0;
+
+    for (const entry of accepted) {
+      index++;
+
+      const name = String(entry.name);
+      const ext = extension(name);
+      const blob = await entry.async("blob");
+
+      const type =
+        ext === "pdf"
+          ? "application/pdf"
+          : ext === "jpg" || ext === "jpeg"
+            ? "image/jpeg"
+            : "image/" + ext;
+
+      const child = new File([blob], name, { type });
+
+      if (callbacks && callbacks.status) {
+        callbacks.status(
+          "ZIP " + index + "/" + accepted.length +
+          ": processing " + name
+        );
+      }
+
+      if (
+        window.RankForgeOwnerPDFAutoAdapterV4 &&
+        typeof window.RankForgeOwnerPDFAutoAdapterV4.importPDF === "function"
+      ) {
+        if (ext === "pdf") {
+          results.push(
+            await window.RankForgeOwnerPDFAutoAdapterV4.importPDF(
+              child,
+              Object.assign({}, meta, {
+                sourceType: "zip-pdf",
+                sourceName: name,
+                zipEntry: name
+              }),
+              callbacks
+            )
+          );
+        } else if (
+          typeof window.RankForgeOwnerPDFAutoAdapterV4.importScan === "function"
+        ) {
+          results.push(
+            await window.RankForgeOwnerPDFAutoAdapterV4.importScan(
+              child,
+              Object.assign({}, meta, {
+                sourceType: "zip-scanned-image",
+                sourceName: name,
+                zipEntry: name
+              }),
+              callbacks
+            )
+          );
+        } else {
+          results.push({
+            sourceName: name,
+            status: "quarantine",
+            reason: "scan_adapter_missing"
+          });
+        }
+      } else {
+        throw new Error("Owner PDF Adapter V4 unavailable");
+      }
+    }
+
+    return {
+      sourceType: "zip",
+      sourceName: file.name,
+      entries: entries.length,
+      supportedEntries: accepted.length,
+      results
+    };
+  }
+
+  window.RankForgeOwnerZIPV4 = {
+    version: "V4",
+    supported: SUPPORTED.slice(),
+    importZIP
+  };
+})();
+</script>
+
+<script src="./rankforge-source-engine.js"></script>
+</body>
+</html>

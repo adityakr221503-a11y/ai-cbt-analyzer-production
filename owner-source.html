@@ -3,520 +3,237 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RankForge Owner Question Hub</title>
+<title>RankForge AI — Owner Source Hub</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f5f7fb;color:#172033;font-family:system-ui,-apple-system,sans-serif}
-main{max-width:1100px;margin:auto;padding:20px}
-.card{background:#fff;border:1px solid #e1e6ef;border-radius:16px;padding:18px;margin:14px 0}
-h1{margin:0 0 6px}
-.muted{color:#667085}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
-.stat{border:1px solid #e1e6ef;border-radius:12px;padding:14px}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#080b12;color:#eef2ff}
+header{padding:22px;background:#101522;border-bottom:1px solid #242b3d}
+h1{margin:0;font-size:24px}
+.sub{color:#9ca8c2;margin-top:6px}
+main{max-width:1200px;margin:auto;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.card{background:#111827;border:1px solid #273149;border-radius:14px;padding:16px}
 .num{font-size:28px;font-weight:800}
-input,button{font:inherit;padding:11px;border-radius:9px;border:1px solid #cbd3df}
-input{width:100%;margin:5px 0}
-button{cursor:pointer;font-weight:700;background:#fff}
-button.primary{background:#111827;color:#fff}
-button:disabled{opacity:.5}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#progress{height:10px;background:#e7ebf2;border-radius:99px;overflow:hidden;margin:10px 0}
-#bar{height:100%;width:0;background:#111827}
-#log{white-space:pre-wrap;background:#111827;color:#fff;border-radius:10px;padding:13px;min-height:55px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:9px;border-bottom:1px solid #edf0f5;text-align:left;vertical-align:top}
-.badge{font-size:12px;font-weight:700}
-@media(max-width:650px){.row{grid-template-columns:1fr}}
+.label{color:#9ca8c2;font-size:13px}
+section{margin-top:18px;background:#0f1521;border:1px solid #273149;border-radius:16px;padding:18px}
+h2{font-size:17px;margin:0 0 14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button,label.upload{border:1px solid #35415b;background:#182238;color:#fff;border-radius:10px;padding:10px 14px;cursor:pointer}
+button:hover,label.upload:hover{background:#202d47}
+input[type=file]{display:none}
+pre{white-space:pre-wrap;background:#080c14;border-radius:10px;padding:12px;color:#b9c5dd;max-height:300px;overflow:auto}
+.ok{color:#73e6a8}.warn{color:#ffd166}.bad{color:#ff7b8a}
+.small{font-size:12px;color:#8f9bb4}
 </style>
-<script src="./owner-imports/rankforge-owner-access.js"></script><script src="./owner-imports/rankforge-student-source-guard.js"></script></head>
-
+</head>
 <body>
+<header>
+<h1>RankForge AI — Owner Source Hub</h1>
+<div class="sub">V10/V11 extraction → OCR → QC → Owner Review → Approved Master Pool</div>
+</header>
+
 <main>
+<div class="grid" id="stats"></div>
 
-<div class="card">
-<h1>RankForge Owner Question Hub</h1>
-<div class="muted">Independent module ingestion • English PDF • OCR • review • quarantine</div>
-</div>
-
-<div class="card">
-<h3>1. Module Source</h3>
-
+<section>
+<h2>Module Source Import</h2>
 <div class="row">
-<div>
-<label>Source ID</label>
-<input id="sourceId" placeholder="e.g. NEET-MODULE-001">
+<label class="upload">
+Select PDF / ZIP / Scan / Data
+<input id="sourceFile" type="file"
+accept=".pdf,.zip,.png,.jpg,.jpeg,.webp,.json,.jsonl,.ndjson,.csv,.tsv,.txt,.md,.xlsx,.xls,.docx">
+</label>
+<button onclick="runImport()">Import to Owner Inbox</button>
+<button onclick="refresh()">Refresh</button>
 </div>
-<div>
-<label>Module Name</label>
-<input id="moduleName" placeholder="e.g. Physics Module 01">
+<div class="small">
+V10/V11 extraction is owner-controlled. Uncertain reconstruction is quarantined.
+No answer guessing.
 </div>
-</div>
+</section>
 
+<section>
+<h2>AI Question Import</h2>
 <div class="row">
-<div>
-<label>Subject</label>
-<input id="subject" placeholder="Physics / Chemistry / Biology">
+<label class="upload">
+Select AI JSON / JSONL
+<input id="aiFile" type="file" accept=".json,.jsonl,.ndjson">
+</label>
+<button onclick="runAIImport()">Import AI Questions</button>
 </div>
-<div>
-<label>Chapter</label>
-<input id="chapter" placeholder="Chapter">
-</div>
-</div>
+</section>
 
-<label>Select English PDF</label>
-<input id="pdfFile" type="file" accept="application/pdf,.pdf">
-
-<button id="processBtn" class="primary" type="button">
-Process PDF Module
-</button>
+<section>
+<h2>Quality Control</h2>
+<div class="row">
+<button onclick="show('inbox')">Owner Inbox</button>
+<button onclick="show('review')">Review Queue</button>
+<button onclick="show('quarantine')">Quarantine</button>
+<button onclick="show('approved')">Approved Master</button>
+<button onclick="approveClean()">Approve Clean</button>
+<button onclick="recheck()">Recheck</button>
+<button onclick="rebuild()">Rebuild Index</button>
 </div>
+<pre id="output">Owner Source Hub ready.</pre>
+</section>
 
-<div class="card">
-<h3>2. Processing</h3>
-<div id="progress"><div id="bar"></div></div>
-<div id="log">Ready. Select a PDF.</div>
+<section>
+<h2>Extraction Architecture</h2>
+<div class="small">
+V10 canonicalization → exact duplicate removal → near-duplicate/family checks →
+V11 OCR/recovery → question reconstruction → quality gates → quarantine/review →
+Owner approval → Canonical Question Pool → Master Pool V2.
 </div>
-
-<div class="card">
-<h3>3. Question Results</h3>
-<div class="grid">
-<div class="stat">Detected<div class="num" id="detected">0</div></div>
-<div class="stat">Review<div class="num" id="review">0</div></div>
-<div class="stat">Quarantine<div class="num" id="quarantine">0</div></div>
-<div class="stat">Answer Key<div class="num" id="answers">0</div></div>
-</div>
-</div>
-
-<div class="card">
-<h3>4. Staged Questions</h3>
-<div id="questions">No questions processed yet.</div>
-</div>
-
+</section>
 </main>
 
+<script src="./rankforge-source-engine.js"></script>
+<script src="./rankforge-owner-pdf-auto-adapter.js"></script>
 <script>
+(function(){
 "use strict";
 
-const RF={
-  KEY:"rankforgeOwnerModuleStagingV1",
-  JOB:"rankforgeOwnerModuleJobsV1",
-  PDFJS:"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
-  WORKER:"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
-  TESS:"https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"
-};
+const E=()=>window.RankForgeSourceEngine;
+const A=()=>window.RankForgeOwnerPDFAutoAdapterV4 ||
+          window.RankForgeOwnerPDFAutoAdapter;
 
-const $=id=>document.getElementById(id);
-
-function clean(x){
- return String(x||"")
-  .replace(/\u00a0/g," ")
-  .replace(/[ \t]+/g," ")
-  .replace(/\n{3,}/g,"\n\n")
-  .trim();
+function out(x){
+  document.getElementById("output").textContent=
+    typeof x==="string"?x:JSON.stringify(x,null,2);
 }
 
-function setLog(x){$("log").textContent=x}
-function setProgress(x){$("bar").style.width=Math.max(0,Math.min(100,x))+"%"}
-
-function loadScript(src,ready){
- return new Promise((resolve,reject)=>{
-  if(ready())return resolve();
-  const s=document.createElement("script");
-  s.src=src;
-  s.onload=resolve;
-  s.onerror=()=>reject(new Error("Could not load "+src));
-  document.head.appendChild(s);
- });
+function refresh(){
+  const e=E();
+  if(!e){out("Source Engine unavailable");return}
+  let s={};
+  try{s=e.stats()}catch(_){}
+  document.getElementById("stats").innerHTML=[
+    ["Owner Inbox",s.ownerInbox ?? s.inbox ?? 0],
+    ["Review Queue",s.review ?? s.reviewQueue ?? 0],
+    ["Quarantine",s.quarantine ?? 0],
+    ["Approved",s.approved ?? 0],
+    ["AI Questions",s.ai ?? s.aiQuestions ?? 0]
+  ].map(x=>'<div class="card"><div class="num">'+x[1]+'</div><div class="label">'+x[0]+'</div></div>').join("");
 }
 
-async function loadPDFJS(){
- await loadScript(RF.PDFJS,()=>!!window.pdfjsLib);
- window.pdfjsLib.GlobalWorkerOptions.workerSrc=RF.WORKER;
- return window.pdfjsLib;
+async function runImport(){
+  const f=document.getElementById("sourceFile").files[0];
+  if(!f){out("Select a source file first.");return}
+
+  const ext=f.name.split(".").pop().toLowerCase();
+  out("Starting V10/V11 owner import: "+f.name);
+
+  try{
+    if(ext==="zip" &&
+       window.RankForgeOwnerZIPV4 &&
+       typeof window.RankForgeOwnerZIPV4.importZIP==="function"){
+      const r=await window.RankForgeOwnerZIPV4.importZIP(f,{
+        source:"owner-source-hub",
+        pipeline:"V10-V11"
+      });
+      out(r);
+    }
+    else if(["png","jpg","jpeg","webp"].includes(ext) &&
+            A() && typeof A().importScan==="function"){
+      const r=await A().importScan(f,{
+        source:"owner-source-hub",
+        pipeline:"V11-OCR"
+      },{
+        status:x=>out(x)
+      });
+      out(r);
+    }
+    else if(ext==="pdf" &&
+            A() && typeof A().importPDF==="function"){
+      const r=await A().importPDF(f,{
+        source:"owner-source-hub",
+        pipeline:"V10-V11-PDF"
+      },{
+        status:x=>out(x)
+      });
+      out(r);
+    }
+    else if(["json","jsonl","ndjson"].includes(ext)){
+      const text=await f.text();
+      const rows=text.trim().split(/\r?\n/)
+        .filter(Boolean)
+        .map(x=>JSON.parse(x));
+
+      const qs=Array.isArray(rows)?rows:
+        (rows.questions||[]);
+
+      const r=E().submitModuleQuestions(qs,{
+        source:"owner-source-hub",
+        sourceFile:f.name,
+        pipeline:"structured"
+      });
+      out(r);
+    }
+    else{
+      out("No connected extraction adapter for: "+ext+
+          "\nThe file is NOT silently converted.");
+    }
+  }catch(err){
+    out("IMPORT ERROR\n"+(err&&err.stack||err));
+  }
+  refresh();
 }
 
-async function loadTesseract(){
- await loadScript(RF.TESS,()=>!!window.Tesseract);
- return window.Tesseract;
+async function runAIImport(){
+  const f=document.getElementById("aiFile").files[0];
+  if(!f){out("Select AI JSON/JSONL first.");return}
+  try{
+    const text=await f.text();
+    let qs;
+    if(f.name.toLowerCase().endsWith(".jsonl")||
+       f.name.toLowerCase().endsWith(".ndjson")){
+      qs=text.trim().split(/\r?\n/).filter(Boolean).map(JSON.parse);
+    }else{
+      qs=JSON.parse(text);
+    }
+    if(!Array.isArray(qs)) qs=qs.questions||[];
+    const r=E().submitAIQuestions(qs,{
+      source:"owner-source-hub",
+      sourceFile:f.name
+    });
+    out(r);
+    refresh();
+  }catch(err){out("AI IMPORT ERROR\n"+(err.stack||err))}
 }
 
-function nativeQuality(text){
- const t=clean(text);
- return {
-   chars:t.length,
-   needsOCR:t.length<100
- };
+function show(type){
+  const e=E();
+  const map={
+    inbox:"getOwnerInbox",
+    review:"getReviewQueue",
+    quarantine:"getQuarantine",
+    approved:"getApproved"
+  };
+  try{out(e[map[type]]())}catch(err){out(err.stack||err)}
 }
 
-async function renderPage(page){
- const viewport=page.getViewport({scale:3});
- const canvas=document.createElement("canvas");
- canvas.width=Math.ceil(viewport.width);
- canvas.height=Math.ceil(viewport.height);
-
- await page.render({
-   canvasContext:canvas.getContext("2d"),
-   viewport
- }).promise;
-
- return canvas;
+function approveClean(){
+  try{out(E().bulkApproveClean())}catch(err){out(err.stack||err)}
+  refresh();
+}
+function recheck(){
+  try{out(E().recheckAll())}catch(err){out(err.stack||err)}
+  refresh();
+}
+function rebuild(){
+  try{out(E().rebuildIndex())}catch(err){out(err.stack||err)}
+  refresh();
 }
 
-function prep(canvas,mode){
- const out=document.createElement("canvas");
- out.width=canvas.width;
- out.height=canvas.height;
-
- const ctx=out.getContext("2d",{willReadFrequently:true});
- ctx.drawImage(canvas,0,0);
-
- const im=ctx.getImageData(0,0,out.width,out.height);
- const d=im.data;
-
- for(let i=0;i<d.length;i+=4){
-   let g=.299*d[i]+.587*d[i+1]+.114*d[i+2];
-
-   if(mode==="contrast")
-     g=Math.max(0,Math.min(255,(g-128)*1.8+128));
-
-   if(mode==="binary")
-     g=g>175?255:0;
-
-   d[i]=d[i+1]=d[i+2]=g;
- }
-
- ctx.putImageData(im,0,0);
- return out;
-}
-
-async function OCR(canvas,onProgress){
- const T=await loadTesseract();
- const worker=await T.createWorker("eng",1,{
-   logger:m=>{
-     if(typeof m.progress==="number")
-       onProgress(m.progress,m.status||"OCR");
-   }
- });
-
- try{
-   const results=[];
-
-   for(const mode of ["gray","contrast","binary"]){
-     const img=mode==="gray"?canvas:prep(canvas,mode);
-     const r=await worker.recognize(img);
-
-     results.push({
-       mode,
-       text:clean(r.data.text),
-       confidence:Number(r.data.confidence||0)
-     });
-   }
-
-   results.sort((a,b)=>{
-     const score=a.confidence+(a.text.length/100);
-     const scoreB=b.confidence+(b.text.length/100);
-     return scoreB-score;
-   });
-
-   return results[0]||{text:"",confidence:0};
- }finally{
-   await worker.terminate();
- }
-}
-
-function splitQuestions(text){
- const lines=clean(text).split("\n");
- const starts=[];
-
- const re=/^\s*(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\.\):\-]\s+/i;
-
- lines.forEach((line,i)=>{
-   const m=line.match(re);
-   if(m)starts.push({line:i,no:Number(m[1])});
- });
-
- const blocks=[];
-
- for(let i=0;i<starts.length;i++){
-   blocks.push({
-     number:starts[i].no,
-     raw:lines.slice(
-       starts[i].line,
-       i+1<starts.length?starts[i+1].line:lines.length
-     ).join("\n")
-   });
- }
-
- return blocks;
-}
-
-function parseOptions(raw){
- const lines=raw.split("\n");
- const re=/^\s*\(?([A-D])\)?[\.\):\-]\s*/i;
- const out=[];
- let current=null;
-
- for(const line of lines){
-   const m=line.match(re);
-
-   if(m){
-     current={
-       letter:m[1].toUpperCase(),
-       text:clean(line.slice(m[0].length))
-     };
-     out.push(current);
-   }else if(current && clean(line)){
-     current.text=clean(current.text+" "+line);
-   }
- }
-
- return out.filter(x=>x.text).slice(0,4);
-}
-
-function parseAnswerKey(text){
- const map={};
- let active=false;
-
- for(const line of clean(text).split("\n")){
-   if(/answer\s*key|correct\s*answers?/i.test(line))
-     active=true;
-
-   if(!active)continue;
-
-   const re=/(\d{1,4})\s*[\.\):\-]?\s*([A-D])/gi;
-   let m;
-
-   while((m=re.exec(line))){
-     map[Number(m[1])]=m[2].toUpperCase();
-   }
- }
-
- return map;
-}
-
-function buildQuestion(block,key){
- const opts=parseOptions(block.raw);
-
- let question=block.raw;
-
- const optionStart=block.raw.search(
-   /\n\s*\(?[A-D]\)?[\.\):\-]\s+/i
- );
-
- if(optionStart>0)
-   question=block.raw.slice(0,optionStart);
-
- question=question.replace(
-   /^\s*(?:Q(?:uestion)?\s*)?\d{1,4}\s*[\.\):\-]\s*/i,
-   ""
- );
-
- const answer=key[block.number]||null;
- const correct=answer
-   ? opts.findIndex(x=>x.letter===answer)
-   : -1;
-
- let confidence=40;
-
- if(question.length>=30)confidence+=15;
- if(opts.length===4)confidence+=25;
- if(correct>=0)confidence+=15;
-
- confidence=Math.min(100,confidence);
-
- return {
-   id:"MOD-"+Date.now()+"-"+block.number+"-"+Math.random().toString(36).slice(2,7),
-   question:clean(question),
-   options:opts.map(x=>x.text),
-   correctAnswer:correct>=0?correct:null,
-   answerLetter:answer,
-   sourceQuestionNumber:block.number,
-   extractionConfidence:confidence,
-   status:confidence>=78?"review":"quarantine"
- };
-}
-
-function saveQuestions(qs,meta){
- let old=[];
-
- try{
-   old=JSON.parse(localStorage.getItem(RF.KEY)||"[]");
- }catch(e){}
-
- const stamped=qs.map(q=>Object.assign({},q,{
-   sourceId:meta.sourceId,
-   moduleName:meta.moduleName,
-   subject:meta.subject,
-   chapter:meta.chapter,
-   origin:"OWNER_MODULE",
-   createdAt:Date.now()
- }));
-
- localStorage.setItem(RF.KEY,JSON.stringify(stamped.concat(old)));
- return stamped;
-}
-
-function renderQuestions(){
- let q=[];
-
- try{
-   q=JSON.parse(localStorage.getItem(RF.KEY)||"[]");
- }catch(e){}
-
- $("detected").textContent=q.length;
- $("review").textContent=q.filter(x=>x.status==="review").length;
- $("quarantine").textContent=q.filter(x=>x.status==="quarantine").length;
- $("answers").textContent=q.filter(x=>Number.isInteger(x.correctAnswer)).length;
-
- if(!q.length){
-   $("questions").textContent="No questions processed yet.";
-   return;
- }
-
- $("questions").innerHTML=
- "<table><tr><th>#</th><th>Question</th><th>Options</th><th>Status</th><th>Confidence</th></tr>"+
- q.slice(0,100).map((x,i)=>
-   "<tr>"+
-   "<td>"+(i+1)+"</td>"+
-   "<td>"+escapeHTML(x.question).slice(0,400)+"</td>"+
-   "<td>"+x.options.length+"/4</td>"+
-   "<td><span class='badge'>"+x.status+"</span></td>"+
-   "<td>"+x.extractionConfidence+"%</td>"+
-   "</tr>"
- ).join("")+
- "</table>";
-}
-
-function escapeHTML(x){
- return String(x||"")
-  .replace(/&/g,"&amp;")
-  .replace(/</g,"&lt;")
-  .replace(/>/g,"&gt;");
-}
-
-async function processPDF(){
- const file=$("pdfFile").files[0];
-
- if(!file){
-   setLog("ERROR: No PDF selected.");
-   return;
- }
-
- if(file.type!=="application/pdf"&&!/\.pdf$/i.test(file.name)){
-   setLog("ERROR: Selected file is not a PDF.");
-   return;
- }
-
- $("processBtn").disabled=true;
- setProgress(0);
-
- try{
-   setLog("Loading PDF engine…");
-
-   const PDF=await loadPDFJS();
-   const pdf=await PDF.getDocument({
-     data:await file.arrayBuffer()
-   }).promise;
-
-   let fullText="";
-   let ocrPages=0;
-
-   for(let i=1;i<=pdf.numPages;i++){
-     setLog("Reading PDF\nPage "+i+" / "+pdf.numPages);
-     setProgress((i-1)/pdf.numPages*100);
-
-     const page=await pdf.getPage(i);
-     const tc=await page.getTextContent();
-
-     let text=clean(
-       (tc.items||[]).map(x=>x.str).join(" ")
-     );
-
-     if(nativeQuality(text).needsOCR){
-       ocrPages++;
-
-       setLog(
-         "OCR required\nPage "+i+" / "+pdf.numPages
-       );
-
-       const canvas=await renderPage(page);
-
-       const r=await OCR(canvas,(p,status)=>{
-         setLog(
-           "OCR\nPage "+i+" / "+pdf.numPages+
-           "\n"+status+
-           " "+Math.round(p*100)+"%"
-         );
-       });
-
-       text=r.text;
-     }
-
-     fullText+="\n"+text;
-     setProgress(i/pdf.numPages*100);
-   }
-
-   setLog("Reconstructing questions…");
-
-   const key=parseAnswerKey(fullText);
-   const blocks=splitQuestions(fullText);
-   const questions=blocks.map(x=>buildQuestion(x,key));
-
-   const meta={
-     sourceId:$("sourceId").value.trim()||"OWNER_MODULE",
-     moduleName:$("moduleName").value.trim()||file.name,
-     subject:$("subject").value.trim(),
-     chapter:$("chapter").value.trim()
-   };
-
-   const saved=saveQuestions(questions,meta);
-
-   localStorage.setItem(
-     RF.JOB,
-     JSON.stringify({
-       version:"RANKFORGE_OWNER_MODULE_IMPORT_V2",
-       fileName:file.name,
-       pages:pdf.numPages,
-       ocrPages,
-       detected:questions.length,
-       review:questions.filter(x=>x.status==="review").length,
-       quarantine:questions.filter(x=>x.status==="quarantine").length,
-       answerKey:Object.keys(key).length,
-       completedAt:Date.now()
-     })
-   );
-
-   setProgress(100);
-
-   setLog(
-     "COMPLETE\n"+
-     "File: "+file.name+"\n"+
-     "Pages: "+pdf.numPages+"\n"+
-     "OCR pages: "+ocrPages+"\n"+
-     "Questions detected: "+questions.length+"\n"+
-     "Review: "+questions.filter(x=>x.status==="review").length+"\n"+
-     "Quarantine: "+questions.filter(x=>x.status==="quarantine").length+"\n"+
-     "Answer-key entries: "+Object.keys(key).length
-   );
-
-   renderQuestions();
-
- }catch(e){
-   console.error(e);
-   setLog("PROCESS FAILED\n"+(e.message||String(e)));
- }finally{
-   $("processBtn").disabled=false;
- }
-}
-
-$("processBtn").addEventListener("click",processPDF);
-$("pdfFile").addEventListener("change",()=>{
- const f=$("pdfFile").files[0];
- setLog(f?"PDF selected: "+f.name:"Ready. Select a PDF.");
-});
-
-renderQuestions();
-
+window.runImport=runImport;
+window.runAIImport=runAIImport;
+window.show=show;
+window.approveClean=approveClean;
+window.recheck=recheck;
+window.rebuild=rebuild;
+window.refresh=refresh;
+
+refresh();
 })();
 </script>
 </body>
