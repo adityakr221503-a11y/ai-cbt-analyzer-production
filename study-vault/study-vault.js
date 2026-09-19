@@ -296,88 +296,6 @@ function escapeHtml(v){
 
 
 
-function renderChapterBrowser(){
-  const box=document.getElementById("chapterBrowserContent");
-  const back=document.getElementById("chapterBack");
-  const title=document.getElementById("chapterBrowserTitle");
-  if(!box) return;
-
-  const subject=chapterBrowserState.subject;
-  const cls=chapterBrowserState.className;
-  const chapter=chapterBrowserState.chapter;
-
-  if(!subject){
-    if(back) back.hidden=true;
-    if(title) title.textContent="📚 NCERT Chapter Library";
-    box.innerHTML="";
-    ["Physics","Chemistry","Biology"].forEach(sub=>{
-      const b=document.createElement("button");
-      b.className="chapterTile";
-      b.innerHTML="<strong>"+sub+"</strong><small>Class 11 + Class 12</small>";
-      b.onclick=()=>{chapterBrowserState={subject:sub,className:"",chapter:""};renderChapterBrowser();};
-      box.appendChild(b);
-    });
-    return;
-  }
-
-  if(!cls){
-    if(back) back.hidden=false;
-    if(title) title.textContent="📚 "+subject;
-    box.innerHTML="";
-    ["Class 11","Class 12"].forEach(c=>{
-      const b=document.createElement("button");
-      b.className="chapterTile";
-      b.innerHTML="<strong>"+c+"</strong><small>"+(NCERT_CHAPTERS[subject]?.[c]?.length||0)+" chapters</small>";
-      b.onclick=()=>{chapterBrowserState.className=c;renderChapterBrowser();};
-      box.appendChild(b);
-    });
-    return;
-  }
-
-  if(!chapter){
-    if(back) back.hidden=false;
-    if(title) title.textContent="📚 "+subject+" • "+cls;
-    box.innerHTML="";
-    (NCERT_CHAPTERS[subject]?.[cls]||[]).forEach((ch,i)=>{
-      const b=document.createElement("button");
-      b.className="chapterTile chapterName";
-      b.innerHTML="<strong>"+(i+1)+". "+ch+"</strong><small>Open chapter materials →</small>";
-      b.onclick=()=>{chapterBrowserState.chapter=ch;renderChapterBrowser();};
-      box.appendChild(b);
-    });
-    return;
-  }
-
-  if(back) back.hidden=false;
-  if(title) title.textContent="📖 "+chapter;
-  const items=window.RankForgeStudyVault?.getAll?.()||[];
-  const matches=items.filter(x=>
-    String(x.subject||"").toLowerCase()===subject.toLowerCase() &&
-    String(x.chapter||"").toLowerCase()===chapter.toLowerCase()
-  );
-
-  box.innerHTML="";
-  const head=document.createElement("div");
-  head.className="chapterMaterialHead";
-  head.innerHTML="<strong>"+subject+" • "+cls+"</strong><span>"+matches.length+" saved material"+(matches.length===1?"":"s")+"</span>";
-  box.appendChild(head);
-
-  if(!matches.length){
-    const empty=document.createElement("div");
-    empty.className="chapterEmpty";
-    empty.innerHTML="<strong>No saved material yet</strong><p>Save questions, NCERT points, screenshots, notes, formulas or mistakes with this chapter selected.</p>";
-    box.appendChild(empty);
-    return;
-  }
-
-  matches.forEach(x=>{
-    const card=document.createElement("div");
-    card.className="chapterMaterial";
-    card.innerHTML="<strong>"+(x.title||"Untitled")+"</strong><small>"+(x.type||"Material")+" • "+(x.priority||"Normal")+"</small><p>"+(x.remember||x.note||"")+"</p>";
-    box.appendChild(card);
-  });
-}
-
 function populateChapters(){
 const subject=$("subject").value;
 const select=$("chapter");
@@ -657,6 +575,21 @@ document.querySelectorAll("[data-subject]").forEach(btn=>{
     if(browser) browser.scrollIntoView({behavior:"smooth",block:"start"});
   });
 });
+
+const chapterBackButton=document.getElementById("chapterBack");
+if(chapterBackButton){
+  chapterBackButton.addEventListener("click",()=>{
+    if(chapterBrowserState.chapter){
+      chapterBrowserState.chapter="";
+    }else if(chapterBrowserState.className){
+      chapterBrowserState.className="";
+    }else{
+      chapterBrowserState.subject="";
+      activeSubject="";
+    }
+    renderChapterBrowser();
+  });
+}
 
 $("materialForm").onsubmit=async e=>{
 
@@ -1023,18 +956,3 @@ return true;
 };
 
 })();
-
-
-
-document.addEventListener("DOMContentLoaded",()=>{
-  const back=document.getElementById("chapterBack");
-  if(back){
-    back.addEventListener("click",()=>{
-      if(chapterBrowserState.chapter) chapterBrowserState.chapter="";
-      else if(chapterBrowserState.className) chapterBrowserState.className="";
-      else chapterBrowserState.subject="";
-      renderChapterBrowser();
-    });
-  }
-  renderChapterBrowser();
-});
