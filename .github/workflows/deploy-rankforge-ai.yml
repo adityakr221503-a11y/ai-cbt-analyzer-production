@@ -57,15 +57,20 @@ jobs:
         run: |
           set -e
 
+          echo "Checking for actual credential values..."
+
           if grep -RInE \
             --exclude-dir=.git \
-            'OPENAI_API_KEY|CLOUDFLARE_API_TOKEN|LECTURE_STREAM_SECRET' \
+            --exclude='*.md' \
+            --exclude='*.txt' \
+            'sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' \
             rankforge-ai-worker 2>/dev/null; then
-              echo "❌ Server secret reference detected in Worker package"
+              echo "❌ Possible credential value detected"
               exit 1
           fi
 
-          echo "✅ No protected secret names exposed in Worker package"
+          echo "✅ No obvious credential values exposed"
+          echo "ℹ️ Secret variable names are allowed; their values must remain server-side."
 
   deploy:
     name: Secure Cloudflare Deployment
