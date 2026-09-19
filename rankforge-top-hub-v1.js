@@ -26,7 +26,8 @@ var sections=[
 ["📚","Subjects & Chapters","Subject → unit → chapter flow","question-bank.html"],
 ["🔄","Smart Revision","Formulas • reactions • key facts","ranker-revision/index.html"],
 ["📕","Notes","Keep revision material organized","ranker-revision/index.html"],
-["🤖","AI Learning","AI-assisted explanations and learning","rankforge-ai-new-questions.html"]
+["🤖","AI Learning","AI-assisted explanations and learning","rankforge-ai-new-questions.html"],
+["🎥","Lectures","Subject → chapter → lecture learning","rankforge-lecture-module/pages/lectures.html"]
 ]],
 
 ["✍️","PRACTICE","Targeted practice that improves weak areas",[
