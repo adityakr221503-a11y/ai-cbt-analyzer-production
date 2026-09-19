@@ -340,6 +340,11 @@ list=list.filter(x=>!x.archived);
 
 if(activeFilter==="important")
 list=list.filter(x=>x.priority==="high");
+if(activeFilter==="pinned")
+list=list.filter(x=>x.pinned);
+
+if(activeFilter==="gallery")
+list=list.filter(x=>x.attachment?.type?.startsWith("image/"));
 
 if(activeFilter==="revision")
 list=list.filter(x=>
@@ -373,10 +378,42 @@ Number(b.createdAt||0)-Number(a.createdAt||0)
 );
 }
 
+function renderRevisionDashboard(){
+const el=document.getElementById("vaultDashboard");
+if(!el)return;
+const active=items.filter(x=>!x.archived);
+const due=active.filter(x=>x.revisionDue&&x.revisionDue<=Date.now()).length;
+const pinned=active.filter(x=>x.pinned).length;
+const images=active.filter(x=>x.attachment?.type?.startsWith("image/")).length;
+const linked=active.filter(x=>(x.relatedIds||[]).length).length;
+el.innerHTML=
+'<div class="vaultDashItem"><b>'+due+'</b><small>Due Revision</small></div>'+
+'<div class="vaultDashItem"><b>'+pinned+'</b><small>Pinned</small></div>'+
+'<div class="vaultDashItem"><b>'+images+'</b><small>Images</small></div>'+
+'<div class="vaultDashItem"><b>'+linked+'</b><small>Linked</small></div>';
+}
+
+function renderGallery(){
+const el=document.getElementById("vaultGallery");
+if(!el)return;
+const imgs=items.filter(x=>!x.archived&&x.attachment?.stored&&x.attachment?.type?.startsWith("image/"));
+if(!imgs.length){
+el.innerHTML='<div class="empty">No screenshots/photos saved yet.</div>';
+return;
+}
+el.innerHTML=imgs.map(x=>
+'<button class="galleryItem" data-gallery-id="'+escapeHTML(x.id)+'">'+
+'<img src="'+x.attachment.data+'" alt="'+escapeHTML(x.title)+'">'+
+'<span>'+escapeHTML(x.title)+'</span></button>'
+).join("");
+}
+
 function render(){
 stats();
 renderMaterials();
 renderCollections();
+renderRevisionDashboard();
+renderGallery();
 }
 
 function renderMaterials(){
@@ -392,6 +429,10 @@ activeFilter==="archive"?
 "Archive":
 activeFilter==="important"?
 "Important":
+activeFilter==="pinned"?
+"📌 Pinned / Top Picks":
+activeFilter==="gallery"?
+"🖼️ Screenshot Gallery":
 activeFilter==="revision"?
 "Revision Queue":
 "Quick Inbox";
@@ -455,6 +496,10 @@ ${attachment}
 <button data-action="practice" data-id="${x.id}">🎯 Practice</button>
 <button data-action="revision" data-id="${x.id}">🔄 Revision</button>
 <button data-action="collection" data-id="${x.id}">🗂️ Collection</button>
+<button data-action="pin" data-id="${x.id}">${x.pinned?"📌 Pinned":"📌 Pin"}</button>
+${x.attachment?'<button data-action="attachment" data-id="'+x.id+'">👁️ Open File</button>':""}
+${x.attachment?.type==="application/pdf"?'<button data-action="bookmarkPage" data-id="'+x.id+'">🔖 PDF Page</button>':""}
+<button data-action="related" data-id="${x.id}">🔗 Link Material</button>
 <button data-action="link" data-id="${x.id}">🔗 Copy Link</button>
 <button data-action="delete" data-id="${x.id}">Delete</button>
 </div>
@@ -629,7 +674,10 @@ attachment:await attachment(file),
 createdAt:Date.now(),
 updatedAt:Date.now(),
 archived:false,
-collectionIds:[]
+collectionIds:[],
+pinned:false,
+pdfBookmarks:[],
+relatedIds:[]
 };
 
 const dup=duplicate(candidate);
@@ -659,6 +707,17 @@ $("dialog").close();
 render();
 
 };
+
+document.getElementById("vaultGallery")?.addEventListener("click",e=>{
+const b=e.target.closest("[data-gallery-id]");
+if(!b)return;
+const x=items.find(i=>i.id===b.dataset.galleryId);
+if(!x?.attachment?.data)return;
+const w=window.open("");
+if(!w)return;
+w.document.write("<body style='margin:0;background:#111;text-align:center'><img src='"+x.attachment.data+"' style='max-width:100%;max-height:100vh'></body>");
+w.document.close();
+});
 
 $("materials").onclick=e=>{
 
@@ -727,12 +786,68 @@ item.collectionIds.push(collections[n].id);
 }
 }
 
+if(action==="pin"){
+item.pinned=!item.pinned;
+item.updatedAt=Date.now();
+}
+
+if(action==="attachment"){
+if(item.attachment?.stored && item.attachment.data){
+const w=window.open("");
+if(w){
+w.document.write("<title>"+escapeHTML(item.title||"Study Vault")+"</title>");
+if((item.attachment.type||"").startsWith("image/")){
+w.document.write("<body style='margin:0;background:#111;text-align:center'><img src='"+item.attachment.data+"' style='max-width:100%;max-height:100vh'></body>");
+}else if(item.attachment.type==="application/pdf"){
+w.document.write("<body style='margin:0'><iframe src='"+item.attachment.data+"' style='width:100vw;height:100vh;border:0'></iframe></body>");
+}else{
+w.document.write("<body style='background:#111;color:white'><p>Attachment: "+escapeHTML(item.attachment.name||"file")+"</p></body>");
+}
+w.document.close();
+}
+}else{
+alert("This attachment is metadata-only because it is larger than 8 MB.");
+}
+}
+
+if(action==="bookmarkPage"){
+const page=Number(prompt("PDF page number:"));
+if(Number.isInteger(page)&&page>0){
+item.pdfBookmarks=item.pdfBookmarks||[];
+if(!item.pdfBookmarks.includes(page)) item.pdfBookmarks.push(page);
+item.pdfBookmarks.sort((a,b)=>a-b);
+item.updatedAt=Date.now();
+alert("PDF page "+page+" bookmarked.");
+}
+}
+
+if(action==="related"){
+const candidates=items.filter(x=>x.id!==item.id&&!x.archived);
+if(!candidates.length){
+alert("No other material available.");
+}else{
+const names=candidates.slice(0,30).map((x,i)=>(i+1)+". "+x.title).join("\n");
+const n=Number(prompt("Link with which material?\n\n"+names+"\n\nEnter number:"))-1;
+const target=candidates[n];
+if(target){
+item.relatedIds=item.relatedIds||[];
+target.relatedIds=target.relatedIds||[];
+if(!item.relatedIds.includes(target.id)) item.relatedIds.push(target.id);
+if(!target.relatedIds.includes(item.id)) target.relatedIds.push(item.id);
+item.updatedAt=Date.now();
+target.updatedAt=Date.now();
+alert("Materials linked.");
+}
+}
+}
+
 if(action==="link"){
 
 const text=
 "Study Vault: "+
 item.title+
-(item.chapter?" → "+item.chapter:"");
+(item.chapter?" → "+item.chapter:"")+
+(item.topic?" → "+item.topic:"");
 
 navigator.clipboard?.writeText(text);
 
@@ -920,6 +1035,9 @@ updatedAt:Date.now(),
 archived:false,
 revisionState:"new",
 revisionStep:0,
+pinned:false,
+pdfBookmarks:[],
+relatedIds:[],
 ...data
 };
 

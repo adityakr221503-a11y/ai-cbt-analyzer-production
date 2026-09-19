@@ -291,3 +291,52 @@ margin-top:15px
 .chapterMaterial p{margin:9px 0 0;opacity:.8}
 .chapterEmpty{grid-column:1/-1;padding:24px;text-align:center;border:1px dashed rgba(120,130,150,.3);border-radius:16px}
 .chapterEmpty p{opacity:.7}
+
+
+/* Study Vault V2 */
+.vaultDashboard{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:9px;
+margin-top:10px
+}
+.vaultDashItem{
+background:#0c1424;
+border:1px solid var(--line);
+border-radius:14px;
+padding:13px;
+text-align:center
+}
+.vaultDashItem b{display:block;font-size:22px}
+.vaultDashItem small{color:var(--muted);font-size:10px}
+.vaultGallery{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+gap:9px
+}
+.galleryItem{
+padding:0;
+overflow:hidden;
+background:#0c1424;
+border:1px solid var(--line);
+border-radius:13px;
+color:white;
+text-align:left
+}
+.galleryItem img{
+display:block;
+width:100%;
+height:110px;
+object-fit:cover
+}
+.galleryItem span{
+display:block;
+padding:8px;
+font-size:11px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis
+}
+@media(max-width:620px){
+.vaultDashboard{grid-template-columns:repeat(2,1fr)}
+}

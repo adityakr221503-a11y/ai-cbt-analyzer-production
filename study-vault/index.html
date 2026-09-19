@@ -28,7 +28,9 @@
 <section class="stats" id="stats"></section>
 
 <section class="quickGrid">
-  <button data-filter="important">⭐<b>Important</b><small>Top material</small></button>
+  <button data-filter="pinned">📌<b>Top Picks</b><small>Pinned material</small></button>
+<button data-filter="gallery">🖼️<b>Gallery</b><small>Saved screenshots</small></button>
+<button data-filter="important">⭐<b>Important</b><small>Top material</small></button>
   <button data-filter="revision">🔄<b>Revision</b><small>Due today</small></button>
   <button data-filter="inbox">📥<b>Quick Inbox</b><small>Unsorted</small></button>
   <button data-filter="archive">🗃️<b>Archive</b><small>Stored safely</small></button>
@@ -40,6 +42,19 @@
 <button data-subject="Physics">⚡<b>Physics</b><small>Chapters & materials</small></button>
 <button data-subject="Chemistry">🧪<b>Chemistry</b><small>Chapters & materials</small></button>
 <button data-subject="Biology">🧬<b>Biology</b><small>Chapters & materials</small></button>
+</div>
+</section>
+
+<section class="panel">
+<div class="panelHead">
+<h2>📊 Study Vault Dashboard</h2>
+<span class="meta">Live local summary</span>
+</div>
+<div id="vaultDashboard" class="vaultDashboard">
+<div class="vaultDashItem"><b>0</b><small>Due Revision</small></div>
+<div class="vaultDashItem"><b>0</b><small>Pinned</small></div>
+<div class="vaultDashItem"><b>0</b><small>Images</small></div>
+<div class="vaultDashItem"><b>0</b><small>Linked</small></div>
 </div>
 </section>
 
@@ -63,6 +78,14 @@
 </div>
 </div>
 <div id="materials"></div>
+</section>
+
+<section class="panel">
+<div class="panelHead">
+<h2>🖼️ Screenshot Gallery</h2>
+<span class="meta">Saved image materials</span>
+</div>
+<div id="vaultGallery" class="vaultGallery"></div>
 </section>
 
 <section class="panel">
