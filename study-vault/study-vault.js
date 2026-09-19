@@ -174,62 +174,127 @@ return String(v??"")
 
 const NCERT_CHAPTERS = {
   Physics: {
-    "Class 11": [
-      "Units and Measurements","Motion in a Straight Line","Motion in a Plane",
-      "Laws of Motion","Work, Energy and Power","System of Particles and Rotational Motion",
-      "Gravitation","Mechanical Properties of Solids","Mechanical Properties of Fluids",
-      "Thermal Properties of Matter","Thermodynamics","Kinetic Theory","Oscillations","Waves"
-    ],
-    "Class 12": [
-      "Electric Charges and Fields","Electrostatic Potential and Capacitance","Current Electricity",
-      "Moving Charges and Magnetism","Magnetism and Matter","Electromagnetic Induction",
-      "Alternating Current","Electromagnetic Waves","Ray Optics and Optical Instruments",
-      "Wave Optics","Dual Nature of Radiation and Matter","Atoms","Nuclei","Semiconductor Electronics"
-    ]
+    "Class 11": ["Units and Measurements","Motion in a Straight Line","Motion in a Plane","Laws of Motion","Work, Energy and Power","System of Particles and Rotational Motion","Gravitation","Mechanical Properties of Solids","Mechanical Properties of Fluids","Thermal Properties of Matter","Thermodynamics","Kinetic Theory","Oscillations","Waves"],
+    "Class 12": ["Electric Charges and Fields","Electrostatic Potential and Capacitance","Current Electricity","Moving Charges and Magnetism","Magnetism and Matter","Electromagnetic Induction","Alternating Current","Electromagnetic Waves","Ray Optics and Optical Instruments","Wave Optics","Dual Nature of Radiation and Matter","Atoms","Nuclei","Semiconductor Electronics"]
   },
   Chemistry: {
-    "Class 11": [
-      "Some Basic Concepts of Chemistry","Structure of Atom",
-      "Classification of Elements and Periodicity in Properties",
-      "Chemical Bonding and Molecular Structure","Thermodynamics","Equilibrium",
-      "Redox Reactions","Organic Chemistry – Some Basic Principles and Techniques",
-      "Hydrocarbons","s-Block Elements","p-Block Elements","Environmental Chemistry"
-    ],
-    "Class 12": [
-      "Solutions","Electrochemistry","Chemical Kinetics","Surface Chemistry",
-      "General Principles and Processes of Isolation of Elements","p-Block Elements",
-      "d- and f-Block Elements","Coordination Compounds","Haloalkanes and Haloarenes",
-      "Alcohols, Phenols and Ethers","Aldehydes, Ketones and Carboxylic Acids",
-      "Amines","Biomolecules","Polymers","Chemistry in Everyday Life"
-    ]
+    "Class 11": ["Some Basic Concepts of Chemistry","Structure of Atom","Classification of Elements and Periodicity in Properties","Chemical Bonding and Molecular Structure","Thermodynamics","Equilibrium","Redox Reactions","Organic Chemistry – Some Basic Principles and Techniques","Hydrocarbons","s-Block Elements","p-Block Elements","Environmental Chemistry"],
+    "Class 12": ["Solutions","Electrochemistry","Chemical Kinetics","Surface Chemistry","General Principles and Processes of Isolation of Elements","p-Block Elements","d- and f-Block Elements","Coordination Compounds","Haloalkanes and Haloarenes","Alcohols, Phenols and Ethers","Aldehydes, Ketones and Carboxylic Acids","Amines","Biomolecules","Polymers","Chemistry in Everyday Life"]
   },
   Biology: {
-    "Class 11": [
-      "The Living World","Biological Classification","Plant Kingdom","Animal Kingdom",
-      "Morphology of Flowering Plants","Anatomy of Flowering Plants",
-      "Structural Organisation in Animals","Cell: The Unit of Life","Biomolecules",
-      "Cell Cycle and Cell Division","Transport in Plants","Mineral Nutrition",
-      "Photosynthesis in Plants","Respiration in Plants","Plant Growth and Development",
-      "Digestion and Absorption","Breathing and Exchange of Gases","Body Fluids and Circulation",
-      "Excretory Products and Elimination","Locomotion and Movement",
-      "Neural Control and Coordination","Chemical Coordination and Integration"
-    ],
-    "Class 12": [
-      "Sexual Reproduction in Flowering Plants","Human Reproduction","Reproductive Health",
-      "Principles of Inheritance and Variation","Molecular Basis of Inheritance","Evolution",
-      "Human Health and Disease","Strategies for Enhancement in Food Production",
-      "Microbes in Human Welfare","Biotechnology: Principles and Processes",
-      "Biotechnology and its Applications","Organisms and Populations","Ecosystem",
-      "Biodiversity and Conservation"
-    ]
+    "Class 11": ["The Living World","Biological Classification","Plant Kingdom","Animal Kingdom","Morphology of Flowering Plants","Anatomy of Flowering Plants","Structural Organisation in Animals","Cell: The Unit of Life","Biomolecules","Cell Cycle and Cell Division","Transport in Plants","Mineral Nutrition","Photosynthesis in Plants","Respiration in Plants","Plant Growth and Development","Digestion and Absorption","Breathing and Exchange of Gases","Body Fluids and Circulation","Excretory Products and Elimination","Locomotion and Movement","Neural Control and Coordination","Chemical Coordination and Integration"],
+    "Class 12": ["Sexual Reproduction in Flowering Plants","Human Reproduction","Reproductive Health","Principles of Inheritance and Variation","Molecular Basis of Inheritance","Evolution","Human Health and Disease","Strategies for Enhancement in Food Production","Microbes in Human Welfare","Biotechnology: Principles and Processes","Biotechnology and its Applications","Organisms and Populations","Ecosystem","Biodiversity and Conservation"]
   }
 };
 
-let chapterBrowserState = {
-  subject: "",
-  className: "",
-  chapter: ""
-};
+let chapterBrowserState = {subject:"",className:"",chapter:""};
+
+function renderChapterBrowser(){
+  const box=document.getElementById("chapterBrowserContent");
+  const title=document.getElementById("chapterBrowserTitle");
+  const back=document.getElementById("chapterBack");
+  if(!box) return;
+
+  const sub=chapterBrowserState.subject;
+  const cls=chapterBrowserState.className;
+  const ch=chapterBrowserState.chapter;
+
+  if(!sub){
+    title.textContent="📚 NCERT Chapter Library";
+    back.hidden=true;
+    box.innerHTML="";
+    ["Physics","Chemistry","Biology"].forEach(x=>{
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="chapterTile";
+      b.innerHTML="<strong>"+x+"</strong><small>Class 11 + Class 12</small>";
+      b.addEventListener("click",()=>{
+        chapterBrowserState.subject=x;
+        chapterBrowserState.className="";
+        chapterBrowserState.chapter="";
+        renderChapterBrowser();
+      });
+      box.appendChild(b);
+    });
+    return;
+  }
+
+  if(!cls){
+    title.textContent="📚 "+sub;
+    back.hidden=false;
+    box.innerHTML="";
+    ["Class 11","Class 12"].forEach(x=>{
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="chapterTile";
+      b.innerHTML="<strong>"+x+"</strong><small>"+NCERT_CHAPTERS[sub][x].length+" chapters</small>";
+      b.addEventListener("click",()=>{
+        chapterBrowserState.className=x;
+        chapterBrowserState.chapter="";
+        renderChapterBrowser();
+      });
+      box.appendChild(b);
+    });
+    return;
+  }
+
+  if(!ch){
+    title.textContent="📚 "+sub+" • "+cls;
+    back.hidden=false;
+    box.innerHTML="";
+    NCERT_CHAPTERS[sub][cls].forEach((x,i)=>{
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="chapterTile chapterName";
+      b.innerHTML="<strong>"+(i+1)+". "+x+"</strong><small>Open chapter →</small>";
+      b.addEventListener("click",()=>{
+        chapterBrowserState.chapter=x;
+        renderChapterBrowser();
+      });
+      box.appendChild(b);
+    });
+    return;
+  }
+
+  title.textContent="📖 "+ch;
+  back.hidden=false;
+  box.innerHTML="";
+
+  const all=(window.RankForgeStudyVault && typeof window.RankForgeStudyVault.getAll==="function")
+    ? window.RankForgeStudyVault.getAll() : [];
+
+  const matches=all.filter(x=>
+    String(x.subject||"").trim().toLowerCase()===sub.toLowerCase() &&
+    String(x.chapter||"").trim().toLowerCase()===ch.toLowerCase()
+  );
+
+  const info=document.createElement("div");
+  info.className="chapterMaterialHead";
+  info.innerHTML="<strong>"+sub+" • "+cls+"</strong><span>"+matches.length+" saved material"+(matches.length===1?"":"s")+"</span>";
+  box.appendChild(info);
+
+  if(!matches.length){
+    const empty=document.createElement("div");
+    empty.className="chapterEmpty";
+    empty.innerHTML="<strong>No saved material in this chapter yet.</strong><p>Use Quick Save and select this subject + chapter to add material here.</p>";
+    box.appendChild(empty);
+    return;
+  }
+
+  matches.forEach(x=>{
+    const card=document.createElement("div");
+    card.className="chapterMaterial";
+    const text=x.remember||x.note||x.description||"";
+    card.innerHTML="<strong>"+escapeHtml(String(x.title||"Untitled"))+"</strong><small>"+escapeHtml(String(x.type||"Material"))+"</small><p>"+escapeHtml(String(text))+"</p>";
+    box.appendChild(card);
+  });
+}
+
+function escapeHtml(v){
+  return v.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+
 
 function renderChapterBrowser(){
   const box=document.getElementById("chapterBrowserContent");
@@ -579,11 +644,18 @@ render();
 });
 
 document.querySelectorAll("[data-subject]").forEach(btn=>{
-btn.onclick=()=>{
-activeSubject=btn.dataset.subject;
-activeFilter="all";
-render();
-};
+  btn.addEventListener("click",()=>{
+    activeSubject=btn.dataset.subject||"";
+    chapterBrowserState={
+      subject:activeSubject,
+      className:"",
+      chapter:""
+    };
+    renderChapterBrowser();
+
+    const browser=document.getElementById("chapterBrowser");
+    if(browser) browser.scrollIntoView({behavior:"smooth",block:"start"});
+  });
 });
 
 $("materialForm").onsubmit=async e=>{
@@ -953,19 +1025,16 @@ return true;
 })();
 
 
+
 document.addEventListener("DOMContentLoaded",()=>{
   const back=document.getElementById("chapterBack");
   if(back){
-    back.onclick=()=>{
-      if(chapterBrowserState.chapter){
-        chapterBrowserState.chapter="";
-      }else if(chapterBrowserState.className){
-        chapterBrowserState.className="";
-      }else{
-        chapterBrowserState.subject="";
-      }
+    back.addEventListener("click",()=>{
+      if(chapterBrowserState.chapter) chapterBrowserState.chapter="";
+      else if(chapterBrowserState.className) chapterBrowserState.className="";
+      else chapterBrowserState.subject="";
       renderChapterBrowser();
-    };
+    });
   }
   renderChapterBrowser();
 });
