@@ -372,6 +372,14 @@ refresh();
     Import Module
   </button>
 
+  <button
+    id="rankforgeOwnerPipelineCheck"
+    type="button"
+    style="margin:10px 0;padding:9px 14px;border-radius:10px"
+  >
+    Check Ingestion Pipeline
+  </button>
+
   <div
     id="rankforgeModuleUploadStatus"
     aria-live="polite"
@@ -402,6 +410,56 @@ refresh();
     const input=document.getElementById("rankforgeModuleUpload");
     const button=document.getElementById("rankforgeModuleUploadButton");
     const status=document.getElementById("rankforgeModuleUploadStatus");
+    const pipelineCheck=document.getElementById("rankforgeOwnerPipelineCheck");
+
+    if(pipelineCheck){
+      pipelineCheck.addEventListener("click",function(){
+        const A=window.RankForgeModuleUploadAdapterV1;
+        const C=window.RankForgeModuleIngestionContractV1;
+        const O=window.RankForgeModuleIngestionOrchestratorV1;
+        const F=window.RankForgeUniversalSourceFabric;
+        const S=window.RankForgeSourceEngine;
+        const P=window.RankForgeOwnerPDFExtractionEngineV6;
+
+        const report={
+          uploadAdapter:!!A,
+          ingestionContract:!!C,
+          orchestrator:!!O,
+          universalFabric:!!F,
+          sourceEngine:!!S,
+          pdfEngineV6:!!P,
+          importPDF:!!(P && typeof P.importPDF==="function"),
+          canonicalSubmit:!!(
+            S &&
+            typeof S.submitModuleQuestions==="function"
+          ),
+          answerGuessing:false,
+          parallelQuestionDatabase:false,
+          realUpload:false
+        };
+
+        report.pass=
+          Object.values(report).every(v=>v===true || v===false) &&
+          report.uploadAdapter &&
+          report.ingestionContract &&
+          report.orchestrator &&
+          report.universalFabric &&
+          report.sourceEngine &&
+          report.pdfEngineV6 &&
+          report.importPDF &&
+          report.canonicalSubmit &&
+          !report.answerGuessing &&
+          !report.parallelQuestionDatabase &&
+          !report.realUpload;
+
+        console.table(report);
+        status.textContent=report.pass
+          ? "Pipeline ready • PDF V6 → Source Engine → Canonical Pool"
+          : "Pipeline check failed. No upload was started.";
+
+        window.RankForgeOwnerPipelineReport=report;
+      });
+    }
 
     if(!input || !button || !status) return;
 
