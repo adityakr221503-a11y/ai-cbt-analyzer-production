@@ -1,0 +1,20 @@
+
+# RankForge local backups / recovery snapshots
+.before-*
+*.before-*
+*.pre-*
+*.backup*
+*.bak
+
+# Local runtime files
+*.pid
+*.log
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local owner-ingestion working artifacts
+owner-imports/
+question-data/
+
