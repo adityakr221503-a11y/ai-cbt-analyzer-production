@@ -3,19 +3,100 @@ name: Deploy RankForge AI Worker
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - "rankforge-ai-worker/**"
       - ".github/workflows/deploy-rankforge-ai.yml"
 
+# Minimum GitHub permission required.
+permissions:
+  contents: read
+
+# Prevent two deployments from running over each other.
+concurrency:
+  group: rankforge-ai-production
+  cancel-in-progress: true
+
 jobs:
-  deploy:
+  security-check:
+    name: Privacy & Security Check
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check for exposed secrets
+        shell: bash
+        run: |
+          set -e
+          echo "========== SECRET SAFETY =========="
+
+          if grep -RInE \
+            --exclude-dir=.git \
+            --exclude='*.md' \
+            --exclude='*.txt' \
+            'sk-[A-Za-z0-9_-]{20,}|OPENAI_API_KEY[[:space:]]*[:=][[:space:]]*["'\''][^"'\'']+|CLOUDFLARE_API_TOKEN[[:space:]]*[:=][[:space:]]*["'\''][^"'\'']+' \
+            rankforge-ai-worker 2>/dev/null; then
+              echo "❌ Possible secret found in Worker source"
+              exit 1
+          fi
+
+          echo "✅ No obvious API-key pattern found in Worker source"
+
+      - name: Check required config
+        shell: bash
+        run: |
+          set -e
+          test -f rankforge-ai-worker/src/index.js
+          test -f rankforge-ai-worker/wrangler.jsonc
+          echo "✅ Worker source/config present"
+
+      - name: Check frontend secret exposure
+        shell: bash
+        run: |
+          set -e
+
+          if grep -RInE \
+            --exclude-dir=.git \
+            'OPENAI_API_KEY|CLOUDFLARE_API_TOKEN|LECTURE_STREAM_SECRET' \
+            rankforge-ai-worker 2>/dev/null; then
+              echo "❌ Server secret reference detected in Worker package"
+              exit 1
+          fi
+
+          echo "✅ No protected secret names exposed in Worker package"
+
+  deploy:
+    name: Secure Cloudflare Deployment
+    needs: security-check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Cloudflare secrets exist
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -e
+          echo "========== CLOUDFLARE SECRET CHECK =========="
+
+          if [ -z "$CF_TOKEN" ]; then
+            echo "❌ CLOUDFLARE_API_TOKEN is missing"
+            exit 1
+          fi
+
+          if [ -z "$CF_ACCOUNT" ]; then
+            echo "❌ CLOUDFLARE_ACCOUNT_ID is missing"
+            exit 1
+          fi
+
+          echo "✅ Required Cloudflare credentials are present"
+          echo "🔒 Secret values are not displayed"
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
@@ -25,8 +106,11 @@ jobs:
           workingDirectory: rankforge-ai-worker
           command: deploy
 
-      - name: Deployment complete
+      - name: Deployment result
         run: |
           echo "======================================"
           echo "✅ RANKFORGE AI WORKER DEPLOYED"
+          echo "🔒 GitHub permission: contents:read"
+          echo "🔒 Secrets never printed"
+          echo "🔒 Deployment concurrency protected"
           echo "======================================"
