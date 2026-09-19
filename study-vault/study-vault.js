@@ -265,7 +265,7 @@ function renderChapterBrowser(){
 
   const matches=all.filter(x=>
     String(x.subject||"").trim().toLowerCase()===sub.toLowerCase() &&
-    String(x.chapter||"").trim().toLowerCase()===ch.toLowerCase()
+    normalize(x.chapter)===normalize(ch)
   );
 
   const info=document.createElement("div");
@@ -451,6 +451,7 @@ ${attachment}
 </div>
 
 <div class="materialActions">
+<button data-action="chapter" data-id="${x.id}">📚 Chapter</button>
 <button data-action="practice" data-id="${x.id}">🎯 Practice</button>
 <button data-action="revision" data-id="${x.id}">🔄 Revision</button>
 <button data-action="collection" data-id="${x.id}">🗂️ Collection</button>
@@ -603,6 +604,16 @@ version:VERSION,
 title:$("title").value.trim(),
 subject:$("subject").value,
 chapter:$("chapter").value,
+className:(function(){
+  const sub=$("subject").value;
+  const ch=$("chapter").value;
+  if(sub && NCERT_CHAPTERS[sub]){
+    for(const c of Object.keys(NCERT_CHAPTERS[sub])){
+      if((NCERT_CHAPTERS[sub][c]||[]).includes(ch)) return c;
+    }
+  }
+  return "";
+})(),
 topic:$("topic").value.trim(),
 type:$("type").value,
 tags:$("tags").value
@@ -726,6 +737,17 @@ item.title+
 navigator.clipboard?.writeText(text);
 
 alert("Reference copied.");
+}
+
+if(action==="chapter"){
+  chapterBrowserState={
+    subject:item.subject||"",
+    className:item.className||"",
+    chapter:item.chapter||""
+  };
+  renderChapterBrowser();
+  const browser=document.getElementById("chapterBrowser");
+  if(browser) browser.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 if(action==="delete"){
