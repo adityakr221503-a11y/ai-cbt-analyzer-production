@@ -27,6 +27,20 @@ pre{white-space:pre-wrap;background:#080c14;border-radius:10px;padding:12px;colo
 </style>
 </head>
 <body>
+<script src="./owner-imports/rankforge-owner-access.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  const access = window.RankForgeOwnerAccess;
+
+  if (!access || !access.isOwner || !access.isOwner()) {
+    location.replace("./owner-access.html");
+    throw new Error("RankForge Owner Source Hub blocked: owner verification required.");
+  }
+})();
+</script>
+
 <header>
 <h1>RankForge AI — Owner Source Hub</h1>
 <div class="sub">V10/V11 extraction → OCR → QC → Owner Review → Approved Master Pool</div>
