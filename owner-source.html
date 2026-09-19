@@ -437,16 +437,31 @@ refresh();
           }
         });
 
-        if(result && result.ok){
-          status.textContent=
-            "Module accepted into the ingestion pipeline. "+
-            "Questions remain subject to validation/review.";
-        }else{
-          status.textContent=
-            "Module sent to the ingestion pipeline.";
-        }
+        const data=(result && result.data) || result || {};
+        const counts=data.counts || data.stats || {};
 
-        console.log("[RankForge] Module ingestion result",result);
+        const parsed=counts.parsed ?? data.parsed ?? 0;
+        const valid=counts.validated ?? counts.valid ?? data.validated ?? 0;
+        const duplicate=counts.duplicates ?? counts.duplicate ?? data.duplicates ?? 0;
+        const review=counts.review ?? counts.quarantine ?? data.review ?? 0;
+        const approved=counts.approved ?? data.approved ?? 0;
+
+        status.textContent=
+          "Ingestion complete • Parsed: "+parsed+
+          " • Valid: "+valid+
+          " • Duplicate: "+duplicate+
+          " • Review: "+review+
+          " • Approved: "+approved;
+
+        console.log("[RankForge] OWNER MODULE INGESTION RESULT",{
+          file:file.name,
+          parsed,
+          valid,
+          duplicate,
+          review,
+          approved,
+          raw:result
+        });
 
       }catch(error){
         console.error("[RankForge] Module ingestion failed",error);
