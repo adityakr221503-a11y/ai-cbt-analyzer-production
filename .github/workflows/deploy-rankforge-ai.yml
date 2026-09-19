@@ -115,7 +115,11 @@ jobs:
         run: |
           echo "======================================"
           echo "✅ RANKFORGE AI WORKER DEPLOYED"
+          echo "Worker: rankforge-ai"
+          echo "API route: /api/ai/generate"
+          echo "Lecture route: /api/lecture-ai/explain"
           echo "🔒 GitHub permission: contents:read"
+          echo "======================================"
           echo "🔒 Secrets never printed"
           echo "🔒 Deployment concurrency protected"
           echo "======================================"
