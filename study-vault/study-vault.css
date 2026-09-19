@@ -277,3 +277,17 @@ margin-top:15px
 .two{grid-template-columns:1fr}
 .panelHead{align-items:flex-start;flex-direction:column}
 }
+
+.chapterBrowser{margin-top:18px}
+#chapterBrowserContent{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.chapterTile{border:1px solid rgba(120,130,150,.22);background:var(--card,#fff);border-radius:16px;padding:16px;text-align:left;cursor:pointer;min-height:82px}
+.chapterTile strong{display:block;font-size:15px}
+.chapterTile small{display:block;margin-top:7px;opacity:.65}
+.chapterName{min-height:72px}
+.chapterMaterialHead{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;padding:12px 2px}
+.chapterMaterial{border:1px solid rgba(120,130,150,.2);border-radius:14px;padding:14px;background:var(--card,#fff)}
+.chapterMaterial strong,.chapterMaterial small{display:block}
+.chapterMaterial small{margin-top:5px;opacity:.65}
+.chapterMaterial p{margin:9px 0 0;opacity:.8}
+.chapterEmpty{grid-column:1/-1;padding:24px;text-align:center;border:1px dashed rgba(120,130,150,.3);border-radius:16px}
+.chapterEmpty p{opacity:.7}

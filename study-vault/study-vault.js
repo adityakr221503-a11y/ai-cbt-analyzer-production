@@ -171,6 +171,148 @@ return String(v??"")
 .replace(/'/g,"&#39;");
 }
 
+
+const NCERT_CHAPTERS = {
+  Physics: {
+    "Class 11": [
+      "Units and Measurements","Motion in a Straight Line","Motion in a Plane",
+      "Laws of Motion","Work, Energy and Power","System of Particles and Rotational Motion",
+      "Gravitation","Mechanical Properties of Solids","Mechanical Properties of Fluids",
+      "Thermal Properties of Matter","Thermodynamics","Kinetic Theory","Oscillations","Waves"
+    ],
+    "Class 12": [
+      "Electric Charges and Fields","Electrostatic Potential and Capacitance","Current Electricity",
+      "Moving Charges and Magnetism","Magnetism and Matter","Electromagnetic Induction",
+      "Alternating Current","Electromagnetic Waves","Ray Optics and Optical Instruments",
+      "Wave Optics","Dual Nature of Radiation and Matter","Atoms","Nuclei","Semiconductor Electronics"
+    ]
+  },
+  Chemistry: {
+    "Class 11": [
+      "Some Basic Concepts of Chemistry","Structure of Atom",
+      "Classification of Elements and Periodicity in Properties",
+      "Chemical Bonding and Molecular Structure","Thermodynamics","Equilibrium",
+      "Redox Reactions","Organic Chemistry – Some Basic Principles and Techniques",
+      "Hydrocarbons","s-Block Elements","p-Block Elements","Environmental Chemistry"
+    ],
+    "Class 12": [
+      "Solutions","Electrochemistry","Chemical Kinetics","Surface Chemistry",
+      "General Principles and Processes of Isolation of Elements","p-Block Elements",
+      "d- and f-Block Elements","Coordination Compounds","Haloalkanes and Haloarenes",
+      "Alcohols, Phenols and Ethers","Aldehydes, Ketones and Carboxylic Acids",
+      "Amines","Biomolecules","Polymers","Chemistry in Everyday Life"
+    ]
+  },
+  Biology: {
+    "Class 11": [
+      "The Living World","Biological Classification","Plant Kingdom","Animal Kingdom",
+      "Morphology of Flowering Plants","Anatomy of Flowering Plants",
+      "Structural Organisation in Animals","Cell: The Unit of Life","Biomolecules",
+      "Cell Cycle and Cell Division","Transport in Plants","Mineral Nutrition",
+      "Photosynthesis in Plants","Respiration in Plants","Plant Growth and Development",
+      "Digestion and Absorption","Breathing and Exchange of Gases","Body Fluids and Circulation",
+      "Excretory Products and Elimination","Locomotion and Movement",
+      "Neural Control and Coordination","Chemical Coordination and Integration"
+    ],
+    "Class 12": [
+      "Sexual Reproduction in Flowering Plants","Human Reproduction","Reproductive Health",
+      "Principles of Inheritance and Variation","Molecular Basis of Inheritance","Evolution",
+      "Human Health and Disease","Strategies for Enhancement in Food Production",
+      "Microbes in Human Welfare","Biotechnology: Principles and Processes",
+      "Biotechnology and its Applications","Organisms and Populations","Ecosystem",
+      "Biodiversity and Conservation"
+    ]
+  }
+};
+
+let chapterBrowserState = {
+  subject: "",
+  className: "",
+  chapter: ""
+};
+
+function renderChapterBrowser(){
+  const box=document.getElementById("chapterBrowserContent");
+  const back=document.getElementById("chapterBack");
+  const title=document.getElementById("chapterBrowserTitle");
+  if(!box) return;
+
+  const subject=chapterBrowserState.subject;
+  const cls=chapterBrowserState.className;
+  const chapter=chapterBrowserState.chapter;
+
+  if(!subject){
+    if(back) back.hidden=true;
+    if(title) title.textContent="📚 NCERT Chapter Library";
+    box.innerHTML="";
+    ["Physics","Chemistry","Biology"].forEach(sub=>{
+      const b=document.createElement("button");
+      b.className="chapterTile";
+      b.innerHTML="<strong>"+sub+"</strong><small>Class 11 + Class 12</small>";
+      b.onclick=()=>{chapterBrowserState={subject:sub,className:"",chapter:""};renderChapterBrowser();};
+      box.appendChild(b);
+    });
+    return;
+  }
+
+  if(!cls){
+    if(back) back.hidden=false;
+    if(title) title.textContent="📚 "+subject;
+    box.innerHTML="";
+    ["Class 11","Class 12"].forEach(c=>{
+      const b=document.createElement("button");
+      b.className="chapterTile";
+      b.innerHTML="<strong>"+c+"</strong><small>"+(NCERT_CHAPTERS[subject]?.[c]?.length||0)+" chapters</small>";
+      b.onclick=()=>{chapterBrowserState.className=c;renderChapterBrowser();};
+      box.appendChild(b);
+    });
+    return;
+  }
+
+  if(!chapter){
+    if(back) back.hidden=false;
+    if(title) title.textContent="📚 "+subject+" • "+cls;
+    box.innerHTML="";
+    (NCERT_CHAPTERS[subject]?.[cls]||[]).forEach((ch,i)=>{
+      const b=document.createElement("button");
+      b.className="chapterTile chapterName";
+      b.innerHTML="<strong>"+(i+1)+". "+ch+"</strong><small>Open chapter materials →</small>";
+      b.onclick=()=>{chapterBrowserState.chapter=ch;renderChapterBrowser();};
+      box.appendChild(b);
+    });
+    return;
+  }
+
+  if(back) back.hidden=false;
+  if(title) title.textContent="📖 "+chapter;
+  const items=window.RankForgeStudyVault?.getAll?.()||[];
+  const matches=items.filter(x=>
+    String(x.subject||"").toLowerCase()===subject.toLowerCase() &&
+    String(x.chapter||"").toLowerCase()===chapter.toLowerCase()
+  );
+
+  box.innerHTML="";
+  const head=document.createElement("div");
+  head.className="chapterMaterialHead";
+  head.innerHTML="<strong>"+subject+" • "+cls+"</strong><span>"+matches.length+" saved material"+(matches.length===1?"":"s")+"</span>";
+  box.appendChild(head);
+
+  if(!matches.length){
+    const empty=document.createElement("div");
+    empty.className="chapterEmpty";
+    empty.innerHTML="<strong>No saved material yet</strong><p>Save questions, NCERT points, screenshots, notes, formulas or mistakes with this chapter selected.</p>";
+    box.appendChild(empty);
+    return;
+  }
+
+  matches.forEach(x=>{
+    const card=document.createElement("div");
+    card.className="chapterMaterial";
+    card.innerHTML="<strong>"+(x.title||"Untitled")+"</strong><small>"+(x.type||"Material")+" • "+(x.priority||"Normal")+"</small><p>"+(x.remember||x.note||"")+"</p>";
+    box.appendChild(card);
+  });
+}
+
 function populateChapters(){
 const subject=$("subject").value;
 const select=$("chapter");
@@ -809,3 +951,21 @@ return true;
 };
 
 })();
+
+
+document.addEventListener("DOMContentLoaded",()=>{
+  const back=document.getElementById("chapterBack");
+  if(back){
+    back.onclick=()=>{
+      if(chapterBrowserState.chapter){
+        chapterBrowserState.chapter="";
+      }else if(chapterBrowserState.className){
+        chapterBrowserState.className="";
+      }else{
+        chapterBrowserState.subject="";
+      }
+      renderChapterBrowser();
+    };
+  }
+  renderChapterBrowser();
+});
