@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d19">
+<title>Study Vault — RankForge AI</title>
+<link rel="stylesheet" href="./study-vault.css">
+</head>
+<body>
+
+<main class="app">
+
+<header class="top">
+  <div>
+    <a href="../index.html" class="back">← RankForge</a>
+    <h1>📚 Study Vault</h1>
+    <p>Your personal NEET knowledge base</p>
+  </div>
+  <button id="quickSave" class="primary">＋ Quick Save</button>
+</header>
+
+<section class="search">
+  <input id="search" placeholder="Search questions, notes, formulas, traps...">
+  <button id="clearSearch">×</button>
+</section>
+
+<section class="stats" id="stats"></section>
+
+<section class="quickGrid">
+  <button data-filter="important">⭐<b>Important</b><small>Top material</small></button>
+  <button data-filter="revision">🔄<b>Revision</b><small>Due today</small></button>
+  <button data-filter="inbox">📥<b>Quick Inbox</b><small>Unsorted</small></button>
+  <button data-filter="archive">🗃️<b>Archive</b><small>Stored safely</small></button>
+</section>
+
+<section>
+<h2>Subjects</h2>
+<div class="subjects">
+<button data-subject="Physics">⚡<b>Physics</b><small>Chapters & materials</small></button>
+<button data-subject="Chemistry">🧪<b>Chemistry</b><small>Chapters & materials</small></button>
+<button data-subject="Biology">🧬<b>Biology</b><small>Chapters & materials</small></button>
+</div>
+</section>
+
+<section class="panel">
+<div class="panelHead">
+<h2 id="listTitle">Recently Added</h2>
+<div>
+<button id="backup">💾 Backup</button>
+<label class="restore">Restore<input id="restore" type="file" accept=".json"></label>
+</div>
+</div>
+<div id="materials"></div>
+</section>
+
+<section class="panel">
+<h2>🧩 Collections</h2>
+<div id="collections" class="collections"></div>
+<button id="newCollection" class="secondary">＋ New Collection</button>
+</section>
+
+</main>
+
+<dialog id="dialog">
+<form id="materialForm">
+<div class="dialogTop">
+<h2>Save Material</h2>
+<button type="button" id="closeDialog">×</button>
+</div>
+
+<label>Title
+<input id="title" required placeholder="e.g. Projectile motion trap">
+</label>
+
+<div class="two">
+<label>Subject
+<select id="subject">
+<option value="Inbox">📥 Inbox</option>
+<option>Physics</option>
+<option>Chemistry</option>
+<option>Biology</option>
+</select>
+</label>
+
+<label>Type
+<select id="type">
+<option value="question">⭐ Important Question</option>
+<option value="screenshot">📸 Screenshot / Photo</option>
+<option value="ncert">📖 NCERT Point</option>
+<option value="pdf">📄 PDF / Document</option>
+<option value="note">📝 Note</option>
+<option value="trap">⚠️ Trap / Exception</option>
+<option value="formula">📐 Formula / Shortcut</option>
+<option value="mistake">❌ Mistake</option>
+<option value="reference">🔗 Reference</option>
+</select>
+</label>
+</div>
+
+<label>Chapter
+<select id="chapter"></select>
+</label>
+
+<label>Topic
+<input id="topic" placeholder="e.g. Projectile Motion">
+</label>
+
+<label>Tags
+<input id="tags" placeholder="kinematics, formula, trap">
+</label>
+
+<div class="two">
+<label>Priority
+<select id="priority">
+<option value="high">⭐ High</option>
+<option value="normal" selected>Normal</option>
+<option value="low">Low</option>
+</select>
+</label>
+
+<label>Revision
+<select id="revision">
+<option value="new">New</option>
+<option value="learning">Learning</option>
+<option value="revising">Revising</option>
+<option value="strong">Strong</option>
+</select>
+</label>
+</div>
+
+<label>What to remember?
+<textarea id="body" rows="5"></textarea>
+</label>
+
+<label>Why I saved this?
+<input id="why" placeholder="Repeated mistake / important NCERT line / trap...">
+</label>
+
+<label>Attachment
+<input id="attachment" type="file" accept="image/*,.pdf,.txt,.doc,.docx">
+</label>
+
+<div class="actions">
+<button type="button" id="cancel">Cancel</button>
+<button class="primary">Save Material</button>
+</div>
+</form>
+</dialog>
+
+<script src="./study-vault.js"></script>
+</body>
+</html>
