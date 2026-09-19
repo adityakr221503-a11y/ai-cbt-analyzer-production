@@ -1,0 +1,34 @@
+{
+  "version": "RANKFORGE_REAL_OWNER_INGESTION_REPORT_V1",
+  "generatedAt": "2026-09-19T12:23:43.613Z",
+  "execution": "READY_FOR_USER_SELECTED_PDF",
+  "realUpload": false,
+  "downloadsScan": false,
+  "answerGuessing": false,
+  "parallelQuestionDatabase": false,
+  "canonicalPipeline": true,
+  "adapter": true,
+  "pdfV6": true,
+  "sourceEngine": true,
+  "contract": true,
+  "orchestrator": true,
+  "universalFabric": true,
+  "counts": {
+    "parsed": 0,
+    "valid": 0,
+    "duplicate": 0,
+    "review": 0,
+    "quarantine": 0,
+    "approved": 0,
+    "canonical": 0
+  },
+  "files": {
+    "adapterFile": true,
+    "pdfV6File": true,
+    "sourceEngineFile": true,
+    "contractFile": true,
+    "orchestratorFile": true,
+    "fabricFile": true
+  },
+  "result": "READY"
+}
