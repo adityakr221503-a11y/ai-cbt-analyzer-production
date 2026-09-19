@@ -344,5 +344,125 @@ refresh();
 </script>
 <script src="rankforge-owner-pdf-engine-v6.js"></script>
 <script src="./rankforge-universal-source-fabric-v1.js"></script>
+
+<section id="rankforge-owner-module-upload" style="
+  margin:24px 0;
+  padding:20px;
+  border:1px solid rgba(120,140,180,.25);
+  border-radius:18px;
+  background:rgba(20,25,40,.04);
+">
+  <h2 style="margin:0 0 8px">Owner Module Upload</h2>
+  <p style="margin:0 0 16px;opacity:.72">
+    Upload an owner module. It will enter the RankForge ingestion pipeline
+    and remain subject to validation, duplicate, quality and review gates.
+  </p>
+
+  <input
+    id="rankforgeModuleUpload"
+    type="file"
+    accept=".pdf,.json,.jsonl,.ndjson,.xml"
+  />
+
+  <button
+    id="rankforgeModuleUploadButton"
+    type="button"
+    style="margin-top:12px;padding:10px 16px;border-radius:10px"
+  >
+    Import Module
+  </button>
+
+  <div
+    id="rankforgeModuleUploadStatus"
+    aria-live="polite"
+    style="margin-top:12px"
+  >
+    Ready.
+  </div>
+</section>
+
+
+<script src="./rankforge-module-ingestion-contract-v1.js"></script>
+<script src="./rankforge-module-ingestion-orchestrator-v1.js"></script>
+<script src="./rankforge-universal-source-fabric-v1.js"></script>
+<script src="./rankforge-source-engine.js"></script>
+<script src="./rankforge-owner-pdf-engine-v6.js"></script>
+<script src="./rankforge-module-upload-adapter-v1.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  function boot(){
+    const A=window.RankForgeModuleUploadAdapterV1;
+    if(!A){
+      console.error("[RankForge] Upload Adapter unavailable");
+      return;
+    }
+
+    const input=document.getElementById("rankforgeModuleUpload");
+    const button=document.getElementById("rankforgeModuleUploadButton");
+    const status=document.getElementById("rankforgeModuleUploadStatus");
+
+    if(!input || !button || !status) return;
+
+    button.addEventListener("click",async function(){
+      const file=input.files && input.files[0];
+
+      if(!file){
+        status.textContent="Select a module first.";
+        return;
+      }
+
+      const detected=A.detect(file);
+
+      if(!detected.supported){
+        status.textContent="Unsupported module format.";
+        return;
+      }
+
+      status.textContent=
+        "Module received • "+detected.sourceType+" • processing…";
+
+      try{
+        const result=await A.ingest(file,{
+          owner:true,
+          sourceName:file.name,
+          sourceReference:"owner-module-upload"
+        },{
+          progress:function(x){
+            if(x && x.data && typeof x.data.progress==="number"){
+              status.textContent=
+                "Processing… "+Math.round(x.data.progress*100)+"%";
+            }
+          }
+        });
+
+        if(result && result.ok){
+          status.textContent=
+            "Module accepted into the ingestion pipeline. "+
+            "Questions remain subject to validation/review.";
+        }else{
+          status.textContent=
+            "Module sent to the ingestion pipeline.";
+        }
+
+        console.log("[RankForge] Module ingestion result",result);
+
+      }catch(error){
+        console.error("[RankForge] Module ingestion failed",error);
+        status.textContent=
+          "Module processing failed safely. Check the source/review queue.";
+      }
+    });
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",boot,{once:true});
+  }else{
+    boot();
+  }
+})();
+</script>
+
 </body>
 </html>
