@@ -177,3 +177,42 @@
 
   render();
 })();
+
+(function setupLectureAIUI() {
+  const btn = document.getElementById("aiExplainBtn");
+  const input = document.getElementById("aiConcept");
+  const result = document.getElementById("aiResult");
+
+  if (!btn || !input || !result) return;
+
+  btn.addEventListener("click", async function () {
+    const topic = input.value.trim();
+
+    if (!topic) {
+      result.innerHTML =
+        '<div class="ai-result-title">AI explanation</div>' +
+        '<p>Enter a concept first.</p>';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "🤖 Thinking...";
+
+    result.innerHTML =
+      '<div class="ai-result-title">AI explanation</div>' +
+      '<p>Preparing lecture context...</p>';
+
+    const answer = await window.RankForgeLectureAI.explain(topic);
+
+    result.innerHTML =
+      '<div class="ai-result-title">' +
+      (answer.source === "ai" ? "🤖 AI Explanation" : "🤖 AI Ready") +
+      '</div>' +
+      '<p>' +
+      String(answer.explanation || "").replace(/</g, "&lt;") +
+      '</p>';
+
+    btn.disabled = false;
+    btn.textContent = "🤖 Explain with AI";
+  });
+})();

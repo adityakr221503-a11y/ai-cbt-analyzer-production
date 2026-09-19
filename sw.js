@@ -21,6 +21,7 @@ const CORE = [
   "./rankforge-lecture-module/pages/lectures.html",
   "./rankforge-lecture-module/components/lecture-module.css",
   "./rankforge-lecture-module/components/lecture-module.js",
+  "./rankforge-lecture-module/components/lecture-ai.js",
   "./rankforge-lecture-module/data/lecture-data.js",
   "./study-vault/",
   "./study-vault/index.html",

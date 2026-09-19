@@ -276,3 +276,74 @@ body {
     width: 100%;
   }
 }
+
+
+.lecture-ai-card {
+  margin-bottom: 18px;
+  padding: 18px;
+  background: white;
+  border: 1px solid #eaecf0;
+  border-radius: 20px;
+}
+
+.ai-badge {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .8px;
+}
+
+.ai-heading h2 {
+  margin: 7px 0 4px;
+  font-size: 18px;
+}
+
+.ai-heading p {
+  margin: 0 0 14px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.ai-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 13px;
+  border: 1px solid #d0d5dd;
+  border-radius: 14px;
+  font: inherit;
+  outline: none;
+}
+
+.ai-explain-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border: 0;
+  border-radius: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ai-explain-btn:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+.ai-result {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #f8f9fb;
+}
+
+.ai-result-title {
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.ai-result p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #475467;
+}
