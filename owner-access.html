@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RankForge AI — Owner Access</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7fb;color:#111827;font-family:system-ui,sans-serif}
+main{max-width:520px;margin:auto;padding:24px 16px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:20px}
+h1{margin:0 0 6px;font-size:22px}
+.sub{color:#6b7280;font-size:12px;line-height:1.5}
+input,button{width:100%;padding:13px;border-radius:12px;font:inherit}
+input{border:1px solid #d1d5db;margin:18px 0 10px}
+button{border:0;background:#111827;color:#fff;font-weight:800}
+#status{margin-top:12px;font-size:12px}
+a{display:block;margin-top:14px;text-align:center;color:#374151}
+</style>
+</head>
+<body>
+<main>
+<div class="card">
+<h1>🔐 Owner Access</h1>
+<div class="sub">Private RankForge module ingestion access.</div>
+
+<input id="token" type="password"
+ autocomplete="off"
+ placeholder="Owner verification token">
+
+<button id="enable" type="button">
+Enable Owner Mode
+</button>
+
+<div id="status"></div>
+
+<a href="index.html">← Back to RankForge</a>
+</div>
+</main>
+
+<script src="./owner-imports/rankforge-owner-access.js"></script>
+<script>
+(function(){
+"use strict";
+
+const input=document.getElementById("token");
+const button=document.getElementById("enable");
+const status=document.getElementById("status");
+
+button.addEventListener("click",function(){
+  const access=window.RankForgeOwnerAccess;
+  const token=input.value.trim();
+
+  if(!access || typeof access.enableOwnerMode!=="function"){
+    status.textContent="Owner access module unavailable.";
+    return;
+  }
+
+  if(!access.enableOwnerMode(token)){
+    status.textContent="Invalid owner verification token.";
+    return;
+  }
+
+  status.textContent="Owner Mode enabled.";
+  setTimeout(function(){
+    location.href="index.html";
+  },500);
+});
+})();
+</script>
+</body>
+</html>
