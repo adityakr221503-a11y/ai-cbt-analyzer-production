@@ -167,3 +167,18 @@
     }
   });
 })();
+
+document.addEventListener("DOMContentLoaded", function () {
+  try {
+    const result = window.RankForgeLectureResult?.getLastResult?.();
+
+    if (result) {
+      window.RankForgeAIMentorContext?.publish({
+        event: "practice-result",
+        result: result
+      });
+    }
+  } catch (_) {}
+});
+
+window.addEventListener("rankforge:ai-context", function () {});
