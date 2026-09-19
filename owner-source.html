@@ -408,6 +408,10 @@ refresh();
     button.addEventListener("click",async function(){
       const file=input.files && input.files[0];
 
+      if(button.dataset.ingesting==="1"){
+        return;
+      }
+
       if(!file){
         status.textContent="Select a module first.";
         return;
@@ -419,6 +423,11 @@ refresh();
         status.textContent="Unsupported module format.";
         return;
       }
+
+      button.dataset.ingesting="1";
+      button.disabled=true;
+      const originalButtonText=button.textContent;
+      button.textContent="Processing…";
 
       status.textContent=
         "Module received • "+detected.sourceType+" • processing…";
@@ -467,6 +476,10 @@ refresh();
         console.error("[RankForge] Module ingestion failed",error);
         status.textContent=
           "Module processing failed safely. Check the source/review queue.";
+      }finally{
+        button.dataset.ingesting="";
+        button.disabled=false;
+        button.textContent=originalButtonText;
       }
     });
   }
