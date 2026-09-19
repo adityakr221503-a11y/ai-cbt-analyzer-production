@@ -2322,7 +2322,8 @@ if(document.readyState === "loading"){
     if (localStorage.getItem(RESET_VERSION) !== "done") {
 
       const preserve = new Set([
-        RESET_VERSION
+        RESET_VERSION,
+        "rankforgeOwnerMode"
       ]);
 
       const keys = [];
