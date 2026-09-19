@@ -18,3 +18,14 @@ __pycache__/
 owner-imports/
 question-data/
 
+
+# Legacy PDF owner artifacts kept locally for recovery/testing
+pdf-cbt-production-engine-v10-backup-*.js
+pdf-cbt-production-engine-v10-verified-backup-*.js
+pdf-cbt-production-engine-v11-backup-*.js
+pdf-owner-android-test.html
+pdf-owner-test.html
+rankforge-owner-pdf-engine-v5.js
+rankforge-owner-pdf-extractor.py
+rankforge-owner-pdf-inventory-v1.json
+rankforge-selected-module-master-v2.json
