@@ -41,7 +41,7 @@ function normalize(q,i,source){
 
   if(typeof correct==="string"){
     const raw=correct.trim();
-    const letter=raw.toUpperCase();
+    const letter=String(raw ?? "").toUpperCase();
 
     if(/^[A-D]$/.test(letter)){
       correct=letter.charCodeAt(0)-65;

@@ -260,12 +260,12 @@ function loadPDFLibrary(){
 
     return new Promise(function(resolve,reject){
         const script=document.createElement("script");
-        script.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+        script.src="./vendor/pdf.min.js";
 
         script.onload=function(){
             if(window.pdfjsLib){
                 pdfjsLib.GlobalWorkerOptions.workerSrc=
-                    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+                    "./vendor/pdf.worker.min.js";
                 resolve();
             }else{
                 reject(new Error("PDF library unavailable"));

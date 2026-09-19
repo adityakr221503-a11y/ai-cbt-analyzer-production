@@ -138,7 +138,7 @@
 
   async function pdfjs() {
     await loadScript(
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+      "./vendor/pdf.min.js",
       () => !!window.pdfjsLib
     );
 
@@ -147,7 +147,7 @@
 
     if (window.pdfjsLib.GlobalWorkerOptions) {
       window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        "./vendor/pdf.worker.min.js";
     }
 
     return window.pdfjsLib;

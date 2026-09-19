@@ -196,7 +196,7 @@
 
       if (letter) {
         const i =
-          letter[1].toUpperCase().charCodeAt(0) - 65;
+          String(letter[1] ?? "").toUpperCase().charCodeAt(0) - 65;
         if (i >= 0 && i < options.length) return i;
       }
 

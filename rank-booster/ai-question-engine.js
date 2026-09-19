@@ -87,7 +87,7 @@
 
     if (idx >= 0) return idx;
 
-    const letter = c.toUpperCase().match(/^[A-D]$/);
+    const letter = String(c ?? "").toUpperCase().match(/^[A-D]$/);
     if (letter) return letter.charCodeAt(0) - 65;
 
     const number = Number(c);
