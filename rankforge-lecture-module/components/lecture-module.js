@@ -216,3 +216,40 @@
     btn.textContent = "🤖 Explain with AI";
   });
 })();
+
+
+(function setupLearningLoop() {
+  const result = document.getElementById("loopResult");
+  if (!result) return;
+
+  const content = {
+    ncert: {
+      title: "📖 NCERT Key Points",
+      text: "AI will extract the most relevant NCERT concepts, definitions, examples and high-value facts from the authorized lecture context."
+    },
+    trap: {
+      title: "⚠️ Common Traps",
+      text: "AI will identify likely conceptual confusions, misleading options and common NEET-style traps related to this concept."
+    },
+    practice: {
+      title: "✍️ Practice",
+      text: "The next layer will generate concept-linked practice questions and connect them with the existing RankForge practice system."
+    },
+    revision: {
+      title: "🔄 Quick Revision",
+      text: "Important concepts can be saved for later revision and eventually connected with weak-area and mistake tracking."
+    }
+  };
+
+  document.addEventListener("click", function (e) {
+    const card = e.target.closest("[data-loop]");
+    if (!card) return;
+
+    const item = content[card.dataset.loop];
+    if (!item) return;
+
+    result.innerHTML =
+      '<b>' + item.title + '</b>' +
+      '<p>' + item.text + '</p>';
+  });
+})();
