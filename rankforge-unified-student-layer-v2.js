@@ -519,7 +519,13 @@
       if (document.getElementById("rankforgeStudyVaultEntry")) return;
 
       const file = location.pathname.split("/").pop().toLowerCase();
-      if (file !== "index.html" && file !== "") return;
+      const isRootApp =
+        file === "" ||
+        file === "index.html" ||
+        location.pathname.endsWith("/ai-cbt-analyzer-production/") ||
+        location.pathname.endsWith("/ai-cbt-analyzer-production");
+
+      if (!isRootApp) return;
 
       const grids = document.querySelectorAll(".grid");
       let grid = null;
