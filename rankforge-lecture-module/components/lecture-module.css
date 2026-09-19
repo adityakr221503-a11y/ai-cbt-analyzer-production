@@ -483,3 +483,71 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+.lecture-result-panel {
+  margin-bottom: 18px;
+  padding: 18px;
+  background: white;
+  border: 1px solid #eaecf0;
+  border-radius: 20px;
+}
+
+.result-summary {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.result-icon {
+  font-size: 25px;
+}
+
+.result-summary b,
+.result-summary small {
+  display: block;
+}
+
+.result-summary b {
+  font-size: 15px;
+}
+
+.result-summary small {
+  margin-top: 3px;
+  color: #667085;
+  font-size: 11px;
+}
+
+.result-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 14px 0;
+}
+
+.result-stats span {
+  padding: 7px 9px;
+  border-radius: 9px;
+  background: #f8f9fb;
+  font-size: 11px;
+}
+
+.result-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.result-actions button {
+  padding: 11px;
+  border: 0;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 420px) {
+  .result-actions {
+    grid-template-columns: 1fr;
+  }
+}

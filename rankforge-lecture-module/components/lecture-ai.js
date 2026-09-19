@@ -58,6 +58,7 @@
           credentials: "include",
           body: JSON.stringify({
             action: "explain",
+            mistakeMode: /mistake|wrong|re-explain/i.test(topic),
             topic: topic.trim(),
             lecture: {
               id: context.lectureId,

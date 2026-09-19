@@ -67,6 +67,34 @@
 
   function launch() {
     const context = getLectureContext();
+
+    /*
+     * If the existing RankForge practice/test system writes a result
+     * object, the Lecture Module can consume it without replacing
+     * the existing test engine.
+     */
+    try {
+      const existing = JSON.parse(
+        localStorage.getItem("cbtLastResult") ||
+        localStorage.getItem("lastCBTResult") ||
+        "null"
+      );
+
+      if (
+        existing &&
+        typeof existing === "object" &&
+        window.RankForgeLectureResult
+      ) {
+        window.RankForgeLectureResult.saveResult({
+          score: existing.score ?? existing.marks ?? 0,
+          total: existing.total ?? existing.maxMarks ?? 0,
+          correct: existing.correct ?? 0,
+          wrong: existing.wrong ?? existing.incorrect ?? 0,
+          skipped: existing.skipped ?? existing.unattempted ?? 0,
+          accuracy: existing.accuracy ?? 0
+        });
+      }
+    } catch (_) {}
     const bank = findBank();
     const questions = getQuestions(bank, context);
 
