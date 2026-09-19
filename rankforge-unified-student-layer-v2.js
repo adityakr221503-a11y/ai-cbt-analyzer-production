@@ -515,41 +515,7 @@
       };
     },
 
-    injectStudyVaultEntry() {
-      if (document.getElementById("rankforgeStudyVaultEntry")) return;
-
-      const file = location.pathname.split("/").pop().toLowerCase();
-      const isRootApp =
-        file === "" ||
-        file === "index.html" ||
-        location.pathname.endsWith("/ai-cbt-analyzer-production/") ||
-        location.pathname.endsWith("/ai-cbt-analyzer-production");
-
-      if (!isRootApp) return;
-
-      const grids = document.querySelectorAll(".grid");
-      let grid = null;
-
-      grids.forEach(g => {
-        if (!grid && /NICHOD Hub/i.test(g.textContent || "")) {
-          grid = g;
-        }
-      });
-
-      if (!grid) return;
-
-      const card = document.createElement("a");
-      card.id = "rankforgeStudyVaultEntry";
-      card.className = "card";
-      card.href = "./study-vault/";
-
-      card.innerHTML =
-        '<div class="icon">📚</div>' +
-        '<strong>Study Vault</strong>' +
-        '<span>Save, organize and revise your important study material.</span>';
-
-      grid.appendChild(card);
-    },
+    /* Study Vault uses the single canonical entry from index.html. */
 
     init() {
       RF.expose();
@@ -563,7 +529,6 @@
 
       const run = () => {
         RF.render();
-        RF.injectStudyVaultEntry();
       };
 
       if (document.readyState === "loading") {
