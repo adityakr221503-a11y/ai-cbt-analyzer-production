@@ -290,5 +290,57 @@ window.refresh=refresh;
 refresh();
 })();
 </script>
+
+<script>
+(function(){
+  "use strict";
+
+  function rfBindPicker(){
+    const input=document.getElementById("sourceFile");
+    const selected=document.getElementById("selectedFile");
+    const btn=document.getElementById("importBtn");
+
+    if(!input) return false;
+
+    if(input.dataset.rfPickerBound==="1") return true;
+    input.dataset.rfPickerBound="1";
+
+    input.removeAttribute("disabled");
+
+    input.addEventListener("change",function(){
+      const file=input.files && input.files[0];
+
+      if(selected){
+        selected.textContent=file
+          ? file.name+" ("+Math.round(file.size/1024)+" KB)"
+          : "No file selected";
+      }
+
+      if(btn){
+        btn.disabled=!file;
+      }
+
+      console.log("[RankForge Owner Picker]",file ? {
+        name:file.name,
+        size:file.size,
+        type:file.type
+      } : "NO FILE");
+    });
+
+    if(btn){
+      btn.disabled=!(input.files && input.files.length);
+    }
+
+    return true;
+  }
+
+  if(!rfBindPicker()){
+    const observer=new MutationObserver(function(){
+      if(rfBindPicker()) observer.disconnect();
+    });
+    observer.observe(document.documentElement,{childList:true,subtree:true});
+  }
+})();
+</script>
 </body>
 </html>
