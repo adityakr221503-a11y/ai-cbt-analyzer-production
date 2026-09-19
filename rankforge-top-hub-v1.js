@@ -62,6 +62,18 @@ var sections=[
 ]]
 ];
 
+function ownerSupport(){
+  try{
+    return !!(
+      window.RankForgeOwnerAccess &&
+      typeof window.RankForgeOwnerAccess.isOwner === "function" &&
+      window.RankForgeOwnerAccess.isOwner()
+    );
+  }catch(_){
+    return false;
+  }
+}
+
 var support=[
 ["🤖","AI Mentor","Next-best study action","ranker-command-center.html"],
 ["📖","Revision","Structured revision","ranker-revision/index.html"],
@@ -126,6 +138,14 @@ function render(){
     '<div class="rfp-head"><span class="rfp-phase">🧩</span><h2>SUPPORT</h2></div>'+
     '<p class="rfp-sub">Helpful tools without cluttering the main journey.</p>'+
     '<div class="rfp-support">'+support.map(card).join("")+'</div>'+
+    (ownerSupport() ?
+      '<div data-owner-only style="margin-top:8px">'+
+        '<a class="rfp-card" href="owner-source.html">'+
+          '<span class="rfp-icon">🔐</span>'+
+          '<span class="rfp-title">Private Source Hub<small>Owner-only module ingestion</small></span>'+
+          '<b class="rfp-arrow">›</b>'+
+        '</a>'+
+      '</div>' : '')+
     '<div class="rfp-note">Internal intelligence stays in the background. Student-facing navigation stays focused and clean.</div>'+
   '</section>';
 
