@@ -9743,8 +9743,8 @@ window.RankForgePDFVisualV11={
 <script src="./rankforge-unified-student-layer-v2.js" defer></script>
 
 
-<script src="./rankforge-canonical-session-v1.js"></script>
-<script src="./rankforge-system-health-v1.js"></script>
+
+
 
 <script>
 (function(){
@@ -9775,6 +9775,41 @@ window.RankForgePDFVisualV11={
   window.addEventListener("visibilitychange",function(){
     if(document.visibilityState==="visible") sync();
   });
+})();
+</script>
+
+<script src="./rankforge-canonical-session-v1.js"></script>
+<script src="./rankforge-system-health-v1.js"></script>
+
+<script>
+(function(){
+"use strict";
+if(window.__RANKFORGE_FINAL_RUNTIME__)return;
+window.__RANKFORGE_FINAL_RUNTIME__=true;
+
+function rfSync(){
+ try{
+  if(!window.RankForgeCanonicalSession)return;
+  const s=window.RankForgeCanonicalSession.publish();
+  window.RANKFORGE_ACTIVE_SOURCE=s.source;
+  window.RANKFORGE_ACTIVE_QUESTIONS=s.questions||[];
+  window.RANKFORGE_ACTIVE_TEST=s.test||null;
+  document.documentElement.dataset.rankforgeSource=s.source||"NONE";
+  document.documentElement.dataset.rankforgeQuestionCount=
+    String((s.questions||[]).length);
+ }catch(e){
+  console.warn("RankForge canonical runtime:",e);
+ }
+}
+
+window.RankForgeFinalRuntime={sync:rfSync};
+
+document.addEventListener("DOMContentLoaded",rfSync);
+window.addEventListener("pageshow",rfSync);
+window.addEventListener("focus",rfSync);
+document.addEventListener("visibilitychange",function(){
+ if(document.visibilityState==="visible")rfSync();
+});
 })();
 </script>
 
