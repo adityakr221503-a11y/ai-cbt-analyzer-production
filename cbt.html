@@ -8450,7 +8450,26 @@ const RF_REAL={
     let attempted=0;
     let marks=0;
 
-    const topicMistakes={};
+    
+/* RankForge AI → existing CBT mistake pipeline */
+(function(){
+  try{
+    const active=JSON.parse(
+      sessionStorage.getItem("RANKFORGE_ACTIVE_TEST") ||
+      localStorage.getItem("RANKFORGE_ACTIVE_TEST") ||
+      "null"
+    );
+
+    if(active && Array.isArray(active.questions)){
+      window.RANKFORGE_ACTIVE_TEST=active;
+      window.RANKFORGE_AI_TEST=true;
+    }
+  }catch(e){
+    console.warn("RankForge active-test metadata unavailable:",e);
+  }
+})();
+
+const topicMistakes={};
 
     for(const t of history){
       questions+=this.number(t,[
