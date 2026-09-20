@@ -239,6 +239,23 @@ function checkBankCount() {
            (q.question||q.text||q.image||q.imageUrl||q.data||q.dataUrl);
        });
 
+       window.TEST180_QUESTIONS = src.slice();
+       window.__RANKERS_TEST180_BANK = bank.slice();
+
+       /* AUTO-SEED REAL TEST180 INTO RANKERS MASTER BANK */
+       if (typeof window.addRankBoosterQuestion === "function") {
+         src.forEach(function(q,i){
+           try {
+             window.addRankBoosterQuestion(Object.assign({}, q, {
+               id: q.id || ("TEST180-" + (i+1)),
+               answer: q.correctAnswer || "",
+               correctAnswer: q.correctAnswer || "",
+               source: q.source || "TEST180"
+             }));
+           } catch (_) {}
+         });
+       }
+
        window.__RANKERS_TEST180_BANK = bank.slice();
        window.__RANKERS_TEST180_READY = bank.length === 180;
        $("qCount").textContent = bank.length;
@@ -303,6 +320,7 @@ if(perf.length){
        });
      }
 
+     window.TEST180_QUESTIONS = src.slice();
      rbTest180Ready = bank.length === 180;
      window.__RANKERS_TEST180_BANK = bank.slice();
      window.__RANKERS_TEST180_READY = rbTest180Ready;
