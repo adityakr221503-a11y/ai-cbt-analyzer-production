@@ -1,0 +1,81 @@
+name: RankForge Android AAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Create Android wrapper
+        run: |
+          mkdir -p android-wrapper/www
+          rsync -a \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='android-wrapper' \
+            ./ android-wrapper/www/
+
+      - name: Create Capacitor package
+        working-directory: android-wrapper
+        run: |
+          cat > package.json <<'JSON'
+          {
+            "name": "rankforge-android",
+            "private": true,
+            "dependencies": {
+              "@capacitor/core": "^8.0.0",
+              "@capacitor/android": "^8.0.0"
+            },
+            "devDependencies": {
+              "@capacitor/cli": "^8.0.0"
+            }
+          }
+          JSON
+
+          cat > capacitor.config.json <<'JSON'
+          {
+            "appId": "com.rankforge.ai",
+            "appName": "RankForge AI",
+            "webDir": "www"
+          }
+          JSON
+
+          npm install
+          npx cap add android
+
+      - name: Sync web app
+        working-directory: android-wrapper
+        run: npx cap sync android
+
+      - name: Build Android AAB
+        working-directory: android-wrapper/android
+        run: ./gradlew bundleRelease
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: rankforge-android-aab
+          path: android-wrapper/android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
