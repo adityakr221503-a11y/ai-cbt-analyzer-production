@@ -251,3 +251,32 @@ global.RankForgeAINewQuestionModuleV1={
  getHistory:()=>arr(read(HISTORY_KEY))
 };
 })(window);
+
+/* RANKFORGE_TARGETED_DPP_V1 */
+(function(){
+"use strict";
+
+window.RankForgeTargetedDPP={
+  version:"RANKFORGE_TARGETED_DPP_V1",
+
+  buildRequest:function(topic,subject,count){
+    return {
+      type:"targeted-dpp",
+      subject:subject||"",
+      topic:topic||"",
+      count:Number(count||15),
+      source:"RankForge Student Weakness Engine",
+      requirements:{
+        fresh:true,
+        fourOptions:true,
+        oneCorrect:true,
+        ncertFirst:true,
+        examinerThinking:true,
+        avoidRewordedDuplicates:true,
+        explanations:true,
+        detailedSolutions:true
+      }
+    };
+  }
+};
+})();

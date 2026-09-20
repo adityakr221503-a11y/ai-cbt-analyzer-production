@@ -3221,5 +3221,218 @@ window.addEventListener(
 })();
 </script>
 
+
+<style id="RANKFORGE_ALL_FEATURES_V1">
+.rf-dpp-panel{
+  margin-top:14px;
+  padding:16px;
+  border-radius:16px;
+  border:1px solid rgba(127,127,127,.22);
+  background:rgba(127,127,127,.05);
+}
+.rf-dpp-panel button{
+  border:0;
+  border-radius:12px;
+  padding:10px 14px;
+  margin:5px 5px 5px 0;
+  cursor:pointer;
+  font-weight:700;
+}
+</style>
+
+<script id="RANKFORGE_ALL_FEATURES_V1">
+(function(){
+"use strict";
+
+const MKEY="cbtMasteryV2";
+
+function read(){
+  try{
+    return JSON.parse(localStorage.getItem(MKEY)||"{}")||{};
+  }catch(e){return {};}
+}
+
+function topicList(){
+  const s=read();
+  const map={};
+
+  (s.mistakes||[]).forEach(q=>{
+    const t=q.topic||q.chapter||q.concept||q.subject||"Unclassified";
+    map[t]=(map[t]||0)+1;
+  });
+
+  return Object.entries(map)
+    .sort((a,b)=>b[1]-a[1]);
+}
+
+function buildDPP(topic){
+  const s=read();
+
+  const weak=(s.mistakes||[]).filter(q=>{
+    const t=q.topic||q.chapter||q.concept||q.subject||"Unclassified";
+    return String(t)===String(topic);
+  });
+
+  if(!weak.length){
+    alert("No active weakness found for this topic.");
+    return;
+  }
+
+  const subject=weak[0].subject||"NEET";
+  const count=15;
+
+  const request={
+    type:"targeted-dpp",
+    topic:topic,
+    subject:subject,
+    count:count,
+    source:"RankForge Weakness Engine",
+    prompt:
+      "Generate fresh original NEET-level DPP questions for the student's weak topic. "+
+      "Use examiner-thinking patterns, NCERT-first facts, concept traps, application, "+
+      "inference and elimination. Do not copy or merely reword known questions. "+
+      "Return exactly four options and exactly one correct answer per question.",
+    avoidQuestionIds:weak.map(q=>q.id||q.questionId).filter(Boolean)
+  };
+
+  sessionStorage.setItem(
+    "RANKFORGE_TARGETED_DPP_REQUEST",
+    JSON.stringify(request)
+  );
+
+  localStorage.setItem(
+    "RANKFORGE_TARGETED_DPP_REQUEST",
+    JSON.stringify(request)
+  );
+
+  /*
+   * If the existing AI generator is available, hand the request to it.
+   * Otherwise open the existing generator rather than creating a second UI.
+   */
+  if(window.RankForgeAI && typeof window.RankForgeAI.generate==="function"){
+    Promise.resolve(
+      window.RankForgeAI.generate(request)
+    ).then(function(result){
+      launch(result,"RankForge — "+topic+" DPP");
+    }).catch(function(){
+      location.href="./ai-test-generator.html?targetedDPP=1";
+    });
+  }else{
+    location.href="./ai-test-generator.html?targetedDPP=1";
+  }
+}
+
+function launch(result,title){
+  const questions=
+    Array.isArray(result) ? result :
+    result && Array.isArray(result.questions)
+      ? result.questions : [];
+
+  const valid=questions.filter(q=>
+    (q.question||q.text) &&
+    Array.isArray(q.options) &&
+    q.options.length===4
+  );
+
+  if(!valid.length){
+    location.href="./ai-test-generator.html?targetedDPP=1";
+    return;
+  }
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(valid)
+  );
+
+  localStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(valid)
+  );
+
+  localStorage.setItem(
+    "RANKFORGE_ACTIVE_TEST",
+    JSON.stringify({
+      title:title,
+      source:"RankForge Targeted AI DPP",
+      generatedAt:new Date().toISOString(),
+      questionCount:valid.length,
+      questions:valid
+    })
+  );
+
+  location.href="./cbt.html?source=rankforge-dpp&title="+
+    encodeURIComponent(title);
+}
+
+function mountDPP(){
+  if(document.getElementById("rankforge-targeted-dpp")) return;
+
+  const dashboard=document.getElementById(
+    "rankforge-student-dashboard"
+  );
+
+  if(!dashboard) return;
+
+  const panel=document.createElement("section");
+  panel.id="rankforge-targeted-dpp";
+  panel.className="rf-dpp-panel";
+
+  const topics=topicList();
+
+  panel.innerHTML=
+    "<div><strong>🎯 Targeted DPP</strong></div>"+
+    "<div style='font-size:12px;opacity:.7;margin:6px 0 10px'>"+
+    "Practice your weakest topics with fresh RankForge questions."+
+    "</div>";
+
+  if(!topics.length){
+    panel.innerHTML+=
+      "<div style='font-size:13px;opacity:.7'>"+
+      "Complete a test to build your first weakness profile."+
+      "</div>";
+  }else{
+    topics.slice(0,5).forEach(function(item){
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.textContent=item[0]+" ("+item[1]+")";
+      btn.onclick=function(){
+        buildDPP(item[0]);
+      };
+      panel.appendChild(btn);
+    });
+  }
+
+  dashboard.appendChild(panel);
+}
+
+function boot(){
+  setTimeout(mountDPP,100);
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",boot);
+}else{
+  boot();
+}
+
+window.addEventListener(
+  "rankforge-mastery-updated",
+  function(){
+    const old=document.getElementById("rankforge-targeted-dpp");
+    if(old) old.remove();
+    mountDPP();
+  }
+);
+
+window.RankForgeAllFeatures={
+  version:"RANKFORGE_ALL_FEATURES_V1",
+  refresh:mountDPP,
+  getWeakTopics:topicList,
+  buildTargetedDPP:buildDPP
+};
+
+})();
+</script>
+
 </body>
 </html>

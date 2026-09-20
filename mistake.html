@@ -1588,5 +1588,24 @@ else
 })();
 </script>
 
+
+<script id="RANKFORGE_DPP_MISTAKE_META_V1">
+(function(){
+"use strict";
+
+try{
+  const active=JSON.parse(
+    sessionStorage.getItem("RANKFORGE_ACTIVE_TEST") ||
+    localStorage.getItem("RANKFORGE_ACTIVE_TEST") ||
+    "null"
+  );
+
+  if(active && active.source==="RankForge Targeted AI DPP"){
+    window.RANKFORGE_DPP_MISTAKES=true;
+  }
+}catch(e){}
+})();
+</script>
+
 </body>
 </html>

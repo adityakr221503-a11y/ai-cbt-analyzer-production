@@ -290,4 +290,38 @@ localStorage.setItem("CBT_ACTIVE_QUESTIONS", JSON.stringify(normalized));
 </script>
 
 <div id="rankforgeLectureFallback" style="display:block !important;visibility:visible !important;opacity:1 !important;"><a href="rankforge-lecture-module/pages/lectures.html" style="display:block !important;visibility:visible !important;opacity:1 !important;">🎓 <strong>AI Lectures</strong> — NCERT-first lectures, AI explanation and practice.</a></div>
+
+<script id="RANKFORGE_TARGETED_DPP_HANDLER_V1">
+(function(){
+"use strict";
+
+try{
+  const raw=
+    sessionStorage.getItem("RANKFORGE_TARGETED_DPP_REQUEST") ||
+    localStorage.getItem("RANKFORGE_TARGETED_DPP_REQUEST");
+
+  if(raw){
+    const request=JSON.parse(raw);
+    window.RANKFORGE_TARGETED_DPP_REQUEST=request;
+
+    /*
+     * Existing generator can consume this request through its
+     * normal generation flow. No second question-generation system
+     * is created here.
+     */
+    window.RANKFORGE_GENERATION_CONTEXT={
+      mode:"targeted-dpp",
+      topic:request.topic||"",
+      subject:request.subject||"",
+      count:Number(request.count||15),
+      source:"weakness-engine",
+      avoidQuestionIds:request.avoidQuestionIds||[]
+    };
+  }
+}catch(e){
+  console.warn("Targeted DPP context unavailable:",e);
+}
+})();
+</script>
+
 </body></html>
