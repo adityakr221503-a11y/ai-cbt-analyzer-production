@@ -335,10 +335,18 @@ function parseQuestions(text){
     const b=i+1<starts.length ? starts[i+1].index : raw.length;
     const body=raw.slice(a,b).trim();
 
-    if(body) blocks.push({
-      number:starts[i].number,
-      body:body
-    });
+    if(body) {
+      const before=raw.slice(0,a);
+      const tests=before.match(/\bTest\s*[-–—]?\s*(\d{1,2})\b/gi)||[];
+      const lastTest=tests.length
+        ? Number((tests[tests.length-1].match(/\d{1,2}/)||["0"])[0])
+        : 0;
+      blocks.push({
+        number:starts[i].number,
+        testNumber:lastTest,
+        body:body
+      });
+    }
   }
 
   const questions=[];
@@ -424,38 +432,48 @@ function parseQuestions(text){
       status:"quarantine",
       origin:"module",
       extraction:"pdf-text-or-ocr",
-      sourceQuestionNumber:item.number
+      sourceQuestionNumber:item.number,
+      testNumber:item.testNumber||0
     });
   }
 
   /*
-   * Remove duplicate question numbers produced by repeated headers/pages.
-   * Never merge/reword questions.
+   * Question numbers repeat 1..90 in every Biology test.
+   * Test number + question number is the real identity.
+   * Never globally deduplicate Q1..Q90.
    */
-  const out=[];
-  const seenNumbers=new Set();
-
-  for(const q of questions){
-    const key=String(q.sourceQuestionNumber);
-    if(seenNumbers.has(key)) continue;
-    seenNumbers.add(key);
-    out.push(q);
-  }
-
-  return out;
+  return questions;
 }
 
 function parseAnswerKey(text){
   const out={};
-  const lines=String(text||"").split(/\r?\n/);
+  let currentTest=0;
+  const raw=String(text||"").replace(/\r/g,"\n");
+  const lines=raw.split(/\n+/);
 
-  for(const line of lines){
-    let m=line.match(
-      /(?:Q(?:uestion)?\s*)?(\d{1,4})\s*[\).:\-]?\s*([A-D])\b/i
-    );
+  const testRe=/\bTest\s*[-–—]?\s*(\d{1,2})\b/gi;
+  const pairRe=/(?:Q(?:us(?:tion)?)?\.?\s*)?(\d{1,3})\s*(?:Ans(?:wer)?\.?\s*)[:.)-]?\s*([A-D])\b/gi;
 
-    if(m){
-      out[String(Number(m[1]))]="ABCD".indexOf(m[2].toUpperCase());
+  for(const line0 of lines){
+    const line=String(line0||"").trim();
+    if(!line) continue;
+
+    testRe.lastIndex=0;
+    let tm;
+    while((tm=testRe.exec(line))!==null){
+      currentTest=Number(tm[1]);
+    }
+
+    pairRe.lastIndex=0;
+    let m;
+    while((m=pairRe.exec(line))!==null){
+      const qn=Number(m[1]);
+      const ai="ABCD".indexOf(m[2].toUpperCase());
+
+      if(qn>=1 && qn<=90 && ai>=0 &&
+         currentTest>=1 && currentTest<=30){
+        out[currentTest+"-"+qn]=ai;
+      }
     }
   }
 
@@ -465,14 +483,11 @@ function parseAnswerKey(text){
 function applyAnswerKey(questions,key){
   for(let i=0;i<questions.length;i++){
     const q=questions[i];
+    const test=Number(q.testNumber||0);
+    const qn=Number(q.sourceQuestionNumber||0);
+    const k=key[test+"-"+qn];
 
-    const nums=String(q.question).match(
-      /^(?:Q(?:uestion)?\s*)?(\d{1,4})/
-    );
-
-    if(nums && key[String(Number(nums[1]))]!==undefined){
-      q.correctAnswer=key[String(Number(nums[1]))];
-    }
+    if(k!==undefined) q.correctAnswer=k;
   }
 
   return questions;
@@ -584,15 +599,33 @@ async function importPDF(file,meta,callbacks){
   });
 
   const questions=parseQuestions(fullText);
-  const answerKey=parseAnswerKey(fullText);
+
+  const answerStartIndex=pageTexts.findIndex(function(p){
+    return /ANSWER\s*KEY/i.test(String(p||""));
+  });
+
+  const answerText=answerStartIndex>=0
+    ? pageTexts.slice(answerStartIndex).join("\n")
+    : "";
+
+  const answerKey=parseAnswerKey(answerText);
   applyAnswerKey(questions,answerKey);
 
   const source=getSourceMeta(file,meta);
 
   questions.forEach(function(q){
-    q.sourceId=source.sourceId;
+    q.sourceId=source.sourceId||("NEET-BIO-TEST-"+String(q.testNumber||0));
     q.filename=source.filename;
+    q.subject="Biology";
+    q.chapter="NEET Biology Test Series — Test "+String(q.testNumber||"");
+    q.topic="Test "+String(q.testNumber||"");
     q.extraction="pdf-text-or-ocr";
+    q.moduleName="NEET Biology Test Series";
+    q.importedFromModule=true;
+    q.originalSourcePreserved=true;
+    q.marks=4;
+    q.negativeMarks=1;
+    q.id="NEET-BIO-TS-"+String(q.testNumber||0)+"-Q"+String(q.sourceQuestionNumber||0);
   });
 
   let result=null;
@@ -619,6 +652,15 @@ async function importPDF(file,meta,callbacks){
     reviewQuestions:result && result.review || 0,
     quarantinedQuestions:result && result.quarantine || questions.length,
     answerKeyEntries:Object.keys(answerKey).length,
+    expectedQuestionCount:2700,
+    testCounts:(function(){
+      const m={};
+      questions.forEach(function(q){
+        const t=String(q.testNumber||0);
+        m[t]=(m[t]||0)+1;
+      });
+      return m;
+    })(),
     ocrPages:ocrPages,
     questions:questions,
     engineResult:result
