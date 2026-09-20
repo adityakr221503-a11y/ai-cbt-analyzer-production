@@ -5235,22 +5235,12 @@ window.RankForgePDFAuthorityV3={
     }
 
     /* Remove legacy listeners by replacing controls once. */
-    if(!input.dataset.rfV4){
-      var ni=input.cloneNode(true);
-      ni.dataset.rfV4="1";
-      ni.disabled=false;
-      ni.removeAttribute("disabled");
-      input.replaceWith(ni);
-      input=ni;
-    }
-
-    if(!button.dataset.rfV4){
-      var nb=button.cloneNode(true);
-      nb.dataset.rfV4="1";
-      nb.disabled=true;
-      button.replaceWith(nb);
-      button=nb;
-    }
+    /* Keep the native file input. Cloning an <input type="file">
+       clears its selected FileList and causes "Select a PDF first". */
+    input.dataset.rfV4="1";
+    button.dataset.rfV4="1";
+    input.disabled=false;
+    input.removeAttribute("disabled");
 
     input.addEventListener("change",function(){
       var f=input.files && input.files[0];
