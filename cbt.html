@@ -8462,6 +8462,115 @@ const RF_REAL={
 
     if(active && Array.isArray(active.questions)){
       window.RANKFORGE_ACTIVE_TEST=active;
+
+/* RANKFORGE_MISTAKE_BRIDGE_V1 */
+(function(){
+  try{
+    const active=window.RANKFORGE_ACTIVE_TEST;
+    if(!active || !Array.isArray(active.questions)) return;
+
+    window.RankForgeMistakeBridge={
+      version:"RANKFORGE_MISTAKE_BRIDGE_V1",
+
+      record:function(question,userAnswer){
+        if(!question) return;
+
+        const key="cbtMasteryV2";
+        let state={mistakes:[],mastered:[],retries:[]};
+
+        try{
+          const saved=JSON.parse(localStorage.getItem(key)||"null");
+          if(saved && typeof saved==="object"){
+            state=Object.assign(state,saved);
+          }
+        }catch(e){}
+
+        if(!Array.isArray(state.mistakes)) state.mistakes=[];
+        if(!Array.isArray(state.mastered)) state.mastered=[];
+        if(!Array.isArray(state.retries)) state.retries=[];
+
+        const id=String(
+          question.id ||
+          question.questionId ||
+          question.text ||
+          question.question ||
+          ""
+        );
+
+        if(!id) return;
+
+        const now=new Date().toISOString();
+
+        const existing=state.mistakes.findIndex(x=>
+          String(x.id||x.questionId||"")===id
+        );
+
+        const entry={
+          id:id,
+          questionId:id,
+          question:question.question||question.text||"",
+          options:Array.isArray(question.options)?question.options:[],
+          correctAnswer:question.correctAnswer??question.correctIndex??"",
+          userAnswer:userAnswer??"",
+          subject:question.subject||"",
+          chapter:question.chapter||"",
+          topic:question.topic||"",
+          concept:question.concept||"",
+          difficultyLevel:question.difficultyLevel||"",
+          questionType:question.questionType||"",
+          trapType:question.trapType||"",
+          noveltyScore:Number(question.noveltyScore||0),
+          source:"RankForge AI",
+          generationMethod:question.generationMethod||"examiner-thinking-engine",
+          reason:"Pending analysis",
+          status:"active",
+          firstMistakeAt:existing>=0
+            ? (state.mistakes[existing].firstMistakeAt||now)
+            : now,
+          lastMistakeAt:now,
+          attempts:Number(
+            existing>=0 ? (state.mistakes[existing].attempts||0)+1 : 1
+          ),
+          retryCount:Number(
+            existing>=0 ? (state.mistakes[existing].retryCount||0) : 0
+          )
+        };
+
+        if(existing>=0) state.mistakes[existing]=entry;
+        else state.mistakes.push(entry);
+
+        localStorage.setItem(key,JSON.stringify(state));
+        window.RANKFORGE_LAST_MISTAKE=entry;
+        return entry;
+      },
+
+      retry:function(questionId){
+        const id=String(questionId||"");
+        let state={mistakes:[]};
+
+        try{
+          state=JSON.parse(
+            localStorage.getItem("cbtMasteryV2")||'{"mistakes":[]}'
+          )||{mistakes:[]};
+        }catch(e){}
+
+        const item=(state.mistakes||[]).find(x=>
+          String(x.id||x.questionId||"")===id
+        );
+
+        if(item){
+          item.retryCount=Number(item.retryCount||0)+1;
+          item.status="retry";
+          localStorage.setItem("cbtMasteryV2",JSON.stringify(state));
+        }
+
+        return item||null;
+      }
+    };
+  }catch(e){
+    console.warn("RankForge mistake bridge unavailable:",e);
+  }
+})();
       window.RANKFORGE_AI_TEST=true;
     }
   }catch(e){
