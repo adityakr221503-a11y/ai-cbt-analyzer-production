@@ -1,78 +1,4 @@
-name: Deploy RankForge AI Worker
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "rankforge-ai-worker/**"
-      - ".github/workflows/deploy-rankforge-ai.yml"
-
-# Minimum GitHub permission required.
-permissions:
-  contents: read
-
-# Prevent two deployments from running over each other.
-concurrency:
-  group: rankforge-ai-production
-  cancel-in-progress: true
-
-jobs:
-  security-check:
-    name: Privacy & Security Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check for exposed secrets
-        shell: bash
-        run: |
-          set -e
-          echo "========== SECRET SAFETY =========="
-
-          if grep -RInE \
-            --exclude-dir=.git \
-            --exclude='*.md' \
-            --exclude='*.txt' \
-            'sk-[A-Za-z0-9_-]{20,}|OPENAI_API_KEY[[:space:]]*[:=][[:space:]]*["'\''][^"'\'']+|CLOUDFLARE_API_TOKEN[[:space:]]*[:=][[:space:]]*["'\''][^"'\'']+' \
-            rankforge-ai-worker 2>/dev/null; then
-              echo "❌ Possible secret found in Worker source"
-              exit 1
-          fi
-
-          echo "✅ No obvious API-key pattern found in Worker source"
-
-      - name: Check required config
-        shell: bash
-        run: |
-          set -e
-          test -f rankforge-ai-worker/src/index.js
-          test -f rankforge-ai-worker/wrangler.jsonc
-          echo "✅ Worker source/config present"
-
-      - name: Check frontend secret exposure
-        shell: bash
-        run: |
-          set -e
-
-          echo "Checking for actual credential values..."
-
-          if grep -RInE \
-            --exclude-dir=.git \
-            --exclude='*.md' \
-            --exclude='*.txt' \
-            'sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' \
-            rankforge-ai-worker 2>/dev/null; then
-              echo "❌ Possible credential value detected"
-              exit 1
-          fi
-
-          echo "✅ No obvious credential values exposed"
-          echo "ℹ️ Secret variable names are allowed; their values must remain server-side."
-
-  deploy:
     name: Secure Cloudflare Deployment
     needs: security-check
     runs-on: ubuntu-latest
@@ -121,4 +47,4 @@ jobs:
           echo "======================================"
           echo "🔒 Secrets never printed"
           echo "🔒 Deployment concurrency protected"
-          echo "======================================"
+          echo "
