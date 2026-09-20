@@ -48,7 +48,6 @@
         const response = await fetch(AI_ENDPOINT, {
           method: "POST",
           headers: {"Content-Type": "application/json"},
-          credentials: "include",
           body: JSON.stringify({
             action: "explain",
             mode: "NCERT_360_DISSECTION",
