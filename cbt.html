@@ -9941,6 +9941,22 @@ document.addEventListener("visibilitychange",function(){
 })();
 </script>
 
+
+/* RANKFORGE_MASTERY_FLOW_V1_CBT_HOOK */
+(function(){
+  try{
+    window.RankForgeCBTMistakeComplete=function(questionId,correct,userAnswer){
+      if(window.RankForgeMastery &&
+         typeof window.RankForgeMastery.completeRetry==="function"){
+        return window.RankForgeMastery.completeRetry(
+          questionId,correct,userAnswer
+        );
+      }
+      return null;
+    };
+  }catch(e){}
+})();
+
 </body>
 
 </html>

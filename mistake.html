@@ -1409,5 +1409,184 @@ else
 <script src="./rankforge-unified-student-layer-v2.js" defer></script>
 
 <div id="rankforgeLectureFallback" style="display:block !important;visibility:visible !important;opacity:1 !important;"><a href="rankforge-lecture-module/pages/lectures.html" style="display:block !important;visibility:visible !important;opacity:1 !important;">🎓 <strong>AI Lectures</strong> — NCERT-first lectures, AI explanation and practice.</a></div>
+
+<!-- RANKFORGE_MASTERY_FLOW_V1 -->
+<script>
+(function(){
+  "use strict";
+
+  const KEY="cbtMasteryV2";
+
+  function load(){
+    try{
+      const x=JSON.parse(localStorage.getItem(KEY)||"null");
+      return x && typeof x==="object"
+        ? x
+        : {mistakes:[],mastered:[],retries:[],improvement:[]};
+    }catch(e){
+      return {mistakes:[],mastered:[],retries:[],improvement:[]};
+    }
+  }
+
+  function save(x){
+    localStorage.setItem(KEY,JSON.stringify(x));
+    window.dispatchEvent(new Event("rankforge-mastery-updated"));
+  }
+
+  function idOf(q){
+    return String(q && (q.id||q.questionId||q._id)||"");
+  }
+
+  window.RankForgeMastery={
+    version:"RANKFORGE_MASTERY_FLOW_V1",
+
+    retry:function(questionId){
+      const state=load();
+      const id=String(questionId||"");
+      const item=(state.mistakes||[]).find(x=>
+        String(x.id||x.questionId||"")===id
+      );
+
+      if(!item) return null;
+
+      item.status="retry";
+      item.retryCount=Number(item.retryCount||0)+1;
+      item.lastRetryAt=new Date().toISOString();
+
+      state.retries=Array.isArray(state.retries)?state.retries:[];
+      const old=state.retries.find(x=>
+        String(x.id||x.questionId||"")===id
+      );
+
+      if(old){
+        old.retryCount=item.retryCount;
+        old.lastRetryAt=item.lastRetryAt;
+      }else{
+        state.retries.push({
+          id:id,
+          questionId:id,
+          retryCount:item.retryCount,
+          lastRetryAt:item.lastRetryAt,
+          source:item.source||"RankForge AI",
+          topic:item.topic||"",
+          concept:item.concept||""
+        });
+      }
+
+      save(state);
+      return item;
+    },
+
+    completeRetry:function(questionId,correct,userAnswer){
+      const state=load();
+      const id=String(questionId||"");
+      const index=(state.mistakes||[]).findIndex(x=>
+        String(x.id||x.questionId||"")===id
+      );
+
+      if(index<0) return null;
+
+      const item=state.mistakes[index];
+      item.lastRetryAnswer=userAnswer??"";
+      item.lastRetryCorrect=!!correct;
+      item.lastRetryAt=new Date().toISOString();
+
+      state.improvement=Array.isArray(state.improvement)
+        ? state.improvement
+        : [];
+
+      state.improvement.push({
+        id:id,
+        questionId:id,
+        correct:!!correct,
+        at:item.lastRetryAt,
+        topic:item.topic||"",
+        concept:item.concept||"",
+        source:item.source||"RankForge AI"
+      });
+
+      if(correct){
+        item.status="mastered";
+        item.masteredAt=item.lastRetryAt;
+        item.improvementStatus="improved";
+
+        state.mastered=Array.isArray(state.mastered)
+          ? state.mastered
+          : [];
+
+        const already=state.mastered.some(x=>
+          String(x.id||x.questionId||"")===id
+        );
+
+        if(!already){
+          state.mastered.push({
+            ...item,
+            status:"mastered",
+            masteredAt:item.masteredAt
+          });
+        }
+
+        state.mistakes.splice(index,1);
+
+        state.retries=(state.retries||[]).filter(x=>
+          String(x.id||x.questionId||"")!==id
+        );
+      }else{
+        item.status="active";
+        item.retryFailedCount=
+          Number(item.retryFailedCount||0)+1;
+      }
+
+      save(state);
+      return item;
+    },
+
+    stats:function(){
+      const state=load();
+      const improvement=state.improvement||[];
+      const correct=improvement.filter(x=>x.correct).length;
+      const attempted=improvement.length;
+
+      return {
+        activeMistakes:(state.mistakes||[]).length,
+        mastered:(state.mastered||[]).length,
+        retries:(state.retries||[]).length,
+        retryAttempts:attempted,
+        retryCorrect:correct,
+        improvementRate:attempted
+          ? Math.round(correct/attempted*100)
+          : 0
+      };
+    },
+
+    get:function(questionId){
+      const state=load();
+      const id=String(questionId||"");
+
+      return (state.mistakes||[]).find(x=>
+        String(x.id||x.questionId||"")===id
+      ) ||
+      (state.mastered||[]).find(x=>
+        String(x.id||x.questionId||"")===id
+      ) ||
+      null;
+    }
+  };
+
+  window.RANKFORGE_MASTERY_FLOW_READY=true;
+
+  window.addEventListener("rankforge-mastery-updated",function(){
+    try{
+      if(typeof window.renderMistakes==="function")
+        window.renderMistakes();
+      if(typeof window.renderMistakeBook==="function")
+        window.renderMistakeBook();
+      if(typeof window.refreshMistakes==="function")
+        window.refreshMistakes();
+    }catch(e){}
+  });
+})();
+</script>
+
 </body>
 </html>
