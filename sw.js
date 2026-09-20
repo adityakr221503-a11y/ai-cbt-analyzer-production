@@ -70,3 +70,14 @@ self.addEventListener("fetch", event => {
   );
 
 });
+
+
+/* RANKFORGE_PWA_UPDATE_V1 */
+self.addEventListener("install", event => {
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", event => {
+  event.waitUntil(self.clients.claim());
+});
+/* /RANKFORGE_PWA_UPDATE_V1 */

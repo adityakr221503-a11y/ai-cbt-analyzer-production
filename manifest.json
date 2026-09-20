@@ -1,7 +1,7 @@
 {
   "name": "RankForge AI",
   "short_name": "RankForge",
-  "description": "AI-powered topper-first NEET learning, practice, testing and mastery system.",
+  "description": "AI powered student learning, practice and test platform",
   "start_url": "./?app=rankforge-v2",
   "scope": "./",
   "display": "standalone",
@@ -10,16 +10,17 @@
   "theme_color": "#111827",
   "icons": [
     {
-      "src": "./rankforge-icon-192.png?v=3",
+      "src": "./rankforge-icon-192.png?v=4",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./rankforge-icon-512.png?v=3",
+      "src": "./rankforge-icon-512.png?v=4",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
