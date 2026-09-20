@@ -1,4 +1,77 @@
+name: Deploy RankForge AI Worker
 
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "rankforge-ai-worker/**"
+      - ".github/workflows/deploy-rankforge-ai.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rankforge-ai-production
+  cancel-in-progress: true
+
+jobs:
+  security-check:
+    name: Privacy & Security Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for exposed secrets
+        shell: bash
+        run: |
+          set -e
+          echo "========== SECRET SAFETY =========="
+
+          if grep -RInE \
+            --exclude-dir=.git \
+            --exclude='*.md' \
+            --exclude='*.txt' \
+            'sk-[A-Za-z0-9_-]{20,}|OPENAI_API_KEY[[:space:]]*[:=][[:space:]]*["'\''][^"'\'']+|CLOUDFLARE_API_TOKEN[[:space:]]*[:=][[:space:]]*["'\''][^"'\'']+' \
+            rankforge-ai-worker 2>/dev/null; then
+              echo "❌ Possible secret found in Worker source"
+              exit 1
+          fi
+
+          echo "✅ No obvious API-key pattern found in Worker source"
+
+      - name: Check required config
+        shell: bash
+        run: |
+          set -e
+
+          test -f rankforge-ai-worker/src/index.js
+          test -f rankforge-ai-worker/wrangler.jsonc
+
+          echo "✅ Worker source/config present"
+
+      - name: Check credential exposure
+        shell: bash
+        run: |
+          set -e
+
+          echo "Checking for actual credential values..."
+
+          if grep -RInE \
+            --exclude-dir=.git \
+            --exclude='*.md' \
+            --exclude='*.txt' \
+            'sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' \
+            rankforge-ai-worker 2>/dev/null; then
+              echo "❌ Possible credential value detected"
+              exit 1
+          fi
+
+          echo "✅ No obvious credential values exposed"
+
+  deploy:
     name: Secure Cloudflare Deployment
     needs: security-check
     runs-on: ubuntu-latest
@@ -7,6 +80,22 @@
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install Wrangler explicitly
+        shell: bash
+        run: |
+          set -e
+
+          npm install --no-save --no-package-lock wrangler@3.90.0
+
+          echo "========== WRANGLER VERSION =========="
+          npx wrangler --version
+
       - name: Verify Cloudflare secrets exist
         shell: bash
         env:
@@ -14,6 +103,7 @@
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -e
+
           echo "========== CLOUDFLARE SECRET CHECK =========="
 
           if [ -z "$CF_TOKEN" ]; then
@@ -29,12 +119,34 @@
           echo "✅ Required Cloudflare credentials are present"
           echo "🔒 Secret values are not displayed"
 
+      - name: Validate Wrangler config
+        shell: bash
+        run: |
+          set -e
+
+          test -f rankforge-ai-worker/wrangler.jsonc
+          test -f rankforge-ai-worker/src/index.js
+
+          echo "========== CONFIG CHECK =========="
+          echo "✅ wrangler.jsonc found"
+          echo "✅ Worker source found"
+
       - name: Deploy Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy rankforge-ai-worker/src/index.js --config rankforge-ai-worker/wrangler.jsonc
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -e
+
+          echo "========== CLOUDFLARE DEPLOY =========="
+
+          npx wrangler deploy \
+            rankforge-ai-worker/src/index.js \
+            --config rankforge-ai-worker/wrangler.jsonc \
+            --account-id "$CLOUDFLARE_ACCOUNT_ID"
+
+          echo "✅ Wrangler deployment command completed"
 
       - name: Deployment result
         run: |
@@ -43,8 +155,7 @@
           echo "Worker: rankforge-ai"
           echo "API route: /api/ai/generate"
           echo "Lecture route: /api/lecture-ai/explain"
-          echo "🔒 GitHub permission: contents:read"
           echo "======================================"
           echo "🔒 Secrets never printed"
           echo "🔒 Deployment concurrency protected"
-          echo "
+          echo "======================================"
