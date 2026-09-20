@@ -64,62 +64,13 @@ jobs:
 
           npm install
           npx cap add android
-          npx cap sync android
 
-      - name: Prepare signing
-        env:
-          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KS_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          if [ -n "$KEYSTORE_B64" ]; then
-            echo "$KEYSTORE_B64" | base64 --decode > android-wrapper/rankforge-upload.jks
+      - name: Sync web app
+        working-directory: android-wrapper
+        run: npx cap sync android
 
-            python3 - <<'PY'
-from pathlib import Path
-
-p = Path("android-wrapper/android/app/build.gradle")
-s = p.read_text()
-
-if "rankforge-upload.jks" not in s:
-    s = s.replace(
-        "android {",
-        """android {
-    signingConfigs {
-        release {
-            storeFile file("../../rankforge-upload.jks")
-            storePassword System.getenv("KS_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
-        }
-    }
-""",
-        1
-    )
-
-    s = s.replace(
-        "buildTypes {",
-        """buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-""",
-        1
-    )
-
-    p.write_text(s)
-PY
-          else
-            echo "No signing secrets configured; building release AAB."
-          fi
-
-      - name: Build Release AAB
+      - name: Build Android AAB
         working-directory: android-wrapper/android
-        env:
-          KS_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew bundleRelease
 
       - name: Upload AAB
@@ -128,7 +79,3 @@ PY
           name: rankforge-android-aab
           path: android-wrapper/android/app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
-
-      - name: Cleanup signing key
-        if: always()
-        run: rm -f android-wrapper/rankforge-upload.jks
