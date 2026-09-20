@@ -2999,5 +2999,227 @@ window.addEventListener(
 })();
 </script>
 
+
+<script id="RANKFORGE_DASHBOARD_ACTIONS_V1">
+(function(){
+"use strict";
+
+const KEY="cbtMasteryV2";
+
+function read(){
+  try{
+    return JSON.parse(localStorage.getItem(KEY)||"{}")||{};
+  }catch(e){
+    return {};
+  }
+}
+
+function save(x){
+  localStorage.setItem(KEY,JSON.stringify(x));
+  window.dispatchEvent(new Event("rankforge-mastery-updated"));
+}
+
+function questionsFromMistakes(items){
+  return (items||[]).map((q,i)=>({
+    id:q.id||q.questionId||("RF-MISTAKE-"+i+"-"+Date.now()),
+    question:q.question||q.text||"",
+    text:q.text||q.question||"",
+    options:Array.isArray(q.options)?q.options:[],
+    correctAnswer:q.correctAnswer??q.correctIndex??"",
+    explanation:q.explanation||q.detailedSolution||"",
+    detailedSolution:q.detailedSolution||q.explanation||"",
+    subject:q.subject||"",
+    chapter:q.chapter||"",
+    topic:q.topic||"",
+    concept:q.concept||"",
+    difficultyLevel:q.difficultyLevel||"",
+    questionType:q.questionType||"",
+    trapType:q.trapType||"",
+    source:"RankForge Mistake Book",
+    generationMethod:q.generationMethod||"mistake-retry"
+  })).filter(q=>
+    q.question &&
+    Array.isArray(q.options) &&
+    q.options.length>=2
+  );
+}
+
+function launch(title,items){
+  const qs=questionsFromMistakes(items);
+
+  if(!qs.length){
+    alert("No retry-ready questions available yet.");
+    return;
+  }
+
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(qs)
+  );
+
+  localStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(qs)
+  );
+
+  localStorage.setItem(
+    "RANKFORGE_ACTIVE_TEST",
+    JSON.stringify({
+      title:title,
+      source:"RankForge Mistake Book",
+      generatedAt:new Date().toISOString(),
+      questionCount:qs.length,
+      questions:qs
+    })
+  );
+
+  location.href=
+    "./cbt.html?source=rankforge-mistakes&title="+
+    encodeURIComponent(title);
+}
+
+function openMistakes(){
+  location.href="./mistake.html";
+}
+
+function retryAll(){
+  const s=read();
+  launch(
+    "RankForge — Practice Your Mistakes",
+    Array.isArray(s.mistakes)?s.mistakes:[]
+  );
+}
+
+function retryDue(){
+  const s=read();
+  const due=Array.isArray(s.retries)?s.retries:[];
+
+  const ids=new Set(
+    due.map(x=>String(x.id||x.questionId||""))
+  );
+
+  const items=(s.mistakes||[]).filter(x=>
+    ids.has(String(x.id||x.questionId||""))
+  );
+
+  launch(
+    "RankForge — Retry Due Mistakes",
+    items
+  );
+}
+
+function weakTopic(topic){
+  const s=read();
+  const items=(s.mistakes||[]).filter(x=>
+    String(
+      x.topic||x.chapter||x.concept||x.subject||"Unclassified"
+    )===String(topic)
+  );
+
+  launch(
+    "RankForge — "+topic+" Targeted Practice",
+    items
+  );
+}
+
+function mastered(){
+  const s=read();
+  const items=Array.isArray(s.mastered)?s.mastered:[];
+
+  if(!items.length){
+    alert("No mastered questions yet.");
+    return;
+  }
+
+  launch(
+    "RankForge — Mastered Revision",
+    items
+  );
+}
+
+window.RankForgeDashboardActions={
+  version:"RANKFORGE_DASHBOARD_ACTIONS_V1",
+  openMistakes,
+  retryAll,
+  retryDue,
+  weakTopic,
+  mastered
+};
+
+function wire(){
+  const root=document.getElementById("rankforge-student-dashboard");
+  if(!root || root.dataset.rfActions==="1") return;
+
+  root.dataset.rfActions="1";
+
+  root.addEventListener("click",function(e){
+    const el=e.target.closest("[data-rf-action]");
+    if(!el) return;
+
+    const action=el.dataset.rfAction;
+
+    if(action==="mistakes") openMistakes();
+    if(action==="retry") retryDue();
+    if(action==="practice") retryAll();
+    if(action==="mastered") mastered();
+
+    if(action==="weak"){
+      weakTopic(el.dataset.topic||"");
+    }
+  });
+
+  const cards=root.querySelectorAll(".rf-sd-card");
+
+  if(cards[0]) cards[0].dataset.rfAction="mistakes";
+  if(cards[1]) cards[1].dataset.rfAction="mastered";
+  if(cards[2]) cards[2].dataset.rfAction="retry";
+  if(cards[4]) cards[4].dataset.rfAction="weak";
+
+  cards.forEach(card=>{
+    if(card.dataset.rfAction){
+      card.style.cursor="pointer";
+      card.setAttribute("role","button");
+      card.setAttribute("tabindex","0");
+    }
+  });
+
+  root.querySelectorAll(".rf-sd-card").forEach(card=>{
+    card.addEventListener("keydown",function(e){
+      if(e.key==="Enter" || e.key===" "){
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+}
+
+const oldBuild=window.RankForgeStudentDashboard &&
+  window.RankForgeStudentDashboard.refresh;
+
+if(oldBuild){
+  window.RankForgeStudentDashboard.refresh=function(){
+    oldBuild();
+    setTimeout(wire,0);
+  };
+}
+
+function boot(){
+  setTimeout(wire,50);
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",boot);
+}else{
+  boot();
+}
+
+window.addEventListener(
+  "rankforge-mastery-updated",
+  function(){setTimeout(wire,50);}
+);
+
+})();
+</script>
+
 </body>
 </html>
