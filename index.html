@@ -302,6 +302,71 @@ html,body{min-height:100%;overscroll-behavior-y:none}
 }
 </style>
 
+
+<style id="RANKFORGE_STUDENT_DASHBOARD_V1">
+.rf-student-dashboard{
+  margin:20px 0;
+  font-family:inherit;
+}
+.rf-sd-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.rf-sd-card{
+  border:1px solid rgba(127,127,127,.22);
+  border-radius:16px;
+  padding:16px;
+  background:rgba(127,127,127,.06);
+}
+.rf-sd-title{
+  font-weight:700;
+  font-size:15px;
+  margin-bottom:8px;
+}
+.rf-sd-value{
+  font-size:26px;
+  font-weight:800;
+}
+.rf-sd-sub{
+  font-size:12px;
+  opacity:.7;
+  margin-top:4px;
+}
+.rf-sd-wide{
+  grid-column:1/-1;
+}
+.rf-sd-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(127,127,127,.12);
+}
+.rf-sd-row:last-child{border-bottom:0}
+.rf-sd-empty{
+  opacity:.65;
+  font-size:13px;
+}
+.rf-sd-progress{
+  height:8px;
+  border-radius:99px;
+  background:rgba(127,127,127,.18);
+  overflow:hidden;
+  margin-top:8px;
+}
+.rf-sd-progress>span{
+  display:block;
+  height:100%;
+  width:0%;
+  background:currentColor;
+}
+@media(max-width:600px){
+  .rf-sd-grid{grid-template-columns:1fr}
+  .rf-sd-wide{grid-column:auto}
+}
+</style>
+
 </head>
 
 <body>
@@ -2663,5 +2728,276 @@ if(document.readyState === "loading"){
 <script src="./rankforge-premium-experience-v1.js"></script>
 <script src="./rankforge-unified-student-layer-v2.js" defer></script>
 <script src="./rankforge-universal-source-fabric-v1.js"></script>
+
+<script id="RANKFORGE_STUDENT_DASHBOARD_V1">
+(function(){
+"use strict";
+
+const KEY="cbtMasteryV2";
+
+function read(key, fallback){
+  try{
+    const x=JSON.parse(localStorage.getItem(key)||"null");
+    return x ?? fallback;
+  }catch(e){
+    return fallback;
+  }
+}
+
+function mastery(){
+  const x=read(KEY,{});
+  return x && typeof x==="object" ? x : {};
+}
+
+function history(){
+  const possible=[
+    "cbtHistory",
+    "testHistory",
+    "CBT_HISTORY",
+    "rankForgeHistory"
+  ];
+
+  for(const k of possible){
+    const x=read(k,null);
+    if(Array.isArray(x)) return x;
+    if(x && Array.isArray(x.tests)) return x.tests;
+    if(x && Array.isArray(x.history)) return x.history;
+  }
+
+  return [];
+}
+
+function esc(v){
+  return String(v??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+
+function build(){
+  const root=document.getElementById("rankforge-student-dashboard");
+  if(!root) return;
+
+  const m=mastery();
+
+  const mistakes=Array.isArray(m.mistakes)?m.mistakes:[];
+  const mastered=Array.isArray(m.mastered)?m.mastered:[];
+  const retries=Array.isArray(m.retries)?m.retries:[];
+  const improvement=Array.isArray(m.improvement)?m.improvement:[];
+
+  const hist=history();
+
+  const correctRetries=improvement.filter(x=>x.correct).length;
+  const retryRate=improvement.length
+    ? Math.round(correctRetries/improvement.length*100)
+    : 0;
+
+  let totalTests=hist.length;
+  let totalQuestions=0;
+  let totalCorrect=0;
+
+  for(const t of hist){
+    const total=Number(
+      t.totalQuestions ??
+      t.total ??
+      t.questionCount ??
+      (Array.isArray(t.questions)?t.questions.length:0)
+    )||0;
+
+    const correct=Number(
+      t.correct ??
+      t.correctAnswers ??
+      t.score ??
+      0
+    )||0;
+
+    totalQuestions+=total;
+    totalCorrect+=Math.min(correct,total||correct);
+  }
+
+  const accuracy=totalQuestions
+    ? Math.round(totalCorrect/totalQuestions*100)
+    : 0;
+
+  const topicMap={};
+
+  for(const q of mistakes){
+    const topic=
+      q.topic ||
+      q.chapter ||
+      q.concept ||
+      q.subject ||
+      "Unclassified";
+
+    topicMap[topic]=(topicMap[topic]||0)+1;
+  }
+
+  const weak=Object.entries(topicMap)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,5);
+
+  const weakHTML=weak.length
+    ? weak.map(([topic,count])=>`
+      <div class="rf-sd-row">
+        <span>${esc(topic)}</span>
+        <strong>${count}</strong>
+      </div>
+    `).join("")
+    : `<div class="rf-sd-empty">No active weak topics yet.</div>`;
+
+  const retryHTML=retries.length
+    ? retries.slice(0,5).map(q=>`
+      <div class="rf-sd-row">
+        <span>${esc(q.topic||q.concept||"Mistake")}</span>
+        <strong>${Number(q.retryCount||0)}×</strong>
+      </div>
+    `).join("")
+    : `<div class="rf-sd-empty">No retry-due mistakes.</div>`;
+
+  const recent=mistakes.slice(-5).reverse();
+
+  const recentHTML=recent.length
+    ? recent.map(q=>`
+      <div class="rf-sd-row">
+        <span>${esc(
+          q.question ||
+          q.topic ||
+          q.concept ||
+          "Question"
+        ).slice(0,90)}</span>
+        <strong>${esc(q.status||"active")}</strong>
+      </div>
+    `).join("")
+    : `<div class="rf-sd-empty">Mistake Book is clear.</div>`;
+
+  root.innerHTML=`
+    <section class="rf-student-dashboard">
+      <div class="rf-sd-grid">
+
+        <div class="rf-sd-card">
+          <div class="rf-sd-title">Active Mistakes</div>
+          <div class="rf-sd-value">${mistakes.length}</div>
+          <div class="rf-sd-sub">Questions needing attention</div>
+        </div>
+
+        <div class="rf-sd-card">
+          <div class="rf-sd-title">Mastered</div>
+          <div class="rf-sd-value">${mastered.length}</div>
+          <div class="rf-sd-sub">Mistakes successfully improved</div>
+        </div>
+
+        <div class="rf-sd-card">
+          <div class="rf-sd-title">Retry Due</div>
+          <div class="rf-sd-value">${retries.length}</div>
+          <div class="rf-sd-sub">Practice again</div>
+        </div>
+
+        <div class="rf-sd-card">
+          <div class="rf-sd-title">Improvement</div>
+          <div class="rf-sd-value">${retryRate}%</div>
+          <div class="rf-sd-sub">
+            ${correctRetries}/${improvement.length||0} retry attempts correct
+          </div>
+          <div class="rf-sd-progress">
+            <span style="width:${retryRate}%"></span>
+          </div>
+        </div>
+
+        <div class="rf-sd-card rf-sd-wide">
+          <div class="rf-sd-title">Weak Topics</div>
+          ${weakHTML}
+        </div>
+
+        <div class="rf-sd-card">
+          <div class="rf-sd-title">Test Performance</div>
+          <div class="rf-sd-value">${accuracy}%</div>
+          <div class="rf-sd-sub">
+            ${totalCorrect}/${totalQuestions} questions
+            · ${totalTests} tests
+          </div>
+          <div class="rf-sd-progress">
+            <span style="width:${accuracy}%"></span>
+          </div>
+        </div>
+
+        <div class="rf-sd-card">
+          <div class="rf-sd-title">Retry Queue</div>
+          ${retryHTML}
+        </div>
+
+        <div class="rf-sd-card rf-sd-wide">
+          <div class="rf-sd-title">Recent Mistakes</div>
+          ${recentHTML}
+        </div>
+
+      </div>
+    </section>
+  `;
+}
+
+function mount(){
+  if(document.getElementById("rankforge-student-dashboard")) return;
+
+  const host=
+    document.querySelector("[data-dashboard-content]") ||
+    document.querySelector(".dashboard-content") ||
+    document.querySelector("main") ||
+    document.body;
+
+  if(!host) return;
+
+  const root=document.createElement("div");
+  root.id="rankforge-student-dashboard";
+
+  if(host===document.body){
+    root.style.margin="20px";
+    document.body.prepend(root);
+  }else{
+    host.prepend(root);
+  }
+
+  build();
+}
+
+window.RankForgeStudentDashboard={
+  version:"RANKFORGE_STUDENT_DASHBOARD_V1",
+  refresh:build,
+  stats:function(){
+    const m=mastery();
+    const imp=Array.isArray(m.improvement)?m.improvement:[];
+    const correct=imp.filter(x=>x.correct).length;
+
+    return {
+      activeMistakes:Array.isArray(m.mistakes)?m.mistakes.length:0,
+      mastered:Array.isArray(m.mastered)?m.mastered.length:0,
+      retryDue:Array.isArray(m.retries)?m.retries.length:0,
+      improvementRate:imp.length
+        ? Math.round(correct/imp.length*100)
+        : 0
+    };
+  }
+};
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",mount);
+}else{
+  mount();
+}
+
+window.addEventListener(
+  "rankforge-mastery-updated",
+  build
+);
+
+window.addEventListener(
+  "storage",
+  function(e){
+    if(e.key===KEY || !e.key) build();
+  }
+);
+})();
+</script>
+
 </body>
 </html>
