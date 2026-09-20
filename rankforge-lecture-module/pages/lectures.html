@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RankForge Lectures</title>
+<link rel="stylesheet" href="../components/lecture-module.css">
+</head>
+<body>
+
+<main class="rf-lecture-app">
+  <header class="hero">
+    <div>
+      <span class="badge">RANKFORGE</span>
+      <h1>Lectures</h1>
+      <p>Learn → Practice → Revise → Improve</p>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div><b id="subjects">0</b><span>Subjects</span></div>
+    <div><b id="chapters">0</b><span>Chapters</span></div>
+    <div><b id="lectures">0</b><span>Lectures</span></div>
+    <div><b id="progress">0%</b><span>Progress</span></div>
+  </section>
+
+  
+<section class="lecture-ai-card">
+  <div class="ai-heading">
+    <div>
+      <span class="ai-badge">🤖 AI LEARNING</span>
+      <h2>Explain this concept</h2>
+      <p>Lecture context → concept explanation → NCERT focus → trap awareness</p>
+    </div>
+  </div>
+
+  <textarea
+    id="aiConcept"
+    class="ai-input"
+    rows="3"
+    placeholder="Ask about a concept from this lecture..."
+  ></textarea>
+
+  <button id="aiExplainBtn" class="ai-explain-btn">
+    🤖 Explain with AI
+  </button>
+
+  <div id="aiResult" class="ai-result">
+    <div class="ai-result-title">AI explanation</div>
+    <p>Choose a lecture concept to begin.</p>
+  </div>
+</section>
+
+
+<section class="ai-learning-loop">
+  <div class="loop-head">
+    <span class="ai-badge">🧠 AI LEARNING LOOP</span>
+    <h2>Learn → Practice → Improve</h2>
+    <p>Explanation ke baad concept ko practice aur revision se reinforce karo.</p>
+  </div>
+
+  <div class="loop-grid">
+    <button class="loop-card" data-loop="ncert">
+      <span>📖</span>
+      <b>NCERT Key Points</b>
+      <small>Important facts & concepts</small>
+    </button>
+
+    <button class="loop-card" data-loop="trap">
+      <span>⚠️</span>
+      <b>Common Traps</b>
+      <small>NEET-style confusion points</small>
+    </button>
+
+    <button class="loop-card" data-loop="practice">
+      <span>✍️</span>
+      <b>Practice</b>
+      <small>Test the concept</small>
+    </button>
+
+    <button class="loop-card" data-loop="revision">
+      <span>🔄</span>
+      <b>Quick Revision</b>
+      <small>Recall the concept later</small>
+    </button>
+  </div>
+
+  <div id="loopResult" class="loop-result">
+    Select a learning action.
+  </div>
+</section>
+
+
+<section id="lecturePractice" class="lecture-practice-panel">
+  <div class="practice-head">
+    <span>✍️ PRACTICE</span>
+    <h2>Practice this concept</h2>
+    <p id="practiceContext">Select a lecture concept to start.</p>
+  </div>
+
+  <div class="practice-actions">
+    <button id="startLecturePractice">Start Practice</button>
+    <button id="openQuestionBank">Question Bank</button>
+  </div>
+
+  <div id="practiceStatus" class="practice-status">
+    Lecture-linked practice will use the existing RankForge question system.
+  </div>
+</section>
+
+<section class="learning-tools">
+    <div id="continueBox" class="continue-box"></div>
+
+    <input
+      id="lectureSearch"
+      class="lecture-search"
+      type="search"
+      placeholder="Search lectures, chapters or subjects..."
+      autocomplete="off"
+    >
+
+    <div id="subjectFilters" class="subject-filters"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>My Learning</h2>
+      <span id="status">Ready</span>
+    </div>
+    <div id="lectureGrid" class="lecture-grid"></div>
+  </section>
+</main>
+
+<script src="../data/lecture-data.js"></script>
+<script src="../components/lecture-ai.js"></script>
+<script src="../components/lecture-practice.js"></script>
+<script src="../components/lecture-result.js"></script>
+<script src="../components/rankforge-ai-context.js"></script>
+<script src="../components/rankforge-ai-handoff.js"></script>
+<script src="../components/lecture-module.js"></script>
+</body>
+</html>
