@@ -540,11 +540,22 @@
       'style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:12px"></div>';
 
     const anchor =
+      document.querySelector(".wrap") ||
       document.querySelector("main") ||
       document.querySelector(".container") ||
       document.body;
 
-    anchor.appendChild(section);
+    const hero = anchor && anchor.querySelector(".hero");
+
+    if (hero) {
+      hero.insertAdjacentElement("afterend", section);
+    } else {
+      anchor.appendChild(section);
+    }
+
+    section.style.setProperty("display", "block", "important");
+    section.style.setProperty("visibility", "visible", "important");
+    section.style.setProperty("opacity", "1", "important");
 
     el("rfBio2700Import").onclick = async function () {
       const input = el("rfBio2700Pdf");
