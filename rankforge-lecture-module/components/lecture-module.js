@@ -200,6 +200,22 @@
 
   if (!btn || !input || !result) return;
 
+  const esc = value =>
+    String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+
+  const list = (title, items) => {
+    if (!Array.isArray(items) || !items.length) return "";
+    return `
+      <section class="ncert-ai-section">
+        <h4>${esc(title)}</h4>
+        <ul>${items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+      </section>`;
+  };
+
   btn.addEventListener("click", async function () {
     const topic = input.value.trim();
 
@@ -211,21 +227,45 @@
     }
 
     btn.disabled = true;
-    btn.textContent = "🤖 Thinking...";
+    btn.textContent = "🤖 Dissecting NCERT...";
 
     result.innerHTML =
-      '<div class="ai-result-title">AI explanation</div>' +
-      '<p>Preparing lecture context...</p>';
+      '<div class="ai-result-title">📚 NCERT 360° Dissection</div>' +
+      '<p>Chapter context analyse ho raha hai...</p>';
 
     const answer = await window.RankForgeLectureAI.explain(topic);
 
-    result.innerHTML =
-      '<div class="ai-result-title">' +
-      (answer.source === "ai" ? "🤖 AI Explanation" : "🤖 AI Ready") +
-      '</div>' +
-      '<p>' +
-      String(answer.explanation || "").replace(/</g, "&lt;") +
-      '</p>';
+    if (!answer.ok) {
+      result.innerHTML =
+        '<div class="ai-result-title">AI explanation</div>' +
+        '<p>' + esc(answer.message || "Unable to explain.") + '</p>';
+      btn.disabled = false;
+      btn.textContent = "🤖 Explain with AI";
+      return;
+    }
+
+    result.innerHTML = `
+      <div class="ai-result-title">
+        ${answer.source === "ai" ? "🧠 NCERT 360° Nichod" : "⚠️ NCERT 360° AI"}
+      </div>
+
+      <p><strong>Core Explanation</strong></p>
+      <p>${esc(answer.explanation)}</p>
+
+      ${list("📖 NCERT Focus", answer.ncertFocus)}
+      ${list("🔤 Definitions & Terminology", answer.definitions)}
+      ${list("📐 Formulae / Laws / Principles", answer.formulas)}
+      ${list("⚗️ Reactions / Chemical Points", answer.reactions)}
+      ${list("🖼️ Diagrams / Labels / Tables", answer.diagrams)}
+      ${list("📘 NCERT Examples", answer.examples)}
+      ${list("⚠️ Exceptions / Special Cases", answer.exceptions)}
+      ${list("🎯 NEET Traps", answer.traps)}
+      ${list("🧩 Misconceptions", answer.misconceptions)}
+      ${list("✍️ Practice Direction", answer.practice)}
+      ${list("🔄 Quick Revision", answer.revision)}
+
+      <small>Source mode: ${esc(answer.verification)}</small>
+    `;
 
     btn.disabled = false;
     btn.textContent = "🤖 Explain with AI";

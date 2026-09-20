@@ -211,6 +211,245 @@ export default {
 
     const url = new URL(request.url);
 
+    if (url.pathname === "/api/lecture-ai/explain") {
+      if (request.method !== "POST") {
+        return response(
+          { ok: false, error: "POST required" },
+          405,
+          origin,
+          allowed
+        );
+      }
+
+      if (!env.OPENAI_API_KEY) {
+        return response(
+          { ok: false, error: "AI provider secret is not configured" },
+          503,
+          origin,
+          allowed
+        );
+      }
+
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return response(
+          { ok: false, error: "Invalid JSON request" },
+          400,
+          origin,
+          allowed
+        );
+      }
+
+      const topic = clean(body.topic);
+      const lecture = body.lecture || {};
+      const subject = clean(lecture.subject) || "NEET";
+      const chapter = clean(lecture.chapter) || "Current chapter";
+      const title = clean(lecture.title) || "Current lecture";
+      const transcript = String(body.transcriptContext || "").slice(0, 18000);
+
+      if (!topic) {
+        return response(
+          { ok: false, error: "Topic is required" },
+          400,
+          origin,
+          allowed
+        );
+      }
+
+      const NCERT_360_PROMPT = `
+You are RankForge AI NCERT 360° Dissection Engine.
+
+Your job is to dissect the requested NCERT concept deeply and systematically for NEET preparation.
+
+SUBJECT:
+${subject}
+
+CHAPTER:
+${chapter}
+
+LECTURE:
+${title}
+
+REQUESTED TOPIC:
+${topic}
+
+PRIMARY RULE:
+NCERT-first. Do not present unsupported information as an NCERT fact.
+
+The student wants a complete structured "NCERT Nichod / 360° Dissection":
+1. Core explanation
+2. NCERT focus points
+3. Definitions and exact terminology/concepts
+4. Formulae, laws, principles and conditions where relevant
+5. Chemical reactions, trends and exceptions where relevant
+6. Diagrams, labels, tables and figure-level learning points where relevant
+7. NCERT examples/applications
+8. Exceptions and special cases
+9. NEET traps and confusing distinctions
+10. Common misconceptions
+11. Practice directions
+12. Quick revision points
+
+SUBJECT-SPECIFIC DEPTH:
+
+PHYSICS:
+- concepts and physical meaning
+- laws and assumptions
+- formula meaning and units
+- derivation logic where relevant
+- limiting cases
+- graphs and diagrams
+- NCERT examples/applications
+- common numerical traps
+- sign/convention mistakes
+
+CHEMISTRY:
+- definitions
+- equations and conditions
+- trends
+- mechanisms only where appropriate
+- exceptions
+- tables/data patterns
+- physical chemistry formula meaning and units
+- inorganic NCERT facts
+- organic reaction logic
+- common statement traps
+
+BIOLOGY:
+- NCERT terminology
+- line/concept-level facts from supplied context
+- classifications
+- processes and sequences
+- diagrams and labels
+- tables and comparisons
+- examples
+- exceptions
+- statement-based NEET traps
+- closely related concepts that students confuse
+
+IMPORTANT SOURCE RULE:
+The supplied lecture/transcript context is the strongest local source.
+Do not invent a page number, figure number, quotation or exact NCERT wording.
+If the supplied context does not contain enough evidence for an exact NCERT-specific claim, clearly mark it as "needs NCERT source verification" rather than pretending it is verified.
+Do not reproduce long copyrighted textbook passages. Summarize and explain.
+
+Return JSON ONLY in exactly this shape:
+{
+  "explanation": "string",
+  "ncertFocus": ["string"],
+  "definitions": ["string"],
+  "formulas": ["string"],
+  "reactions": ["string"],
+  "diagrams": ["string"],
+  "examples": ["string"],
+  "exceptions": ["string"],
+  "traps": ["string"],
+  "misconceptions": ["string"],
+  "practice": ["string"],
+  "revision": ["string"],
+  "verification": "string"
+}
+
+Keep every list focused and useful. Do not pad with generic statements.
+`;
+
+      const upstream = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: env.OPENAI_MODEL,
+            temperature: 0.25,
+            messages: [
+              {
+                role: "system",
+                content: NCERT_360_PROMPT
+              },
+              {
+                role: "user",
+                content:
+                  "Authorized lecture/NCERT context:\\n" +
+                  (transcript || "No lecture transcript supplied. Use NCERT-first knowledge but mark exact-source claims as needing verification.")
+              }
+            ],
+            response_format: {
+              type: "json_object"
+            }
+          })
+        }
+      );
+
+      if (!upstream.ok) {
+        const errorText = await upstream.text();
+        return response(
+          {
+            ok: false,
+            error: "AI provider request failed",
+            providerStatus: upstream.status,
+            detail: errorText.slice(0, 1000)
+          },
+          502,
+          origin,
+          allowed
+        );
+      }
+
+      const ai = await upstream.json();
+      const rawText = ai?.choices?.[0]?.message?.content || "";
+
+      let parsed;
+      try {
+        parsed = JSON.parse(rawText);
+      } catch {
+        return response(
+          { ok: false, error: "AI returned invalid JSON" },
+          502,
+          origin,
+          allowed
+        );
+      }
+
+      const arr = key =>
+        Array.isArray(parsed[key])
+          ? parsed[key].map(x => clean(x)).filter(Boolean).slice(0, 20)
+          : [];
+
+      return response(
+        {
+          ok: true,
+          source: "secure-worker",
+          mode: "NCERT_360_DISSECTION",
+          subject,
+          chapter,
+          topic,
+          explanation: clean(parsed.explanation),
+          ncertFocus: arr("ncertFocus"),
+          definitions: arr("definitions"),
+          formulas: arr("formulas"),
+          reactions: arr("reactions"),
+          diagrams: arr("diagrams"),
+          examples: arr("examples"),
+          exceptions: arr("exceptions"),
+          traps: arr("traps"),
+          misconceptions: arr("misconceptions"),
+          practice: arr("practice"),
+          revision: arr("revision"),
+          verification:
+            clean(parsed.verification) ||
+            "NCERT-first; exact source claims require supplied NCERT context"
+        },
+        200,
+        origin,
+        allowed
+      );
+    }
+
     if (url.pathname !== "/api/ai/generate") {
       return response(
         {

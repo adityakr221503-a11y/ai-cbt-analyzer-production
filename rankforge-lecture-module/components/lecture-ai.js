@@ -1,7 +1,11 @@
 (function () {
   "use strict";
 
-  const AI_ENDPOINT = "/api/lecture-ai/explain";
+  const AI_ENDPOINT =
+    window.RANKFORGE_LECTURE_AI_ENDPOINT ||
+    window.RANKFORGE_AI_ENDPOINT ||
+    "/api/lecture-ai/explain";
+
   const STORAGE = "rankforgeLectureAIContextV1";
 
   function getContext() {
@@ -43,14 +47,6 @@
         };
       }
 
-      /*
-       * Secure future flow:
-       * Browser -> authenticated server endpoint
-       * Server -> authorized AI provider
-       *
-       * No API key is stored in this frontend.
-       */
-
       try {
         const response = await fetch(AI_ENDPOINT, {
           method: "POST",
@@ -58,6 +54,7 @@
           credentials: "include",
           body: JSON.stringify({
             action: "explain",
+            mode: "NCERT_360_DISSECTION",
             mistakeMode: /mistake|wrong|re-explain/i.test(topic),
             topic: topic.trim(),
             lecture: {
@@ -66,25 +63,39 @@
               subject: context.subject,
               chapter: context.chapter
             },
-            transcriptContext: context.transcript || ""
+            transcriptContext: String(context.transcript || "").slice(0, 18000)
           })
         });
 
-        if (!response.ok) throw new Error("AI endpoint unavailable");
+        if (!response.ok) {
+          throw new Error("AI endpoint HTTP " + response.status);
+        }
 
         const data = await response.json();
 
         return {
           ok: true,
           source: "ai",
-          explanation: data.explanation || data.answer || ""
+          explanation: data.explanation || data.answer || "",
+          ncertFocus: Array.isArray(data.ncertFocus) ? data.ncertFocus : [],
+          definitions: Array.isArray(data.definitions) ? data.definitions : [],
+          formulas: Array.isArray(data.formulas) ? data.formulas : [],
+          reactions: Array.isArray(data.reactions) ? data.reactions : [],
+          diagrams: Array.isArray(data.diagrams) ? data.diagrams : [],
+          examples: Array.isArray(data.examples) ? data.examples : [],
+          exceptions: Array.isArray(data.exceptions) ? data.exceptions : [],
+          traps: Array.isArray(data.traps) ? data.traps : [],
+          misconceptions: Array.isArray(data.misconceptions) ? data.misconceptions : [],
+          practice: Array.isArray(data.practice) ? data.practice : [],
+          revision: Array.isArray(data.revision) ? data.revision : [],
+          verification: data.verification || "NCERT-first AI analysis"
         };
       } catch (_) {
         return {
           ok: true,
           source: "local",
           explanation:
-            "AI explanation is ready to connect. Once the secure AI endpoint and authorized lecture transcript are available, this section will generate a concept explanation, NCERT focus points, common traps and practice guidance."
+            "NCERT 360° AI endpoint abhi reachable nahi hai. Secure Worker deploy hone ke baad chapter/topic ka complete structured NCERT dissection yahin generate hoga."
         };
       }
     }
