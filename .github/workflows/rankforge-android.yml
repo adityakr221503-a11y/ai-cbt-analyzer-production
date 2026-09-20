@@ -1,10 +1,7 @@
-name: RankForge Android AAB
+name: RankForge Android Build
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
