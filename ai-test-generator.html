@@ -7,7 +7,9 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#0f172a}header{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 20px}.wrap{max-width:1000px;margin:auto}.brand{font-size:21px;font-weight:800}.brand span{color:#2563eb}.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin:18px 0;box-shadow:0 4px 14px rgba(15,23,42,.05)}h1{margin:8px 0;font-size:28px}.muted{color:#64748b}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.field label{display:block;font-weight:700;margin-bottom:7px}.field select,.field input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px;background:#fff}.btn{border:0;border-radius:11px;padding:13px 17px;font-weight:800;cursor:pointer}.primary{background:#2563eb;color:#fff}.secondary{background:#e2e8f0;color:#0f172a}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{padding:14px;background:#f8fafc;border-radius:12px}.stat b{display:block;font-size:22px}.status{padding:12px;border-radius:10px;background:#eff6ff;color:#1e40af}.warning{background:#fff7ed;color:#9a3412}.success{background:#f0fdf4;color:#166534}ul{padding-left:20px}.actions{display:flex;gap:10px;flex-wrap:wrap}@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:24px}}
 </style>
+<script src="./rank-booster/ai-question-engine.js"></script>
 <script src="./rank-booster/unified-question-bank.js"></script>
+<script src="./rank-booster/rankforge-originality-engine.js"></script>
 </head>
 <body>
 <header><div class="wrap"><div class="brand">🏆 Ranker <span>Pro</span></div></div></header>
@@ -34,7 +36,6 @@
 <section class="card" id="preview" style="display:none"><h2>Generated Test</h2><div id="summary"></div><div class="actions" style="margin-top:14px"><button class="btn primary" id="start">Start Test</button></div></section>
 </main>
 <script src="./test180-questions.js"></script>
-<script src="./rank-booster/rankforge-originality-engine.js"></script>
 <script>
 (function(){
 'use strict';
