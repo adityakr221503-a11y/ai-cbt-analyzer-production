@@ -2,9 +2,7 @@
   "use strict";
 
   const AI_ENDPOINT =
-    window.RANKFORGE_LECTURE_AI_ENDPOINT ||
-    window.RANKFORGE_AI_ENDPOINT ||
-    "/api/lecture-ai/explain";
+  "https://rankforge-ai.adityakr221503.workers.dev/api/lecture-ai/explain";
 
   const STORAGE = "rankforgeLectureAIContextV1";
 
