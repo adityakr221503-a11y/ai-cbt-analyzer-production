@@ -1,34 +1,28 @@
 
+# Legacy PDF owner artifacts kept locally for recovery/testing
+# Local dependencies
+# Local owner-ingestion working artifacts
+# Local runtime files
+# Python cache
 # RankForge local backups / recovery snapshots
-.before-*
-*.before-*
-*.pre-*
 *.backup*
 *.bak
-
-# Local runtime files
-*.pid
+*.before-*
 *.log
-
-# Python cache
-__pycache__/
+*.pid
+*.pre-*
 *.pyc
-
-# Local owner-ingestion working artifacts
+.before-*
+__pycache__/
+node_modules/
 owner-imports/
-question-data/
-
-
-# Legacy PDF owner artifacts kept locally for recovery/testing
 pdf-cbt-production-engine-v10-backup-*.js
 pdf-cbt-production-engine-v10-verified-backup-*.js
 pdf-cbt-production-engine-v11-backup-*.js
 pdf-owner-android-test.html
 pdf-owner-test.html
+question-data/
 rankforge-owner-pdf-engine-v5.js
 rankforge-owner-pdf-extractor.py
 rankforge-owner-pdf-inventory-v1.json
 rankforge-selected-module-master-v2.json
-
-# Local dependencies
-node_modules/
