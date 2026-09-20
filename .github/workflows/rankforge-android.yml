@@ -73,9 +73,20 @@ jobs:
         working-directory: android-wrapper/android
         run: ./gradlew bundleRelease
 
+      - name: Build Debug APK
+        working-directory: android-wrapper/android
+        run: ./gradlew assembleDebug
+
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: rankforge-android-aab
           path: android-wrapper/android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: rankforge-android-apk
+          path: android-wrapper/android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
