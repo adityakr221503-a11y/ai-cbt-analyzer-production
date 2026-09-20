@@ -2,15 +2,6 @@
   "use strict";
 
   const DATA = window.RANKFORGE_LECTURE_DATA || {subjects:[]};
-
-  function setCurrentLectureContext(lecture) {
-    if (
-      window.RankForgeLectureAI &&
-      typeof window.RankForgeLectureAI.setLectureContext === "function"
-    ) {
-      window.RankForgeLectureAI.setLectureContext(lecture);
-    }
-  }
   const STORAGE = "rankforgeLectureProgressV1";
 
   let state = {
@@ -51,8 +42,6 @@
   }
 
   function toggleDone(id) {
-    const lecture = allLectures().find(x => x.id === id);
-    if (lecture) setCurrentLectureContext(lecture);
     if (isDone(id)) delete state.progress[id];
     else state.progress[id] = true;
     save();
@@ -167,10 +156,6 @@
 
     const cont = e.target.closest("[data-continue]");
     if (cont) {
-      const lecture = allLectures().find(
-        x => x.id === cont.dataset.continue
-      );
-      if (lecture) setCurrentLectureContext(lecture);
       const el = document.querySelector(
         `[data-toggle="${cont.dataset.continue}"]`
       );

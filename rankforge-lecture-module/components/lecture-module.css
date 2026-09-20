@@ -427,6 +427,7 @@ body {
     grid-template-columns: 1fr;
   }
 }
+<<<<<<< HEAD
 
 
 .lecture-practice-panel {
@@ -551,3 +552,5 @@ body {
     grid-template-columns: 1fr;
   }
 }
+=======
+>>>>>>> parent of 62cb787 (Connect lecture learning to RankForge practice)

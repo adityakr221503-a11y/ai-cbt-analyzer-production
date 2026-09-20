@@ -26,9 +26,7 @@ const CORE = [
   "./study-vault/",
   "./study-vault/index.html",
   "./study-vault/study-vault.css",
-  "./study-vault/study-vault.js",
-  "./rankforge-lecture-module/components/rankforge-ai-context.js",
-  "./rankforge-lecture-module/components/rankforge-ai-handoff.js",
+  "./study-vault/study-vault.js"
 ];
 
 self.addEventListener("install", event => {

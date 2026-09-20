@@ -160,11 +160,3 @@
     getQuestions
   };
 })();
-
-document.addEventListener("rankforge:lecture-practice-launched", function () {
-  try {
-    window.RankForgeAIMentorContext?.publish({
-      event: "practice-launched"
-    });
-  } catch (_) {}
-});
