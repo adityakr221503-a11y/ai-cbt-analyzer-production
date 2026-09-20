@@ -269,7 +269,8 @@ function launchRankForgeCBT(questions, title = "RankForge AI Test") {
     throw new Error("RankForge produced no CBT-compatible questions.");
   }
 
-  localStorage.setItem("CBT_ACTIVE_QUESTIONS", JSON.stringify(normalized));
+  sessionStorage.setItem("CBT_ACTIVE_QUESTIONS", JSON.stringify(normalized));
+localStorage.setItem("CBT_ACTIVE_QUESTIONS", JSON.stringify(normalized));
   localStorage.setItem("CBT_TEST_TITLE", title);
   localStorage.setItem("RANKFORGE_ACTIVE_TEST", JSON.stringify({
     title,
