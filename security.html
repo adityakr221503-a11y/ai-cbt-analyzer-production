@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<title>RankForge — Security</title>
+<style>
+body{margin:0;background:#f6f7fb;color:#111827;font-family:system-ui,sans-serif}
+main{max-width:720px;margin:auto;padding:22px 16px 40px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:20px;margin-top:14px}
+h1{margin:0 0 6px}.muted{color:#6b7280;font-size:13px;line-height:1.6}
+a{color:inherit;text-decoration:none}.back{display:inline-block;margin-bottom:18px;font-weight:800}
+.badge{display:inline-block;background:#eef2ff;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800}
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="./">← RankForge</a>
+<h1>Security</h1>
+<p class="muted">Security information for the student-facing RankForge app.</p>
+<div class="card">
+<span class="badge">LOCAL-FIRST</span>
+<h3>Local study state</h3>
+<p class="muted">A large part of the app's study state is kept locally on the device/browser.</p>
+</div>
+<div class="card">
+<span class="badge">PROTECTED MODULES</span>
+<h3>Owner controls</h3>
+<p class="muted">Owner-only modules are separated from normal student workflows. Internal diagnostics are kept out of the student interface.</p>
+</div>
+<div class="card">
+<span class="badge">IMPORTANT</span>
+<h3>Authentication</h3>
+<p class="muted">A visible security page does not itself create account authentication. Real login, server-side authorization and encrypted backend storage require a properly configured backend.</p>
+</div>
+</main>
+</body>
+</html>

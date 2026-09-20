@@ -128,6 +128,30 @@ a{text-decoration:none;color:inherit}
 }
 </style>
 
+<style id="rankforge-android-nav-stability-v3">
+html,body{min-height:100%;overscroll-behavior-y:none}
+.app{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+.nav{
+ position:fixed !important;
+ left:0 !important;
+ right:0 !important;
+ bottom:0 !important;
+ display:grid !important;
+ visibility:visible !important;
+ opacity:1 !important;
+ z-index:2147483647 !important;
+ transform:translate3d(0,0,0) !important;
+ -webkit-transform:translate3d(0,0,0) !important;
+ will-change:transform;
+}
+.nav button{
+ visibility:visible !important;
+ opacity:1 !important;
+ min-height:56px;
+ touch-action:manipulation;
+}
+</style>
+
 <style id="RANKFORGE_HIDE_DEV_AUDIT_V1">
 .rankforge-integration-audit,
 .runtime-health-debug,
@@ -285,10 +309,10 @@ a{text-decoration:none;color:inherit}
 
 <header class="top">
  <div class="brand">
-  <div class="logo">R</div>
+  <div class="logo" aria-label="RankForge">RF</div>
   <div>
    <h1>RankForge AI</h1>
-   <p>Topper-first NEET learning system</p>
+   <p>LEARN • PRACTICE • RISE</p>
   </div>
  </div>
 
@@ -338,6 +362,25 @@ a{text-decoration:none;color:inherit}
 
   </div>
  </div>
+
+
+ <section id="rankforge-security-privacy-v1" class="section">
+  <h3>Security & Privacy</h3>
+
+  <div class="grid">
+    <a class="card" href="privacy.html">
+      <div class="icon">🛡️</div>
+      <strong>Privacy</strong>
+      <span>Your study data stays under your control. Review the privacy information.</span>
+    </a>
+
+    <a class="card" href="security.html">
+      <div class="icon">🔐</div>
+      <strong>Security</strong>
+      <span>Learn how RankForge handles local data, app access and protected modules.</span>
+    </a>
+  </div>
+ </section>
 
 
  <div class="section">
@@ -811,6 +854,46 @@ if("serviceWorker" in navigator){
 
 }
 
+})();
+</script>
+
+<script id="rankforge-android-nav-stability-script-v3">
+(function(){
+  "use strict";
+
+  function repair(){
+    var n=document.querySelector(".nav");
+    if(!n)return;
+
+    n.style.setProperty("position","fixed","important");
+    n.style.setProperty("left","0","important");
+    n.style.setProperty("right","0","important");
+    n.style.setProperty("bottom","0","important");
+    n.style.setProperty("display","grid","important");
+    n.style.setProperty("visibility","visible","important");
+    n.style.setProperty("opacity","1","important");
+    n.style.setProperty("z-index","2147483647","important");
+    n.style.setProperty("transform","translate3d(0,0,0)","important");
+    n.style.setProperty("-webkit-transform","translate3d(0,0,0)","important");
+  }
+
+  function boot(){
+    repair();
+
+    ["pageshow","resume","visibilitychange","resize","orientationchange"].forEach(function(e){
+      window.addEventListener(e,function(){
+        repair();
+        setTimeout(repair,150);
+        setTimeout(repair,700);
+      },{passive:true});
+    });
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",boot,{once:true});
+  }else{
+    boot();
+  }
 })();
 </script>
 
