@@ -33,6 +33,7 @@
 <section class="card" id="preview" style="display:none"><h2>Generated Test</h2><div id="summary"></div><div class="actions" style="margin-top:14px"><button class="btn primary" id="start">Start Test</button></div></section>
 </main>
 <script src="./test180-questions.js"></script>
+<script src="./rank-booster/rankforge-originality-engine.js"></script>
 <script>
 (function(){
 'use strict';
@@ -167,16 +168,37 @@ async function generate(){
         })
       );
 
-      const freshAI = [];
-      for(const q of aiQuestions){
-        const key = q.question.toLowerCase().replace(/\s+/g,' ').trim();
-        if(seen.has(key)) continue;
-        seen.add(key);
-        freshAI.push(q);
+      let freshAI = [];
+
+      if(window.RankForgeOriginality){
+        const gate = window.RankForgeOriginality.filter(
+          aiQuestions,
+          existing,
+          0.62
+        );
+
+        freshAI = gate.accepted;
+
+        console.log(
+          'RankForge originality gate:',
+          {
+            accepted: gate.acceptedCount,
+            rejected: gate.rejectedCount
+          }
+        );
+      }else{
+        for(const q of aiQuestions){
+          const key = q.question.toLowerCase().replace(/\s+/g,' ').trim();
+          if(seen.has(key)) continue;
+          seen.add(key);
+          freshAI.push(q);
+        }
       }
 
       if(!freshAI.length){
-        throw new Error('AI questions duplicate existing bank questions');
+        throw new Error(
+          'AI candidates failed RankForge originality gate'
+        );
       }
 
       if(bankApi && typeof bankApi.saveAI === 'function'){
