@@ -1,6 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
 <script src="./test180-questions.js"></script>
+
+<script>
+/* ============================================================
+   RANKFORGE BIOLOGY TEST-SERIES MODULE BRIDGE
+   Existing Module Upload -> 30 Tests x 90 Questions
+   Original PDF wording preserved; no AI rewording.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  const BIO_MODULE = "NEET Biology Test Series";
+
+  function clean(s) {
+    return String(s == null ? "" : s)
+      .replace(/\u00a0/g, " ")
+      .replace(/\r/g, "")
+      .replace(/[ \t]+/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function answerIndex(v) {
+    const x = String(v || "").trim().toLowerCase();
+    if (/^[abcd]$/.test(x)) return x.charCodeAt(0) - 97;
+    if (/^[1-4]$/.test(x)) return Number(x) - 1;
+    return null;
+  }
+
+  function detectTestSections(text) {
+    const src = clean(text);
+    const re = /(?:^|\n)\s*Test\s*[-–—]?\s*(\d{1,2})\s*\n/gi;
+    const hits = [];
+    let m;
+
+    while ((m = re.exec(src))) {
+      const n = Number(m[1]);
+      if (n >= 1 && n <= 30) {
+        hits.push({
+          test: n,
+          start: re.lastIndex
+        });
+      }
+    }
+
+    const out = [];
+    for (let i = 0; i < hits.length; i++) {
+      const end = i + 1 < hits.length
+        ? hits[i + 1].start
+        : src.length;
+
+      out.push({
+        test: hits[i].test,
+        text: src.slice(hits[i].start, end)
+      });
+    }
+
+    return out;
+  }
+
+  function parseOptions(block) {
+    const re = /(?:^|\s)\(?([a-d])\)?\s*[.)\-:]\s*/gi;
+    const hits = [];
+    let m;
+
+    while ((m = re.exec(block))) {
+      hits.push({
+        letter: m[1].toLowerCase(),
+        start: re.lastIndex,
+        marker: m.index
+      });
+    }
+
+    if (hits.length < 2) return null;
+
+    const options = [];
+
+    for (let i = 0; i < hits.length && options.length < 4; i++) {
+      const end = i + 1 < hits.length
+        ? hits[i + 1].marker
+        : block.length;
+
+      const value = block
+        .slice(hits[i].start, end)
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (value) {
+        options.push(value);
+      }
+    }
+
+    if (options.length < 2) return null;
+
+    return {
+      start: hits[0].marker,
+      options
+    };
+  }
+
+  function parseTestQuestions(testText, testNo) {
+    const src = clean(testText);
+
+    /*
+     * Question numbers restart at 1 for every test.
+     * Accept:
+     * 1.
+     * 1)
+     * 1-
+     * 1
+     */
+    const re = /(?:^|\s)(\d{1,2})\s*[.)-]\s+/g;
+    const hits = [];
+    let m;
+
+    while ((m = re.exec(src))) {
+      const n = Number(m[1]);
+
+      if (n >= 1 && n <= 90) {
+        hits.push({
+          number: n,
+          start: re.lastIndex
+        });
+      }
+    }
+
+    /* Keep the first ordered 1..90 sequence. */
+    const ordered = [];
+    let expected = 1;
+
+    for (const h of hits) {
+      if (h.number === expected) {
+        ordered.push(h);
+        expected++;
+        if (expected > 90) break;
+      }
+    }
+
+    const questions = [];
+
+    for (let i = 0; i < ordered.length; i++) {
+      const h = ordered[i];
+      const end = i + 1 < ordered.length
+        ? ordered[i + 1].start
+        : src.length;
+
+      const block = src.slice(h.start, end).trim();
+      const parsed = parseOptions(block);
+
+      if (!parsed) continue;
+
+      const qtext = block
+        .slice(0, parsed.start)
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (qtext.length < 5) continue;
+
+      questions.push({
+        id: "NEET-BIO-TS-" + testNo + "-Q" + h.number,
+        questionNumber: h.number,
+        text: qtext,
+        question: qtext,
+        options: parsed.options.slice(0, 4),
+
+        /* Filled later from the PDF's official answer-key pages. */
+        correctAnswer: "",
+        correctIndex: null,
+
+        subject: "Biology",
+        module: BIO_MODULE,
+        testNumber: testNo,
+        source: BIO_MODULE + " — Test " + testNo,
+
+        marks: 4,
+        negativeMarks: 1,
+
+        importedFromModule: true,
+        originalSourcePreserved: true
+      });
+    }
+
+    return questions;
+  }
+
+  function parseAnswerKeys(text) {
+    const src = clean(text);
+    const answerMap = new Map();
+
+    const testRe =
+      /ANSWER\s+KEY\s+TEST\s*[-–—]?\s*(\d{1,2})([\s\S]*?)(?=ANSWER\s+KEY\s+TEST\s*[-–—]?\s*\d{1,2}|$)/gi;
+
+    let tm;
+
+    while ((tm = testRe.exec(src))) {
+      const testNo = Number(tm[1]);
+      if (testNo < 1 || testNo > 30) continue;
+
+      const body = tm[2];
+
+      /*
+       * Reads:
+       * Qus. 1 2 3 ... 20
+       * Ans. b c a ...
+       */
+      const rowRe =
+        /Qus\.\s*([\d\s]+)\s+Ans\.?\s*([a-d](?:\s+[a-d])*(?:\s+|$))/gi;
+
+      let rm;
+
+      while ((rm = rowRe.exec(body))) {
+        const nums = rm[1].trim().split(/\s+/).map(Number);
+        const answers = rm[2].trim().split(/\s+/);
+
+        for (let i = 0; i < Math.min(nums.length, answers.length); i++) {
+          const qn = nums[i];
+          const ans = answers[i].toLowerCase();
+
+          if (qn >= 1 && qn <= 90 && /^[abcd]$/.test(ans)) {
+            answerMap.set(
+              testNo + ":" + qn,
+              ans
+            );
+          }
+        }
+      }
+    }
+
+    return answerMap;
+  }
+
+  function applyAnswerKeys(questions, answerMap) {
+    return questions.map(function (q) {
+      const key = q.testNumber + ":" + q.questionNumber;
+      const ans = answerMap.get(key);
+
+      if (ans) {
+        q.correctAnswer = ans.toUpperCase();
+        q.correctIndex = answerIndex(ans);
+      }
+
+      return q;
+    });
+  }
+
+  function uniqueQuestions(list) {
+    const seen = new Set();
+
+    return list.filter(function (q) {
+      const id = String(q.id);
+
+      if (seen.has(id)) return false;
+
+      seen.add(id);
+      return true;
+    });
+  }
+
+  async function importBiologyTestSeries(file) {
+    if (!file) throw new Error("No PDF selected.");
+
+    const text = await extractPDFText(file);
+
+    if (!text) {
+      throw new Error("PDF text extraction returned empty content.");
+    }
+
+    const sections = detectTestSections(text)
+      .filter(function (x) {
+        return x.test >= 1 && x.test <= 30;
+      });
+
+    if (sections.length < 30) {
+      throw new Error(
+        "Biology Test Series detected, but fewer than 30 test sections were found: " +
+        sections.length
+      );
+    }
+
+    /*
+     * Answer-key pages are at the end of this PDF.
+     * Parse them from the same original PDF text.
+     */
+    const answerMap = parseAnswerKeys(text);
+
+    let all = [];
+
+    sections.forEach(function (section) {
+      all = all.concat(
+        parseTestQuestions(section.text, section.test)
+      );
+    });
+
+    all = applyAnswerKeys(all, answerMap);
+    all = uniqueQuestions(all);
+
+    /*
+     * Preserve only genuine parsed questions.
+     * Do NOT generate/reword missing questions.
+     */
+    const keyed = all.filter(function (q) {
+      return q.correctIndex !== null &&
+             Array.isArray(q.options) &&
+             q.options.length >= 2;
+    });
+
+    /*
+     * Merge with the EXISTING Module Upload pool.
+     */
+    const existing = getPDFQuestionPool();
+    const map = new Map();
+
+    existing.forEach(function (q) {
+      if (q && q.id) map.set(String(q.id), q);
+    });
+
+    all.forEach(function (q) {
+      map.set(String(q.id), q);
+    });
+
+    const merged = Array.from(map.values());
+
+    savePDFQuestionPool(merged);
+    updatePoolStats();
+
+    /*
+     * Create module/test metadata for the existing module system.
+     */
+    const tests = [];
+
+    for (let t = 1; t <= 30; t++) {
+      const qs = all.filter(function (q) {
+        return Number(q.testNumber) === t;
+      });
+
+      tests.push({
+        id: "neet-biology-test-series-" + t,
+        title: "NEET Biology Test Series — Test " + t,
+        module: BIO_MODULE,
+        subject: "Biology",
+        testNumber: t,
+        duration: 60,
+        questionCount: qs.length,
+        questionIds: qs.map(function (q) {
+          return q.id;
+        })
+      });
+    }
+
+    localStorage.setItem(
+      "CBT_BIOLOGY_MODULE_TESTS",
+      JSON.stringify(tests)
+    );
+
+    localStorage.setItem(
+      "CBT_BIOLOGY_MODULE_META",
+      JSON.stringify({
+        name: BIO_MODULE,
+        subject: "Biology",
+        tests: 30,
+        questionsDeclared: 2700,
+        questionsParsed: all.length,
+        questionsWithAnswerKey: keyed.length,
+        importedAt: Date.now(),
+        originalFileName: file.name
+      })
+    );
+
+    window.CBT_BIOLOGY_MODULE_TESTS = tests;
+
+    return {
+      tests: 30,
+      declaredQuestions: 2700,
+      parsedQuestions: all.length,
+      answerKeyMapped: keyed.length,
+      poolTotal: merged.length
+    };
+  }
+
+  /*
+   * Hook into the EXISTING Module Upload button.
+   * No separate Biology upload UI is created.
+   */
+  const originalConvert = window.convertSelectedPDF;
+
+  window.convertSelectedPDF = async function () {
+    const input = document.getElementById("pdfInput");
+    const file = input && input.files && input.files[0];
+
+    const moduleInput = document.getElementById("moduleName");
+    const moduleName =
+      moduleInput && moduleInput.value.trim();
+
+    const looksLikeBiology =
+      file &&
+      (
+        /biology/i.test(file.name) ||
+        /neet.*bio/i.test(moduleName) ||
+        /biology.*test.*series/i.test(moduleName)
+      );
+
+    if (!looksLikeBiology) {
+      return originalConvert.apply(this, arguments);
+    }
+
+    const button = document.getElementById("convertButton");
+    const status = document.getElementById("status");
+
+    if (button) button.disabled = true;
+
+    if (status) {
+      status.textContent =
+        "⏳ Importing NEET Biology Test Series...\n" +
+        "Detecting Test 1–30 and official answer keys.";
+    }
+
+    try {
+      const result = await importBiologyTestSeries(file);
+
+      if (status) {
+        status.textContent =
+          "✅ NEET Biology Test Series imported.\n\n" +
+          "Tests: " + result.tests + "\n" +
+          "Declared questions: " + result.declaredQuestions + "\n" +
+          "Parsed questions: " + result.parsedQuestions + "\n" +
+          "Answer-key mapped: " + result.answerKeyMapped + "\n" +
+          "Pool total: " + result.poolTotal + "\n\n" +
+          "Test 1–30 are now available through the Module Upload pool.";
+      }
+
+      console.log(
+        "BIOLOGY MODULE IMPORT:",
+        result
+      );
+
+    } catch (err) {
+      console.error(
+        "Biology module import failed:",
+        err
+      );
+
+      if (status) {
+        status.textContent =
+          "❌ Biology Module Import failed.\n\n" +
+          err.message;
+      }
+
+    } finally {
+      if (button) button.disabled = false;
+    }
+  };
+
+  window.CBTBiologyModuleBridge = {
+    version: 1,
+    importBiologyTestSeries
+  };
+
+  console.log(
+    "🧬 RankForge Biology Test-Series Module Bridge active."
+  );
+
+})();
+</script>
+
 <head>
 <script src="./vendor/pdf.min.js"></script>
 <script>
