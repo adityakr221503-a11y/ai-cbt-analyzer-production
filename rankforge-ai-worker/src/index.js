@@ -365,7 +365,7 @@ Keep every list focused and useful. Do not pad with generic statements.
           },
           body: JSON.stringify({
             model: env.OPENAI_MODEL,
-            temperature: 0.25,
+            reasoning_effort: env.OPENAI_REASONING_EFFORT || "high",
             messages: [
               {
                 role: "system",
@@ -533,7 +533,7 @@ Requirements:
         },
         body: JSON.stringify({
           model: env.OPENAI_MODEL,
-          temperature: 0.75,
+          reasoning_effort: env.OPENAI_REASONING_EFFORT || "high",
           messages: [
             {
               role: "system",
