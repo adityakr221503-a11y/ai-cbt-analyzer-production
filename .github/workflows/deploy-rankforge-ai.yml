@@ -28,6 +28,7 @@ jobs:
         shell: bash
         run: |
           set -e
+
           echo "========== SECRET SAFETY =========="
 
           if grep -RInE \
@@ -40,9 +41,9 @@ jobs:
               exit 1
           fi
 
-          echo "✅ No obvious API-key pattern found in Worker source"
+          echo "✅ No obvious API-key pattern found"
 
-      - name: Check required config
+      - name: Check required files
         shell: bash
         run: |
           set -e
@@ -57,7 +58,7 @@ jobs:
         run: |
           set -e
 
-          echo "Checking for actual credential values..."
+          echo "========== CREDENTIAL CHECK =========="
 
           if grep -RInE \
             --exclude-dir=.git \
@@ -84,9 +85,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
 
-      - name: Install Wrangler explicitly
+      - name: Install Wrangler
         shell: bash
         run: |
           set -e
@@ -96,7 +96,7 @@ jobs:
           echo "========== WRANGLER VERSION =========="
           npx wrangler --version
 
-      - name: Verify Cloudflare secrets exist
+      - name: Verify Cloudflare secrets
         shell: bash
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -116,20 +116,20 @@ jobs:
             exit 1
           fi
 
-          echo "✅ Required Cloudflare credentials are present"
+          echo "✅ Cloudflare credentials are present"
           echo "🔒 Secret values are not displayed"
 
-      - name: Validate Wrangler config
+      - name: Validate Worker files
         shell: bash
         run: |
           set -e
 
-          test -f rankforge-ai-worker/wrangler.jsonc
           test -f rankforge-ai-worker/src/index.js
+          test -f rankforge-ai-worker/wrangler.jsonc
 
-          echo "========== CONFIG CHECK =========="
+          echo "========== WORKER CHECK =========="
+          echo "✅ index.js found"
           echo "✅ wrangler.jsonc found"
-          echo "✅ Worker source found"
 
       - name: Deploy Worker
         shell: bash
