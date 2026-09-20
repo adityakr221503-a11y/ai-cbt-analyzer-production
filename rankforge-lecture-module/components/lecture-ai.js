@@ -1,8 +1,7 @@
 (function () {
   "use strict";
 
-  const AI_ENDPOINT =
-  "https://rankforge-ai.adityakr221503.workers.dev/api/lecture-ai/explain";
+  const AI_ENDPOINT = "https://rankforge-ai.adityakr221503.workers.dev/api/lecture-ai/explain";
 
   const STORAGE = "rankforgeLectureAIContextV1";
 

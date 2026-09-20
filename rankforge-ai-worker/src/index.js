@@ -196,6 +196,30 @@ Output shape:
 }
 `;
 
+
+function rankforgeCors(request, env) {
+  const origin = request.headers.get("Origin") || "";
+  const allowed =
+    env.ALLOWED_ORIGIN ||
+    "https://adityakr221503-a11y.github.io";
+
+  const headers = new Headers({
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+    "Vary": "Origin"
+  });
+
+  if (origin === allowed) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Access-Control-Allow-Credentials", "true");
+  } else {
+    headers.set("Access-Control-Allow-Origin", allowed);
+  }
+
+  return headers;
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
