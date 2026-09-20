@@ -1,4 +1,3 @@
-
 # Legacy PDF owner artifacts kept locally for recovery/testing
 # Local dependencies
 # Local owner-ingestion working artifacts
@@ -26,3 +25,6 @@ rankforge-owner-pdf-engine-v5.js
 rankforge-owner-pdf-extractor.py
 rankforge-owner-pdf-inventory-v1.json
 rankforge-selected-module-master-v2.json
+
+# Temporary canonical-runtime backups
+cbt.pre-canonical-*.html

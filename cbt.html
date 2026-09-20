@@ -253,8 +253,8 @@
 
 </script>
 <script src="rank-booster/question-bank.js"></script>
-<script src="ranker-common-engine.js"></script>
-<script src="orbit-engine.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: ranker-common-engine.js -->
+<!-- CANONICAL-RUNTIME-BLOCKED: orbit-engine.js -->
 
   <meta charset="UTF-8">
 
@@ -899,27 +899,27 @@
 </style>
 
 <!-- CBT_CORE_PRESERVATION_V1 -->
-<script src="./cbt-core-preservation-v1.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: cbt-core-preservation-v1.js -->
 <!-- END CBT_CORE_PRESERVATION_V1 -->
 <!-- CBT_CORE_V2 -->
-<script src="./cbt-core-v2.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: cbt-core-v2.js -->
 <!-- END CBT_CORE_V2 -->
 <!-- CBT_CORE_V3 -->
-<script src="./cbt-core-v3.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: cbt-core-v3.js -->
 <!-- END CBT_CORE_V3 -->
 <!-- CBT_CORE_V4 -->
-<script src="./cbt-core-v4.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: cbt-core-v4.js -->
 <!-- END CBT_CORE_V4 -->
 <!-- CBT_CORE_V5 -->
-<script src="./cbt-core-v5.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: cbt-core-v5.js -->
 <!-- END CBT_CORE_V5 -->
 <!-- CBT_CORE_V6 -->
-<script src="./cbt-core-v6.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: cbt-core-v6.js -->
 <!-- END CBT_CORE_V6 -->
 
-<script src="./ranker-v11-runtime-fix.js?v=1"></script>
-<script src="./basic-foundation-hardening-v1.js"></script>
-<script src="./pdf-cbt-cbt-bridge.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: ranker-v11-runtime-fix.js -->
+<!-- CANONICAL-RUNTIME-BLOCKED: basic-foundation-hardening-v1.js -->
+<!-- CANONICAL-RUNTIME-BLOCKED: pdf-cbt-cbt-bridge.js -->
 <script src="./nichod/engine/cbt-unified-question-loader.js"></script>
 <script src="./nichod/engine/cbt-active-test-router.js"></script>
 <script src="./nichod/engine/unified-test-library.js"></script>
@@ -6804,17 +6804,17 @@ window.addEventListener(
 
 
 <!-- RANKER_V8_UNIFIED_LIFECYCLE -->
-<script src="./ranker-v8-unified-lifecycle.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: ranker-v8-unified-lifecycle.js -->
 
 <!-- CBT_BEHAVIOR_V9 -->
-<script src="./cbt-behavior-v9.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: cbt-behavior-v9.js -->
 
 <!-- CBT_RANKER_V10_ADAPTIVE -->
-<script src="./ranker-v10-adaptive-engine.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: ranker-v10-adaptive-engine.js -->
 
 <!-- RANKER_V11_REAL_LIFECYCLE -->
-<script src="./ranker-v11-real-lifecycle.js"></script>
-<script src="./cbt-unified-core.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: ranker-v11-real-lifecycle.js -->
+<!-- CANONICAL-RUNTIME-BLOCKED: cbt-unified-core.js -->
 
 <script src="./nichod/engine/nichod-cbt-metadata-bridge.js"></script>
 <script src="./nichod/engine/nichod-posttest-bridge.js"></script>
@@ -7226,7 +7226,7 @@ window.addEventListener("load", function () {
 
 })();
 </script>
-<script src="./practice-experience-v1.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: practice-experience-v1.js -->
   <script src="./rankforge-result-mistake-engine-v1.js"></script>
 <script src="./rankforge-result-metadata-bridge-v2.js"></script>
   <script src="./rankforge-dpp-intelligence-v1.js"></script>
@@ -7255,7 +7255,7 @@ window.addEventListener("load", function () {
 })();
 </script>
 
-<script src="./rankforge-approved-ai-cbt-integration-v1.js"></script>\n
+<!-- CANONICAL-RUNTIME-BLOCKED: rankforge-approved-ai-cbt-integration-v1.js -->\n
 <script>
 (function(){
 "use strict";
@@ -7290,7 +7290,7 @@ if(document.readyState==="loading"){
 }
 })();
 </script>
-<script src="./rankforge-pdf-cbt-flow-bridge-v1.js"></script>
+<!-- CANONICAL-RUNTIME-BLOCKED: rankforge-pdf-cbt-flow-bridge-v1.js -->
 <script src="./rankforge-pdf-result-mastery-bridge-v1.js"></script>
 
 <!-- RANKFORGE_CBT_MISTAKE_BRIDGE_V1 -->
@@ -9741,8 +9741,43 @@ window.RankForgePDFVisualV11={
 </script>
 
 <script src="./rankforge-unified-student-layer-v2.js" defer></script>
+
+
 <script src="./rankforge-canonical-session-v1.js"></script>
 <script src="./rankforge-system-health-v1.js"></script>
+
+<script>
+(function(){
+  "use strict";
+  if(window.__RANKFORGE_CANONICAL_GUARD__) return;
+  window.__RANKFORGE_CANONICAL_GUARD__=true;
+
+  function sync(){
+    try{
+      if(!window.RankForgeCanonicalSession) return;
+      var state=window.RankForgeCanonicalSession.publish();
+      window.RANKFORGE_ACTIVE_SOURCE=state.source;
+      window.RANKFORGE_ACTIVE_QUESTIONS=state.questions||[];
+      window.RANKFORGE_ACTIVE_TEST=state.test||null;
+      document.documentElement.setAttribute(
+        "data-rankforge-source",
+        String(state.source||"NONE")
+      );
+    }catch(e){
+      console.warn("RankForge canonical sync:",e);
+    }
+  }
+
+  window.RankForgeCanonicalGuard={sync:sync};
+
+  document.addEventListener("DOMContentLoaded",sync);
+  window.addEventListener("pageshow",sync);
+  window.addEventListener("visibilitychange",function(){
+    if(document.visibilityState==="visible") sync();
+  });
+})();
+</script>
+
 </body>
 
 </html>
