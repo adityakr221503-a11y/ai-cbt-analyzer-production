@@ -86,12 +86,12 @@
           revision: Array.isArray(data.revision) ? data.revision : [],
           verification: data.verification || "NCERT-first AI analysis"
         };
-      } catch (_) {
+      } catch (error) {
         return {
-          ok: true,
-          source: "local",
-          explanation:
-            "NCERT 360° AI endpoint abhi reachable nahi hai. Secure Worker deploy hone ke baad chapter/topic ka complete structured NCERT dissection yahin generate hoga."
+          ok: false,
+          source: "error",
+          message:
+            "AI Lecture service is currently unavailable. Please retry when the AI service is reachable."
         };
       }
     }

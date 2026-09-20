@@ -29,3 +29,6 @@ rankforge-owner-pdf-engine-v5.js
 rankforge-owner-pdf-extractor.py
 rankforge-owner-pdf-inventory-v1.json
 rankforge-selected-module-master-v2.json
+
+# Local dependencies
+node_modules/

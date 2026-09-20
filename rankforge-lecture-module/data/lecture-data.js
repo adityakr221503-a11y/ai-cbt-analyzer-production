@@ -3,7 +3,20 @@ window.RANKFORGE_LECTURE_DATA = {
     {
       id: "physics",
       name: "Physics",
-      chapters: []
+      chapters: [
+        {
+          id: "physics-ai",
+          name: "AI Concept Learning",
+          lectures: [
+            {
+              id: "physics-ai-concept",
+              title: "Ask AI to Explain a Physics Concept",
+              duration: "AI",
+              transcript: ""
+            }
+          ]
+        }
+      ]
     },
     {
       id: "chemistry",
