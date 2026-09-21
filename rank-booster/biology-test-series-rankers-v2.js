@@ -564,36 +564,96 @@
   }
 
   function startTest(testNumber) {
-    const bank = JSON.parse(
-      localStorage.getItem(BANK_KEY) || "{}"
+    const test = Number(testNumber);
+
+    if (!Number.isInteger(test) || test < 1 || test > 30) {
+      alert("Invalid Biology test number.");
+      return;
+    }
+
+    let bank;
+
+    try {
+      bank = JSON.parse(
+        localStorage.getItem(BANK_KEY) || "{}"
+      );
+    } catch (err) {
+      alert("Biology verified bank could not be read.");
+      return;
+    }
+
+    const source = Array.isArray(bank[String(test)])
+      ? bank[String(test)].slice()
+      : [];
+
+    source.sort(
+      (a, b) =>
+        Number(a.sourceQuestionNumber ?? a.questionNumber) -
+        Number(b.sourceQuestionNumber ?? b.questionNumber)
     );
 
-    const questions = bank[String(testNumber)];
+    const expected = test === 11 ? 89 : 90;
 
-    if (!Array.isArray(questions) || questions.length !== 90) {
+    if (source.length !== expected) {
       alert(
-        "Biology Test " +
-        testNumber +
-        " is not a validated 90-question test."
+        "Biology Test " + test +
+        " has " + source.length +
+        " source questions. Expected " + expected +
+        ".\n\nCBT NOT STARTED."
       );
       return;
     }
 
-    /*
-     * Existing RankForge/CBT-compatible active-question handoff.
-     */
+    const questions = source.slice(0, expected).map((q, index) => ({
+      ...q,
+      questionNumber: index + 1,
+      sourceQuestionNumber:
+        Number(q.sourceQuestionNumber ?? q.questionNumber),
+      originalSource: true,
+      source:
+        q.source || "NEET Biology Test Series.pdf"
+    }));
+
+    if (questions.length !== expected) {
+      alert("Safety check failed: incorrect CBT question count.");
+      return;
+    }
+
     const payload = JSON.stringify(questions);
 
-    localStorage.setItem("CBT_ACTIVE_QUESTIONS", payload);
-    localStorage.setItem("CBT_ACTIVE_TEST_TITLE",
-      "NEET Biology Test " + testNumber);
-    localStorage.setItem("CBT_ACTIVE_SOURCE",
-      "rankers-biology-2700");
-    localStorage.setItem("pdfCbtQuestions", payload);
-    localStorage.setItem("pdfQuestions", payload);
+    localStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      payload
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_TEST_TITLE",
+      "NEET Biology Test " + test
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "rankers-biology-2699"
+    );
+
+    localStorage.setItem(
+      "pdfCbtQuestions",
+      payload
+    );
+
+    localStorage.setItem(
+      "pdfQuestions",
+      payload
+    );
+
+    console.log(
+      "RANKFORGE BIOLOGY CBT HANDOFF:",
+      "Test " + test,
+      questions.length + " questions"
+    );
 
     window.location.href =
-      "./cbt.html?source=rankers-biology&test=" + testNumber;
+      "./cbt.html?source=rankers-biology&test=" + test;
   }
 
   function renderTests() {
