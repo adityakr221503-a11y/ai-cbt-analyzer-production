@@ -656,6 +656,17 @@
 
     const payload = JSON.stringify(questions);
 
+    // HARD RESET: remove every stale CBT/test payload before Biology starts.
+    [
+      "CBT_ACTIVE_QUESTIONS",
+      "pdfCbtQuestions",
+      "pdfQuestions",
+      "TEST180_QUESTIONS",
+      "CBT_ACTIVE_SOURCE",
+      "CBT_ACTIVE_TEST_TITLE"
+    ].forEach(key => localStorage.removeItem(key));
+
+    // Write ONLY the selected Biology test.
     localStorage.setItem(
       "CBT_ACTIVE_QUESTIONS",
       payload
