@@ -719,6 +719,190 @@ const G={
    return result;
  },
 
+ async checkDeploymentIntegrity(){
+   this.start();
+
+   const checks=[];
+   const add=(name,ok,expected,actual,critical=true)=>{
+     checks.push({
+       name,expected,actual,
+       status:ok?"VERIFIED WORKING":"VERIFIED BROKEN",
+       critical
+     });
+   };
+
+   /* ---------- SCRIPT DEPENDENCIES ---------- */
+   const scripts=[...document.scripts]
+     .filter(x=>x.src)
+     .map(x=>x.src);
+
+   for(const src of scripts){
+     try{
+       const r=await fetch(src,{cache:"no-store"});
+       add(
+         "Script "+src.split("/").pop(),
+         r.ok,
+         "HTTP 200",
+         r.status,
+         true
+       );
+     }catch(e){
+       add(
+         "Script "+src.split("/").pop(),
+         false,
+         "reachable",
+         String(e),
+         true
+       );
+     }
+   }
+
+   /* ---------- CRITICAL LOCAL ASSETS ---------- */
+   const assets=[
+     "./cbt.html",
+     "./rankers-test-series.html",
+     "./mistake.html",
+     "./rankforge-owner-ai.html",
+     "./rankforge-owner-ai.js",
+     "./rank-booster/test180-questions.json",
+     "./rank-booster/biology-test-series-rankers-v2.js"
+   ];
+
+   for(const path of assets){
+     try{
+       const r=await fetch(path,{cache:"no-store"});
+       add(
+         "Asset "+path,
+         r.ok,
+         "HTTP 200",
+         r.status,
+         true
+       );
+     }catch(e){
+       add(
+         "Asset "+path,
+         false,
+         "reachable",
+         String(e),
+         true
+       );
+     }
+   }
+
+   /* ---------- CACHE / VERSION ---------- */
+   const currentScript=document.querySelector(
+     'script[src*="rankforge-owner-ai.js"]'
+   );
+
+   const biologyScript=document.querySelector(
+     'script[src*="biology-test-series-rankers-v2.js"]'
+   );
+
+   checks.push({
+     name:"Owner AI cache identity",
+     expected:"versioned or current deployment",
+     actual:currentScript?.src||"missing",
+     status:currentScript
+       ?"VERIFIED WORKING"
+       :"VERIFIED BROKEN",
+     critical:true
+   });
+
+   checks.push({
+     name:"Biology importer cache identity",
+     expected:"versioned deployment",
+     actual:biologyScript?.src||"missing",
+     status:biologyScript
+       ?"VERIFIED WORKING"
+       :"VERIFIED BROKEN",
+     critical:true
+   });
+
+   /* ---------- RUNTIME DEPENDENCY OBJECTS ---------- */
+   const globals=[
+     "pdfjsLib",
+     "RankBoosterQuestionBank",
+     "RankerUnifiedBank",
+     "RankForgeOwnerAI"
+   ];
+
+   for(const name of globals){
+     const exists=
+       typeof window[name]!=="undefined";
+
+     checks.push({
+       name:"Runtime dependency "+name,
+       expected:"available",
+       actual:exists?"available":"missing",
+       status:exists
+         ?"VERIFIED WORKING"
+         :"NOT VERIFIED",
+       critical:false
+     });
+   }
+
+   /* ---------- NETWORK STATE ---------- */
+   checks.push({
+     name:"Network state",
+     expected:"online",
+     actual:navigator.onLine?"online":"offline",
+     status:navigator.onLine
+       ?"VERIFIED WORKING"
+       :"NOT VERIFIED",
+     critical:false
+   });
+
+   const broken=checks.filter(
+     x=>x.critical&&x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     at:now(),
+     status:broken.length
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     checks
+   };
+
+   this.emit("deployment.integrity",result);
+
+   if(broken.length){
+     this.incident(
+       "Deployment/dependency integrity failure",
+       broken,
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
+ async releaseScan(){
+   this.start();
+
+   const deployment=await this.checkDeploymentIntegrity();
+   const e2e=await this.e2eScan();
+
+   const broken=[
+     deployment,
+     e2e
+   ].some(x=>x.status==="VERIFIED BROKEN");
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     status:broken
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     deployment,
+     e2e
+   };
+
+   this.emit("release.integrity.scan",result);
+   return result;
+ },
+
  async e2eScan(){
    this.start();
 
