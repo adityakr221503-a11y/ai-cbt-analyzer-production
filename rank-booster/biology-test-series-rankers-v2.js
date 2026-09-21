@@ -93,48 +93,156 @@
    * contains its own Q1..Q90.
    */
   function splitQuestions90(text) {
-    const starts = [];
-    const re = /(?:^|\n)\s*(\d{1,2})\s*\.\s+/g;
-    let m;
+    /*
+     * ROBUST PDF QUESTION DETECTOR
+     *
+     * PDF.js may extract question numbers as:
+     *   1. Question...
+     *   1) Question...
+     *   (1) Question...
+     *   Q1. Question...
+     *   Q.1 Question...
+     *   1
+     *   Question text on the following line
+     *
+     * We collect multiple candidate forms and then accept ONLY a
+     * strictly sequential Q1 -> Q90 chain. No global deduplication.
+     */
 
-    while ((m = re.exec(text))) {
-      const n = Number(m[1]);
+    const source = String(text || "").replace(/\r/g, "");
+    const starts = [];
+
+    function add(number, position) {
+      const n = Number(number);
       if (n >= 1 && n <= 90) {
         starts.push({
           number: n,
-          start: m.index + m[0].length - m[0].trimStart().length
+          start: position
         });
       }
     }
 
-    const selected = [];
-    let cursor = 0;
+    /*
+     * Number + punctuation.
+     */
+    const numbered =
+      /(?:^|\n)[ \t]*(?:Q(?:uestion)?[ \t]*\.?[ \t]*)?\(?([0-9]{1,2})\)?[ \t]*[\.\):\-][ \t]+/gi;
 
-    for (let q = 1; q <= 90; q++) {
-      let found = -1;
+    let m;
+    while ((m = numbered.exec(source))) {
+      add(m[1], m.index + m[0].length - m[0].trimStart().length);
+    }
 
-      for (let i = cursor; i < starts.length; i++) {
-        if (starts[i].number === q) {
-          found = i;
+    /*
+     * Question number extracted as a standalone line:
+     *
+     * 1
+     * Question text...
+     */
+    const standalone = /(?:^|\n)[ \t]*([0-9]{1,2})[ \t]*(?=\n)/g;
+
+    while ((m = standalone.exec(source))) {
+      const n = Number(m[1]);
+
+      if (n >= 1 && n <= 90) {
+        const after = m.index + m[0].length;
+        add(n, after);
+      }
+    }
+
+    /*
+     * Some PDF layouts produce "Q1" / "Q 1" without punctuation.
+     */
+    const qOnly =
+      /(?:^|\n)[ \t]*Q[ \t]*([0-9]{1,2})[ \t]*(?:\n|(?=\S))/gi;
+
+    while ((m = qOnly.exec(source))) {
+      add(
+        m[1],
+        m.index + m[0].length - m[0].trimStart().length
+      );
+    }
+
+    /*
+     * Remove exact duplicate candidates at the same position.
+     */
+    const unique = [];
+    const seen = new Set();
+
+    for (const item of starts) {
+      const key = item.number + ":" + item.start;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      unique.push(item);
+    }
+
+    unique.sort((a, b) => a.start - b.start);
+
+    /*
+     * Find the first genuine Q1 -> Q90 sequential chain.
+     * A random "1" inside question content cannot satisfy the chain.
+     */
+    let selected = null;
+
+    for (let i = 0; i < unique.length; i++) {
+      if (unique[i].number !== 1) continue;
+
+      const chain = [unique[i]];
+      let cursor = i + 1;
+
+      for (let q = 2; q <= 90; q++) {
+        let found = -1;
+
+        for (let j = cursor; j < unique.length; j++) {
+          if (unique[j].number === q) {
+            found = j;
+            break;
+          }
+        }
+
+        if (found < 0) {
+          chain.length = 0;
           break;
         }
+
+        chain.push(unique[found]);
+        cursor = found + 1;
       }
 
-      if (found < 0) return null;
+      if (chain.length === 90) {
+        selected = chain;
+        break;
+      }
+    }
 
-      selected.push(starts[found]);
-      cursor = found + 1;
+    if (!selected) {
+      return null;
     }
 
     const result = [];
 
     for (let i = 0; i < 90; i++) {
-      const start = selected[i].start;
-      const end = i === 89 ? text.length : selected[i + 1].start;
+      const startPos = selected[i].start;
+      const endPos =
+        i === 89
+          ? source.length
+          : selected[i + 1].start;
 
-      let raw = text.slice(start, end).trim();
+      let raw = source
+        .slice(startPos, endPos)
+        .trim();
 
-      raw = raw.replace(/^\d{1,2}\s*\.\s*/, "").trim();
+      /*
+       * Remove ONLY the question-number prefix.
+       * Question wording itself remains untouched.
+       */
+      raw = raw
+        .replace(
+          /^(?:Q(?:uestion)?[ \t]*\.?[ \t]*)?\(?[0-9]{1,2}\)?[ \t]*[\.\):\-][ \t]*/i,
+          ""
+        )
+        .replace(/^[0-9]{1,2}[ \t]*\n/, "")
+        .trim();
 
       result.push(raw);
     }
