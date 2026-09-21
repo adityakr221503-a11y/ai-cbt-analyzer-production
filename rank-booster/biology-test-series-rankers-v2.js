@@ -604,6 +604,41 @@
       return;
     }
 
+    console.log(
+      "BIOLOGY SOURCE AUDIT:",
+      "Test", test,
+      "RAW", source.length,
+      "EXPECTED", expected
+    );
+
+    const bad = source.filter(q => {
+      const text = String(q.text ?? q.question ?? "").trim();
+      const options = Array.isArray(q.options)
+        ? q.options
+        : [];
+
+      return !text || options.length < 2;
+    });
+
+    console.log(
+      "BIOLOGY INVALID BEFORE CBT:",
+      bad.length,
+      bad.map(q => ({
+        q: q.sourceQuestionNumber ?? q.questionNumber,
+        options: Array.isArray(q.options) ? q.options.length : 0
+      }))
+    );
+
+    if (bad.length) {
+      alert(
+        "Biology Test " + test +
+        " contains " + bad.length +
+        " source questions with missing/invalid options.\\n\\n" +
+        "CBT NOT STARTED — original questions preserved."
+      );
+      return;
+    }
+
     const questions = source.slice(0, expected).map((q, index) => ({
       ...q,
       questionNumber: index + 1,
