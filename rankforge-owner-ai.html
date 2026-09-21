@@ -64,6 +64,8 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="command">INCIDENT COMMAND CENTER</button>
 <button id="bundle">EXPORT INCIDENT BUNDLE</button>
 <button id="flow">REAL USER-FLOW SCAN</button>
+<button id="oracle">INDEPENDENT ORACLE</button>
+<button id="diff">DIFFERENTIAL VERIFICATION</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -156,6 +158,16 @@ $("bundle").onclick=async function(){
 $("flow").onclick=async function(){
   $("log").textContent="Running real RankForge CBT user-flow verification...";
   render(await g.realFlowScan());
+};
+
+$("oracle").onclick=async function(){
+  $("log").textContent="Running independent question-bank oracle...";
+  render(await g.independentOracle());
+};
+
+$("diff").onclick=async function(){
+  $("log").textContent="Running Guardian vs independent differential verification...";
+  render(await g.differentialScan());
 };
 
 $("repair").onclick=function(){

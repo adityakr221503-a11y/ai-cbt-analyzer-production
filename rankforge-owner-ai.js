@@ -2105,6 +2105,284 @@ const G={
    return result;
  },
 
+ async independentOracle(){
+   this.start();
+
+   const checks=[];
+
+   const add=(name,status,expected,guardianActual,oracleActual)=>{
+     checks.push({
+       name,
+       status,
+       expected,
+       guardianActual,
+       oracleActual,
+       agreement:guardianActual===oracleActual
+     });
+   };
+
+   /* =========================================================
+      ORACLE 1 — TEST 180
+      ========================================================= */
+
+   let source180=null;
+
+   try{
+     if(Array.isArray(window.TEST180_QUESTIONS))
+       source180=window.TEST180_QUESTIONS;
+   }catch(_){}
+
+   const oracle180=Array.isArray(source180)
+     ?source180.filter(
+       q=>q&&
+       typeof q.question==="string"&&
+       Array.isArray(q.options)&&
+       q.options.length===4&&
+       q.correctAnswer
+     ).length
+     :0;
+
+   const guardian180=
+     Array.isArray(window.__RANKERS_TEST180_BANK)
+       ?window.__RANKERS_TEST180_BANK.length
+       :0;
+
+   add(
+     "Independent Test 180 count",
+     oracle180===180&&guardian180===oracle180
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     180,
+     guardian180,
+     oracle180
+   );
+
+   /* =========================================================
+      ORACLE 2 — BIOLOGY 30 × 90
+      ========================================================= */
+
+   let biology=[];
+
+   try{
+     const b=read(
+       "RANKFORGE_BIOLOGY_2700_BANK_V2",
+       []
+     );
+
+     if(Array.isArray(b))
+       biology=b;
+   }catch(_){}
+
+   const testCounts={};
+
+   for(const q of biology){
+     const match=String(
+       q?.id||""
+     ).match(/NEET-BIO-TS-(\d+)-Q(\d+)/);
+
+     if(match){
+       const test=Number(match[1]);
+       testCounts[test]=(testCounts[test]||0)+1;
+     }
+   }
+
+   let oracleBio=0;
+   let badTests=[];
+
+   for(let t=1;t<=30;t++){
+     const count=testCounts[t]||0;
+
+     if(count!==90)
+       badTests.push({
+         test:t,
+         expected:90,
+         actual:count
+       });
+
+     oracleBio+=count;
+   }
+
+   const guardianBio=biology.length;
+
+   add(
+     "Independent Biology 30x90 count",
+     oracleBio===2700&&guardianBio===oracleBio
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     2700,
+     guardianBio,
+     oracleBio
+   );
+
+   /* =========================================================
+      ORACLE 3 — BIOLOGY ID UNIQUENESS
+      ========================================================= */
+
+   const bioIds=biology
+     .map(q=>q?.id)
+     .filter(Boolean);
+
+   const uniqueBioIds=new Set(bioIds).size;
+
+   add(
+     "Biology unique IDs",
+     uniqueBioIds===bioIds.length
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     bioIds.length,
+     uniqueBioIds,
+     uniqueBioIds
+   );
+
+   /* =========================================================
+      ORACLE 4 — ANSWER DISTRIBUTION
+      ========================================================= */
+
+   const answerCounts={
+     a:0,b:0,c:0,d:0,
+     other:0
+   };
+
+   for(const q of biology){
+     const a=String(
+       q?.correctAnswer||q?.answer||""
+     ).trim().toLowerCase();
+
+     if(answerCounts[a]!==undefined)
+       answerCounts[a]++;
+     else
+       answerCounts.other++;
+   }
+
+   add(
+     "Biology answer-key validity",
+     answerCounts.other===0&&biology.length===2700
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     "only a/b/c/d",
+     answerCounts.other,
+     answerCounts.other
+   );
+
+   /* =========================================================
+      ORACLE 5 — QUESTION NUMBER DISTRIBUTION
+      ========================================================= */
+
+   let numberingErrors=0;
+
+   for(const q of biology){
+     const match=String(
+       q?.id||""
+     ).match(/-Q(\d+)$/);
+
+     if(!match){
+       numberingErrors++;
+       continue;
+     }
+
+     const n=Number(match[1]);
+
+     if(n<1||n>90)
+       numberingErrors++;
+   }
+
+   add(
+     "Biology question numbering",
+     numberingErrors===0
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     "Q1-Q90 per test",
+     numberingErrors,
+     numberingErrors
+   );
+
+   /* =========================================================
+      ORACLE 6 — GUARDIAN SELF-INTEGRITY
+      ========================================================= */
+
+   const oracleMethods=[
+     "independentOracle",
+     "realFlowScan",
+     "qualityScan",
+     "ultimateScan",
+     "repairCycle"
+   ];
+
+   let missingMethods=[];
+
+   for(const method of oracleMethods){
+     if(typeof this[method]!=="function")
+       missingMethods.push(method);
+   }
+
+   add(
+     "Guardian self-integrity",
+     missingMethods.length===0
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     0,
+     missingMethods.length,
+     missingMethods.length
+   );
+
+   const broken=checks.filter(
+     x=>x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     scanId:"ORACLE-"+Date.now(),
+     at:now(),
+     status:broken.length
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     checks,
+     biologyTestCounts:testCounts,
+     biologyBadTests:badTests,
+     answerDistribution:answerCounts,
+     brokenChecks:broken.length
+   };
+
+   this.emit("independent.oracle",result);
+
+   if(broken.length){
+     this.incident(
+       "Independent oracle disagreement/failure",
+       result,
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
+ async differentialScan(){
+   this.start();
+
+   const oracle=await this.independentOracle();
+   const flow=await this.realFlowScan();
+
+   const mismatches=[];
+
+   for(const check of oracle.checks){
+     if(check.agreement===false){
+       mismatches.push(check);
+     }
+   }
+
+   const result={
+     scanId:"DIFF-"+Date.now(),
+     at:now(),
+     oracle,
+     flow,
+     mismatches,
+     status:
+       mismatches.length||
+       oracle.status==="VERIFIED BROKEN"||
+       flow.status==="VERIFIED BROKEN"
+         ?"VERIFIED BROKEN"
+         :"NOT VERIFIED"
+   };
+
+   this.emit("differential.scan",result);
+
+   return result;
+ },
+
  async realFlowScan(){
    this.start();
 
