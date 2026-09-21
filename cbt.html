@@ -3056,6 +3056,91 @@ const ACTIVE_QUESTION_BANK =
   CBT_PDF_MODE
     ? NORMALIZED_QUESTION_BANK
     : NORMALIZED_QUESTION_BANK.slice(0, 180);
+/* RANKFORGE_BIOLOGY_ENGINE_OVERRIDE_V2 */
+
+/* RANKFORGE_BIOLOGY_ENGINE_OVERRIDE_V2 */
+(function () {
+  try {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("source") !== "rankers-biology") {
+      return;
+    }
+
+    const raw =
+      localStorage.getItem("CBT_ACTIVE_QUESTIONS");
+
+    if (!raw) {
+      throw new Error(
+        "Biology CBT payload is missing."
+      );
+    }
+
+    const biologyQuestions =
+      JSON.parse(raw);
+
+    if (!Array.isArray(biologyQuestions)) {
+      throw new Error(
+        "Biology CBT payload is not an array."
+      );
+    }
+
+    if (
+      biologyQuestions.length !== 89 &&
+      biologyQuestions.length !== 90
+    ) {
+      throw new Error(
+        "Biology CBT payload has " +
+        biologyQuestions.length +
+        " questions; expected 90 " +
+        "(89 only for Test 11)."
+      );
+    }
+
+    /*
+     * Replace the Test180 bank only for the Biology
+     * route. The normal Test180 route is untouched.
+     */
+    ACTIVE_QUESTION_BANK.length = 0;
+
+    biologyQuestions.forEach(function (q, index) {
+      ACTIVE_QUESTION_BANK.push({
+        ...q,
+        id:
+          q.id ||
+          "NEET-BIO-CBT-" +
+          String(q.sourceQuestionNumber ?? index + 1),
+        text:
+          q.text ||
+          q.question ||
+          "",
+        options:
+          Array.isArray(q.options)
+            ? q.options.slice()
+            : [],
+        originalSource: true,
+        biologySource: true
+      });
+    });
+
+    window.__RANKFORGE_BIOLOGY_ENGINE__ = true;
+    window.__RANKFORGE_BIOLOGY_COUNT__ =
+      ACTIVE_QUESTION_BANK.length;
+
+    console.log(
+      "RANKFORGE BIOLOGY ENGINE OVERRIDE:",
+      ACTIVE_QUESTION_BANK.length,
+      "questions"
+    );
+
+  } catch (err) {
+    console.error(
+      "RANKFORGE BIOLOGY ENGINE OVERRIDE FAILED:",
+      err
+    );
+  }
+})();
+
 
 
 console.log(
