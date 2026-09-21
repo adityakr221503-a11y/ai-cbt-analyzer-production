@@ -66,6 +66,8 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="flow">REAL USER-FLOW SCAN</button>
 <button id="oracle">INDEPENDENT ORACLE</button>
 <button id="diff">DIFFERENTIAL VERIFICATION</button>
+<button id="replay">REPRODUCE FAILURE</button>
+<button id="compare">COMPARE REPLAY</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -168,6 +170,16 @@ $("oracle").onclick=async function(){
 $("diff").onclick=async function(){
   $("log").textContent="Running Guardian vs independent differential verification...";
   render(await g.differentialScan());
+};
+
+$("replay").onclick=async function(){
+  $("log").textContent="Re-running the independent oracle to reproduce failures...";
+  render(await g.reproduceFailure());
+};
+
+$("compare").onclick=async function(){
+  $("log").textContent="Comparing replay snapshots...";
+  render(await g.compareReplay());
 };
 
 $("repair").onclick=function(){

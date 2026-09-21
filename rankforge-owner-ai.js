@@ -2350,6 +2350,208 @@ const G={
    return result;
  },
 
+ async createReplaySnapshot(){
+   this.start();
+
+   const snapshot={
+     replayId:"REPLAY-"+Date.now(),
+     createdAt:now(),
+     url:location.href,
+     pathname:location.pathname,
+     online:navigator.onLine,
+     viewport:{
+       width:window.innerWidth,
+       height:window.innerHeight,
+       devicePixelRatio:window.devicePixelRatio
+     },
+
+     /* Only diagnostic state; never modify source data. */
+     banks:{
+       test180:Array.isArray(window.TEST180_QUESTIONS)
+         ?window.TEST180_QUESTIONS.length:0,
+
+       activeTest180:Array.isArray(
+         window.__RANKERS_TEST180_BANK
+       )?window.__RANKERS_TEST180_BANK.length:0,
+
+       biology:(()=>{
+         try{
+           const x=read(
+             "RANKFORGE_BIOLOGY_2700_BANK_V2",
+             []
+           );
+           return Array.isArray(x)?x.length:0;
+         }catch(_){
+           return 0;
+         }
+       })()
+     },
+
+     storageKeys:Object.keys(localStorage)
+       .sort(),
+
+     runtimeErrors:this.consoleErrors.slice(-50),
+
+     recentEvidence:this.evidence.slice(-100),
+
+     recentIncidents:this.incidents.slice(-50)
+   };
+
+   write(
+     "rankforge.guardian.replay.latest.v1",
+     snapshot
+   );
+
+   this.emit(
+     "replay.snapshot.created",
+     {
+       replayId:snapshot.replayId
+     }
+   );
+
+   return snapshot;
+ },
+
+ async reproduceFailure(){
+   this.start();
+
+   const snapshot=await this.createReplaySnapshot();
+
+   const beforeErrors=this.consoleErrors.length;
+
+   /* Re-run the independent oracle rather than trusting
+      the previous result. */
+   const first=await this.independentOracle();
+
+   const second=await this.independentOracle();
+
+   const sameStatus=
+     first.status===second.status;
+
+   const firstBroken=first.checks
+     .filter(x=>x.status==="VERIFIED BROKEN")
+     .map(x=>x.name)
+     .sort();
+
+   const secondBroken=second.checks
+     .filter(x=>x.status==="VERIFIED BROKEN")
+     .map(x=>x.name)
+     .sort();
+
+   const sameFailure=
+     JSON.stringify(firstBroken)===
+     JSON.stringify(secondBroken);
+
+   let classification="NOT VERIFIED";
+
+   if(first.status==="VERIFIED BROKEN"&&
+      second.status==="VERIFIED BROKEN"&&
+      sameStatus&&
+      sameFailure){
+     classification="REPRODUCED";
+   }else if(
+     first.status==="VERIFIED BROKEN"||
+     second.status==="VERIFIED BROKEN"
+   ){
+     classification="INTERMITTENT";
+   }else if(
+     first.status!=="VERIFIED BROKEN"&&
+     second.status!=="VERIFIED BROKEN"
+   ){
+     classification="NOT REPRODUCED";
+   }
+
+   const result={
+     replayId:snapshot.replayId,
+     at:now(),
+     classification,
+     firstRun:first,
+     secondRun:second,
+     sameStatus,
+     sameFailure,
+     errorDelta:
+       this.consoleErrors.length-beforeErrors,
+     snapshot
+   };
+
+   this.emit(
+     "failure.reproduction",
+     result
+   );
+
+   if(classification==="REPRODUCED"){
+     this.incident(
+       "Deterministically reproduced failure",
+       {
+         replayId:snapshot.replayId,
+         failedChecks:firstBroken
+       },
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
+ async compareReplay(){
+   this.start();
+
+   const previous=read(
+     "rankforge.guardian.replay.latest.v1",
+     null
+   );
+
+   if(!previous){
+     return {
+       status:"NOT VERIFIED",
+       reason:"No replay snapshot exists."
+     };
+   }
+
+   const current=await this.createReplaySnapshot();
+
+   const compare={
+     replayId:current.replayId,
+     previousReplayId:previous.replayId,
+     at:now(),
+     changes:{
+       test180:
+         previous.banks.test180!==
+         current.banks.test180,
+
+       activeTest180:
+         previous.banks.activeTest180!==
+         current.banks.activeTest180,
+
+       biology:
+         previous.banks.biology!==
+         current.banks.biology,
+
+       runtimeErrors:
+         previous.runtimeErrors.length!==
+         current.runtimeErrors.length,
+
+       storageKeys:
+         JSON.stringify(previous.storageKeys)!==
+         JSON.stringify(current.storageKeys)
+     }
+   };
+
+   const changed=Object.values(compare.changes)
+     .some(Boolean);
+
+   compare.status=changed
+     ?"CHANGED":"UNCHANGED";
+
+   this.emit(
+     "replay.comparison",
+     compare
+   );
+
+   return compare;
+ },
+
  async differentialScan(){
    this.start();
 
