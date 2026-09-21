@@ -638,9 +638,16 @@
       'Original PDF → 30 × 90 questions → existing CBT. ' +
       'The bank activates only after exact 2700-question validation.' +
       '</p>' +
-      '<input id="rfBio2700Pdf" type="file" accept=".pdf,application/pdf">' +
-      '<button id="rfBio2700Import" type="button" ' +
-      'style="margin-left:8px;padding:9px 12px;border-radius:9px">' +
+      '<input id="rfBio2700Pdf" type="file" accept="application/pdf,.pdf" ' +
+      'style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">' +
+      '<label for="rfBio2700Pdf" id="rfBio2700Choose" ' +
+      'style="display:inline-block;padding:11px 15px;border-radius:10px;' +
+      'background:#2563eb;color:#fff;font-weight:700;cursor:pointer;' +
+      'touch-action:manipulation">📄 Choose Biology PDF</label>' +
+      '<span id="rfBio2700FileName" ' +
+      'style="margin-left:10px;color:#94a3b8">No file selected</span>' +
+      '<br><button id="rfBio2700Import" type="button" ' +
+      'style="margin-top:10px;padding:9px 12px;border-radius:9px">' +
       'Import Biology 2700</button>' +
       '<div id="rfBio2700Status" ' +
       'style="margin-top:12px;white-space:pre-wrap"></div>' +
@@ -664,6 +671,39 @@
     section.style.setProperty("display", "block", "important");
     section.style.setProperty("visibility", "visible", "important");
     section.style.setProperty("opacity", "1", "important");
+
+    const fileInput = el("rfBio2700Pdf");
+    const fileName = el("rfBio2700FileName");
+
+    if (fileInput) {
+      fileInput.addEventListener("change", function () {
+        const file = this.files && this.files[0];
+
+        if (file) {
+          fileName.textContent = file.name;
+          fileName.style.color = "#22c55e";
+        } else {
+          fileName.textContent = "No file selected";
+          fileName.style.color = "#94a3b8";
+        }
+      });
+
+      /*
+       * Android WebView fallback:
+       * the visible label is primary; direct programmatic click is
+       * available as a secondary fallback.
+       */
+      const choose = el("rfBio2700Choose");
+      if (choose) {
+        choose.addEventListener("click", function () {
+          try {
+            if (document.activeElement !== fileInput) {
+              fileInput.click();
+            }
+          } catch (_) {}
+        });
+      }
+    }
 
     el("rfBio2700Import").onclick = async function () {
       const input = el("rfBio2700Pdf");
