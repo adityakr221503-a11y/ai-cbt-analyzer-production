@@ -258,6 +258,229 @@ const G={
    return result;
  },
 
+ async checkDataFlow(){
+   this.start();
+
+   const checks=[];
+   const test=(name,expected,actual,critical=true)=>{
+     const ok=expected===actual;
+     checks.push({
+       name,expected,actual,
+       status:ok?"VERIFIED WORKING":"VERIFIED BROKEN",
+       critical
+     });
+     return ok;
+   };
+
+   /* ---------- TEST 180 DATA CONTRACT ---------- */
+   let t180=Array.isArray(window.TEST180_QUESTIONS)
+     ?window.TEST180_QUESTIONS
+     :(Array.isArray(window.__RANKERS_TEST180_BANK)
+       ?window.__RANKERS_TEST180_BANK:[]);
+
+   test("Test 180 record count",180,t180.length,true);
+
+   if(t180.length){
+     let valid=0;
+     let answers=0;
+     let subjects=0;
+     let duplicateIds=0;
+     const ids=new Set();
+
+     for(const q of t180){
+       if(
+         q &&
+         typeof q.question==="string" &&
+         q.question.trim() &&
+         Array.isArray(q.options) &&
+         q.options.length===4
+       ) valid++;
+
+       if(q && (q.correctAnswer||q.answer)) answers++;
+       if(q && q.subject) subjects++;
+
+       if(q && q.id){
+         if(ids.has(q.id)) duplicateIds++;
+         ids.add(q.id);
+       }
+     }
+
+     test("Test 180 valid question records",180,valid,true);
+     test("Test 180 answer records",180,answers,true);
+     test("Test 180 subject records",180,subjects,false);
+     test("Test 180 duplicate IDs",0,duplicateIds,true);
+   }
+
+   /* ---------- BIOLOGY DATA CONTRACT ---------- */
+   let bio=[];
+   try{
+     const x=read("RANKFORGE_BIOLOGY_2700_BANK_V2",[]);
+     bio=Array.isArray(x)?x:[];
+   }catch(_){}
+
+   test("Biology record count",2700,bio.length,true);
+
+   if(bio.length){
+     const ids=new Set();
+     let valid=0;
+     let answers=0;
+     let duplicates=0;
+     let testScoped=0;
+
+     for(const q of bio){
+       if(
+         q &&
+         typeof q.question==="string" &&
+         q.question.trim() &&
+         Array.isArray(q.options) &&
+         q.options.length>=2
+       ) valid++;
+
+       if(q && (q.correctAnswer||q.answer)) answers++;
+
+       if(q && q.id){
+         if(ids.has(q.id)) duplicates++;
+         ids.add(q.id);
+       }
+
+       if(q && q.testNumber) testScoped++;
+     }
+
+     test("Biology valid records",2700,valid,true);
+     test("Biology answer records",2700,answers,true);
+     test("Biology duplicate IDs",0,duplicates,true);
+     test("Biology test-scoped records",2700,testScoped,true);
+   }
+
+   /* ---------- STORAGE CONTRACT ---------- */
+   const storageKeys=[
+     "CBT_ACTIVE_QUESTIONS",
+     "CBT_ACTIVE_TEST_TITLE",
+     "CBT_ACTIVE_SOURCE",
+     "pdfCbtQuestions",
+     "pdfQuestions"
+   ];
+
+   for(const key of storageKeys){
+     let exists=false;
+     try{
+       exists=localStorage.getItem(key)!==null;
+     }catch(_){}
+
+     checks.push({
+       name:"Storage key "+key,
+       expected:"available when workflow active",
+       actual:exists?"present":"not present",
+       status:"NOT VERIFIED",
+       critical:false
+     });
+   }
+
+   /* ---------- BUTTON REALITY ---------- */
+   const buttons=[...document.querySelectorAll("button")];
+   let visibleButtons=0;
+   let disabledButtons=0;
+
+   for(const b of buttons){
+     const r=b.getBoundingClientRect();
+     if(r.width>0&&r.height>0) visibleButtons++;
+     if(b.disabled) disabledButtons++;
+   }
+
+   checks.push({
+     name:"Visible buttons",
+     expected:">0",
+     actual:visibleButtons,
+     status:visibleButtons>0
+       ?"VERIFIED WORKING"
+       :"VERIFIED BROKEN",
+     critical:true
+   });
+
+   /* ---------- PAGE CONTRACT ---------- */
+   const pages=[
+     "cbt.html",
+     "rankers-test-series.html",
+     "mistake.html"
+   ];
+
+   for(const page of pages){
+     try{
+       const r=await fetch(page,{cache:"no-store"});
+       checks.push({
+         name:"Page "+page,
+         expected:200,
+         actual:r.status,
+         status:r.ok
+           ?"VERIFIED WORKING"
+           :"VERIFIED BROKEN",
+         critical:true
+       });
+     }catch(e){
+       checks.push({
+         name:"Page "+page,
+         expected:"reachable",
+         actual:String(e),
+         status:"VERIFIED BROKEN",
+         critical:true
+       });
+     }
+   }
+
+   const broken=checks.filter(
+     x=>x.critical&&x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     at:now(),
+     status:broken.length
+       ?"VERIFIED BROKEN"
+       :"VERIFIED WORKING",
+     checks
+   };
+
+   this.emit("dataflow.check",result);
+
+   if(broken.length){
+     this.incident(
+       "Data-flow integrity failure",
+       broken,
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
+ async deepScan(){
+   this.start();
+
+   const full=await this.checkPage();
+   const workflow=await this.verifyWorkflow();
+   const dataflow=await this.checkDataFlow();
+
+   const critical=[
+     full,
+     workflow,
+     dataflow
+   ].some(x=>x.status==="VERIFIED BROKEN");
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     status:critical
+       ?"VERIFIED BROKEN"
+       :"VERIFIED WORKING",
+     full,
+     workflow,
+     dataflow
+   };
+
+   this.emit("deep.scan",result);
+   return result;
+ },
+
  async continuousScan(){
    this.start();
 
