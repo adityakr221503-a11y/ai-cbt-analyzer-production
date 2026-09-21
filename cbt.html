@@ -3,6 +3,109 @@
 
 <head>
 
+<!-- RANKFORGE_BIOLOGY_CBT_PRIORITY_V1 -->
+<script>
+(function () {
+  try {
+    const params = new URLSearchParams(location.search);
+
+    if (params.get("source") !== "rankers-biology") {
+      return;
+    }
+
+    const BIO_KEY = "RANKFORGE_BIOLOGY_CBT_PAYLOAD";
+    const active = localStorage.getItem("CBT_ACTIVE_QUESTIONS");
+
+    if (active) {
+      localStorage.setItem(BIO_KEY, active);
+    }
+
+    const protectedPayload =
+      localStorage.getItem(BIO_KEY);
+
+    if (!protectedPayload) {
+      console.error(
+        "RANKFORGE BIOLOGY: protected payload missing"
+      );
+      return;
+    }
+
+    const questions = JSON.parse(protectedPayload);
+
+    if (!Array.isArray(questions) ||
+        questions.length < 89 ||
+        questions.length > 90) {
+      console.error(
+        "RANKFORGE BIOLOGY: invalid question count",
+        questions.length
+      );
+      return;
+    }
+
+    /*
+     * Biology CBT owns these keys for this URL.
+     * Other modules remain untouched.
+     */
+    const originalGetItem =
+      Storage.prototype.getItem;
+
+    Storage.prototype.getItem = function (key) {
+      if (
+        this === localStorage &&
+        (
+          key === "CBT_ACTIVE_QUESTIONS" ||
+          key === "pdfCbtQuestions" ||
+          key === "pdfQuestions"
+        )
+      ) {
+        return protectedPayload;
+      }
+
+      return originalGetItem.call(this, key);
+    };
+
+    /*
+     * Reassert the verified Biology payload before
+     * the CBT application starts reading it.
+     */
+    localStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      protectedPayload
+    );
+
+    localStorage.setItem(
+      "pdfCbtQuestions",
+      protectedPayload
+    );
+
+    localStorage.setItem(
+      "pdfQuestions",
+      protectedPayload
+    );
+
+    window.__RANKFORGE_BIOLOGY_CBT__ = {
+      active: true,
+      count: questions.length,
+      source: "rankers-biology"
+    };
+
+    console.log(
+      "RANKFORGE BIOLOGY CBT PRIORITY:",
+      questions.length,
+      "questions protected"
+    );
+
+  } catch (e) {
+    console.error(
+      "RANKFORGE BIOLOGY CBT PRIORITY FAILED:",
+      e
+    );
+  }
+})();
+</script>
+
+
+
 <script>
 /* ============================================================
    RANKFORGE CBT SOURCE GATE V4
