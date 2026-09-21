@@ -2105,6 +2105,295 @@ const G={
    return result;
  },
 
+ async realFlowScan(){
+   this.start();
+
+   const steps=[];
+   const step=(name,status,expected,actual,details=null)=>{
+     steps.push({
+       name,status,expected,actual,
+       ...(details?{details}:{})
+     });
+   };
+
+   /* =========================================================
+      1. PAGE IDENTITY
+      ========================================================= */
+
+   step(
+     "Rankers page identity",
+     location.pathname.includes("rankers-test-series")
+       ?"VERIFIED WORKING":"NOT VERIFIED",
+     "rankers-test-series route",
+     location.pathname
+   );
+
+   /* =========================================================
+      2. TEST 180 SOURCE
+      ========================================================= */
+
+   const t180=Array.isArray(window.TEST180_QUESTIONS)
+     ?window.TEST180_QUESTIONS:null;
+
+   const t180Count=t180?t180.length:0;
+
+   step(
+     "Test 180 source",
+     t180Count===180
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     180,
+     t180Count
+   );
+
+   /* =========================================================
+      3. TEST 180 RECORD CONTRACT
+      ========================================================= */
+
+   if(t180){
+     let invalid=0;
+     let duplicate=0;
+     const ids=new Set();
+
+     for(const q of t180){
+       if(
+         !q||
+         typeof q.question!=="string"||
+         !Array.isArray(q.options)||
+         q.options.length!==4||
+         !q.correctAnswer
+       ){
+         invalid++;
+       }
+
+       if(q&&q.id){
+         if(ids.has(q.id)) duplicate++;
+         ids.add(q.id);
+       }
+     }
+
+     step(
+       "Test 180 record integrity",
+       invalid===0&&duplicate===0
+         ?"VERIFIED WORKING":"VERIFIED BROKEN",
+       {invalid:0,duplicates:0},
+       {invalid,duplicates:duplicate}
+     );
+   }
+
+   /* =========================================================
+      4. BIOLOGY SOURCE
+      ========================================================= */
+
+   let biology=[];
+
+   try{
+     const b=read(
+       "RANKFORGE_BIOLOGY_2700_BANK_V2",
+       []
+     );
+
+     if(Array.isArray(b))
+       biology=b;
+   }catch(_){}
+
+   step(
+     "Biology question pool",
+     biology.length===2700
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     2700,
+     biology.length
+   );
+
+   /* =========================================================
+      5. ACTIVE CBT CONTRACT
+      ========================================================= */
+
+   let active=[];
+
+   try{
+     const a=read(
+       "CBT_ACTIVE_QUESTIONS",
+       []
+     );
+
+     if(Array.isArray(a))
+       active=a;
+   }catch(_){}
+
+   const activeTitle=localStorage.getItem(
+     "CBT_ACTIVE_TEST_TITLE"
+   );
+
+   step(
+     "Active CBT payload",
+     active.length
+       ?"VERIFIED WORKING":"NOT VERIFIED",
+     "question array",
+     active.length,
+     activeTitle||null
+   );
+
+   /* =========================================================
+      6. ACTIVE QUESTION CONTRACT
+      ========================================================= */
+
+   if(active.length){
+     let invalid=0;
+
+     for(const q of active){
+       if(
+         !q||
+         typeof q.question!=="string"||
+         !Array.isArray(q.options)||
+         q.options.length<2
+       ){
+         invalid++;
+       }
+     }
+
+     step(
+       "Active CBT question integrity",
+       invalid===0
+         ?"VERIFIED WORKING":"VERIFIED BROKEN",
+       0,
+       invalid
+     );
+   }
+
+   /* =========================================================
+      7. RESULT / HISTORY / MISTAKE CONTRACTS
+      ========================================================= */
+
+   const contracts=[
+     ["cbtHistory","History"],
+     ["mistakeBook","Mistake book"],
+     ["bookmarks","Bookmarks"],
+     ["cbtResults","Results"]
+   ];
+
+   for(const [key,label] of contracts){
+     let exists=false;
+
+     try{
+       exists=localStorage.getItem(key)!==null;
+     }catch(_){}
+
+     step(
+       label+" storage contract",
+       exists
+         ?"VERIFIED WORKING":"NOT VERIFIED",
+       "storage key observable",
+       exists?"present":"not observed"
+     );
+   }
+
+   /* =========================================================
+      8. NAVIGATION CONTRACT
+      ========================================================= */
+
+   const requiredPages=[
+     "cbt.html",
+     "mistake.html",
+     "rankers-test-series.html"
+   ];
+
+   for(const page of requiredPages){
+     try{
+       const r=await fetch(
+         "./"+page,
+         {cache:"no-store"}
+       );
+
+       step(
+         "Route "+page,
+         r.ok
+           ?"VERIFIED WORKING":"VERIFIED BROKEN",
+         200,
+         r.status
+       );
+     }catch(e){
+       step(
+         "Route "+page,
+         "VERIFIED BROKEN",
+         "reachable",
+         String(e)
+       );
+     }
+   }
+
+   /* =========================================================
+      9. BUTTON REALITY
+      ========================================================= */
+
+   const buttonTexts=[
+     "Start Ranker Test",
+     "OWNER AI",
+     "SAFE REPAIR CYCLE"
+   ];
+
+   for(const text of buttonTexts){
+     const found=[
+       ...document.querySelectorAll("button,a")
+     ].some(
+       x=>(x.innerText||x.textContent||"")
+         .trim()
+         .toLowerCase()
+         .includes(text.toLowerCase())
+     );
+
+     step(
+       "UI control: "+text,
+       found
+         ?"VERIFIED WORKING":"NOT VERIFIED",
+       "visible control",
+       found?"found":"not found"
+     );
+   }
+
+   /* =========================================================
+      10. RUNTIME ERROR GATE
+      ========================================================= */
+
+   step(
+     "Runtime error gate",
+     this.consoleErrors.length===0
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     0,
+     this.consoleErrors.length
+   );
+
+   /* =========================================================
+      FINAL RESULT
+      ========================================================= */
+
+   const broken=steps.filter(
+     x=>x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     scanId:"FLOW-"+Date.now(),
+     at:now(),
+     status:broken.length
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     steps,
+     brokenSteps:broken.length
+   };
+
+   this.emit("real.flow.scan",result);
+
+   if(broken.length){
+     this.incident(
+       "Real user-flow verification failure",
+       broken,
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
  async commandCenterScan(){
    this.start();
 

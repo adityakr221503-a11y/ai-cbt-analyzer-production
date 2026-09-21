@@ -63,6 +63,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="repair">SAFE REPAIR CYCLE</button>
 <button id="command">INCIDENT COMMAND CENTER</button>
 <button id="bundle">EXPORT INCIDENT BUNDLE</button>
+<button id="flow">REAL USER-FLOW SCAN</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -150,6 +151,11 @@ $("command").onclick=async function(){
 $("bundle").onclick=async function(){
   $("log").textContent="Building immutable-style evidence bundle...";
   render(await g.exportIncidentBundle());
+};
+
+$("flow").onclick=async function(){
+  $("log").textContent="Running real RankForge CBT user-flow verification...";
+  render(await g.realFlowScan());
 };
 
 $("repair").onclick=function(){
