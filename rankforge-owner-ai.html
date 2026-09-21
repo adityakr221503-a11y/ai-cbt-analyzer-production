@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RankForge Owner AI</title>
+<style>
+body{margin:0;background:#0b1020;color:#e8eefc;font-family:system-ui,sans-serif}
+.wrap{max-width:1000px;margin:auto;padding:20px}
+.card{background:#111a30;border:1px solid #263454;border-radius:18px;padding:18px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.stat{background:#17223b;border-radius:14px;padding:15px}
+.n{font-size:26px;font-weight:900}
+.muted{color:#9eabc5}
+button{width:100%;padding:13px;border:0;border-radius:11px;background:#4f7cff;color:white;font-weight:800;margin-top:8px}
+pre{white-space:pre-wrap;word-break:break-word;max-height:520px;overflow:auto;background:#080d19;padding:12px;border-radius:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="card">
+<h1>RankForge Owner AI</h1>
+<div class="muted">
+Evidence-first Guardian • No fake blame • No unverified fixes
+</div>
+</section>
+
+<section class="grid">
+
+<div class="stat">
+<div class="n" id="state">NOT VERIFIED</div>
+<div class="muted">Guardian state</div>
+</div>
+
+<div class="stat">
+<div class="n" id="t180">—</div>
+<div class="muted">Test 180</div>
+</div>
+
+<div class="stat">
+<div class="n" id="bio">—</div>
+<div class="muted">Biology</div>
+</div>
+
+<div class="stat">
+<div class="n" id="errors">0</div>
+<div class="muted">Runtime errors</div>
+</div>
+
+</section>
+
+<section class="card">
+<h2>Verification</h2>
+<button id="scan">VERIFY EVERYTHING</button>
+<button id="repair">SAFE LOCAL REPAIR</button>
+<button id="export">EXPORT EVIDENCE</button>
+</section>
+
+<section class="card">
+<h2>Evidence</h2>
+<pre id="log">Guardian starting...</pre>
+</section>
+
+</div>
+
+<script src="./rankforge-owner-ai.js"></script>
+
+<script>
+(async function(){
+
+const g=window.RankForgeOwnerAI;
+const $=id=>document.getElementById(id);
+
+function render(r){
+  $("state").textContent=r.status||"NOT VERIFIED";
+
+  $("t180").textContent=
+    (r.banks?.test180?.actual??"—")+"/180";
+
+  $("bio").textContent=
+    (r.banks?.biology?.actual??"—")+"/2700";
+
+  $("errors").textContent=
+    g.consoleErrors.length;
+
+  $("log").textContent=
+    JSON.stringify(r,null,2);
+}
+
+$("scan").onclick=async function(){
+  render(await g.checkPage());
+};
+
+$("repair").onclick=function(){
+  const r=g.safeRepairLocalRegistration();
+  $("log").textContent=
+    JSON.stringify(r,null,2);
+};
+
+$("export").onclick=function(){
+  g.exportEvidence();
+};
+
+render(await g.checkPage());
+
+})();
+</script>
+
+</body>
+</html>
