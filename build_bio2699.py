@@ -41,7 +41,22 @@ def parse(text,test):
     for i,(n,st,en) in enumerate(chosen):
         end=chosen[i+1][1] if i+1<len(chosen) else len(text)
         raw=text[en:end].strip()
-        om=list(re.finditer(r"(?m)(?:^|\n)\s*\(?([a-dA-D])\)?\s*[.)\-:]\s+",raw))
+        # Biology PDF options can appear as a), a., a-, (a)
+        # or numeric forms such as 1), 2), 3), 4).
+        # Parse both without inventing/rewording source content.
+        option_pattern = (
+            r"(?m)^\s*"
+            r"(?:"
+            r"\(?([a-dA-D])\)?\s*[.)\-:]\s+"
+            r"|"
+            r"\(?([1-4])\)?\s*[.)\-:]\s+"
+            r"|"
+            r"Option\s*([a-dA-D1-4])\s*[:.)\-]\s+"
+            r")"
+        )
+
+        om=list(re.finditer(option_pattern,raw,re.I))
+
         if len(om)>=4:
             om=om[:4]
             q=raw[:om[0].start()].strip()

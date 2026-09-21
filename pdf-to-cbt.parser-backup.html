@@ -2,6 +2,8 @@
 <html lang="en">
 <script src="./test180-questions.js"></script>
 <head>
+<script src="./rankforge-core-v1.js"></script>
+
 <script src="./vendor/pdf.min.js"></script>
 <script>
   if (window.pdfjsLib) {
@@ -1332,7 +1334,8 @@ function parseQuestionJSON(
 
 function parsePlainTextQuestions(text) {
   const questions = [];
-  const cleaned = cleanPDFText(text).replace(//g, "
+  const cleaned = cleanPDFText(text).replace(/
+/g, "
 ").replace(/[ 	]+/g, " ").trim();
   const blocks = cleaned.split(/(?=(?:^|
 )\s*\d+\s*[.)]\s*)/gm);
