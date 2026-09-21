@@ -176,6 +176,110 @@ const G={
    return out;
  },
 
+ async verifyWorkflow(){
+   const checks=[];
+   const add=(name,expected,actual,critical=true)=>{
+     const ok=expected===actual;
+     checks.push({
+       name,expected,actual,
+       status:ok?"VERIFIED WORKING":"VERIFIED BROKEN",
+       critical
+     });
+     return ok;
+   };
+
+   let t180=0;
+   try{
+     if(Array.isArray(window.TEST180_QUESTIONS))
+       t180=window.TEST180_QUESTIONS.length;
+     else if(Array.isArray(window.__RANKERS_TEST180_BANK))
+       t180=window.__RANKERS_TEST180_BANK.length;
+   }catch(_){}
+
+   let bio=0;
+   try{
+     const x=read("RANKFORGE_BIOLOGY_2700_BANK_V2",[]);
+     bio=Array.isArray(x)?x.length:0;
+   }catch(_){}
+
+   add("Test 180 source",180,t180,true);
+   add("Biology source",2700,bio,true);
+
+   const required=[
+     ["CBT page","./cbt.html"],
+     ["Mistake page","./mistake.html"],
+     ["Rankers page","./rankers-test-series.html"]
+   ];
+
+   for(const [name,path] of required){
+     try{
+       const r=await fetch(path,{cache:"no-store"});
+       checks.push({
+         name,
+         expected:"HTTP 200",
+         actual:r.status,
+         status:r.ok?"VERIFIED WORKING":"VERIFIED BROKEN",
+         critical:true
+       });
+     }catch(e){
+       checks.push({
+         name,
+         expected:"reachable",
+         actual:String(e),
+         status:"VERIFIED BROKEN",
+         critical:true
+       });
+     }
+   }
+
+   const criticalBroken=checks.filter(
+     x=>x.critical&&x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     at:now(),
+     checks,
+     status:criticalBroken.length
+       ?"VERIFIED BROKEN"
+       :"VERIFIED WORKING"
+   };
+
+   this.emit("workflow.verification",result);
+
+   if(criticalBroken.length){
+     this.incident(
+       "RankForge workflow verification failed",
+       criticalBroken,
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
+ async continuousScan(){
+   this.start();
+
+   const full=await this.checkPage();
+   const workflow=await this.verifyWorkflow();
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     status:
+       full.status==="VERIFIED BROKEN"||
+       workflow.status==="VERIFIED BROKEN"
+       ?"VERIFIED BROKEN"
+       :"VERIFIED WORKING",
+     full,
+     workflow
+   };
+
+   this.emit("continuous.scan",result);
+   return result;
+ },
+
  async checkPage(){
    this.start();
 

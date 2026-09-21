@@ -53,6 +53,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <section class="card">
 <h2>Verification</h2>
 <button id="scan">VERIFY EVERYTHING</button>
+<button id="continuous">CONTINUOUS FULL SCAN</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -89,7 +90,12 @@ function render(r){
 }
 
 $("scan").onclick=async function(){
-  render(await g.checkPage());
+  render(await g.continuousScan());
+};
+
+$("continuous").onclick=async function(){
+  $("log").textContent="Running full evidence scan...";
+  render(await g.continuousScan());
 };
 
 $("repair").onclick=function(){
