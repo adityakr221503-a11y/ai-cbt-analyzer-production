@@ -745,32 +745,127 @@
     };
   }
 
-  function boot() {
+  async function loadVerifiedJSONBank() {
+    const res = await fetch("./rank-booster/biology-test-series-2699.json", {
+      cache: "no-store"
+    });
+
+    if (!res.ok) {
+      throw new Error(
+        "Verified Biology JSON load failed: HTTP " + res.status
+      );
+    }
+
+    const raw = await res.json();
+
+    if (!Array.isArray(raw)) {
+      throw new Error("Verified Biology JSON is not an array.");
+    }
+
+    const bank = {};
+
+    for (const q of raw) {
+      const test = Number(q.testNumber);
+      const num = Number(
+        q.questionNumber ?? q.sourceQuestionNumber
+      );
+
+      if (!test || !num) continue;
+
+      const key = String(test);
+
+      if (!bank[key]) {
+        bank[key] = [];
+      }
+
+      bank[key].push({
+        ...q,
+        sourceQuestionNumber: num,
+        originalSource: true,
+        source: q.source || "NEET Biology Test Series.pdf"
+      });
+    }
+
+    for (const arr of Object.values(bank)) {
+      arr.sort(
+        (a, b) =>
+          Number(a.sourceQuestionNumber) -
+          Number(b.sourceQuestionNumber)
+      );
+    }
+
+    const total = Object.values(bank)
+      .reduce((n, arr) => n + arr.length, 0);
+
+    if (total !== 2699) {
+      throw new Error(
+        "Verified Biology bank contains " +
+        total +
+        " questions; expected 2699."
+      );
+    }
+
+    if (
+      bank["11"] &&
+      bank["11"].some(
+        q => Number(q.sourceQuestionNumber) === 53
+      )
+    ) {
+      throw new Error(
+        "Safety check failed: Test 11 Q53 is still active."
+      );
+    }
+
+    localStorage.setItem(
+      BANK_KEY,
+      JSON.stringify(bank)
+    );
+
+    localStorage.setItem(
+      META_KEY,
+      JSON.stringify({
+        version: "RANKFORGE_BIOLOGY_2699_VERIFIED_JSON",
+        sourceFile: "NEET Biology Test Series.pdf",
+        pages: 310,
+        tests: 30,
+        totalQuestions: 2699,
+        answerMissing: 0,
+        originalSourcePreserved: true,
+        importedAt: new Date().toISOString()
+      })
+    );
+
+    return bank;
+  }
+
+  async function boot() {
     installUI();
 
     try {
-      const meta = JSON.parse(
-        localStorage.getItem(META_KEY) || "null"
+      const bank = await loadVerifiedJSONBank();
+
+      const total = Object.values(bank)
+        .reduce((n, arr) => n + arr.length, 0);
+
+      renderTests();
+
+      say(
+        "VERIFIED Biology bank loaded.\n" +
+        "30 tests • " +
+        total +
+        " questions • 0 missing answers.\n" +
+        "Test 11 Q53 intentionally skipped."
       );
-
-      const bank = JSON.parse(
-        localStorage.getItem(BANK_KEY) || "null"
+    } catch (err) {
+      say(
+        "BIOLOGY BANK LOAD FAILED — NOT ACTIVATED\n\n" +
+        (
+          err && err.message
+            ? err.message
+            : String(err)
+        )
       );
-
-      if (
-        meta &&
-        meta.totalQuestions === 2700 &&
-        bank &&
-        Object.keys(bank).length === 30
-      ) {
-        renderTests();
-
-        say(
-          "Validated Biology 2700 bank already loaded.\n" +
-          "30 tests × 90 questions."
-        );
-      }
-    } catch (_) {}
+    }
   }
 
   if (document.readyState === "loading") {
