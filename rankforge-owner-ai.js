@@ -878,6 +878,184 @@ const G={
    return result;
  },
 
+ async correlateFailures(){
+   this.start();
+
+   const evidence=this.evidence||[];
+   const incidents=this.incidents||[];
+
+   const errors=evidence.filter(e=>
+     e.type==="runtime.error"||
+     e.type==="runtime.unhandledrejection"||
+     e.type==="console.error"||
+     e.type==="source.check"||
+     e.type==="bank.check"||
+     e.type==="deployment.integrity"||
+     e.type==="dataflow.check"||
+     e.type==="e2e.contracts"
+   );
+
+   const fingerprint=(x)=>{
+     const raw=JSON.stringify(x)
+       .replace(/https?:\/\/[^\s"'`]+/g,"<URL>")
+       .replace(/\b\d+\b/g,"<N>")
+       .toLowerCase();
+
+     let h=2166136261;
+     for(let i=0;i<raw.length;i++){
+       h^=raw.charCodeAt(i);
+       h=Math.imul(h,16777619);
+     }
+     return ("00000000"+(h>>>0).toString(16)).slice(-8);
+   };
+
+   const groups=new Map();
+
+   for(const e of errors){
+     const fp=fingerprint({
+       type:e.type,
+       data:e.data
+     });
+
+     if(!groups.has(fp)){
+       groups.set(fp,{
+         fingerprint:fp,
+         count:0,
+         firstSeen:e.at,
+         lastSeen:e.at,
+         evidence:[]
+       });
+     }
+
+     const g=groups.get(fp);
+     g.count++;
+     g.lastSeen=e.at;
+
+     if(g.evidence.length<10)
+       g.evidence.push(e.id);
+   }
+
+   const correlated=[...groups.values()]
+     .sort((a,b)=>b.count-a.count);
+
+   /* ---------- ROOT-CAUSE HYPOTHESES ---------- */
+   const hypotheses=[];
+
+   for(const g of correlated){
+     if(g.count<1) continue;
+
+     const related=evidence.filter(
+       e=>g.evidence.includes(e.id)
+     );
+
+     const text=JSON.stringify(related).toLowerCase();
+
+     let cause="Cause not established";
+     let confidence="LOW";
+
+     if(
+       text.includes("404")||
+       text.includes("failed to fetch")||
+       text.includes("missing")
+     ){
+       cause="Missing/unreachable dependency or asset";
+       confidence="HIGH";
+     }else if(
+       text.includes("2700")||
+       text.includes("biology")
+     ){
+       cause="Biology question-bank data-flow mismatch";
+       confidence="MEDIUM";
+     }else if(
+       text.includes("180")||
+       text.includes("test 180")
+     ){
+       cause="Test 180 registration/data-flow mismatch";
+       confidence="MEDIUM";
+     }else if(
+       text.includes("syntax")||
+       text.includes("unexpected token")
+     ){
+       cause="JavaScript syntax/runtime parsing failure";
+       confidence="HIGH";
+     }else if(
+       text.includes("storage")||
+       text.includes("localstorage")
+     ){
+       cause="Client storage/state contract failure";
+       confidence="MEDIUM";
+     }
+
+     hypotheses.push({
+       fingerprint:g.fingerprint,
+       occurrences:g.count,
+       cause,
+       confidence,
+       evidence:g.evidence
+     });
+   }
+
+   /* ---------- INCIDENT DEDUPLICATION ---------- */
+   const uniqueIncidents=[];
+   const seen=new Set();
+
+   for(const i of incidents){
+     const fp=fingerprint({
+       title:i.title,
+       details:i.details
+     });
+
+     if(seen.has(fp)) continue;
+     seen.add(fp);
+
+     uniqueIncidents.push({
+       id:i.id,
+       fingerprint:fp,
+       title:i.title,
+       status:i.status,
+       severity:i.severity,
+       at:i.at
+     });
+   }
+
+   const result={
+     at:now(),
+     status:"NOT VERIFIED",
+     evidenceCount:errors.length,
+     failureGroups:correlated.length,
+     uniqueIncidents:uniqueIncidents.length,
+     hypotheses
+   };
+
+   this.emit("failure.correlation",result);
+
+   return result;
+ },
+
+ async investigationScan(){
+   this.start();
+
+   const release=await this.checkDeploymentIntegrity();
+   const e2e=await this.e2eScan();
+   const correlation=await this.correlateFailures();
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     status:
+       release.status==="VERIFIED BROKEN"||
+       e2e.status==="VERIFIED BROKEN"
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     release,
+     e2e,
+     correlation
+   };
+
+   this.emit("investigation.scan",result);
+   return result;
+ },
+
  async releaseScan(){
    this.start();
 

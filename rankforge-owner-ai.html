@@ -57,6 +57,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="deep">DEEP DATA-FLOW SCAN</button>
 <button id="e2e">E2E CBT FLOW SCAN</button>
 <button id="release">RELEASE / DEPLOYMENT SCAN</button>
+<button id="investigate">ROOT-CAUSE INVESTIGATION</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -114,6 +115,11 @@ $("e2e").onclick=async function(){
 $("release").onclick=async function(){
   $("log").textContent="Running deployment and dependency verification...";
   render(await g.releaseScan());
+};
+
+$("investigate").onclick=async function(){
+  $("log").textContent="Correlating failures and investigating root causes...";
+  render(await g.investigationScan());
 };
 
 $("repair").onclick=function(){
