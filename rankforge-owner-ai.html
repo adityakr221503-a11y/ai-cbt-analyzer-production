@@ -69,6 +69,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="replay">REPRODUCE FAILURE</button>
 <button id="compare">COMPARE REPLAY</button>
 <button id="root">ROOT-CAUSE ENGINE</button>
+<button id="fix">VERIFIED FIX ENGINE</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -186,6 +187,11 @@ $("compare").onclick=async function(){
 $("root").onclick=async function(){
   $("log").textContent="Correlating evidence and testing root-cause hypotheses...";
   render(await g.rootCauseEngine());
+};
+
+$("fix").onclick=async function(){
+  $("log").textContent="Running evidence-gated deterministic repair and independent verification...";
+  render(await g.verifiedFixEngine());
 };
 
 $("repair").onclick=function(){

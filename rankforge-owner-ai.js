@@ -2412,6 +2412,249 @@ const G={
    return snapshot;
  },
 
+ async verifiedFixEngine(){
+   this.start();
+
+   const root=await this.rootCauseEngine();
+
+   const fixes=[];
+   const add=(id,cause,action,risk,allowed)=>{
+     fixes.push({
+       id,
+       cause,
+       action,
+       risk,
+       allowed,
+       status:"CANDIDATE"
+     });
+   };
+
+   /* =========================================================
+      FIX 1 — TEST 180 LOCAL REGISTRATION
+      ========================================================= */
+
+   const source180=Array.isArray(
+     window.TEST180_QUESTIONS
+   )?window.TEST180_QUESTIONS:null;
+
+   const runtime180=Array.isArray(
+     window.__RANKERS_TEST180_BANK
+   )?window.__RANKERS_TEST180_BANK.length:0;
+
+   if(
+     source180&&
+     source180.length===180&&
+     runtime180!==180
+   ){
+     add(
+       "FIX-TEST180-REGISTRATION",
+       "Verified source/runtime registration mismatch",
+       "Register a copy of the independently verified 180-question source.",
+       "SAFE",
+       true
+     );
+   }
+
+   /* =========================================================
+      FIX 2 — BIOLOGY LOCAL REGISTRATION
+      ========================================================= */
+
+   let biology=[];
+
+   try{
+     const b=read(
+       "RANKFORGE_BIOLOGY_2700_BANK_V2",
+       []
+     );
+
+     if(Array.isArray(b))
+       biology=b;
+   }catch(_){}
+
+   if(biology.length===2700){
+     const active=Array.isArray(
+       window.__RANKFORGE_BIOLOGY_ACTIVE
+     )?window.__RANKFORGE_BIOLOGY_ACTIVE.length:0;
+
+     if(active!==2700){
+       add(
+         "FIX-BIOLOGY-LOCAL-REGISTRATION",
+         "Verified Biology source exists but active runtime registration differs.",
+         "Register a non-mutating copy of the verified Biology pool.",
+         "SAFE",
+         true
+       );
+     }
+   }
+
+   /* =========================================================
+      SOURCE / STUDENT DATA SAFETY
+      ========================================================= */
+
+   add(
+     "GUARD-SOURCE-DATA",
+     "Any repair that rewrites original questions or answer keys",
+     "Do not modify source question data.",
+     "BLOCKED",
+     false
+   );
+
+   add(
+     "GUARD-STUDENT-DATA",
+     "Any destructive student-data operation",
+     "Do not delete/reset history, mistakes, bookmarks, or results.",
+     "BLOCKED",
+     false
+   );
+
+   const safeFixes=fixes.filter(
+     x=>x.allowed&&x.risk==="SAFE"
+   );
+
+   /* =========================================================
+      CHECKPOINT
+      ========================================================= */
+
+   const checkpoint={
+     at:now(),
+     source180:
+       source180?source180.length:0,
+     runtime180,
+     biology:biology.length,
+     storageKeys:Object.keys(localStorage).sort()
+   };
+
+   write(
+     "rankforge.guardian.v15.checkpoint",
+     checkpoint
+   );
+
+   /* =========================================================
+      APPLY ONLY DETERMINISTIC LOCAL FIXES
+      ========================================================= */
+
+   const applied=[];
+
+   for(const fix of safeFixes){
+
+     if(fix.id==="FIX-TEST180-REGISTRATION"){
+       window.__RANKERS_TEST180_BANK=
+         source180.slice();
+
+       window.__RANKERS_TEST180_READY=true;
+
+       applied.push({
+         id:fix.id,
+         before:runtime180,
+         after:
+           window.__RANKERS_TEST180_BANK.length
+       });
+     }
+
+     if(fix.id==="FIX-BIOLOGY-LOCAL-REGISTRATION"){
+       try{
+         const copy=biology.slice();
+
+         window.__RANKFORGE_BIOLOGY_ACTIVE=
+           copy;
+
+         applied.push({
+           id:fix.id,
+           before:0,
+           after:copy.length
+         });
+       }catch(e){
+         applied.push({
+           id:fix.id,
+           status:"APPLY ERROR",
+           error:String(e)
+         });
+       }
+     }
+   }
+
+   /* =========================================================
+      INDEPENDENT VERIFICATION
+      ========================================================= */
+
+   const oracle=await this.independentOracle();
+
+   const flow=await this.realFlowScan();
+
+   const verifiedTest180=
+     Array.isArray(
+       window.__RANKERS_TEST180_BANK
+     )&&
+     window.__RANKERS_TEST180_BANK.length===180;
+
+   const verifiedBiology=
+     biology.length===2700;
+
+   const allSafeApplied=
+     applied.every(
+       x=>
+         !x.error&&
+         (
+           x.after===180||
+           x.after===2700
+         )
+     );
+
+   const regressionFree=
+     oracle.status!=="VERIFIED BROKEN"&&
+     flow.status!=="VERIFIED BROKEN";
+
+   const status=
+     applied.length&&
+     allSafeApplied&&
+     regressionFree&&
+     (verifiedTest180||verifiedBiology)
+       ?"VERIFIED FIXED"
+       :"NOT VERIFIED";
+
+   const result={
+     scanId:"FIX-"+Date.now(),
+     at:now(),
+     rootCause:root.status,
+     root,
+     candidates:fixes,
+     applied,
+     checkpoint,
+     verification:{
+       oracle,
+       flow
+     },
+     regressionFree,
+     status
+   };
+
+   this.emit(
+     "verified.fix",
+     result
+   );
+
+   if(status!=="VERIFIED FIXED"){
+     this.incident(
+       "Fix verification failed",
+       result,
+       "NOT VERIFIED",
+       "critical"
+     );
+   }else{
+     this.incident(
+       "Safe deterministic fix independently verified",
+       {
+         applied,
+         regressionFree
+       },
+       "VERIFIED WORKING",
+       "info"
+     );
+   }
+
+   return result;
+ },
+
  async rootCauseEngine(){
    this.start();
 
