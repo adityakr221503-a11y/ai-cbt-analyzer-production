@@ -58,6 +58,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="e2e">E2E CBT FLOW SCAN</button>
 <button id="release">RELEASE / DEPLOYMENT SCAN</button>
 <button id="investigate">ROOT-CAUSE INVESTIGATION</button>
+<button id="mega">MEGA GUARDIAN SCAN</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -120,6 +121,11 @@ $("release").onclick=async function(){
 $("investigate").onclick=async function(){
   $("log").textContent="Correlating failures and investigating root causes...";
   render(await g.investigationScan());
+};
+
+$("mega").onclick=async function(){
+  $("log").textContent="Running complete multi-layer Guardian scan...";
+  render(await g.megaScan());
 };
 
 $("repair").onclick=function(){

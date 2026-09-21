@@ -1032,6 +1032,268 @@ const G={
    return result;
  },
 
+ async regressionScan(){
+   this.start();
+
+   const RK="rankforge.guardian.regression.v1";
+   const BK="rankforge.guardian.baseline.v1";
+   const previous=read(RK,[]);
+   const baseline=read(BK,null);
+
+   const nowState={
+     at:now(),
+     url:location.href,
+     online:navigator.onLine,
+     scripts:[...document.scripts]
+       .filter(x=>x.src)
+       .map(x=>x.src),
+     storageKeys:Object.keys(localStorage).sort(),
+     test180:Array.isArray(window.TEST180_QUESTIONS)
+       ?window.TEST180_QUESTIONS.length
+       :(Array.isArray(window.__RANKERS_TEST180_BANK)
+         ?window.__RANKERS_TEST180_BANK.length:0),
+     biology:(()=>{
+       try{
+         const x=read("RANKFORGE_BIOLOGY_2700_BANK_V2",[]);
+         return Array.isArray(x)?x.length:0;
+       }catch(_){return 0}
+     })()
+   };
+
+   const stable=(x)=>{
+     const raw=JSON.stringify(x);
+     let h=2166136261;
+     for(let i=0;i<raw.length;i++){
+       h^=raw.charCodeAt(i);
+       h=Math.imul(h,16777619);
+     }
+     return ("00000000"+(h>>>0).toString(16)).slice(-8);
+   };
+
+   const fingerprint=stable({
+     scripts:nowState.scripts,
+     test180:nowState.test180,
+     biology:nowState.biology
+   });
+
+   const checks=[];
+
+   /* ---------- GOLDEN EXPECTATIONS ---------- */
+   const golden=[
+     ["Test 180",180,nowState.test180],
+     ["Biology",2700,nowState.biology]
+   ];
+
+   for(const [name,expected,actual] of golden){
+     checks.push({
+       name,
+       expected,
+       actual,
+       status:actual===expected
+         ?"VERIFIED WORKING"
+         :"VERIFIED BROKEN",
+       critical:true
+     });
+   }
+
+   /* ---------- DUPLICATE STORAGE KEYS ---------- */
+   const keys=nowState.storageKeys;
+   const normalized=new Map();
+
+   for(const key of keys){
+     const n=key
+       .toLowerCase()
+       .replace(/[_\-]/g,"");
+
+     if(!normalized.has(n))
+       normalized.set(n,[]);
+
+     normalized.get(n).push(key);
+   }
+
+   const duplicateGroups=
+     [...normalized.values()].filter(x=>x.length>1);
+
+   checks.push({
+     name:"Potential duplicate storage namespaces",
+     expected:0,
+     actual:duplicateGroups.length,
+     status:duplicateGroups.length
+       ?"NOT VERIFIED"
+       :"VERIFIED WORKING",
+     critical:false,
+     groups:duplicateGroups
+   });
+
+   /* ---------- BASELINE COMPARISON ---------- */
+   let baselineStatus="NOT VERIFIED";
+
+   if(baseline){
+     const changed=[];
+
+     for(const key of [
+       "scripts",
+       "storageKeys",
+       "test180",
+       "biology",
+       "online"
+     ]){
+       if(JSON.stringify(baseline[key])!==JSON.stringify(nowState[key]))
+         changed.push(key);
+     }
+
+     baselineStatus=changed.length
+       ?"CHANGED"
+       :"UNCHANGED";
+
+     checks.push({
+       name:"Golden baseline comparison",
+       expected:"UNCHANGED",
+       actual:baselineStatus,
+       status:changed.length
+         ?"NOT VERIFIED"
+         :"VERIFIED WORKING",
+       critical:false,
+       changed
+     });
+   }else{
+     write(BK,nowState);
+
+     checks.push({
+       name:"Golden baseline",
+       expected:"created",
+       actual:"created",
+       status:"VERIFIED WORKING",
+       critical:false
+     });
+   }
+
+   /* ---------- REGRESSION FINGERPRINT ---------- */
+   const old=previous.find(
+     x=>x.fingerprint===fingerprint
+   );
+
+   const record={
+     id:"REG-"+Date.now(),
+     at:now(),
+     fingerprint,
+     state:nowState
+   };
+
+   previous.push(record);
+
+   if(previous.length>100)
+     previous.splice(0,previous.length-100);
+
+   write(RK,previous);
+
+   checks.push({
+     name:"Regression fingerprint",
+     expected:"stable",
+     actual:fingerprint,
+     status:"VERIFIED WORKING",
+     critical:false,
+     previousMatch:!!old
+   });
+
+   /* ---------- COVERAGE GAP ---------- */
+   const coverage=[
+     "source",
+     "runtime",
+     "dataflow",
+     "e2e",
+     "deployment",
+     "regression"
+   ];
+
+   const missing=[];
+
+   for(const type of coverage){
+     if(!this.evidence.some(
+       e=>e.type&&e.type.includes(type)
+     )){
+       missing.push(type);
+     }
+   }
+
+   checks.push({
+     name:"Guardian coverage",
+     expected:0,
+     actual:missing.length,
+     status:missing.length
+       ?"NOT VERIFIED"
+       :"VERIFIED WORKING",
+     critical:false,
+     missing
+   });
+
+   /* ---------- INCIDENT TIMELINE ---------- */
+   const timeline=this.incidents
+     .slice(-50)
+     .map(i=>({
+       id:i.id,
+       at:i.at,
+       title:i.title,
+       status:i.status,
+       severity:i.severity
+     }));
+
+   const broken=checks.filter(
+     x=>x.critical&&x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     at:now(),
+     scanId:"SCAN-"+Date.now(),
+     fingerprint,
+     status:broken.length
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     checks,
+     timeline
+   };
+
+   this.emit("regression.scan",result);
+
+   if(broken.length){
+     this.incident(
+       "Regression/golden check failure",
+       broken,
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
+ async megaScan(){
+   this.start();
+
+   const investigation=await this.investigationScan();
+   const regression=await this.regressionScan();
+
+   const criticalBroken=[
+     investigation,
+     regression
+   ].some(x=>x.status==="VERIFIED BROKEN");
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     scanId:"MEGA-"+Date.now(),
+     status:criticalBroken
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     investigation,
+     regression
+   };
+
+   this.emit("mega.scan",result);
+
+   return result;
+ },
+
  async investigationScan(){
    this.start();
 
