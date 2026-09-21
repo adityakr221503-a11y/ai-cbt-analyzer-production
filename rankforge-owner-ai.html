@@ -61,6 +61,8 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="mega">MEGA GUARDIAN SCAN</button>
 <button id="ultimate">ULTIMATE QUALITY SCAN</button>
 <button id="repair">SAFE REPAIR CYCLE</button>
+<button id="command">INCIDENT COMMAND CENTER</button>
+<button id="bundle">EXPORT INCIDENT BUNDLE</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -138,6 +140,16 @@ $("ultimate").onclick=async function(){
 $("repair").onclick=async function(){
   $("log").textContent="Building evidence-backed safe repair plan...";
   render(await g.repairCycle());
+};
+
+$("command").onclick=async function(){
+  $("log").textContent="Running incident command and health-state analysis...";
+  render(await g.commandCenterScan());
+};
+
+$("bundle").onclick=async function(){
+  $("log").textContent="Building immutable-style evidence bundle...";
+  render(await g.exportIncidentBundle());
 };
 
 $("repair").onclick=function(){

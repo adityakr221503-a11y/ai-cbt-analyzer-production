@@ -1891,6 +1891,245 @@ const G={
    return result;
  },
 
+ async incidentCommand(){
+   this.start();
+
+   const STATE_KEY="rankforge.guardian.health-state.v1";
+   const HISTORY_KEY="rankforge.guardian.health-history.v1";
+
+   const previous=read(STATE_KEY,{
+     state:"UNKNOWN",
+     at:null
+   });
+
+   const history=read(HISTORY_KEY,[]);
+
+   const evidence=this.evidence||[];
+   const incidents=this.incidents||[];
+
+   const recentBroken=incidents
+     .slice(-20)
+     .filter(x=>x.status==="VERIFIED BROKEN");
+
+   const recentVerified=incidents
+     .slice(-20)
+     .filter(x=>x.status==="VERIFIED WORKING");
+
+   let state="HEALTHY";
+
+   if(recentBroken.length){
+     state="BROKEN";
+   }else if(
+     incidents.slice(-20).some(
+       x=>x.status==="NOT VERIFIED"
+     )
+   ){
+     state="DEGRADING";
+   }else if(recentVerified.length){
+     state="VERIFIED";
+   }
+
+   const transition={
+     from:previous.state,
+     to:state,
+     at:now(),
+     reason:
+       state==="BROKEN"
+         ?"Recent verified failures"
+         :state==="DEGRADING"
+           ?"Unverified/uncertain conditions remain"
+           :state==="VERIFIED"
+             ?"Recent verified checks passed"
+             :"No sufficient evidence"
+   };
+
+   history.push(transition);
+
+   if(history.length>200)
+     history.splice(0,history.length-200);
+
+   write(STATE_KEY,{
+     state,
+     at:transition.at
+   });
+
+   write(HISTORY_KEY,history);
+
+   /* ---------------------------------------------------------
+      INCIDENT TIMELINE
+      --------------------------------------------------------- */
+
+   const timeline=incidents
+     .slice(-50)
+     .map(x=>({
+       id:x.id,
+       at:x.at,
+       title:x.title,
+       status:x.status,
+       severity:x.severity
+     }));
+
+   /* ---------------------------------------------------------
+      ROLLBACK CHECKPOINT VERIFICATION
+      --------------------------------------------------------- */
+
+   const checkpoint=read(
+     "rankforge.guardian.repair-checkpoint.v1",
+     null
+   );
+
+   let rollbackStatus="NOT VERIFIED";
+
+   if(checkpoint){
+     rollbackStatus="CHECKPOINT AVAILABLE";
+   }
+
+   /* ---------------------------------------------------------
+      EVIDENCE BUNDLE
+      --------------------------------------------------------- */
+
+   const bundle={
+     bundleId:"BUNDLE-"+Date.now(),
+     createdAt:now(),
+     guardian:this.version,
+     health:{
+       previous:previous.state,
+       current:state,
+       transition
+     },
+     timeline,
+     checkpoint,
+     evidence:evidence.slice(-100),
+     incidents:incidents.slice(-50)
+   };
+
+   const result={
+     at:now(),
+     state,
+     transition,
+     timeline,
+     rollbackStatus,
+     evidenceCount:evidence.length,
+     incidentCount:incidents.length,
+     bundle
+   };
+
+   this.emit("incident.command",result);
+
+   return result;
+ },
+
+ async exportIncidentBundle(){
+   this.start();
+
+   const command=await this.incidentCommand();
+
+   const blob=new Blob(
+     [JSON.stringify(command.bundle,null,2)],
+     {type:"application/json"}
+   );
+
+   const url=URL.createObjectURL(blob);
+   const a=document.createElement("a");
+
+   a.href=url;
+   a.download=
+     "rankforge-guardian-incident-"+Date.now()+".json";
+
+   document.body.appendChild(a);
+   a.click();
+   a.remove();
+
+   setTimeout(
+     ()=>URL.revokeObjectURL(url),
+     1500
+   );
+
+   this.emit(
+     "incident.bundle.exported",
+     {bundleId:command.bundle.bundleId}
+   );
+
+   return {
+     status:"VERIFIED WORKING",
+     bundleId:command.bundle.bundleId
+   };
+ },
+
+ async rollbackVerification(){
+   this.start();
+
+   const checkpoint=read(
+     "rankforge.guardian.repair-checkpoint.v1",
+     null
+   );
+
+   if(!checkpoint){
+     const result={
+       at:now(),
+       status:"NOT VERIFIED",
+       reason:"No repair checkpoint exists."
+     };
+
+     this.emit("rollback.verification",result);
+     return result;
+   }
+
+   const current={
+     test180:Array.isArray(window.__RANKERS_TEST180_BANK)
+       ?window.__RANKERS_TEST180_BANK.length:0,
+     biology:(()=>{
+       try{
+         const x=read("RANKFORGE_BIOLOGY_2700_BANK_V2",[]);
+         return Array.isArray(x)?x.length:0;
+       }catch(_){return 0}
+     })(),
+     storageKeys:Object.keys(localStorage).sort()
+   };
+
+   const result={
+     at:now(),
+     status:"NOT VERIFIED",
+     checkpoint,
+     current
+   };
+
+   /*
+    * This intentionally DOES NOT mutate or restore data.
+    * Rollback is only verified here; destructive restoration
+    * requires a controlled external repair boundary.
+    */
+
+   this.emit("rollback.verification",result);
+
+   return result;
+ },
+
+ async commandCenterScan(){
+   this.start();
+
+   const incident=await this.incidentCommand();
+   const rollback=await this.rollbackVerification();
+   const quality=await this.qualityScan();
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     health:incident.state,
+     incident,
+     rollback,
+     quality,
+     status:
+       quality.status==="VERIFIED BROKEN"
+         ?"VERIFIED BROKEN"
+         :"NOT VERIFIED"
+   };
+
+   this.emit("command.center.scan",result);
+
+   return result;
+ },
+
  async repairCycle(){
    this.start();
 
