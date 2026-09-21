@@ -1628,6 +1628,306 @@ const G={
    return result;
  },
 
+ async buildRepairPlan(){
+   this.start();
+
+   const PLAN_KEY="rankforge.guardian.repair-plan.v1";
+   const plan=[];
+
+   const add=(id,title,risk,reason,action,requiresApproval)=>{
+     plan.push({
+       id,
+       title,
+       risk,
+       reason,
+       action,
+       requiresApproval,
+       status:"CANDIDATE"
+     });
+   };
+
+   /* ---------------------------------------------------------
+      SAFE DETERMINISTIC REPAIR CANDIDATES
+      --------------------------------------------------------- */
+
+   const ownerScript=document.querySelector(
+     'script[src*="rankforge-owner-ai.js"]'
+   );
+
+   if(!ownerScript){
+     add(
+       "FIX-SCRIPT-OWNER-AI",
+       "Restore Owner AI script reference",
+       "SAFE",
+       "Owner AI runtime script is not present in the current page.",
+       "Restore the known local Owner AI script reference.",
+       false
+     );
+   }
+
+   const biologyScript=document.querySelector(
+     'script[src*="biology-test-series-rankers-v2.js"]'
+   );
+
+   if(!biologyScript){
+     add(
+       "FIX-SCRIPT-BIOLOGY",
+       "Restore Biology importer reference",
+       "SAFE",
+       "Biology importer script is not present in the current page.",
+       "Restore the known Biology importer script reference.",
+       false
+     );
+   }
+
+   /* ---------------------------------------------------------
+      QUESTION BANK SAFETY BOUNDARY
+      --------------------------------------------------------- */
+
+   add(
+     "GUARD-BANK-SOURCE",
+     "Protect source question banks",
+     "BLOCKED",
+     "Guardian must never rewrite source questions or answer keys.",
+     "No automatic mutation permitted.",
+     true
+   );
+
+   /* ---------------------------------------------------------
+      STUDENT DATA SAFETY
+      --------------------------------------------------------- */
+
+   add(
+     "GUARD-STUDENT-DATA",
+     "Protect student history/mistakes/bookmarks",
+     "BLOCKED",
+     "Student state is user data and cannot be destructively modified automatically.",
+     "No automatic deletion/reset permitted.",
+     true
+   );
+
+   /* ---------------------------------------------------------
+      DEPLOYMENT BOUNDARY
+      --------------------------------------------------------- */
+
+   add(
+     "GUARD-DEPLOYMENT",
+     "Protect production deployment",
+     "REVIEW",
+     "Static GitHub Pages runtime cannot safely deploy source changes.",
+     "Prepare evidence and require external controlled deployment.",
+     true
+   );
+
+   /* ---------------------------------------------------------
+      RUNTIME STORAGE REPAIR
+      --------------------------------------------------------- */
+
+   const t180=Array.isArray(window.TEST180_QUESTIONS)
+     ?window.TEST180_QUESTIONS:null;
+
+   if(t180&&t180.length===180){
+     const current=Array.isArray(window.__RANKERS_TEST180_BANK)
+       ?window.__RANKERS_TEST180_BANK.length:0;
+
+     if(current!==180){
+       add(
+         "FIX-TEST180-LOCAL-REG",
+         "Repair local Test 180 registration",
+         "SAFE",
+         "Independent source contains exactly 180 questions but active local registration differs.",
+         "Register a copy of the independently verified 180-question source in local runtime state.",
+         false
+       );
+     }
+   }
+
+   /* ---------------------------------------------------------
+      PLAN CHECKSUM
+      --------------------------------------------------------- */
+
+   const raw=JSON.stringify(plan);
+   let hash=2166136261;
+
+   for(let i=0;i<raw.length;i++){
+     hash^=raw.charCodeAt(i);
+     hash=Math.imul(hash,16777619);
+   }
+
+   const checksum=("00000000"+(hash>>>0).toString(16))
+     .slice(-8);
+
+   const result={
+     at:now(),
+     planId:"PLAN-"+Date.now(),
+     checksum,
+     candidates:plan,
+     status:"NOT VERIFIED"
+   };
+
+   write(PLAN_KEY,result);
+   this.emit("repair.plan",result);
+
+   return result;
+ },
+
+ async executeSafeRepair(){
+   this.start();
+
+   const before={
+     test180:Array.isArray(window.__RANKERS_TEST180_BANK)
+       ?window.__RANKERS_TEST180_BANK.length:0,
+     biology:(()=>{
+       try{
+         const x=read("RANKFORGE_BIOLOGY_2700_BANK_V2",[]);
+         return Array.isArray(x)?x.length:0;
+       }catch(_){return 0}
+     })()
+   };
+
+   const checkpoint={
+     at:now(),
+     before,
+     storageKeys:Object.keys(localStorage).sort()
+   };
+
+   write(
+     "rankforge.guardian.repair-checkpoint.v1",
+     checkpoint
+   );
+
+   const actions=[];
+
+   /* Only the previously defined safe local registration
+      repair is allowed here. */
+   const q=Array.isArray(window.TEST180_QUESTIONS)
+     ?window.TEST180_QUESTIONS:null;
+
+   if(q&&q.length===180){
+     const current=Array.isArray(
+       window.__RANKERS_TEST180_BANK
+     )?window.__RANKERS_TEST180_BANK.length:0;
+
+     if(current!==180){
+       window.__RANKERS_TEST180_BANK=q.slice();
+       window.__RANKERS_TEST180_READY=true;
+
+       actions.push({
+         id:"FIX-TEST180-LOCAL-REG",
+         status:
+           Array.isArray(window.__RANKERS_TEST180_BANK)&&
+           window.__RANKERS_TEST180_BANK.length===180
+             ?"VERIFIED WORKING"
+             :"VERIFIED BROKEN"
+       });
+     }
+   }
+
+   const after={
+     test180:Array.isArray(window.__RANKERS_TEST180_BANK)
+       ?window.__RANKERS_TEST180_BANK.length:0,
+     biology:(()=>{
+       try{
+         const x=read("RANKFORGE_BIOLOGY_2700_BANK_V2",[]);
+         return Array.isArray(x)?x.length:0;
+       }catch(_){return 0}
+     })()
+   };
+
+   const verified=
+     actions.length>0 &&
+     actions.every(
+       x=>x.status==="VERIFIED WORKING"
+     );
+
+   const result={
+     at:now(),
+     checkpoint,
+     before,
+     actions,
+     after,
+     status:
+       verified
+         ?"VERIFIED WORKING"
+         :"NOT VERIFIED"
+   };
+
+   this.emit("repair.execution",result);
+
+   if(!verified){
+     this.incident(
+       "Safe repair not verified",
+       result,
+       "NOT VERIFIED",
+       "warning"
+     );
+   }
+
+   return result;
+ },
+
+ async repairVerification(){
+   this.start();
+
+   const scan=await this.ultimateScan();
+
+   const checkpoint=read(
+     "rankforge.guardian.repair-checkpoint.v1",
+     null
+   );
+
+   const result={
+     at:now(),
+     status:
+       scan.status==="VERIFIED BROKEN"
+         ?"VERIFIED BROKEN"
+         :"NOT VERIFIED",
+     scan,
+     checkpoint
+   };
+
+   this.emit("repair.verification",result);
+
+   return result;
+ },
+
+ async repairCycle(){
+   this.start();
+
+   const plan=await this.buildRepairPlan();
+
+   const safe=plan.candidates.filter(
+     x=>x.risk==="SAFE"&&!x.requiresApproval
+   );
+
+   let execution={
+     status:"NOT VERIFIED",
+     actions:[]
+   };
+
+   if(safe.length)
+     execution=await this.executeSafeRepair();
+
+   const verification=await this.repairVerification();
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     plan,
+     execution,
+     verification,
+     status:
+       execution.status==="VERIFIED WORKING"&&
+       verification.status!=="VERIFIED BROKEN"
+         ?"VERIFIED WORKING"
+         :"NOT VERIFIED"
+   };
+
+   this.emit("repair.cycle",result);
+
+   return result;
+ },
+
  async ultimateScan(){
    this.start();
 
