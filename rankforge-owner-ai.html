@@ -70,7 +70,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="compare">COMPARE REPLAY</button>
 <button id="root">ROOT-CAUSE ENGINE</button>
 <button id="fix">VERIFIED FIX ENGINE</button>
-<button id="repair">SAFE LOCAL REPAIR</button>
+<button id="localRepair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
 
@@ -194,7 +194,7 @@ $("fix").onclick=async function(){
   render(await g.verifiedFixEngine());
 };
 
-$("repair").onclick=function(){
+$("localRepair").onclick=function(){
   const r=g.safeRepairLocalRegistration();
   $("log").textContent=
     JSON.stringify(r,null,2);
