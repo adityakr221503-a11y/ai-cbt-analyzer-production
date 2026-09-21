@@ -59,6 +59,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="release">RELEASE / DEPLOYMENT SCAN</button>
 <button id="investigate">ROOT-CAUSE INVESTIGATION</button>
 <button id="mega">MEGA GUARDIAN SCAN</button>
+<button id="ultimate">ULTIMATE QUALITY SCAN</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -126,6 +127,11 @@ $("investigate").onclick=async function(){
 $("mega").onclick=async function(){
   $("log").textContent="Running complete multi-layer Guardian scan...";
   render(await g.megaScan());
+};
+
+$("ultimate").onclick=async function(){
+  $("log").textContent="Running ultimate quality/security/mobile scan...";
+  render(await g.ultimateScan());
 };
 
 $("repair").onclick=function(){

@@ -1267,6 +1267,396 @@ const G={
    return result;
  },
 
+ async qualityScan(){
+   this.start();
+
+   const checks=[];
+   const add=(name,status,expected,actual,critical=false,details=null)=>{
+     checks.push({
+       name,status,expected,actual,critical,
+       ...(details?{details}: {})
+     });
+   };
+
+   /* =========================================================
+      1. SECURITY / PRIVACY
+      ========================================================= */
+
+   const html=document.documentElement.outerHTML;
+
+   const dangerousPatterns=[
+     /eval\s*\(/i,
+     /new\s+Function\s*\(/i,
+     /document\.write\s*\(/i
+   ];
+
+   for(const pattern of dangerousPatterns){
+     const found=pattern.test(html);
+
+     add(
+       "Dangerous runtime pattern "+pattern,
+       found?"NOT VERIFIED":"VERIFIED WORKING",
+       "not detected",
+       found?"detected":"not detected",
+       false
+     );
+   }
+
+   const passwordLike=[];
+   for(const key of Object.keys(localStorage)){
+     if(/password|token|secret|api[_-]?key/i.test(key))
+       passwordLike.push(key);
+   }
+
+   add(
+     "Sensitive-looking localStorage keys",
+     passwordLike.length
+       ?"NOT VERIFIED":"VERIFIED WORKING",
+     0,
+     passwordLike.length,
+     false,
+     passwordLike
+   );
+
+   /* =========================================================
+      2. STORAGE HEALTH
+      ========================================================= */
+
+   let storageBytes=0;
+
+   try{
+     storageBytes=JSON.stringify(localStorage).length;
+   }catch(_){}
+
+   add(
+     "LocalStorage capacity observation",
+     storageBytes<4500000
+       ?"VERIFIED WORKING":"NOT VERIFIED",
+     "< 4.5MB observed",
+     storageBytes+" bytes",
+     false
+   );
+
+   let storageReadable=true;
+
+   try{
+     const probe="__guardian_probe__";
+     localStorage.setItem(probe,"1");
+     storageReadable=localStorage.getItem(probe)==="1";
+     localStorage.removeItem(probe);
+   }catch(_){
+     storageReadable=false;
+   }
+
+   add(
+     "Storage read/write",
+     storageReadable
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     "read/write",
+     storageReadable?"working":"failed",
+     true
+   );
+
+   /* =========================================================
+      3. MALFORMED QUESTION DATA
+      ========================================================= */
+
+   const pools=[];
+
+   if(Array.isArray(window.TEST180_QUESTIONS))
+     pools.push(["Test 180",window.TEST180_QUESTIONS]);
+
+   if(Array.isArray(window.__RANKERS_TEST180_BANK))
+     pools.push(["Rankers Test 180",window.__RANKERS_TEST180_BANK]);
+
+   try{
+     const bio=read("RANKFORGE_BIOLOGY_2700_BANK_V2",[]);
+     if(Array.isArray(bio))
+       pools.push(["Biology",bio]);
+   }catch(_){}
+
+   for(const [name,pool] of pools){
+     let malformed=0;
+
+     for(const q of pool){
+       if(
+         !q||
+         typeof q.question!=="string"||
+         !q.question.trim()||
+         !Array.isArray(q.options)||
+         q.options.length<2
+       ){
+         malformed++;
+       }
+     }
+
+     add(
+       name+" malformed-record scan",
+       malformed
+         ?"VERIFIED BROKEN":"VERIFIED WORKING",
+       0,
+       malformed,
+       true
+     );
+   }
+
+   /* =========================================================
+      4. ACCESSIBILITY
+      ========================================================= */
+
+   const images=[...document.querySelectorAll("img")];
+
+   const missingAlt=images.filter(
+     x=>!x.hasAttribute("alt")
+   ).length;
+
+   add(
+     "Images with missing alt attribute",
+     missingAlt
+       ?"NOT VERIFIED":"VERIFIED WORKING",
+     0,
+     missingAlt,
+     false
+   );
+
+   const interactive=[
+     ...document.querySelectorAll("button,a,input,select,textarea")
+   ];
+
+   const hiddenInteractive=interactive.filter(x=>{
+     const r=x.getBoundingClientRect();
+     return r.width===0||r.height===0;
+   }).length;
+
+   add(
+     "Hidden interactive elements",
+     hiddenInteractive
+       ?"NOT VERIFIED":"VERIFIED WORKING",
+     0,
+     hiddenInteractive,
+     false
+   );
+
+   /* =========================================================
+      5. MOBILE / WEBVIEW
+      ========================================================= */
+
+   const viewport=document.querySelector(
+     'meta[name="viewport"]'
+   );
+
+   add(
+     "Mobile viewport",
+     viewport
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     "viewport meta",
+     viewport?"present":"missing",
+     true
+   );
+
+   const screenWidth=window.innerWidth;
+
+   add(
+     "Mobile viewport width",
+     screenWidth>0,
+     ">0",
+     screenWidth,
+     true
+   );
+
+   /* =========================================================
+      6. OFFLINE / ONLINE CAPABILITY
+      ========================================================= */
+
+   add(
+     "Network state observer",
+     "onLine" in navigator
+       ?"VERIFIED WORKING":"NOT VERIFIED",
+     "navigator.onLine",
+     "onLine" in navigator
+       ?"available":"unavailable",
+     false
+   );
+
+   const offlineListeners=
+     this.evidence.filter(
+       x=>x.type==="network.offline"
+     ).length;
+
+   const onlineListeners=
+     this.evidence.filter(
+       x=>x.type==="network.online"
+     ).length;
+
+   add(
+     "Network event evidence",
+     offlineListeners||onlineListeners
+       ?"VERIFIED WORKING":"NOT VERIFIED",
+     "runtime evidence",
+     {offline:offlineListeners,online:onlineListeners},
+     false
+   );
+
+   /* =========================================================
+      7. TIMER / CBT STATE OBSERVATION
+      ========================================================= */
+
+   const timerCandidates=[
+     "timer",
+     "timeLeft",
+     "remainingTime",
+     "cbtTimer",
+     "CBT_TIMER"
+   ];
+
+   let timerFound=[];
+
+   for(const key of timerCandidates){
+     try{
+       if(
+         localStorage.getItem(key)!==null||
+         typeof window[key]!=="undefined"
+       ){
+         timerFound.push(key);
+       }
+     }catch(_){}
+   }
+
+   add(
+     "Timer state observability",
+     timerFound.length
+       ?"VERIFIED WORKING":"NOT VERIFIED",
+     "timer state observable",
+     timerFound,
+     false
+   );
+
+   /* =========================================================
+      8. ERROR DENSITY
+      ========================================================= */
+
+   const runtimeErrors=this.consoleErrors.length;
+
+   add(
+     "Runtime console error count",
+     runtimeErrors===0
+       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     0,
+     runtimeErrors,
+     true
+   );
+
+   /* =========================================================
+      9. SCRIPT ORDER
+      ========================================================= */
+
+   const scriptSources=[
+     ...document.scripts
+   ].filter(x=>x.src)
+    .map(x=>x.src);
+
+   const duplicateScripts=
+     scriptSources.filter(
+       (x,i)=>scriptSources.indexOf(x)!==i
+     );
+
+   add(
+     "Duplicate script references",
+     duplicateScripts.length
+       ?"NOT VERIFIED":"VERIFIED WORKING",
+     0,
+     duplicateScripts.length,
+     false,
+     duplicateScripts
+   );
+
+   /* =========================================================
+      10. DOM ID COLLISION
+      ========================================================= */
+
+   const ids=[...document.querySelectorAll("[id]")]
+     .map(x=>x.id)
+     .filter(Boolean);
+
+   const duplicateIds=[
+     ...new Set(
+       ids.filter(
+         (x,i)=>ids.indexOf(x)!==i
+       )
+     )
+   ];
+
+   add(
+     "Duplicate DOM IDs",
+     duplicateIds.length
+       ?"VERIFIED BROKEN":"VERIFIED WORKING",
+     0,
+     duplicateIds.length,
+     true,
+     duplicateIds
+   );
+
+   /* =========================================================
+      FINAL QUALITY RESULT
+      ========================================================= */
+
+   const criticalBroken=checks.filter(
+     x=>x.critical&&x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     at:now(),
+     scanId:"QUALITY-"+Date.now(),
+     status:criticalBroken.length
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     checks,
+     criticalFailures:criticalBroken.length
+   };
+
+   this.emit("quality.scan",result);
+
+   if(criticalBroken.length){
+     this.incident(
+       "Quality/security/performance scan failure",
+       criticalBroken,
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
+ async ultimateScan(){
+   this.start();
+
+   const mega=await this.megaScan();
+   const quality=await this.qualityScan();
+
+   const broken=[
+     mega,
+     quality
+   ].some(
+     x=>x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     scanId:"ULTIMATE-"+Date.now(),
+     status:broken
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     mega,
+     quality
+   };
+
+   this.emit("ultimate.scan",result);
+
+   return result;
+ },
+
  async megaScan(){
    this.start();
 
