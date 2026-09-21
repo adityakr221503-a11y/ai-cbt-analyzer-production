@@ -68,6 +68,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="diff">DIFFERENTIAL VERIFICATION</button>
 <button id="replay">REPRODUCE FAILURE</button>
 <button id="compare">COMPARE REPLAY</button>
+<button id="root">ROOT-CAUSE ENGINE</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -180,6 +181,11 @@ $("replay").onclick=async function(){
 $("compare").onclick=async function(){
   $("log").textContent="Comparing replay snapshots...";
   render(await g.compareReplay());
+};
+
+$("root").onclick=async function(){
+  $("log").textContent="Correlating evidence and testing root-cause hypotheses...";
+  render(await g.rootCauseEngine());
 };
 
 $("repair").onclick=function(){

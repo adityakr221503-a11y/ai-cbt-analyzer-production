@@ -2412,6 +2412,302 @@ const G={
    return snapshot;
  },
 
+ async rootCauseEngine(){
+   this.start();
+
+   const incidents=this.incidents.slice(-100);
+   const evidence=this.evidence.slice(-200);
+
+   const hypotheses=[];
+
+   const addHypothesis=(
+     id,
+     cause,
+     supporting,
+     contradicting,
+     affected,
+     confidence
+   )=>{
+     const score=
+       supporting.length-
+       contradicting.length;
+
+     hypotheses.push({
+       id,
+       cause,
+       supporting,
+       contradicting,
+       affected,
+       evidenceScore:score,
+       confidence
+     });
+   };
+
+   /* =========================================================
+      H1 — TEST 180 REGISTRATION / SOURCE MISMATCH
+      ========================================================= */
+
+   const source180=Array.isArray(
+     window.TEST180_QUESTIONS
+   )?window.TEST180_QUESTIONS.length:0;
+
+   const active180=Array.isArray(
+     window.__RANKERS_TEST180_BANK
+   )?window.__RANKERS_TEST180_BANK.length:0;
+
+   if(source180!==active180){
+     addHypothesis(
+       "H-TEST180-REG",
+       "Test 180 source and runtime registration disagree.",
+       [
+         `source=${source180}`,
+         `runtime=${active180}`
+       ],
+       [],
+       ["Test 180","Rankers Test Series"],
+       "HIGH"
+     );
+   }
+
+   /* =========================================================
+      H2 — BIOLOGY TEST-BOUNDARY / BANK INTEGRITY
+      ========================================================= */
+
+   let biology=[];
+
+   try{
+     const b=read(
+       "RANKFORGE_BIOLOGY_2700_BANK_V2",
+       []
+     );
+
+     if(Array.isArray(b))
+       biology=b;
+   }catch(_){}
+
+   const bioExpected=2700;
+   const bioActual=biology.length;
+
+   if(bioActual!==bioExpected){
+     const counts={};
+
+     for(const q of biology){
+       const m=String(q?.id||"")
+         .match(/NEET-BIO-TS-(\d+)-Q/);
+
+       if(m){
+         const t=Number(m[1]);
+         counts[t]=(counts[t]||0)+1;
+       }
+     }
+
+     const badTests=[];
+
+     for(let t=1;t<=30;t++){
+       if((counts[t]||0)!==90){
+         badTests.push({
+           test:t,
+           actual:counts[t]||0
+         });
+       }
+     }
+
+     addHypothesis(
+       "H-BIO-BOUNDARY",
+       "Biology question-pool count/test-boundary mismatch.",
+       [
+         `expected=${bioExpected}`,
+         `actual=${bioActual}`,
+         `badTests=${badTests.length}`
+       ],
+       [],
+       ["Biology 2700 importer","Rankers Test Series"],
+       badTests.length
+         ?"HIGH":"MEDIUM"
+     );
+   }
+
+   /* =========================================================
+      H3 — RUNTIME ERROR CLUSTER
+      ========================================================= */
+
+   const runtimeErrors=this.consoleErrors
+     .slice(-100);
+
+   if(runtimeErrors.length){
+     const signatures={};
+
+     for(const e of runtimeErrors){
+       const text=(e.args||[])
+         .join(" ")
+         .slice(0,300);
+
+       signatures[text]=
+         (signatures[text]||0)+1;
+     }
+
+     const repeated=Object.entries(signatures)
+       .filter(([,count])=>count>1)
+       .sort((a,b)=>b[1]-a[1])
+       .slice(0,10);
+
+     addHypothesis(
+       "H-RUNTIME",
+       "Repeated runtime error signature may affect one or more workflows.",
+       repeated.map(x=>`${x[0]} ×${x[1]}`),
+       [],
+       ["Current runtime"],
+       repeated.length
+         ?"MEDIUM":"LOW"
+     );
+   }
+
+   /* =========================================================
+      H4 — SCRIPT / ASSET FAILURE
+      ========================================================= */
+
+   const scriptEvidence=evidence.filter(
+     x=>x.type==="source.check"&&
+        x.data&&
+        x.data.ok===false
+   );
+
+   if(scriptEvidence.length){
+     addHypothesis(
+       "H-ASSET",
+       "One or more required runtime assets are unreachable.",
+       scriptEvidence.map(
+         x=>x.data?.path||"unknown asset"
+       ),
+       [],
+       ["Runtime dependencies"],
+       "HIGH"
+     );
+   }
+
+   /* =========================================================
+      H5 — STORAGE FAILURE
+      ========================================================= */
+
+   const storageFailures=evidence.filter(
+     x=>
+       x.type==="quality.scan"&&
+       JSON.stringify(x.data||{})
+         .includes("Storage read/write")
+   );
+
+   if(storageFailures.length){
+     addHypothesis(
+       "H-STORAGE",
+       "Storage read/write contract may be failing.",
+       ["Quality scan reported storage evidence."],
+       [],
+       ["LocalStorage","CBT state"],
+       "MEDIUM"
+     );
+   }
+
+   /* =========================================================
+      INCIDENT CORRELATION
+      ========================================================= */
+
+   const recentBroken=incidents.filter(
+     x=>x.status==="VERIFIED BROKEN"
+   );
+
+   const clusters=[];
+
+   for(const h of hypotheses){
+     const related=recentBroken.filter(i=>{
+       const text=JSON.stringify(i).toLowerCase();
+
+       return h.affected.some(
+         a=>text.includes(String(a).toLowerCase())
+       );
+     });
+
+     clusters.push({
+       hypothesis:h.id,
+       relatedIncidents:related.map(x=>x.id)
+     });
+   }
+
+   /* =========================================================
+      BLAST RADIUS
+      ========================================================= */
+
+   const blastRadius=[];
+
+   for(const h of hypotheses){
+     blastRadius.push({
+       hypothesis:h.id,
+       affectedModules:h.affected,
+       directRisk:
+         h.confidence==="HIGH"
+           ?"HIGH"
+           :"MEDIUM",
+       sourceDataProtected:true,
+       studentDataProtected:true
+     });
+   }
+
+   /* =========================================================
+      ESTABLISHMENT RULE
+      ========================================================= */
+
+   const established=hypotheses.filter(h=>
+     h.confidence==="HIGH"&&
+     h.supporting.length>=2&&
+     h.contradicting.length===0
+   );
+
+   let status="CAUSE NOT ESTABLISHED";
+
+   if(established.length===1){
+     status="CAUSE ESTABLISHED";
+   }else if(established.length>1){
+     status="MULTIPLE HYPOTHESES";
+   }
+
+   const result={
+     scanId:"ROOT-"+Date.now(),
+     at:now(),
+     status,
+     hypotheses,
+     established:established.map(x=>x.id),
+     clusters,
+     blastRadius,
+     evidenceBasis:{
+       incidents:recentBroken.length,
+       runtimeErrors:runtimeErrors.length,
+       evidenceRecords:evidence.length
+     }
+   };
+
+   this.emit(
+     "root.cause.engine",
+     result
+   );
+
+   if(status==="CAUSE ESTABLISHED"){
+     this.incident(
+       "Evidence-supported root cause established",
+       {
+         hypotheses:established
+           .map(x=>({
+             id:x.id,
+             cause:x.cause,
+             evidence:x.supporting
+           }))
+       },
+       "VERIFIED WORKING",
+       "info"
+     );
+   }
+
+   return result;
+ },
+
  async reproduceFailure(){
    this.start();
 
