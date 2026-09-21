@@ -2895,14 +2895,54 @@ const G={
    }
 
    /* =========================================================
-      ESTABLISHMENT RULE
+      ESTABLISHMENT RULE + CONTEXT TRUST GATE
       ========================================================= */
 
-   const established=hypotheses.filter(h=>
-     h.confidence==="HIGH"&&
-     h.supporting.length>=2&&
-     h.contradicting.length===0
-   );
+   /*
+    * Owner AI runs on rankforge-owner-ai.html.
+    * Empty runtime banks on this page do NOT prove that the
+    * Rankers/Test180/Biology source is broken.
+    *
+    * A root cause can only be established when the relevant
+    * runtime/source context is actually loaded.
+    */
+
+   const onRankersPage =
+     location.pathname.includes("rankers-test-series");
+
+   const test180ContextLoaded =
+     Array.isArray(window.TEST180_QUESTIONS);
+
+   const biologyContextLoaded =
+     localStorage.getItem(
+       "RANKFORGE_BIOLOGY_2700_BANK_V2"
+     ) !== null;
+
+   const contextTrusted =
+     onRankersPage ||
+     test180ContextLoaded ||
+     biologyContextLoaded;
+
+   const established=contextTrusted
+     ? hypotheses.filter(h=>
+         h.confidence==="HIGH"&&
+         h.supporting.length>=2&&
+         h.contradicting.length===0
+       )
+     : [];
+
+   if(!contextTrusted){
+     this.emit(
+       "rootcause.context.blocked",
+       {
+         page:location.pathname,
+         reason:
+           "Relevant Rankers/Test180/Biology runtime context is not loaded.",
+         test180ContextLoaded,
+         biologyContextLoaded
+       }
+     );
+   }
 
    let status="CAUSE NOT ESTABLISHED";
 
@@ -2916,6 +2956,10 @@ const G={
      scanId:"ROOT-"+Date.now(),
      at:now(),
      status,
+     verificationContext:
+       contextTrusted
+         ? "TRUSTED"
+         : "NOT LOADED / NOT TRUSTED",
      hypotheses,
      established:established.map(x=>x.id),
      clusters,
@@ -3158,10 +3202,12 @@ const G={
 
    step(
      "Test 180 source",
-     t180Count===180
-       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     t180
+       ? (t180Count===180
+          ?"VERIFIED WORKING":"VERIFIED BROKEN")
+       :"NOT VERIFIED",
      180,
-     t180Count
+     t180 ? t180Count : "SOURCE NOT LOADED ON THIS PAGE"
    );
 
    /* =========================================================
@@ -3215,12 +3261,19 @@ const G={
        biology=b;
    }catch(_){}
 
+   const biologyKeyPresent =
+     localStorage.getItem("RANKFORGE_BIOLOGY_2700_BANK_V2") !== null;
+
    step(
      "Biology question pool",
-     biology.length===2700
-       ?"VERIFIED WORKING":"VERIFIED BROKEN",
+     biologyKeyPresent
+       ? (biology.length===2700
+          ?"VERIFIED WORKING":"VERIFIED BROKEN")
+       :"NOT VERIFIED",
      2700,
-     biology.length
+     biologyKeyPresent
+       ? biology.length
+       : "SOURCE NOT LOADED ON THIS PAGE"
    );
 
    /* =========================================================
