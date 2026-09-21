@@ -453,6 +453,298 @@ const G={
    return result;
  },
 
+ async checkE2EContracts(){
+   this.start();
+
+   const checks=[];
+   const check=(name,condition,expected,actual,critical=true)=>{
+     const ok=!!condition;
+     checks.push({
+       name,expected,actual,
+       status:ok?"VERIFIED WORKING":"VERIFIED BROKEN",
+       critical
+     });
+     return ok;
+   };
+
+   /* ---------- CBT ENGINE CONTRACT ---------- */
+   const cbtFunctions=[
+     "startCBT",
+     "submitTest",
+     "calculateResult",
+     "finishTest"
+   ];
+
+   for(const name of cbtFunctions){
+     const exists=typeof window[name]==="function";
+     check(
+       "CBT API "+name,
+       exists,
+       "function",
+       typeof window[name],
+       false
+     );
+   }
+
+   /* ---------- ACTIVE TEST CONTRACT ---------- */
+   let active=null;
+   try{
+     active=JSON.parse(
+       localStorage.getItem("CBT_ACTIVE_QUESTIONS")||"null"
+     );
+   }catch(_){}
+
+   const activeCount=
+     Array.isArray(active)?active.length:0;
+
+   check(
+     "Active CBT question payload",
+     activeCount>0,
+     ">0 questions",
+     activeCount,
+     true
+   );
+
+   if(Array.isArray(active)&&active.length){
+     let usable=0;
+     let answerable=0;
+
+     for(const q of active){
+       if(
+         q &&
+         typeof q.question==="string" &&
+         q.question.trim() &&
+         Array.isArray(q.options) &&
+         q.options.length>=2
+       ) usable++;
+
+       if(q&&(q.correctAnswer||q.answer)) answerable++;
+     }
+
+     check(
+       "Active CBT usable questions",
+       usable===active.length,
+       active.length,
+       usable,
+       true
+     );
+
+     check(
+       "Active CBT answer mapping",
+       answerable===active.length,
+       active.length,
+       answerable,
+       true
+     );
+   }
+
+   /* ---------- RESULT CONTRACT ---------- */
+   const resultKeys=[
+     "cbtResult",
+     "CBT_RESULT",
+     "lastCBTResult",
+     "cbtLastResult"
+   ];
+
+   let resultFound=false;
+   let resultKey=null;
+
+   for(const key of resultKeys){
+     try{
+       const value=localStorage.getItem(key);
+       if(value!==null){
+         resultFound=true;
+         resultKey=key;
+         break;
+       }
+     }catch(_){}
+   }
+
+   checks.push({
+     name:"Result persistence contract",
+     expected:"result after completed test",
+     actual:resultFound
+       ?("present:"+resultKey)
+       :"not present in current session",
+     status:"NOT VERIFIED",
+     critical:false
+   });
+
+   /* ---------- HISTORY CONTRACT ---------- */
+   let history=null;
+   const historyKeys=[
+     "cbtHistory",
+     "CBT_HISTORY",
+     "testHistory"
+   ];
+
+   for(const key of historyKeys){
+     try{
+       const x=JSON.parse(
+         localStorage.getItem(key)||"null"
+       );
+       if(Array.isArray(x)){
+         history=x;
+         break;
+       }
+     }catch(_){}
+   }
+
+   checks.push({
+     name:"History persistence contract",
+     expected:"array after completed test",
+     actual:Array.isArray(history)
+       ?history.length+" records"
+       :"not available in current session",
+     status:"NOT VERIFIED",
+     critical:false
+   });
+
+   /* ---------- MISTAKE CONTRACT ---------- */
+   const mistakeKeys=[
+     "cbtMistakes",
+     "mistakes",
+     "mistakeBook",
+     "cbtMasteryV2"
+   ];
+
+   let mistakeFound=false;
+   let mistakeKey=null;
+
+   for(const key of mistakeKeys){
+     try{
+       if(localStorage.getItem(key)!==null){
+         mistakeFound=true;
+         mistakeKey=key;
+         break;
+       }
+     }catch(_){}
+   }
+
+   checks.push({
+     name:"Mistake system contract",
+     expected:"mistake data after wrong answer",
+     actual:mistakeFound
+       ?("present:"+mistakeKey)
+       :"not available in current session",
+     status:"NOT VERIFIED",
+     critical:false
+   });
+
+   /* ---------- BOOKMARK CONTRACT ---------- */
+   const bookmarkKeys=[
+     "bookmarks",
+     "cbtBookmarks",
+     "questionBookmarks",
+     "rankforgeBookmarks"
+   ];
+
+   let bookmarkFound=false;
+   let bookmarkKey=null;
+
+   for(const key of bookmarkKeys){
+     try{
+       if(localStorage.getItem(key)!==null){
+         bookmarkFound=true;
+         bookmarkKey=key;
+         break;
+       }
+     }catch(_){}
+   }
+
+   checks.push({
+     name:"Bookmark contract",
+     expected:"bookmark data when used",
+     actual:bookmarkFound
+       ?("present:"+bookmarkKey)
+       :"not available in current session",
+     status:"NOT VERIFIED",
+     critical:false
+   });
+
+   /* ---------- RETRY CONTRACT ---------- */
+   const retryKeys=[
+     "retryQuestions",
+     "CBT_RETRY_QUESTIONS",
+     "mistakeRetry",
+     "retryQueue"
+   ];
+
+   let retryFound=false;
+   let retryKey=null;
+
+   for(const key of retryKeys){
+     try{
+       if(localStorage.getItem(key)!==null){
+         retryFound=true;
+         retryKey=key;
+         break;
+       }
+     }catch(_){}
+   }
+
+   checks.push({
+     name:"Retry contract",
+     expected:"retry data when retry is created",
+     actual:retryFound
+       ?("present:"+retryKey)
+       :"not available in current session",
+     status:"NOT VERIFIED",
+     critical:false
+   });
+
+   const broken=checks.filter(
+     x=>x.critical&&x.status==="VERIFIED BROKEN"
+   );
+
+   const result={
+     at:now(),
+     status:broken.length
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     checks
+   };
+
+   this.emit("e2e.contracts",result);
+
+   if(broken.length){
+     this.incident(
+       "E2E CBT contract failure",
+       broken,
+       "VERIFIED BROKEN",
+       "critical"
+     );
+   }
+
+   return result;
+ },
+
+ async e2eScan(){
+   this.start();
+
+   const page=await this.checkPage();
+   const data=await this.checkDataFlow();
+   const flow=await this.checkE2EContracts();
+
+   const criticalBroken=[
+     page,data,flow
+   ].some(x=>x.status==="VERIFIED BROKEN");
+
+   const result={
+     guardian:this.version,
+     at:now(),
+     status:criticalBroken
+       ?"VERIFIED BROKEN"
+       :"NOT VERIFIED",
+     page,
+     dataflow:data,
+     e2e:flow
+   };
+
+   this.emit("e2e.full.scan",result);
+   return result;
+ },
+
  async deepScan(){
    this.start();
 

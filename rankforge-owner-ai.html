@@ -55,6 +55,7 @@ Evidence-first Guardian • No fake blame • No unverified fixes
 <button id="scan">VERIFY EVERYTHING</button>
 <button id="continuous">CONTINUOUS FULL SCAN</button>
 <button id="deep">DEEP DATA-FLOW SCAN</button>
+<button id="e2e">E2E CBT FLOW SCAN</button>
 <button id="repair">SAFE LOCAL REPAIR</button>
 <button id="export">EXPORT EVIDENCE</button>
 </section>
@@ -102,6 +103,11 @@ $("continuous").onclick=async function(){
 $("deep").onclick=async function(){
   $("log").textContent="Running deep data-flow verification...";
   render(await g.deepScan());
+};
+
+$("e2e").onclick=async function(){
+  $("log").textContent="Running E2E CBT contract verification...";
+  render(await g.e2eScan());
 };
 
 $("repair").onclick=function(){
