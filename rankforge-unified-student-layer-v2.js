@@ -491,6 +491,23 @@
         }
 
         if (action === "retry") {
+          /*
+           * Biology mistakes use the main Biology CBT engine.
+           * Generic retry.html cannot consume rankforgeMistakesV1.
+           */
+          try {
+            const mistakes = RF.read("rankforgeMistakesV1");
+            const biology = Array.isArray(mistakes) &&
+              mistakes.some(x =>
+                String(x?.source || "").includes("Biology 2699")
+              );
+
+            if (biology) {
+              location.href = "./cbt.html?retry=biology&v=20260925";
+              return;
+            }
+          } catch (_) {}
+
           location.href = "./retry.html";
         }
       });
