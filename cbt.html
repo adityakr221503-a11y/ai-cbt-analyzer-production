@@ -1933,6 +1933,296 @@ if(document.readyState === "loading"){
 
 <script src="./rankforge-learning-loop-v1.js"></script>
 <script src="./rankforge-learning-loop-v2.js"></script>
+
+<script>
+/* ============================================================
+   RANKFORGE_RUNTIME_STABILITY_V2
+   Runtime safety layer
+   ============================================================ */
+(function () {
+  "use strict";
+
+  if (window.__RANKFORGE_RUNTIME_STABILITY_V2__) return;
+  window.__RANKFORGE_RUNTIME_STABILITY_V2__ = true;
+
+  var KEY = "RANKFORGE_RUNTIME_STATE_V2";
+
+  function parse(v, fallback) {
+    try {
+      return v ? JSON.parse(v) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function normalizeQuestion(q, i) {
+    if (!q || typeof q !== "object") return null;
+
+    var text =
+      q.text ??
+      q.questionText ??
+      q.question ??
+      q.prompt ??
+      "";
+
+    var options =
+      q.options ??
+      q.choices ??
+      q.answers ??
+      [];
+
+    if (!Array.isArray(options)) {
+      if (options && typeof options === "object") {
+        options = Object.values(options);
+      } else {
+        options = [];
+      }
+    }
+
+    if (!String(text).trim() || options.length < 2) {
+      return null;
+    }
+
+    var id = String(
+      q.id ??
+      q.questionId ??
+      q.qid ??
+      q.key ??
+      ("q-" + i)
+    );
+
+    return Object.assign({}, q, {
+      id: id,
+      questionId: q.questionId ?? id,
+      text: String(text),
+      options: options
+    });
+  }
+
+  function normalize(list) {
+    if (!Array.isArray(list)) return [];
+
+    return list
+      .map(normalizeQuestion)
+      .filter(Boolean);
+  }
+
+  function read(key) {
+    try {
+      return parse(localStorage.getItem(key), null);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function extract(value) {
+    if (Array.isArray(value)) return value;
+    if (!value || typeof value !== "object") return [];
+
+    return (
+      value.questions ??
+      value.items ??
+      value.data?.questions ??
+      value.test?.questions ??
+      []
+    );
+  }
+
+  /*
+   * Read-only source discovery.
+   * Nothing here rewrites the canonical bank.
+   */
+  function discover() {
+    var keys = [
+      "CBT_ACTIVE_QUESTIONS",
+      "RANKFORGE_ACTIVE_TEST",
+      "pdfCbtQuestions",
+      "pdfQuestions"
+    ];
+
+    for (var i = 0; i < keys.length; i++) {
+      var raw = read(keys[i]);
+      var questions = normalize(extract(raw));
+
+      if (questions.length) {
+        return {
+          key: keys[i],
+          questions: questions
+        };
+      }
+    }
+
+    return null;
+  }
+
+  function sync() {
+    var found = discover();
+
+    if (!found) {
+      console.warn(
+        "[RankForge V2] No valid active question source found."
+      );
+
+      return false;
+    }
+
+    /*
+     * Runtime copies only.
+     * Source objects remain untouched.
+     */
+    window.RANKFORGE_RUNTIME_QUESTIONS =
+      found.questions.slice();
+
+    window.RANKFORGE_RUNTIME_SOURCE =
+      found.key;
+
+    try {
+      sessionStorage.setItem(
+        KEY,
+        JSON.stringify({
+          version: "v2",
+          source: found.key,
+          questionCount: found.questions.length,
+          time: Date.now()
+        })
+      );
+    } catch (e) {}
+
+    console.log(
+      "[RankForge V2] Active source:",
+      found.key,
+      "| Questions:",
+      found.questions.length
+    );
+
+    return true;
+  }
+
+  /*
+   * Runtime diagnostics.
+   */
+  window.RANKFORGE_RUNTIME_DIAGNOSTICS = function () {
+    var state = parse(
+      sessionStorage.getItem(KEY),
+      {}
+    );
+
+    return {
+      runtimeVersion: "RANKFORGE_RUNTIME_STABILITY_V2",
+      source: state.source || null,
+      questionCount: state.questionCount || 0,
+      error:
+        parse(
+          sessionStorage.getItem("RANKFORGE_RUNTIME_ERROR"),
+          null
+        )
+    };
+  };
+
+  /*
+   * Safe refresh.
+   * Only transient runtime flags are removed.
+   * History/mistakes/mastery/canonical data stay untouched.
+   */
+  window.RANKFORGE_SAFE_REFRESH = function () {
+    try {
+      sessionStorage.removeItem("RANKFORGE_RUNTIME_ERROR");
+    } catch (e) {}
+
+    var url = new URL(window.location.href);
+
+    url.searchParams.set(
+      "rf_refresh",
+      String(Date.now())
+    );
+
+    window.location.replace(url.href);
+  };
+
+  /*
+   * Runtime errors are recorded instead of silently disappearing.
+   */
+  window.addEventListener("error", function (e) {
+    try {
+      sessionStorage.setItem(
+        "RANKFORGE_RUNTIME_ERROR",
+        JSON.stringify({
+          type: "error",
+          message: e.message || "Unknown error",
+          file: e.filename || "",
+          line: e.lineno || 0,
+          column: e.colno || 0,
+          time: new Date().toISOString()
+        })
+      );
+    } catch (_) {}
+  });
+
+  window.addEventListener(
+    "unhandledrejection",
+    function (e) {
+      try {
+        sessionStorage.setItem(
+          "RANKFORGE_RUNTIME_ERROR",
+          JSON.stringify({
+            type: "unhandledrejection",
+            message: String(
+              e.reason?.message ??
+              e.reason ??
+              "Unhandled rejection"
+            ),
+            time: new Date().toISOString()
+          })
+        );
+      } catch (_) {}
+    }
+  );
+
+  /*
+   * Refresh buttons:
+   * only elements explicitly marked for RankForge refresh
+   * are intercepted. Existing application buttons remain
+   * untouched.
+   */
+  document.addEventListener(
+    "click",
+    function (e) {
+      var target =
+        e.target &&
+        e.target.closest &&
+        e.target.closest(
+          "[data-rankforge-refresh]"
+        );
+
+      if (!target) return;
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      window.RANKFORGE_SAFE_REFRESH();
+    },
+    true
+  );
+
+  /*
+   * Initial read.
+   */
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      sync,
+      { once: true }
+    );
+  } else {
+    sync();
+  }
+
+  console.log(
+    "[RankForge] Runtime Stability V2 installed."
+  );
+})();
+</script>
+
 </head>
 
 <body>
