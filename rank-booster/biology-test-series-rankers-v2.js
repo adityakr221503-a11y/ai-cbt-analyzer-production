@@ -985,3 +985,25 @@
     startTest: startTest
   };
 })();
+
+
+/* RANKFORGE_BIOLOGY_EVENT_BRIDGE_V1 */
+(function(){
+  try{
+    const original =
+      window.RANKFORGE_BIOLOGY_START_TEST ||
+      window.startBiologyTest ||
+      null;
+
+    window.RANKFORGE_BIOLOGY_EMIT_CBT = function(testNumber){
+      window.dispatchEvent(
+        new CustomEvent(
+          "rankforge:biology-test-selected",
+          {detail:{testNumber:Number(testNumber)}}
+        )
+      );
+    };
+  }catch(e){
+    console.warn("[RankForge Biology] event bridge unavailable",e);
+  }
+})();
