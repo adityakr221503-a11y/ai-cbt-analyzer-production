@@ -2223,6 +2223,130 @@ if(document.readyState === "loading"){
 })();
 </script>
 
+
+<script>
+/* ============================================================
+   RANKFORGE_STALE_PDF_GUARD_V1
+
+   Purpose:
+   Prevent an old PDF session from silently becoming the next
+   CBT source.
+
+   Explicit PDF import remains supported.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  if (window.__RANKFORGE_STALE_PDF_GUARD_V1__) return;
+  window.__RANKFORGE_STALE_PDF_GUARD_V1__ = true;
+
+  var ACTIVE_TEST = "RANKFORGE_ACTIVE_TEST";
+  var ACTIVE_Q = "CBT_ACTIVE_QUESTIONS";
+
+  function read(key) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function questionCount(value) {
+    if (Array.isArray(value)) return value.length;
+    if (!value || typeof value !== "object") return 0;
+
+    var q =
+      value.questions ??
+      value.items ??
+      value.data?.questions ??
+      [];
+
+    return Array.isArray(q) ? q.length : 0;
+  }
+
+  function isExplicitCurrentTest(test) {
+    if (!test || typeof test !== "object") return false;
+
+    /*
+     * These represent deliberate current selection.
+     * A plain pdfCbtQuestions object alone does NOT qualify.
+     */
+    return Boolean(
+      test.testId ||
+      test.id ||
+      test.selectedAt ||
+      test.createdAt ||
+      test.source === "Rankers Test Series"
+    );
+  }
+
+  function guard() {
+    var activeTest = read(ACTIVE_TEST);
+    var activeQuestions = read(ACTIVE_Q);
+
+    /*
+     * If a real active test exists, leave everything alone.
+     */
+    if (isExplicitCurrentTest(activeTest)) {
+      console.log(
+        "[RankForge PDF Guard] Explicit active test preserved."
+      );
+      return;
+    }
+
+    /*
+     * A bare/stale CBT_ACTIVE_QUESTIONS payload is not allowed
+     * to silently survive as an active session.
+     */
+    if (
+      questionCount(activeQuestions) > 0 &&
+      !activeTest
+    ) {
+      try {
+        localStorage.removeItem(ACTIVE_Q);
+
+        console.log(
+          "[RankForge PDF Guard] Removed orphaned active-question state:",
+          questionCount(activeQuestions)
+        );
+      } catch (e) {
+        console.warn(
+          "[RankForge PDF Guard] Could not clear orphaned state.",
+          e
+        );
+      }
+    }
+
+    /*
+     * Do NOT remove:
+     * pdfCbtQuestions
+     * pdfQuestions
+     *
+     * Those are still required for deliberate PDF import.
+     */
+  }
+
+  /*
+   * Run once before normal CBT interaction.
+   */
+  try {
+    guard();
+  } catch (e) {
+    console.warn(
+      "[RankForge PDF Guard] Guard failed safely.",
+      e
+    );
+  }
+
+  window.RANKFORGE_PDF_GUARD_V1 = {
+    version: "1",
+    run: guard
+  };
+
+})();
+</script>
+
 </head>
 
 <body>
