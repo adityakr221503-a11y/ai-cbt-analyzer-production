@@ -3020,7 +3020,17 @@ else init();
      TEST180 QUESTION BANK MUST BE LOADED FIRST
 ===================================================== -->
 
-<script src="./test180-questions.js?v=181"></script>
+<!--
+ RANKFORGE_OLD180_RUNTIME_BLOCK_V1
+ Test-180 remains in the repository as a selectable legacy test,
+ but it must NOT automatically become the active CBT question source.
+-->
+<script>
+(function () {
+  "use strict";
+  window.RANKFORGE_TEST180_OPTIONAL_ONLY = true;
+})();
+</script>
 
 <script>
   /* =====================================================
