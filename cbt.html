@@ -10890,6 +10890,153 @@ document.addEventListener("visibilitychange",function(){
   }catch(e){}
 })();
 
+
+<!-- RANKFORGE_PDF_AUTHORITY_FIX_V8 -->
+<script>
+(function () {
+  "use strict";
+
+  if (window.__RANKFORGE_PDF_AUTHORITY_FIX_V8__) return;
+  window.__RANKFORGE_PDF_AUTHORITY_FIX_V8__ = true;
+
+  /*
+   * ROOT FIX:
+   * PDF question data may exist in storage/runtime, but it must NOT
+   * automatically become the active CBT source.
+   *
+   * PDF mode is valid only when an explicit PDF session marker exists.
+   * Biology/RankForge sessions remain authoritative otherwise.
+   */
+
+  const EXPLICIT_PDF_KEYS = [
+    "RANKFORGE_EXPLICIT_PDF_SESSION",
+    "PDF_CBT_EXPLICIT_SESSION",
+    "CBT_EXPLICIT_PDF_SESSION"
+  ];
+
+  function explicitPDFSession() {
+    try {
+      if (window.__PDF_CBT_EXPLICIT_SESSION__ === true) return true;
+      if (window.CBT_PDF_MODE === true &&
+          window.__PDF_CBT_USER_STARTED__ === true) return true;
+
+      for (const k of EXPLICIT_PDF_KEYS) {
+        if (sessionStorage.getItem(k) === "1" ||
+            sessionStorage.getItem(k) === "true") return true;
+      }
+
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function hasRankForgeActiveTest() {
+    try {
+      const raw = localStorage.getItem("RANKFORGE_ACTIVE_TEST");
+      if (!raw) return false;
+
+      const t = JSON.parse(raw);
+
+      return !!(
+        t &&
+        Array.isArray(t.questions) &&
+        t.questions.length > 0
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function protectNonPDFRuntime() {
+    if (explicitPDFSession()) return;
+
+    try {
+      /*
+       * A PDF source may remain stored for future explicit PDF use.
+       * We DO NOT delete pdfCbtQuestions/pdfQuestions.
+       *
+       * We only prevent stale PDF state from being declared authoritative.
+       */
+      if (sessionStorage.getItem("CBT_ACTIVE_SOURCE") === "PDF") {
+        sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
+      }
+
+      if (window.CBT_IMPORTED_SOURCE === "PDF Import") {
+        delete window.CBT_IMPORTED_SOURCE;
+      }
+
+      /*
+       * Do not destroy the actual PDF question cache.
+       * Clear only transient PDF authority flags.
+       */
+      if (window.__PDF_CBT_ACTIVE_TEST__) {
+        delete window.__PDF_CBT_ACTIVE_TEST__;
+      }
+
+      if (window.__PDF_CBT_ACTIVE_QUESTIONS__) {
+        delete window.__PDF_CBT_ACTIVE_QUESTIONS__;
+      }
+    } catch (_) {}
+  }
+
+  /*
+   * Do not interfere with a deliberately selected RankForge/Biology test.
+   */
+  function enforceAuthority() {
+    try {
+      if (explicitPDFSession()) {
+        window.RANKFORGE_RUNTIME_SOURCE =
+          window.RANKFORGE_RUNTIME_SOURCE || "PDF_EXPLICIT";
+        return;
+      }
+
+      if (hasRankForgeActiveTest()) {
+        window.CBT_PDF_MODE = false;
+
+        if (window.CBT_IMPORTED_SOURCE === "PDF Import") {
+          delete window.CBT_IMPORTED_SOURCE;
+        }
+
+        protectNonPDFRuntime();
+
+        window.RANKFORGE_RUNTIME_SOURCE =
+          "RANKFORGE_ACTIVE_TEST";
+      }
+    } catch (_) {}
+  }
+
+  /*
+   * Existing PDF authority code can execute later because cbt.html
+   * contains several PDF bridge layers. Re-assert authority after
+   * their normal initialization points without modifying the bank.
+   */
+  enforceAuthority();
+
+  setTimeout(enforceAuthority, 0);
+  setTimeout(enforceAuthority, 250);
+  setTimeout(enforceAuthority, 750);
+  setTimeout(enforceAuthority, 1500);
+
+  window.RANKFORGE_PDF_AUTHORITY_V8 = {
+    version: "V8",
+    explicitPDFSession,
+    hasRankForgeActiveTest,
+    enforceAuthority
+  };
+
+  console.log(
+    "[RankForge] PDF authority V8:",
+    explicitPDFSession()
+      ? "EXPLICIT PDF SESSION"
+      : hasRankForgeActiveTest()
+        ? "RANKFORGE ACTIVE TEST PROTECTED"
+        : "NO ACTIVE RANKFORGE TEST"
+  );
+})();
+</script>
+<!-- /RANKFORGE_PDF_AUTHORITY_FIX_V8 -->
+
 </body>
 
 </html>
