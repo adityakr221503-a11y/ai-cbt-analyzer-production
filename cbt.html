@@ -913,6 +913,75 @@ function submit(){
 }
 
 
+/* ---------- Biology mistake retry ---------- */
+
+function getBiologyRetryQuestions(){
+
+  try{
+
+    const mistakes =
+      JSON.parse(
+        localStorage.getItem(
+          "rankforgeMistakesV1"
+        ) || "[]"
+      );
+
+    if(!Array.isArray(mistakes))
+      return [];
+
+    const out=[];
+    const seen=new Set();
+
+    for(const m of mistakes){
+
+      if(
+        !String(m.source||"")
+          .includes("Biology 2699")
+      )
+        continue;
+
+      const q={
+        id:m.questionId,
+        question:m.question,
+        options:Array.isArray(m.options)
+          ? m.options
+          : [],
+        correctIndex:Number(m.correctAnswer),
+        testNumber:m.testNumber
+      };
+
+      if(
+        !q.question ||
+        q.options.length<2 ||
+        !Number.isInteger(q.correctIndex)
+      )
+        continue;
+
+      if(
+        q.correctIndex<0 ||
+        q.correctIndex>=q.options.length
+      )
+        continue;
+
+      const key=String(q.id||q.question);
+
+      if(seen.has(key))
+        continue;
+
+      seen.add(key);
+      out.push(q);
+    }
+
+    return out;
+
+  }catch(_){
+
+    return [];
+
+  }
+}
+
+
 /* ---------- setup ---------- */
 
 function populateTests(){
@@ -959,7 +1028,26 @@ $("startButton").onclick=function(){
 
  try{
 
-  active=loadTest();
+  const params =
+    new URLSearchParams(
+      location.search
+    );
+
+  if(params.get("retry")==="biology"){
+
+    active=getBiologyRetryQuestions();
+
+    if(!active.length){
+      throw new Error(
+        "No Biology mistakes are available for retry."
+      );
+    }
+
+  }else{
+
+    active=loadTest();
+
+  }
 
   if(!active.length)
    throw new Error(
@@ -984,8 +1072,9 @@ $("startButton").onclick=function(){
   $("cbt").classList.remove("hidden");
 
   $("testTitle").textContent =
-   "Biology Test "+
-   active[0].testNumber;
+   new URLSearchParams(location.search).get("retry")==="biology"
+    ? "Biology Mistake Retry"
+    : "Biology Test "+active[0].testNumber;
 
   render();
   startTimer();
