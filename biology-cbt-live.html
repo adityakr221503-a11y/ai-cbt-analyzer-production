@@ -1736,3 +1736,201 @@ document.addEventListener("click",function(e){
 })();
 </script>
 
+
+<script>
+/* ============================================================
+   RANKFORGE BIOLOGY — RETRY + HISTORY BRIDGE
+   Uses the already-working CBT session.
+   Does NOT modify the 2699-question source.
+   ============================================================ */
+(function(){
+
+"use strict";
+
+const STATE_KEYS=[
+  "rankforge_biology_cbt_v1",
+  "CBT_ACTIVE_QUESTIONS",
+  "RANKFORGE_ACTIVE_TEST"
+];
+
+function readJSON(storage,key){
+  try{
+    const v=storage.getItem(key);
+    return v ? JSON.parse(v) : null;
+  }catch(e){ return null; }
+}
+
+function getState(){
+  for(const key of STATE_KEYS){
+    const a=readJSON(sessionStorage,key);
+    if(a) return a;
+
+    const b=readJSON(localStorage,key);
+    if(b) return b;
+  }
+  return null;
+}
+
+function getMistakes(){
+  const state=getState();
+
+  if(state && Array.isArray(state.mistakes) && state.mistakes.length)
+    return state.mistakes;
+
+  try{
+    const mastery=readJSON(localStorage,"cbtMasteryV2");
+
+    if(mastery && Array.isArray(mastery.mistakes))
+      return mastery.mistakes;
+  }catch(e){}
+
+  return [];
+}
+
+function questionFromMistake(m){
+  return m.question || m;
+}
+
+function launchRetry(){
+
+  const mistakes=getMistakes()
+    .map(questionFromMistake)
+    .filter(q=>q && typeof q==="object");
+
+  if(!mistakes.length){
+    alert("No saved mistakes are available for retry.");
+    return;
+  }
+
+  /*
+   * Put ONLY mistakes into the active CBT session.
+   */
+  window.CBT_ACTIVE_QUESTIONS=mistakes;
+  window.selectedQuestions=mistakes;
+
+  try{
+    sessionStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      JSON.stringify(mistakes)
+    );
+  }catch(e){}
+
+  try{
+    localStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      JSON.stringify(mistakes)
+    );
+  }catch(e){}
+
+  const retryState={
+    version:2,
+    subject:"Biology",
+    testTitle:"Biology Mistake Retry",
+    questions:mistakes,
+    index:0,
+    answers:Array(mistakes.length).fill(null),
+    startedAt:Date.now(),
+    submitted:false,
+    retry:true
+  };
+
+  try{
+    sessionStorage.setItem(
+      "rankforge_biology_cbt_v1",
+      JSON.stringify(retryState)
+    );
+  }catch(e){}
+
+  try{
+    localStorage.setItem(
+      "rankforge_biology_cbt_v1",
+      JSON.stringify(retryState)
+    );
+  }catch(e){}
+
+  /*
+   * Prefer the existing CBT renderer if available.
+   */
+  const candidates=[
+    "startCBT",
+    "startTest",
+    "startExam",
+    "beginCBT",
+    "renderQuestion"
+  ];
+
+  for(const name of candidates){
+    if(typeof window[name]==="function"){
+      try{
+        window[name]();
+        return;
+      }catch(e){}
+    }
+  }
+
+  /*
+   * If the page exposes a Start button, trigger it.
+   */
+  const buttons=[...document.querySelectorAll("button,a")];
+
+  const start=buttons.find(el=>{
+    const t=(el.textContent||"").trim().toLowerCase();
+    return t==="start cbt" ||
+           t.includes("start biology cbt") ||
+           t.includes("start test");
+  });
+
+  if(start){
+    start.click();
+    return;
+  }
+
+  /*
+   * Last-resort reload with retry flag.
+   */
+  const u=new URL(location.href);
+  u.searchParams.set("retry","1");
+  u.searchParams.set("v",Date.now().toString());
+
+  location.href=u.toString();
+}
+
+function retryButtonHandler(e){
+
+  const el=e.target.closest("button,a");
+
+  if(!el) return;
+
+  const text=(el.textContent||"")
+    .trim()
+    .toLowerCase();
+
+  if(
+    text.includes("retry mistakes") ||
+    text.includes("retry mistake")
+  ){
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    launchRetry();
+  }
+}
+
+/*
+ * Capture phase is intentional:
+ * it intercepts the old Retry button before competing
+ * handlers can restart the original 90-question test.
+ */
+document.addEventListener(
+  "click",
+  retryButtonHandler,
+  true
+);
+
+window.RANKFORGE_RETRY_FIX={
+  launchRetry,
+  getMistakes
+};
+
+})();
+</script>
+
