@@ -6741,183 +6741,440 @@ window.addEventListener(
 
 <!-- RANKER_MASTER_CBT_WIRE_V1 -->
 <script>
-(function(){
+(function () {
+  "use strict";
 
-  const HISTORY_KEY="cbtHistory";
-  const MISTAKE_KEY="rankBoosterAttemptHistory";
-  const RETRY_KEY="cbtRetryQuestion";
-  const QUEUE_KEY="cbtAnalyzer.retryQueue";
-  const MASTERY_KEY="cbtMasteryV2";
+  /*
+   * RankForge authoritative CBT attempt commit.
+   *
+   * IMPORTANT:
+   * Runtime answers live in the CBT `answers[]` array.
+   * They do NOT reliably live inside question objects.
+   *
+   * Therefore this bridge reads:
+   *   runtime answers[index]
+   * and writes ONE idempotent attempt record.
+   */
 
-  function read(key,fallback){
-    try{
-      const v=JSON.parse(localStorage.getItem(key));
-      return v==null?fallback:v;
-    }catch(e){return fallback;}
+  const COMMIT_KEY = "rankforgeCBTCommittedAttemptsV1";
+
+  function safeParse(value, fallback) {
+    try {
+      return value ? JSON.parse(value) : fallback;
+    } catch (_) {
+      return fallback;
+    }
   }
 
-  function write(key,value){
-    localStorage.setItem(key,JSON.stringify(value));
+  function readArray(key) {
+    const value = safeParse(localStorage.getItem(key), []);
+    return Array.isArray(value) ? value : [];
   }
 
-  function pick(q){
-    return q || {};
+  function writeArray(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
   }
 
-  function answer(q){
-    const x=pick(q);
-    return x.selectedAnswer ??
-           x.userAnswer ??
-           x.answerSelected ??
-           x.selected ??
-           x.user_answer ??
-           null;
+  function normalizeAnswer(value) {
+    if (value === undefined || value === null || value === "") return null;
+
+    if (typeof value === "object") {
+      return value.value ??
+             value.answer ??
+             value.selectedAnswer ??
+             value.id ??
+             null;
+    }
+
+    return String(value);
   }
 
-  function correct(q){
-    const x=pick(q);
-    return x.correctAnswer ??
-           x.correct ??
-           x.answer ??
-           x.correctOption ??
-           x.correct_answer ??
-           null;
-  }
-
-  function norm(x){
-    return String(x??"").trim().toLowerCase();
-  }
-
-  function isCorrect(q){
-    const a=answer(q), c=correct(q);
-    return a!==null && a!=="" && c!==null && c!=="" && norm(a)===norm(c);
-  }
-
-  function id(q,i){
+  function questionId(q, index) {
     return String(
-      q.questionId ??
-      q.id ??
-      q._id ??
-      q.question ??
-      ("q-"+i)
+      q?.id ??
+      q?.questionId ??
+      q?.qid ??
+      q?.key ??
+      ("q-" + index)
     );
   }
 
-  function getQuestions(){
-    if(typeof selectedQuestions!=="undefined" &&
-       Array.isArray(selectedQuestions)){
-      return selectedQuestions;
-    }
+  function correctAnswer(q) {
+    return normalizeAnswer(
+      q?.correctAnswer ??
+      q?.correct_answer ??
+      q?.answer ??
+      q?.correct ??
+      q?.correctOption
+    );
+  }
+
+  function getRuntimeAnswers() {
+    if (Array.isArray(window.answers)) return window.answers;
+
+    try {
+      if (Array.isArray(answers)) return answers;
+    } catch (_) {}
+
     return [];
   }
 
-  function sync(){
-    try{
-      const qs=getQuestions();
-      if(!qs.length)return;
+  function getQuestions() {
+    if (Array.isArray(window.selectedQuestions)) {
+      return window.selectedQuestions;
+    }
 
-      const history=read(HISTORY_KEY,[]);
-      const mistakes=read(MISTAKE_KEY,[]);
-      const mastery=read(MASTERY_KEY,{});
-      const retryQueue=read(QUEUE_KEY,[]);
+    try {
+      if (Array.isArray(selectedQuestions)) return selectedQuestions;
+    } catch (_) {}
 
-      const now=new Date().toISOString();
+    return [];
+  }
 
-      qs.forEach((q,i)=>{
-        if(!q || !answer(q))return;
+  function getSessionId() {
+    try {
+      const active =
+        sessionStorage.getItem("CBT_ACTIVE_TEST") ||
+        localStorage.getItem("CBT_ACTIVE_TEST");
 
-        const key=id(q,i);
-        const right=isCorrect(q);
+      const parsed = safeParse(active, null);
 
-        const record={
-          questionId:key,
-          question:q.question ?? q.text ?? "",
-          subject:q.subject ?? q.section ?? "",
-          chapter:q.chapter ?? q.topic ?? "",
-          selectedAnswer:answer(q),
-          correctAnswer:correct(q),
-          isCorrect:right,
-          submittedAt:now,
-          mistakeReason:right?"":"Needs review"
-        };
+      return String(
+        parsed?.sessionId ??
+        parsed?.id ??
+        parsed?.testId ??
+        ("cbt-" + Date.now())
+      );
+    } catch (_) {
+      return "cbt-" + Date.now();
+    }
+  }
 
-        history.push(record);
+  function getTestId() {
+    try {
+      return String(
+        window.selectedTest?.id ??
+        window.selectedTest?.testId ??
+        window.selectedTest?.key ??
+        "RANKFORGE_CBT"
+      );
+    } catch (_) {
+      return "RANKFORGE_CBT";
+    }
+  }
 
-        if(!right){
-          mistakes.push(record);
-        }
+  function getTestTitle() {
+    try {
+      return String(
+        window.selectedTest?.title ??
+        window.selectedTest?.name ??
+        "RankForge CBT"
+      );
+    } catch (_) {
+      return "RankForge CBT";
+    }
+  }
 
-        if(right){
-          mastery[key]={
-            ...(mastery[key]||{}),
-            mastered:true,
-            masteredAt:now
-          };
-        }
-      });
+  function getSource() {
+    try {
+      return String(
+        window.selectedTest?.source ??
+        window.selectedTest?.sourceType ??
+        localStorage.getItem("CBT_ACTIVE_SOURCE") ??
+        "rankforge"
+      );
+    } catch (_) {
+      return "rankforge";
+    }
+  }
 
-      write(HISTORY_KEY,history.slice(-2000));
-      write(MISTAKE_KEY,mistakes.slice(-2000));
-      write(MASTERY_KEY,mastery);
+  function isCorrect(selected, correct) {
+    if (selected === null || correct === null) return false;
 
-      /* Remove successfully retried question from queue */
-      if(retryQueue.length){
-        const remaining=retryQueue.filter(r=>{
-          const rid=id(r,0);
-          const match=qs.some((q,i)=>id(q,i)===rid);
-          return !match;
-        });
-        write(QUEUE_KEY,remaining);
+    const a = String(selected).trim().toLowerCase();
+    const b = String(correct).trim().toLowerCase();
+
+    return a === b;
+  }
+
+  function buildAttempt() {
+    const questions = getQuestions();
+    const runtimeAnswers = getRuntimeAnswers();
+
+    if (!questions.length) {
+      console.warn("[RankForge] No CBT questions found; master sync skipped.");
+      return null;
+    }
+
+    const sessionId = getSessionId();
+    const testId = getTestId();
+    const submittedAt = new Date().toISOString();
+
+    const questionRecords = questions.map((q, index) => {
+      const selected = normalizeAnswer(runtimeAnswers[index]);
+      const correct = correctAnswer(q);
+
+      let status = "unanswered";
+
+      if (selected !== null) {
+        status = isCorrect(selected, correct) ? "correct" : "wrong";
       }
 
-      /* Notify dashboard engines */
-      try{
-        window.dispatchEvent(new CustomEvent("ranker:master-sync",{
-          detail:{count:qs.length}
-        }));
-      }catch(e){}
+      return {
+        id: questionId(q, index),
+        index,
+        selectedAnswer: selected,
+        userAnswer: selected,
+        correctAnswer: correct,
+        status,
+        isCorrect: status === "correct",
+        isAttempted: selected !== null,
+        source: getSource(),
+        testId,
+        sessionId,
+        submittedAt
+      };
+    });
 
-      console.log("✅ Ranker Master Loop synced:",qs.length);
-    }catch(e){
-      console.error("Ranker Master Loop sync failed:",e);
-    }
+    const correct = questionRecords.filter(x => x.status === "correct").length;
+    const wrong = questionRecords.filter(x => x.status === "wrong").length;
+    const skipped = questionRecords.filter(x => x.status === "unanswered").length;
+
+    return {
+      version: "rankforge-attempt-v1",
+      sessionId,
+      testId,
+      title: getTestTitle(),
+      source: getSource(),
+      submittedAt,
+      questionCount: questionRecords.length,
+      correct,
+      wrong,
+      skipped,
+      score: correct * 4 - wrong,
+      percentage: questionRecords.length
+        ? Math.round((correct / questionRecords.length) * 100)
+        : 0,
+      questions: questionRecords
+    };
   }
 
-  /* Expose safe manual sync */
-  window.syncRankerMasterLoop=sync;
+  function commitAttempt() {
+    const attempt = buildAttempt();
+
+    if (!attempt) return false;
+
+    const committed = readArray(COMMIT_KEY);
+
+    if (committed.some(x => x && x.sessionId === attempt.sessionId)) {
+      console.log(
+        "[RankForge] Attempt already committed:",
+        attempt.sessionId
+      );
+      return true;
+    }
+
+    committed.push({
+      sessionId: attempt.sessionId,
+      testId: attempt.testId,
+      committedAt: attempt.submittedAt
+    });
+
+    writeArray(COMMIT_KEY, committed.slice(-500));
+
+    /*
+     * History
+     */
+    const history = readArray("cbtHistory");
+    history.push(attempt);
+    writeArray("cbtHistory", history.slice(-500));
+
+    const rankerHistory = readArray("rankBoosterAttemptHistory");
+    rankerHistory.push(attempt);
+    writeArray("rankBoosterAttemptHistory", rankerHistory.slice(-500));
+
+    /*
+     * Mistake records
+     *
+     * Only wrong attempted questions enter the active mistake stream.
+     * Unanswered questions are not falsely classified as mistakes.
+     */
+    const mistakes = readArray("rankforgeMistakesV1");
+
+    for (const q of attempt.questions) {
+      if (q.status !== "wrong") continue;
+
+      mistakes.push({
+        version: "rankforge-mistake-v1",
+        id: attempt.sessionId + "::" + q.id,
+        sessionId: attempt.sessionId,
+        testId: attempt.testId,
+        questionId: q.id,
+        questionIndex: q.index,
+        selectedAnswer: q.selectedAnswer,
+        correctAnswer: q.correctAnswer,
+        status: "active",
+        reason: null,
+        retryCount: 0,
+        createdAt: attempt.submittedAt,
+        updatedAt: attempt.submittedAt
+      });
+    }
+
+    writeArray("rankforgeMistakesV1", mistakes.slice(-5000));
+
+    /*
+     * Mastery / retry compatibility stores.
+     */
+    const mastery = readArray("cbtMasteryV2");
+
+    mastery.push({
+      version: "rankforge-attempt-link-v1",
+      sessionId: attempt.sessionId,
+      testId: attempt.testId,
+      submittedAt: attempt.submittedAt,
+      correct: attempt.correct,
+      wrong: attempt.wrong,
+      skipped: attempt.skipped,
+      score: attempt.score
+    });
+
+    writeArray("cbtMasteryV2", mastery.slice(-1000));
+
+    const retryHistory = readArray("retryHistory");
+
+    attempt.questions
+      .filter(q => q.status === "wrong")
+      .forEach(q => {
+        retryHistory.push({
+          sessionId: attempt.sessionId,
+          testId: attempt.testId,
+          questionId: q.id,
+          selectedAnswer: q.selectedAnswer,
+          correctAnswer: q.correctAnswer,
+          createdAt: attempt.submittedAt
+        });
+      });
+
+    writeArray("retryHistory", retryHistory.slice(-5000));
+
+    /*
+     * Legacy compatibility queue.
+     */
+    const retryQueue = safeParse(
+      localStorage.getItem("cbtAnalyzer.retryQueue"),
+      []
+    );
+
+    const queue = Array.isArray(retryQueue) ? retryQueue : [];
+
+    attempt.questions
+      .filter(q => q.status === "wrong")
+      .forEach(q => {
+        queue.push({
+          sessionId: attempt.sessionId,
+          testId: attempt.testId,
+          questionId: q.id,
+          selectedAnswer: q.selectedAnswer,
+          correctAnswer: q.correctAnswer,
+          source: attempt.source,
+          createdAt: attempt.submittedAt
+        });
+      });
+
+    localStorage.setItem(
+      "cbtAnalyzer.retryQueue",
+      JSON.stringify(queue.slice(-5000))
+    );
+
+    window.RANKFORGE_LAST_COMMITTED_ATTEMPT = attempt;
+
+    try {
+      window.dispatchEvent(
+        new CustomEvent("ranker:master-sync", {
+          detail: attempt
+        })
+      );
+    } catch (_) {}
+
+    console.log("[RankForge] MASTER SYNC COMMITTED", {
+      sessionId: attempt.sessionId,
+      questions: attempt.questionCount,
+      correct: attempt.correct,
+      wrong: attempt.wrong,
+      skipped: attempt.skipped
+    });
+
+    return true;
+  }
 
   /*
-     Wrap submitTest without replacing its original logic.
-     Original submitTest executes first, then sync runs.
-  */
-  if(typeof window.submitTest==="function" &&
-     !window.submitTest.__rankerMasterWrapped){
+   * Public API.
+   */
+  window.RANKFORGE_COMMIT_CBT_ATTEMPT = commitAttempt;
 
-    const originalSubmit=window.submitTest;
+  /*
+   * IMPORTANT:
+   * Do not repeatedly wrap submitTest.
+   * Install exactly once.
+   */
+  if (!window.__RANKFORGE_MASTER_SYNC_WRAPPED__) {
+    window.__RANKFORGE_MASTER_SYNC_WRAPPED__ = true;
 
-    function wrappedSubmit(){
-      const result=originalSubmit.apply(this,arguments);
+    const install = function () {
+      if (typeof window.submitTest !== "function") return false;
+      if (window.submitTest.__rankforgeWrapped__) return true;
 
-      setTimeout(function(){
-        sync();
+      const original = window.submitTest;
 
-        try{
-          if(window.rankerMasterLoop &&
-             typeof window.rankerMasterLoop.refresh==="function"){
-            window.rankerMasterLoop.refresh();
+      function wrappedSubmitTest() {
+        const result = original.apply(this, arguments);
+
+        /*
+         * Original submitTest owns scoring/result rendering.
+         * We only persist the authoritative learning record afterwards.
+         */
+        setTimeout(function () {
+          try {
+            commitAttempt();
+          } catch (error) {
+            console.error(
+              "[RankForge] Master-sync commit failed:",
+              error
+            );
           }
-        }catch(e){}
+        }, 0);
 
-      },300);
+        return result;
+      }
 
-      return result;
+      wrappedSubmitTest.__rankforgeWrapped__ = true;
+      wrappedSubmitTest.__rankforgeOriginal__ = original;
+
+      window.submitTest = wrappedSubmitTest;
+
+      console.log("[RankForge] Master-sync wrapper installed.");
+      return true;
+    };
+
+    if (!install()) {
+      let attempts = 0;
+
+      const timer = setInterval(function () {
+        attempts++;
+
+        if (install() || attempts >= 100) {
+          clearInterval(timer);
+
+          if (attempts >= 100) {
+            console.warn(
+              "[RankForge] submitTest was not available during installation window."
+            );
+          }
+        }
+      }, 100);
     }
-
-    wrappedSubmit.__rankerMasterWrapped=true;
-    wrappedSubmit.__originalSubmitTest=originalSubmit;
-    window.submitTest=wrappedSubmit;
   }
-
 })();
 </script>
 
