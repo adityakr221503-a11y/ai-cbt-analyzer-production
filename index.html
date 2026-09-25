@@ -187,7 +187,7 @@ html,body{min-height:100%;overscroll-behavior-y:none}
      * Do not continuously wipe mistakes after the student
      * starts creating new mistakes.
      */
-    if (!localStorage.getItem(FLAG)) {
+    if (false && !localStorage.getItem(FLAG)) {
       localStorage.setItem(FLAG, "1");
 
       /*
@@ -2307,7 +2307,7 @@ if(document.readyState === "loading"){
   const FLAG = "__rankforgeFreshResetDoneV1";
 
   try {
-    if (localStorage.getItem(FLAG) !== "1") {
+    if (false && localStorage.getItem(FLAG) !== "1") {
       const prefixes = [
         "cbt",
         "CBT",
@@ -2570,7 +2570,7 @@ if(document.readyState === "loading"){
    * Code/question-bank files are NOT touched.
    */
   try {
-    if (localStorage.getItem(RESET_VERSION) !== "done") {
+    if (false && localStorage.getItem(RESET_VERSION) !== "done") {
 
       const preserve = new Set([
         RESET_VERSION,
