@@ -1934,166 +1934,7 @@ if(document.readyState === "loading"){
 <script src="./rankforge-learning-loop-v1.js"></script>
 <script src="./rankforge-learning-loop-v2.js"></script>
 
-<!-- RANKFORGE_BIOLOGY_CBT_AUTHORITATIVE_BRIDGE_V1 -->
-<script>
-(function(){
 
-  const MARK="RANKFORGE_BIOLOGY_CBT_AUTHORITATIVE_BRIDGE_V1";
-  const BANK_URL="./rank-booster/biology-test-series-2699.json";
-
-  function normalize(q,index){
-    const opts=Array.isArray(q.options) ? q.options : [];
-
-    return {
-      id:q.id || ("BIO-"+index),
-      question:q.question || q.text || "",
-      text:q.question || q.text || "",
-      options:opts,
-      correctAnswer:q.correctAnswer,
-      correctIndex:Number.isFinite(Number(q.correctIndex))
-        ? Number(q.correctIndex)
-        : -1,
-      subject:q.subject || "Biology",
-      chapter:q.chapter || "",
-      testNumber:Number(q.testNumber)||0,
-      questionNumber:Number(q.questionNumber)||index+1,
-      marks:q.marks ?? 4,
-      negativeMarks:q.negativeMarks ?? 1,
-      source:q.source || "NEET Biology Test Series.pdf"
-    };
-  }
-
-  function clearTransientPDFAuthority(){
-    try{
-      sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
-      sessionStorage.removeItem("__PDF_CBT_ACTIVE_TEST__");
-      sessionStorage.removeItem("__PDF_CBT_ACTIVE_QUESTIONS__");
-    }catch(e){}
-
-    try{
-      localStorage.removeItem("RANKFORGE_ACTIVE_PDF_TEST");
-      localStorage.removeItem("CBT_ACTIVE_PDF_TEST");
-    }catch(e){}
-  }
-
-  async function startBiologyTest(testNumber){
-
-    testNumber=Number(testNumber);
-
-    if(!Number.isInteger(testNumber) || testNumber<1 || testNumber>30){
-      throw new Error("Invalid Biology test number: "+testNumber);
-    }
-
-    const response=await fetch(
-      BANK_URL+"?v="+Date.now(),
-      {cache:"no-store"}
-    );
-
-    if(!response.ok){
-      throw new Error("Biology bank HTTP "+response.status);
-    }
-
-    const bank=await response.json();
-
-    if(!Array.isArray(bank) || bank.length!==2699){
-      throw new Error(
-        "Biology bank integrity failure: expected 2699, got "+
-        (Array.isArray(bank)?bank.length:"invalid")
-      );
-    }
-
-    let questions=bank
-      .filter(q=>Number(q.testNumber)===testNumber)
-      .sort((a,b)=>Number(a.questionNumber)-Number(b.questionNumber))
-      .map(normalize);
-
-    /*
-      Test 11 contains 89 active questions because Q53 was
-      intentionally removed from the verified source.
-      Do not fabricate a replacement.
-    */
-    if(testNumber===11){
-      if(questions.length!==89){
-        throw new Error(
-          "Biology Test 11 integrity failure: expected 89 active questions, got "+
-          questions.length
-        );
-      }
-    }else if(questions.length!==90){
-      throw new Error(
-        "Biology Test "+testNumber+
-        " integrity failure: expected 90 questions, got "+
-        questions.length
-      );
-    }
-
-    clearTransientPDFAuthority();
-
-    const payload=JSON.stringify(questions);
-
-    localStorage.setItem("CBT_ACTIVE_QUESTIONS",payload);
-
-    localStorage.setItem(
-      "RANKFORGE_ACTIVE_TEST",
-      JSON.stringify({
-        source:"rankers-biology",
-        type:"biology",
-        testNumber:testNumber,
-        title:"Biology Test "+testNumber,
-        questionCount:questions.length,
-        startedAt:new Date().toISOString(),
-        bank:"biology-test-series-2699.json"
-      })
-    );
-
-    sessionStorage.setItem("CBT_ACTIVE_SOURCE","RANKERS_BIOLOGY");
-
-    window.CBT_ACTIVE_QUESTIONS=questions;
-    window.RANKFORGE_ACTIVE_QUESTIONS=questions;
-
-    window.RANKFORGE_ACTIVE_TEST={
-      source:"rankers-biology",
-      type:"biology",
-      testNumber:testNumber,
-      title:"Biology Test "+testNumber,
-      questions:questions,
-      questionCount:questions.length
-    };
-
-    window.RANKFORGE_RUNTIME_QUESTIONS=questions;
-
-    /*
-      Compatibility aliases for existing CBT loaders.
-    */
-    window.selectedQuestions=questions;
-
-    console.log(
-      "[RankForge Biology] authoritative test loaded:",
-      testNumber,
-      questions.length
-    );
-
-    return questions;
-  }
-
-  window.RANKFORGE_START_BIOLOGY_TEST=startBiologyTest;
-
-  /*
-    Intercept the existing Biology loader's startTest().
-    We intentionally do NOT replace its UI.
-    We only guarantee the final handoff into CBT.
-  */
-  window.addEventListener(
-    "rankforge:biology-test-selected",
-    function(e){
-      const n=e && e.detail && e.detail.testNumber;
-      if(n) startBiologyTest(n).catch(console.error);
-    }
-  );
-
-})();
-</script>
-<!-- /RANKFORGE_BIOLOGY_CBT_AUTHORITATIVE_BRIDGE_V1 -->
 
 </head>
 
@@ -10308,6 +10149,126 @@ document.addEventListener("visibilitychange",function(){
     };
   }catch(e){}
 })();
+
+
+<!-- RANKFORGE_BIOLOGY_FINAL_RUNTIME_V2 -->
+<script>
+(function(){
+"use strict";
+
+const BANK="./rank-booster/biology-test-series-2699.json";
+
+function clearPDFState(){
+  ["CBT_ACTIVE_QUESTIONS","RANKFORGE_ACTIVE_PDF_TEST","CBT_ACTIVE_PDF_TEST"]
+    .forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+
+  ["CBT_ACTIVE_SOURCE","CBT_ACTIVE_TEST",
+   "__PDF_CBT_ACTIVE_TEST__","__PDF_CBT_ACTIVE_QUESTIONS__",
+   "CBT_ACTIVE_QUESTIONS"]
+    .forEach(k=>{try{sessionStorage.removeItem(k)}catch(e){}});
+
+  try{
+    delete window.CBT_ACTIVE_QUESTIONS;
+    delete window.RANKFORGE_ACTIVE_QUESTIONS;
+    delete window.RANKFORGE_ACTIVE_TEST;
+    delete window.selectedTest;
+    delete window.selectedQuestions;
+  }catch(e){}
+}
+
+function norm(q,i){
+  return {
+    id:q.id||("BIO-"+i),
+    text:q.question||"",
+    question:q.question||"",
+    options:Array.isArray(q.options)?q.options:[],
+    correctAnswer:q.correctAnswer,
+    correctIndex:Number(q.correctIndex),
+    subject:q.subject||"Biology",
+    chapter:q.chapter||"",
+    testNumber:Number(q.testNumber),
+    questionNumber:Number(q.questionNumber),
+    marks:q.marks??4,
+    negativeMarks:q.negativeMarks??1,
+    source:q.source||"NEET Biology Test Series.pdf"
+  };
+}
+
+async function start(testNumber){
+  testNumber=Number(testNumber);
+
+  const r=await fetch(BANK+"?v="+Date.now(),{cache:"no-store"});
+  if(!r.ok) throw Error("Biology bank HTTP "+r.status);
+
+  const bank=await r.json();
+  if(!Array.isArray(bank)||bank.length!==2699)
+    throw Error("Biology bank integrity failure");
+
+  const q=bank
+    .filter(x=>Number(x.testNumber)===testNumber)
+    .sort((a,b)=>Number(a.questionNumber)-Number(b.questionNumber))
+    .map(norm);
+
+  const expected=testNumber===11?89:90;
+  if(q.length!==expected)
+    throw Error("Test "+testNumber+" expected "+expected+" got "+q.length);
+
+  clearPDFState();
+
+  window.CBT_ACTIVE_QUESTIONS=q;
+  window.RANKFORGE_ACTIVE_QUESTIONS=q;
+  window.selectedQuestions=q.slice();
+
+  window.RANKFORGE_ACTIVE_TEST={
+    source:"rankers-biology",
+    type:"biology",
+    testNumber,
+    title:"Biology Test "+testNumber,
+    questions:q,
+    questionCount:q.length
+  };
+
+  localStorage.setItem("CBT_ACTIVE_QUESTIONS",JSON.stringify(q));
+  localStorage.setItem(
+    "RANKFORGE_ACTIVE_TEST",
+    JSON.stringify({
+      source:"rankers-biology",
+      type:"biology",
+      testNumber,
+      title:"Biology Test "+testNumber,
+      questionCount:q.length
+    })
+  );
+
+  sessionStorage.setItem("CBT_ACTIVE_SOURCE","RANKERS_BIOLOGY");
+  sessionStorage.setItem(
+    "CBT_ACTIVE_TEST",
+    JSON.stringify(window.RANKFORGE_ACTIVE_TEST)
+  );
+
+  document.documentElement.dataset.rankforgeSource="rankers-biology";
+  document.documentElement.dataset.rankforgeQuestionCount=String(q.length);
+
+  console.log("[RankForge] Biology authoritative:",testNumber,q.length);
+  return q;
+}
+
+window.RANKFORGE_FINAL_START_BIOLOGY=start;
+
+const p=new URLSearchParams(location.search);
+if(p.get("source")==="rankers-biology"){
+  start(Number(p.get("test")||1))
+    .then(q=>{
+      window.selectedQuestions=q.slice();
+      const el=document.getElementById("questionCount");
+      if(el) el.textContent=String(q.length);
+    })
+    .catch(e=>console.error("[RankForge Biology]",e));
+}
+
+})();
+</script>
+<!-- /RANKFORGE_BIOLOGY_FINAL_RUNTIME_V2 -->
 
 </body>
 
