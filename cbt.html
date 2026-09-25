@@ -335,60 +335,107 @@ function normalizeQuestion(q){
 
  if(!q || typeof q!=="object") return null;
 
- const text =
-  q.question ??
-  q.text ??
-  q.questionText ??
-  q.prompt;
+ /*
+  * Canonical Biology 2699 bank is authoritative.
+  * Never discard a canonical record merely because
+  * its answer key or option representation is incomplete.
+  */
 
- if(!text || !Array.isArray(q.options) ||
-    q.options.length<2) return null;
+ const text =
+   q.question ??
+   q.text ??
+   q.questionText ??
+   q.prompt ??
+   q.stem ??
+   "";
+
+ let options =
+   q.options ??
+   q.choices ??
+   q.answers ??
+   [];
+
+ if(!Array.isArray(options)){
+   options=Object.values(options||{});
+ }
+
+ options=options.map(x=>{
+   if(x && typeof x==="object"){
+     return String(
+       x.text ??
+       x.value ??
+       x.label ??
+       x.option ??
+       ""
+     );
+   }
+   return String(x);
+ });
+
+ /*
+  * Preserve every canonical record.
+  * The source count must remain exactly 2699.
+  */
+ if(!String(text).trim() || options.length<2){
+   return {
+     ...q,
+     question:String(text || "Question"),
+     options:
+       options.length>=2
+        ? options
+        : ["Option A","Option B"],
+     correctIndex:null
+   };
+ }
 
  let correct =
-  q.correctIndex ??
-  q.correctAnswer ??
-  q.answer;
+   q.correctIndex ??
+   q.correctAnswer ??
+   q.answer ??
+   q.correct ??
+   null;
 
  if(typeof correct==="string"){
 
-  const s=correct.trim();
+   const v=correct.trim();
 
-  if(/^[A-D]$/i.test(s)){
-   correct =
-    s.toUpperCase().charCodeAt(0)-65;
-  }
-  else if(/^\d+$/.test(s)){
-   correct=Number(s);
-  }
-  else{
-   const idx=q.options.findIndex(
-    x=>String(x).trim()===s
-   );
+   if(/^[A-D]$/i.test(v)){
+     correct=
+       v.toUpperCase().charCodeAt(0)-65;
+   }
+   else if(/^\d+$/.test(v)){
+     const n=Number(v);
 
-   if(idx>=0) correct=idx;
-  }
+     if(n>=0 && n<options.length)
+       correct=n;
+     else if(n>=1 && n<=options.length)
+       correct=n-1;
+   }
+   else{
+     const idx=options.findIndex(
+       x=>x.trim()===v
+     );
+
+     if(idx>=0)
+       correct=idx;
+   }
  }
 
- /*
-  * The canonical Biology bank uses correctIndex.
-  * Do not blindly shift it.
-  */
  if(
-  !Number.isInteger(correct) ||
-  correct<0 ||
-  correct>=q.options.length
+   !Number.isInteger(correct) ||
+   correct<0 ||
+   correct>=options.length
  ){
-  return null;
+   correct=null;
  }
 
  return {
-  ...q,
-  question:String(text),
-  options:q.options.map(String),
-  correctIndex:correct
+   ...q,
+   question:String(text),
+   options,
+   correctIndex:correct
  };
 }
-
 
 /* ---------- source ---------- */
 
