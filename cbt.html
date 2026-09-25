@@ -10270,6 +10270,102 @@ if(p.get("source")==="rankers-biology"){
 </script>
 <!-- /RANKFORGE_BIOLOGY_FINAL_RUNTIME_V2 -->
 
+
+<script>
+/* RANKFORGE_BIOLOGY_START_AUTHORITY_V1
+   Existing CBT start path must use the verified Biology session.
+   This does NOT modify the canonical 2699 bank.
+*/
+(function () {
+  "use strict";
+
+  const params = new URLSearchParams(location.search);
+  if (params.get("source") !== "rankers-biology") return;
+
+  function biologyQuestions() {
+    const q =
+      window.RANKFORGE_ACTIVE_QUESTIONS ||
+      window.CBT_ACTIVE_QUESTIONS ||
+      window.selectedQuestions;
+
+    return Array.isArray(q) ? q.filter(Boolean) : [];
+  }
+
+  function enforce() {
+    const q = biologyQuestions();
+    if (!q.length) return false;
+
+    window.selectedQuestions = q.slice();
+
+    try {
+      sessionStorage.setItem(
+        "CBT_ACTIVE_SOURCE",
+        "BIOLOGY"
+      );
+    } catch (_) {}
+
+    try {
+      document.documentElement.dataset.cbtSource = "biology";
+    } catch (_) {}
+
+    const count = document.getElementById("questionCount");
+    if (count) count.textContent = String(q.length);
+
+    return true;
+  }
+
+  window.RANKFORGE_BIOLOGY_ENFORCE_START = enforce;
+
+  /*
+   * Intercept the existing start button without replacing the
+   * existing CBT engine. The original handler is allowed to run,
+   * then the verified Biology selection is restored immediately.
+   */
+  document.addEventListener("click", function (ev) {
+    const btn = ev.target && ev.target.closest
+      ? ev.target.closest("#startButton")
+      : null;
+
+    if (!btn) return;
+
+    setTimeout(function () {
+      const q = biologyQuestions();
+
+      if (q.length) {
+        window.selectedQuestions = q.slice();
+
+        try {
+          window.CBT_ACTIVE_QUESTIONS = q.slice();
+        } catch (_) {}
+
+        const count = document.getElementById("questionCount");
+        if (count) count.textContent = String(q.length);
+
+        console.log(
+          "[RankForge Biology] authoritative start:",
+          q.length
+        );
+      }
+    }, 0);
+  }, true);
+
+  /*
+   * Keep the local CBT variable synchronized whenever the verified
+   * Biology runtime has finished loading.
+   */
+  let tries = 0;
+  const timer = setInterval(function () {
+    tries++;
+
+    if (enforce() || tries >= 100) {
+      clearInterval(timer);
+    }
+  }, 50);
+
+})();
+</script>
+<!-- /RANKFORGE_BIOLOGY_START_AUTHORITY_V1 -->
+
 </body>
 
 </html>
