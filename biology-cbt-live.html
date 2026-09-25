@@ -1251,686 +1251,195 @@ fetch(
 })();
 </script>
 
-</body>
-</html>
 
 <script>
-/* ============================================================
-   RANKFORGE BIOLOGY CBT FLOW — SINGLE AUTHORITATIVE V1
-   Source: existing verified 2699-question Biology bank
-   Flow:
-   START → ANSWER → NEXT → SUBMIT → RESULT → HISTORY
-   → MISTAKE BOOK → RETRY
-   ============================================================ */
+/* RANKFORGE_BIOLOGY_RETRY_FINAL_V1 */
 (function(){
 
 "use strict";
 
-const RF_KEY = "rankforge_biology_cbt_v1";
-const HISTORY_KEY = "cbtHistory";
-const MASTERY_KEY = "cbtMasteryV2";
-
-function getQuestions(){
-  if(Array.isArray(window.CBT_ACTIVE_QUESTIONS) &&
-     window.CBT_ACTIVE_QUESTIONS.length){
-    return window.CBT_ACTIVE_QUESTIONS;
-  }
-
-  if(Array.isArray(window.selectedQuestions) &&
-     window.selectedQuestions.length){
-    return window.selectedQuestions;
-  }
-
+function read(key){
   try{
-    const s=sessionStorage.getItem("CBT_ACTIVE_QUESTIONS");
-    if(s){
-      const q=JSON.parse(s);
-      if(Array.isArray(q) && q.length) return q;
-    }
-  }catch(e){}
-
-  try{
-    const s=localStorage.getItem("CBT_ACTIVE_QUESTIONS");
-    if(s){
-      const q=JSON.parse(s);
-      if(Array.isArray(q) && q.length) return q;
-    }
-  }catch(e){}
-
-  return [];
-}
-
-function saveState(state){
-  try{
-    sessionStorage.setItem(RF_KEY,JSON.stringify(state));
-  }catch(e){}
-
-  try{
-    localStorage.setItem(RF_KEY,JSON.stringify(state));
-  }catch(e){}
-}
-
-function loadState(){
-  try{
-    const s=sessionStorage.getItem(RF_KEY);
-    if(s) return JSON.parse(s);
-  }catch(e){}
-
-  try{
-    const s=localStorage.getItem(RF_KEY);
-    if(s) return JSON.parse(s);
-  }catch(e){}
-
-  return null;
-}
-
-function textOf(q){
-  return String(
-    q?.question ??
-    q?.text ??
-    q?.questionText ??
-    q?.prompt ??
-    ""
-  );
-}
-
-function optionsOf(q){
-  return Array.isArray(q?.options) ? q.options : [];
-}
-
-function answerOf(q){
-  const x =
-    q?.correctIndex ??
-    q?.correctAnswer ??
-    q?.answer ??
-    null;
-
-  if(Number.isInteger(x)) return x;
-
-  if(typeof x==="string"){
-    const v=x.trim().toUpperCase();
-
-    if(/^[A-D]$/.test(v))
-      return v.charCodeAt(0)-65;
-
-    if(/^\d+$/.test(v)){
-      const n=Number(v);
-      if(n>=0 && n<4) return n;
-      if(n>=1 && n<=4) return n-1;
-    }
-  }
-
-  return null;
-}
-
-function ensureState(){
-  let state=loadState();
-
-  const questions=getQuestions();
-
-  if(!questions.length){
-    throw new Error("No Biology CBT questions are active.");
-  }
-
-  if(
-    !state ||
-    !Array.isArray(state.questions) ||
-    state.questions.length!==questions.length
-  ){
-    state={
-      version:1,
-      subject:"Biology",
-      testTitle:"Biology Test Series",
-      testNumber:window.RF_BIOLOGY_TEST_NUMBER || 1,
-      questions:questions,
-      index:0,
-      answers:Array(questions.length).fill(null),
-      startedAt:Date.now(),
-      submitted:false
-    };
-  }
-
-  state.questions=questions;
-
-  if(!Array.isArray(state.answers) ||
-     state.answers.length!==questions.length){
-    state.answers=Array(questions.length).fill(null);
-  }
-
-  return state;
-}
-
-function render(){
-  const state=ensureState();
-  const q=state.questions[state.index];
-
-  if(!q) return;
-
-  const questionText=textOf(q);
-  const options=optionsOf(q);
-
-  const root=
-    document.querySelector("#questionContainer") ||
-    document.querySelector(".question-container") ||
-    document.querySelector("#question") ||
-    document.querySelector("main");
-
-  if(!root) return;
-
-  /*
-   * Only render when the existing CBT screen exposes a usable
-   * question area. This prevents damage to the working launcher.
-   */
-  const box=document.createElement("div");
-  box.id="rankforge-biology-flow";
-  box.style.cssText=
-    "padding:16px;margin:12px 0;border-radius:14px;" +
-    "border:1px solid #ddd;background:#fff;";
-
-  const title=document.createElement("div");
-  title.style.fontWeight="700";
-  title.style.marginBottom="12px";
-  title.textContent=
-    "Question "+(state.index+1)+" of "+state.questions.length;
-
-  const stem=document.createElement("div");
-  stem.style.marginBottom="14px";
-  stem.textContent=questionText;
-
-  box.appendChild(title);
-  box.appendChild(stem);
-
-  options.forEach((option,i)=>{
-    const b=document.createElement("button");
-
-    b.type="button";
-    b.dataset.rfOption=String(i);
-    b.textContent=String(option);
-
-    b.style.cssText=
-      "display:block;width:100%;text-align:left;" +
-      "padding:12px;margin:8px 0;border-radius:10px;" +
-      "border:1px solid #ccc;background:#fafafa;";
-
-    if(state.answers[state.index]===i){
-      b.style.fontWeight="700";
-    }
-
-    b.onclick=function(){
-      state.answers[state.index]=i;
-      saveState(state);
-      render();
-    };
-
-    box.appendChild(b);
-  });
-
-  const nav=document.createElement("div");
-  nav.style.cssText=
-    "display:flex;gap:8px;margin-top:14px;";
-
-  if(state.index>0){
-    const prev=document.createElement("button");
-    prev.textContent="Previous";
-    prev.onclick=function(){
-      state.index--;
-      saveState(state);
-      render();
-    };
-    nav.appendChild(prev);
-  }
-
-  if(state.index<state.questions.length-1){
-    const next=document.createElement("button");
-    next.textContent="Next";
-    next.onclick=function(){
-      state.index++;
-      saveState(state);
-      render();
-    };
-    nav.appendChild(next);
-  }else{
-    const submit=document.createElement("button");
-    submit.textContent="Submit Biology CBT";
-    submit.onclick=submitTest;
-    nav.appendChild(submit);
-  }
-
-  box.appendChild(nav);
-
-  const old=document.getElementById("rankforge-biology-flow");
-  if(old) old.remove();
-
-  root.appendChild(box);
-}
-
-function submitTest(){
-  const state=ensureState();
-
-  let correct=0;
-  let attempted=0;
-  let mistakes=[];
-
-  state.questions.forEach((q,i)=>{
-    const chosen=state.answers[i];
-
-    if(chosen!==null && chosen!==undefined){
-      attempted++;
-    }
-
-    const answer=answerOf(q);
-
-    if(answer!==null && chosen===answer){
-      correct++;
-    }else if(
-      chosen!==null &&
-      chosen!==undefined &&
-      answer!==null
-    ){
-      mistakes.push({
-        question:q,
-        questionIndex:i,
-        selectedAnswer:chosen,
-        correctAnswer:answer
-      });
-    }
-  });
-
-  const score={
-    subject:"Biology",
-    testTitle:state.testTitle,
-    testNumber:state.testNumber,
-    total:state.questions.length,
-    attempted,
-    correct,
-    wrong:mistakes.length,
-    unverified:state.questions.filter(q=>answerOf(q)===null).length,
-    timestamp:Date.now()
-  };
-
-  state.submitted=true;
-  state.score=score;
-  state.mistakes=mistakes;
-
-  saveState(state);
-
-  // HISTORY
-  try{
-    const old=JSON.parse(
-      localStorage.getItem(HISTORY_KEY)||"[]"
-    );
-
-    const history=Array.isArray(old)?old:[];
-
-    history.unshift({
-      ...score,
-      answers:state.answers.slice(),
-      source:"RankForge Biology 2699",
-      id:"BIO-"+Date.now()
-    });
-
-    localStorage.setItem(
-      HISTORY_KEY,
-      JSON.stringify(history.slice(0,100))
-    );
-  }catch(e){}
-
-  // MISTAKE BOOK
-  try{
-    const old=JSON.parse(
-      localStorage.getItem(MASTERY_KEY)||"{}"
-    );
-
-    const mastery=
-      old && typeof old==="object" ? old : {};
-
-    if(!Array.isArray(mastery.mistakes))
-      mastery.mistakes=[];
-
-    mistakes.forEach(m=>{
-      const id=
-        m.question?.id ||
-        m.question?.questionId ||
-        "BIO-Q-"+m.questionIndex;
-
-      const existing=mastery.mistakes.find(x=>x.id===id);
-
-      if(existing){
-        existing.retries=(existing.retries||0)+1;
-        existing.lastSeen=Date.now();
-      }else{
-        mastery.mistakes.push({
-          id,
-          subject:"Biology",
-          questionIndex:m.questionIndex,
-          question:m.question,
-          selectedAnswer:m.selectedAnswer,
-          correctAnswer:m.correctAnswer,
-          reason:"Not classified",
-          retries:0,
-          status:"Active Mistake",
-          firstSeen:Date.now(),
-          lastSeen:Date.now()
-        });
-      }
-    });
-
-    localStorage.setItem(
-      MASTERY_KEY,
-      JSON.stringify(mastery)
-    );
-  }catch(e){}
-
-  showResult(score);
-}
-
-function showResult(score){
-  const root=
-    document.querySelector("#questionContainer") ||
-    document.querySelector(".question-container") ||
-    document.querySelector("#question") ||
-    document.querySelector("main");
-
-  if(!root) return;
-
-  const box=document.createElement("div");
-
-  box.style.cssText=
-    "padding:20px;margin:16px 0;border-radius:16px;" +
-    "border:1px solid #ddd;background:#fff;";
-
-  box.innerHTML=
-    "<h2>Biology CBT Result</h2>"+
-    "<p><b>"+score.correct+
-    "</b> correct out of <b>"+score.total+"</b></p>"+
-    "<p>Attempted: "+score.attempted+"</p>"+
-    "<p>Wrong (verified): "+score.wrong+"</p>"+
-    "<p>Unverified answer keys: "+score.unverified+"</p>"+
-    "<p><b>History saved ✓</b></p>"+
-    "<p><b>Mistake Book updated ✓</b></p>";
-
-  const retry=document.createElement("button");
-  retry.textContent="Retry Mistakes";
-  retry.onclick=retryMistakes;
-
-  box.appendChild(retry);
-
-  root.innerHTML="";
-  root.appendChild(box);
-}
-
-function retryMistakes(){
-  const state=loadState();
-
-  if(!state || !Array.isArray(state.mistakes)){
-    alert("No mistakes available for retry.");
-    return;
-  }
-
-  const qs=state.mistakes.map(x=>x.question);
-
-  if(!qs.length){
-    alert("No verified mistakes to retry.");
-    return;
-  }
-
-  window.CBT_ACTIVE_QUESTIONS=qs;
-  window.selectedQuestions=qs;
-
-  const retryState={
-    version:1,
-    subject:"Biology",
-    testTitle:"Biology Mistake Retry",
-    testNumber:state.testNumber,
-    questions:qs,
-    index:0,
-    answers:Array(qs.length).fill(null),
-    startedAt:Date.now(),
-    submitted:false
-  };
-
-  saveState(retryState);
-  render();
-}
-
-function start(){
-  const state=ensureState();
-
-  window.CBT_ACTIVE_QUESTIONS=state.questions;
-  window.selectedQuestions=state.questions;
-
-  saveState(state);
-
-  render();
-}
-
-window.RANKFORGE_BIOLOGY_CBT_FLOW={
-  start,
-  submitTest,
-  retryMistakes,
-  state:loadState
-};
-
-/*
- * Hook the launcher without replacing the 2699-question loader.
- */
-document.addEventListener("click",function(e){
-
-  const el=e.target.closest("button,a");
-
-  if(!el) return;
-
-  const t=(el.textContent||"").trim().toLowerCase();
-
-  if(
-    t.includes("start biology cbt") ||
-    t==="start cbt"
-  ){
-    setTimeout(function(){
-      try{ start(); }
-      catch(err){ console.error(err); }
-    },0);
-  }
-});
-
-})();
-</script>
-
-
-<script>
-/* ============================================================
-   RANKFORGE BIOLOGY — RETRY + HISTORY BRIDGE
-   Uses the already-working CBT session.
-   Does NOT modify the 2699-question source.
-   ============================================================ */
-(function(){
-
-"use strict";
-
-const STATE_KEYS=[
-  "rankforge_biology_cbt_v1",
-  "CBT_ACTIVE_QUESTIONS",
-  "RANKFORGE_ACTIVE_TEST"
-];
-
-function readJSON(storage,key){
-  try{
-    const v=storage.getItem(key);
-    return v ? JSON.parse(v) : null;
+    const a=localStorage.getItem(key);
+    return a ? JSON.parse(a) : null;
   }catch(e){ return null; }
 }
 
-function getState(){
-  for(const key of STATE_KEYS){
-    const a=readJSON(sessionStorage,key);
-    if(a) return a;
-
-    const b=readJSON(localStorage,key);
-    if(b) return b;
-  }
-  return null;
+function write(key,value){
+  try{
+    localStorage.setItem(key,JSON.stringify(value));
+  }catch(e){}
 }
 
 function getMistakes(){
-  const state=getState();
 
-  if(state && Array.isArray(state.mistakes) && state.mistakes.length)
-    return state.mistakes;
+  const q=read("cbtMistakes");
 
-  try{
-    const mastery=readJSON(localStorage,"cbtMasteryV2");
+  if(Array.isArray(q) && q.length)
+    return q.filter(x=>x && x.mastered!==true);
 
-    if(mastery && Array.isArray(mastery.mistakes))
-      return mastery.mistakes;
-  }catch(e){}
+  const rq=read("rankforge_biology_cbt_v1");
+
+  if(rq && Array.isArray(rq.mistakes) && rq.mistakes.length)
+    return rq.mistakes.map(x=>x.question||x);
+
+  const retry=read("RETRY_QUEUE");
+
+  if(Array.isArray(retry) && retry.length)
+    return retry;
 
   return [];
 }
 
-function questionFromMistake(m){
-  return m.question || m;
+function toQuestion(m,i){
+
+  const q=m.question ? m : (m.questionData || m);
+
+  return {
+    id:q.id || ("BIO-RETRY-"+Date.now()+"-"+i),
+    question:String(
+      q.question ??
+      q.text ??
+      q.questionText ??
+      ""
+    ),
+    options:Array.isArray(q.options)
+      ? q.options.map(String)
+      : [],
+    correctIndex:
+      Number.isInteger(q.correctIndex)
+        ? q.correctIndex
+        : (
+            Number.isInteger(q.correctAnswer)
+              ? q.correctAnswer
+              : (
+                  Number.isInteger(q.answer)
+                    ? q.answer
+                    : null
+                )
+          ),
+    answer:q.answer,
+    solution:q.solution || q.explanation || "",
+    subject:"Biology",
+    source:"Mistake Retry"
+  };
 }
 
-function launchRetry(){
+function startRetry(){
 
-  const mistakes=getMistakes()
-    .map(questionFromMistake)
-    .filter(q=>q && typeof q==="object");
+  const mistakes=getMistakes();
 
   if(!mistakes.length){
-    alert("No saved mistakes are available for retry.");
+    alert("No saved mistakes available for retry.");
+    return;
+  }
+
+  const questions=mistakes
+    .map(toQuestion)
+    .filter(q=>q.question && q.options.length>=2);
+
+  if(!questions.length){
+    alert("Saved mistakes contain no valid Biology questions.");
     return;
   }
 
   /*
-   * Put ONLY mistakes into the active CBT session.
+   * This is the ONLY retry queue.
    */
-  window.CBT_ACTIVE_QUESTIONS=mistakes;
-  window.selectedQuestions=mistakes;
+  window.CBT_ACTIVE_QUESTIONS=questions;
+  window.selectedQuestions=questions;
 
-  try{
-    sessionStorage.setItem(
-      "CBT_ACTIVE_QUESTIONS",
-      JSON.stringify(mistakes)
-    );
-  }catch(e){}
+  sessionStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(questions)
+  );
 
-  try{
-    localStorage.setItem(
-      "CBT_ACTIVE_QUESTIONS",
-      JSON.stringify(mistakes)
-    );
-  }catch(e){}
+  localStorage.setItem(
+    "CBT_ACTIVE_QUESTIONS",
+    JSON.stringify(questions)
+  );
 
-  const retryState={
-    version:2,
+  localStorage.setItem(
+    "RANKFORGE_RETRY_MODE",
+    "1"
+  );
+
+  localStorage.setItem(
+    "RANKFORGE_RETRY_COUNT",
+    String(questions.length)
+  );
+
+  const state={
+    version:3,
     subject:"Biology",
     testTitle:"Biology Mistake Retry",
-    questions:mistakes,
+    questions:questions,
     index:0,
-    answers:Array(mistakes.length).fill(null),
-    startedAt:Date.now(),
+    answers:Array(questions.length).fill(null),
+    retry:true,
     submitted:false,
-    retry:true
+    startedAt:Date.now()
   };
 
-  try{
-    sessionStorage.setItem(
-      "rankforge_biology_cbt_v1",
-      JSON.stringify(retryState)
-    );
-  }catch(e){}
-
-  try{
-    localStorage.setItem(
-      "rankforge_biology_cbt_v1",
-      JSON.stringify(retryState)
-    );
-  }catch(e){}
+  write("rankforge_biology_cbt_v1",state);
 
   /*
-   * Prefer the existing CBT renderer if available.
+   * Stay on the standalone Biology CBT page.
+   * Never redirect to legacy cbt.html.
    */
-  const candidates=[
-    "startCBT",
-    "startTest",
-    "startExam",
-    "beginCBT",
-    "renderQuestion"
-  ];
+  const url=new URL(location.href);
+  url.searchParams.set("retry","1");
+  url.searchParams.set("retryCount",String(questions.length));
+  url.searchParams.set("v",String(Date.now()));
 
-  for(const name of candidates){
-    if(typeof window[name]==="function"){
-      try{
-        window[name]();
-        return;
-      }catch(e){}
+  location.href=url.toString();
+}
+
+function install(){
+
+  document.addEventListener("click",function(e){
+
+    const el=e.target.closest("button,a");
+
+    if(!el) return;
+
+    const text=(el.textContent||"")
+      .trim()
+      .replace(/\s+/g," ")
+      .toLowerCase();
+
+    if(
+      text==="retry mistakes" ||
+      text.includes("retry mistakes")
+    ){
+
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      startRetry();
+      return false;
     }
-  }
 
-  /*
-   * If the page exposes a Start button, trigger it.
-   */
-  const buttons=[...document.querySelectorAll("button,a")];
+  },true);
 
-  const start=buttons.find(el=>{
-    const t=(el.textContent||"").trim().toLowerCase();
-    return t==="start cbt" ||
-           t.includes("start biology cbt") ||
-           t.includes("start test");
-  });
-
-  if(start){
-    start.click();
-    return;
-  }
-
-  /*
-   * Last-resort reload with retry flag.
-   */
-  const u=new URL(location.href);
-  u.searchParams.set("retry","1");
-  u.searchParams.set("v",Date.now().toString());
-
-  location.href=u.toString();
 }
 
-function retryButtonHandler(e){
+install();
 
-  const el=e.target.closest("button,a");
-
-  if(!el) return;
-
-  const text=(el.textContent||"")
-    .trim()
-    .toLowerCase();
-
-  if(
-    text.includes("retry mistakes") ||
-    text.includes("retry mistake")
-  ){
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    launchRetry();
-  }
-}
-
-/*
- * Capture phase is intentional:
- * it intercepts the old Retry button before competing
- * handlers can restart the original 90-question test.
- */
-document.addEventListener(
-  "click",
-  retryButtonHandler,
-  true
-);
-
-window.RANKFORGE_RETRY_FIX={
-  launchRetry,
-  getMistakes
+window.RANKFORGE_BIOLOGY_RETRY_FINAL={
+  start:startRetry,
+  mistakes:getMistakes
 };
 
 })();
 </script>
+
+</body>
+</html>
+
+
+
+
+
 
