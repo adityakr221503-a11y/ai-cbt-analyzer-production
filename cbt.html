@@ -3931,110 +3931,172 @@ function shuffleQuestions(
 ===================================================== */
 
 function buildTestQuestions() {
+  try {
 
-  if (
-    typeof CBT_PDF_MODE !== "undefined" &&
-    CBT_PDF_MODE &&
-    Array.isArray(CBT_PDF_QUESTIONS) &&
-    CBT_PDF_QUESTIONS.length
-  ) {
-    return CBT_PDF_QUESTIONS
-      .map(function(question, index) {
-        return normalizeQuestion(question, index);
-      })
-      .filter(function(question) {
-        return Boolean(question);
-      });
-  }
+    function validQuestion(q) {
+      if (!q || typeof q !== "object") return false;
 
+      var text =
+        q.text ??
+        q.questionText ??
+        q.question ??
+        q.prompt ??
+        "";
 
-  if (!selectedTest) {
+      var options =
+        q.options ??
+        q.choices ??
+        q.answers ??
+        [];
+
+      return (
+        String(text).trim().length > 0 &&
+        Array.isArray(options) &&
+        options.length >= 2
+      );
+    }
+
+    function normalize(list) {
+      if (!Array.isArray(list)) return [];
+
+      return list
+        .filter(validQuestion)
+        .map(function(q, i) {
+          var id = String(
+            q.id ??
+            q.questionId ??
+            q.qid ??
+            ("q-" + i)
+          );
+
+          return Object.assign({}, q, {
+            id: id,
+            questionId: q.questionId ?? id,
+            text: String(
+              q.text ??
+              q.questionText ??
+              q.question ??
+              q.prompt ??
+              ""
+            ),
+            options:
+              Array.isArray(q.options)
+                ? q.options
+                : (
+                    Array.isArray(q.choices)
+                      ? q.choices
+                      : q.answers
+                  )
+          });
+        });
+    }
+
+    /*
+     * 1. Runtime source established by Runtime Stability V2.
+     */
+    if (
+      Array.isArray(window.RANKFORGE_RUNTIME_QUESTIONS) &&
+      window.RANKFORGE_RUNTIME_QUESTIONS.length
+    ) {
+      return normalize(
+        window.RANKFORGE_RUNTIME_QUESTIONS
+      );
+    }
+
+    /*
+     * 2. Active CBT questions.
+     */
+    try {
+      var activeRaw =
+        localStorage.getItem("CBT_ACTIVE_QUESTIONS");
+
+      if (activeRaw) {
+        var activeParsed =
+          JSON.parse(activeRaw);
+
+        var activeList =
+          Array.isArray(activeParsed)
+            ? activeParsed
+            : (
+                activeParsed.questions ??
+                activeParsed.items ??
+                activeParsed.data?.questions ??
+                []
+              );
+
+        var activeQuestions =
+          normalize(activeList);
+
+        if (activeQuestions.length) {
+          return activeQuestions;
+        }
+      }
+    } catch (_) {}
+
+    /*
+     * 3. Active test object.
+     */
+    try {
+      var testRaw =
+        localStorage.getItem("RANKFORGE_ACTIVE_TEST");
+
+      if (testRaw) {
+        var testParsed =
+          JSON.parse(testRaw);
+
+        var testQuestions =
+          normalize(
+            testParsed.questions ??
+            testParsed.items ??
+            testParsed.data?.questions ??
+            []
+          );
+
+        if (testQuestions.length) {
+          return testQuestions;
+        }
+      }
+    } catch (_) {}
+
+    /*
+     * 4. Existing RankForge question-bank globals.
+     * We deliberately do NOT use Test-180.
+     */
+    var candidates = [
+      window.RANKFORGE_ACTIVE_QUESTIONS,
+      window.RANKFORGE_QUESTION_BANK,
+      window.RANK_BOOSTER_QUESTION_BANK,
+      window.QUESTION_BANK,
+      window.questionBank
+    ];
+
+    for (var i = 0; i < candidates.length; i++) {
+      var found = normalize(candidates[i]);
+
+      if (found.length) {
+        return found;
+      }
+    }
+
+    /*
+     * IMPORTANT:
+     * Never silently return a 10-question demo/fallback.
+     */
+    console.warn(
+      "[RankForge] No authoritative question source available."
+    );
 
     return [];
 
+  } catch (error) {
+
+    console.error(
+      "[RankForge] buildTestQuestions failed:",
+      error
+    );
+
+    return [];
   }
-
-
-  let questions =
-    selectedTest.questionIds
-      .map(
-        function(id) {
-
-          return ACTIVE_QUESTION_BANK.find(
-            function(question) {
-
-              return (
-                question.id === id
-              );
-
-            }
-          );
-
-        }
-      )
-      .filter(
-        function(question) {
-
-          return Boolean(
-            question
-          );
-
-        }
-      );
-
-
-  /*
-   * Random mode
-   */
-
-  if (
-    selectionMode ===
-    "random"
-  ) {
-
-    questions =
-      shuffleQuestions(
-        questions
-      );
-
-  }
-
-
-  /*
-   * Question count
-   */
-
-  if (
-    questionCount.value !==
-    "all"
-  ) {
-
-    const requested =
-      Number(
-        questionCount.value
-      );
-
-
-    if (
-      Number.isFinite(
-        requested
-      ) &&
-      requested > 0
-    ) {
-
-      questions =
-        questions.slice(
-          0,
-          requested
-        );
-
-    }
-
-  }
-
-
-  return questions;
-
 }
 
 
