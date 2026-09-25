@@ -52,6 +52,27 @@ function openMistakes(){
 }
 
 function openRetry(){
+  /*
+   * Biology mistakes use the main CBT engine.
+   * retry.html is the DPP engine and must not receive Biology CBT mistakes.
+   */
+  try{
+    const mistakes=JSON.parse(
+      localStorage.getItem("rankforgeMistakesV1")||"[]"
+    );
+
+    const biology =
+      Array.isArray(mistakes) &&
+      mistakes.some(x =>
+        String(x.source||"").includes("Biology 2699")
+      );
+
+    if(biology){
+      go("cbt.html?retry=biology&v=20260925");
+      return;
+    }
+  }catch(_){}
+
   go(FLOW.retry);
 }
 
