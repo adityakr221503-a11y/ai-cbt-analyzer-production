@@ -403,12 +403,19 @@ function normalizeQuestion(q){
   * The canonical Biology bank uses correctIndex.
   * Do not blindly shift it.
   */
+ /*
+  * A question remains valid even when its answer key is
+  * missing/unverified. Never discard source questions just
+  * because the answer key is unavailable.
+  *
+  * null = answer not verified.
+  */
  if(
   !Number.isInteger(correct) ||
   correct<0 ||
   correct>=q.options.length
  ){
-  return null;
+  correct=null;
  }
 
  return {
@@ -674,11 +681,18 @@ function saveAttempt(){
  let correct=0;
  let incorrect=[];
  let unanswered=[];
+ let unverified=[];
 
  active.forEach((q,i)=>{
 
   if(answers[i]===null){
    unanswered.push({
+    q:q,
+    index:i
+   });
+  }
+  else if(!Number.isInteger(q.correctIndex)){
+   unverified.push({
     q:q,
     index:i
    });
@@ -723,6 +737,9 @@ function saveAttempt(){
 
   unanswered:
    unanswered.length,
+
+  unverified:
+   unverified.length,
 
   score:correct,
 
@@ -885,6 +902,10 @@ function submit(){
   '<div class="stat">'+
    '<b>'+result.unanswered.length+'</b>'+
    'Unanswered'+
+  '</div>'+
+  '<div class="stat">'+
+   '<b>'+result.unverified.length+'</b>'+
+   'Unverified'+
   '</div>';
 
  const mistakes=[
@@ -1135,9 +1156,17 @@ fetch(
 
  if(bank.length!==2699)
   throw new Error(
-   "Only "+bank.length+
-   " valid questions after normalization"
+   "Source corruption: expected 2699 questions, got "+
+   bank.length
   );
+
+ const verifiedAnswers =
+  bank.filter(
+   q=>Number.isInteger(q.correctIndex)
+  ).length;
+
+ const unverifiedAnswers =
+  bank.length-verifiedAnswers;
 
  populateTests();
 
@@ -1145,7 +1174,11 @@ fetch(
   "status ok";
 
  $("status").textContent =
-  "Verified Biology bank: 2699 questions loaded.";
+  "Verified Biology bank: 2699 questions loaded · "+
+  verifiedAnswers+
+  " answers verified · "+
+  unverifiedAnswers+
+  " answers unverified.";
 
  $("startButton").disabled=false;
 
