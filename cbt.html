@@ -9745,7 +9745,10 @@ if(document.readyState==="loading"){
 <!-- /RANKFORGE_REAL_INTEGRATION_V1 -->
 
 <!-- RANKFORGE_CBT_RESET_V2 -->
-<script>
+<!-- RANKFORGE_PDF_AUTOMATIC_AUTHORITY_DISABLED_V9 -->
+<!-- Original PDF authority block retained but disabled during boot. -->
+<script type="application/x-rankforge-disabled">
+<!-- original-script>
 (function () {
   "use strict";
 
@@ -9866,7 +9869,7 @@ if(document.readyState==="loading"){
   };
 
 })();
-</script>
+--> </script>
 <!-- /RANKFORGE_CBT_RESET_V2 -->
 
 
@@ -10044,10 +10047,15 @@ window.RankForgePDFCBTPriorityV3={
 
 })();
 </script>
+</script>
+<!-- /RANKFORGE_PDF_AUTOMATIC_AUTHORITY_DISABLED_V9 -->
 <!-- /RANKFORGE_PDF_CBT_PRIORITY_V3 -->
 
 
-<script>
+<!-- RANKFORGE_PDF_AUTOMATIC_AUTHORITY_DISABLED_V9 -->
+<!-- Original PDF authority block retained but disabled during boot. -->
+<script type="application/x-rankforge-disabled">
+<!-- original-script>
 /* ============================================================
    RANKFORGE PDF FINAL RUNTIME OVERRIDE V5
    PDF import has priority over Test 180 everywhere.
@@ -10330,7 +10338,7 @@ window.RankForgePDFCBTPriorityV3={
   );
 
 })();
-</script>
+--> </script>
 
 
 <!-- RANKFORGE FINAL CBT PDF AUTHORITY V7 -->
@@ -10410,6 +10418,8 @@ window.addEventListener("load",function(){
 
 })();
 </script>
+</script>
+<!-- /RANKFORGE_PDF_AUTOMATIC_AUTHORITY_DISABLED_V9 -->
 
 
 <script>
@@ -10535,7 +10545,10 @@ window.addEventListener("load",function(){
 </script>
 
 
-<script>
+<!-- RANKFORGE_PDF_AUTOMATIC_AUTHORITY_DISABLED_V9 -->
+<!-- Original PDF authority block retained but disabled during boot. -->
+<script type="application/x-rankforge-disabled">
+<!-- original-script>
 /* RANKFORGE PDF CBT VISUAL V11 AUTHORITATIVE */
 (function(){
 
@@ -10799,7 +10812,9 @@ window.RankForgePDFVisualV11={
 };
 
 })();
+--> </script>
 </script>
+<!-- /RANKFORGE_PDF_AUTOMATIC_AUTHORITY_DISABLED_V9 -->
 
 <script src="./rankforge-unified-student-layer-v2.js" defer></script>
 
@@ -11036,6 +11051,95 @@ document.addEventListener("visibilitychange",function(){
 })();
 </script>
 <!-- /RANKFORGE_PDF_AUTHORITY_FIX_V8 -->
+
+
+<!-- RANKFORGE_PDF_AUTHORITY_V9 -->
+<script>
+(function(){
+"use strict";
+
+if(window.__RANKFORGE_PDF_AUTHORITY_V9__) return;
+window.__RANKFORGE_PDF_AUTHORITY_V9__ = true;
+
+/*
+ * Normal CBT boot:
+ *   RankForge/Biology is authoritative.
+ *
+ * Explicit PDF boot:
+ *   caller must invoke window.RANKFORGE_START_EXPLICIT_PDF(...)
+ *
+ * Merely having pdfCbtQuestions/pdfQuestions in storage is NOT enough.
+ */
+
+window.RANKFORGE_START_EXPLICIT_PDF = function(questions, meta){
+  try{
+    if(!Array.isArray(questions) || !questions.length){
+      throw new Error("No valid PDF questions supplied");
+    }
+
+    window.__PDF_CBT_USER_STARTED__ = true;
+    window.__PDF_CBT_EXPLICIT_SESSION__ = true;
+
+    window.CBT_PDF_MODE = true;
+    window.CBT_IMPORTED_SOURCE = "PDF Import";
+    window.CBT_PDF_QUESTIONS = questions;
+    window.__PDF_CBT_ACTIVE_QUESTIONS__ = questions;
+
+    sessionStorage.setItem("RANKFORGE_EXPLICIT_PDF_SESSION","1");
+    sessionStorage.setItem("CBT_ACTIVE_SOURCE","PDF");
+
+    if(meta && typeof meta === "object"){
+      window.__PDF_CBT_ACTIVE_TEST__ = {
+        ...meta,
+        source:"PDF",
+        questions:questions
+      };
+    }
+
+    window.RANKFORGE_RUNTIME_SOURCE = "PDF_EXPLICIT";
+
+    console.log(
+      "[RankForge] Explicit PDF CBT activated:",
+      questions.length,
+      "questions"
+    );
+
+    return true;
+  }catch(e){
+    console.error("[RankForge] Explicit PDF activation failed:",e);
+    return false;
+  }
+};
+
+window.RANKFORGE_EXIT_PDF_MODE = function(){
+  try{
+    window.__PDF_CBT_USER_STARTED__ = false;
+    window.__PDF_CBT_EXPLICIT_SESSION__ = false;
+
+    delete window.CBT_PDF_MODE;
+    delete window.CBT_IMPORTED_SOURCE;
+    delete window.CBT_PDF_QUESTIONS;
+    delete window.__PDF_CBT_ACTIVE_QUESTIONS__;
+    delete window.__PDF_CBT_ACTIVE_TEST__;
+
+    sessionStorage.removeItem("RANKFORGE_EXPLICIT_PDF_SESSION");
+
+    if(sessionStorage.getItem("CBT_ACTIVE_SOURCE")==="PDF"){
+      sessionStorage.removeItem("CBT_ACTIVE_SOURCE");
+    }
+
+    console.log("[RankForge] PDF CBT mode exited.");
+  }catch(e){}
+};
+
+console.log(
+  "[RankForge] PDF authority V9:",
+  "automatic takeover disabled"
+);
+
+})();
+</script>
+<!-- /RANKFORGE_PDF_AUTHORITY_V9 -->
 
 </body>
 
