@@ -685,189 +685,204 @@ function startTimer(){
 
 function saveAttempt(){
 
- const now =
-  new Date().toISOString();
+ const now=new Date().toISOString();
 
  let correct=0;
- let incorrect=[];
- let unanswered=[];
+ const incorrect=[];
+ const unanswered=[];
+ const unverified=[];
 
  active.forEach((q,i)=>{
 
-  if(answers[i]===null){
-   unanswered.push({
-    q:q,
-    index:i
-   });
-  }
-  else if(
-   answers[i]===q.correctIndex
+  const userAnswer=answers[i];
+
+  if(
+   userAnswer===null||
+   userAnswer===undefined
   ){
-   correct++;
+   unanswered.push({q:q,index:i});
+   return;
   }
-  else{
-   incorrect.push({
-    q:q,
-    index:i
-   });
+
+  const validAnswer=
+   Number.isInteger(q.correctIndex)&&
+   q.correctIndex>=0&&
+   Array.isArray(q.options)&&
+   q.correctIndex<q.options.length;
+
+  if(!validAnswer){
+   unverified.push({q:q,index:i});
+   return;
+  }
+
+  if(Number(userAnswer)===Number(q.correctIndex)){
+   correct++;
+  }else{
+   incorrect.push({q:q,index:i});
   }
 
  });
 
  const attempt={
-
   id:"bio-"+Date.now(),
-
-  source:
-   "RankForge Biology 2699",
-
+  source:"RankForge Biology 2699",
   sourceType:"BIOLOGY",
-
-  title:
-   "Biology Test "+
-   (active[0]?.testNumber ?? ""),
-
-  testNumber:
-   active[0]?.testNumber ?? null,
-
-  questionCount:
-   active.length,
-
-  correct,
-
-  incorrect:
-   incorrect.length,
-
-  unanswered:
-   unanswered.length,
-
+  title:"Biology Test "+(active[0]?.testNumber??""),
+  testNumber:active[0]?.testNumber??null,
+  questionCount:active.length,
+  correct:correct,
+  incorrect:incorrect.length,
+  unanswered:unanswered.length,
+  unverified:unverified.length,
+  skipped:unanswered.length,
   score:correct,
-
   answers:answers.slice(),
-
   questions:active.slice(),
-
-  submittedAt:now
-
+  submittedAt:now,
+  date:now
  };
 
-
- function push(key){
+ function append(key,value){
 
   try{
 
-   const list =
+   const old=
     JSON.parse(
      localStorage.getItem(key)||"[]"
     );
 
-   list.push(attempt);
+   const list=
+    Array.isArray(old)?old:[];
+
+   list.push(value);
 
    localStorage.setItem(
     key,
-    JSON.stringify(
-     list.slice(-100)
-    )
+    JSON.stringify(list.slice(-100))
    );
 
-  }catch(_){}
+  }catch(error){
+   console.warn("[RankForge]",key,error);
+  }
 
  }
 
- push("cbtHistory");
- push("rankBoosterAttemptHistory");
-
+ append("cbtHistory",attempt);
+ append("rankBoosterAttemptHistory",attempt);
 
  /*
-  * Mistake Book.
+  * Biology-native + legacy Mistake Book stores.
   */
  try{
 
-  const mistakes =
+  const nativeRaw=
    JSON.parse(
-    localStorage.getItem(
-     "rankforgeMistakesV1"
-    )||"[]"
+    localStorage.getItem("rankforgeMistakesV1")||"[]"
    );
+
+  const legacyRaw=
+   JSON.parse(
+    localStorage.getItem("cbtMistakes")||"[]"
+   );
+
+  const native=
+   Array.isArray(nativeRaw)?nativeRaw:[];
+
+  const legacy=
+   Array.isArray(legacyRaw)?legacyRaw:[];
 
   incorrect.forEach(x=>{
 
-   mistakes.push({
+   const options=
+    Array.isArray(x.q.options)
+     ?x.q.options.slice()
+     :[];
 
-    id:
-     "mistake-"+
-     attempt.id+
-     "-"+
-     x.index,
+   const selectedIndex=
+    Number(answers[x.index]);
 
-    questionId:
-     x.q.id,
+   const correctIndex=
+    Number(x.q.correctIndex);
 
-    question:
-     x.q.question,
-
-    options:
-     x.q.options,
-
-    correctAnswer:
-     x.q.correctIndex,
-
-    userAnswer:
-     answers[x.index],
-
+   const item={
+    id:"mistake-"+attempt.id+"-"+x.index,
+    questionId:x.q.id,
+    question:x.q.question,
+    options:options,
+    correctIndex:correctIndex,
+    correctAnswer:options[correctIndex]??"",
+    userAnswer:selectedIndex,
+    selectedIndex:selectedIndex,
+    selectedAnswer:options[selectedIndex]??"",
+    mistakeType:"🧠 Conceptual",
+    mistakeReason:
+     "The selected answer was incorrect. Review the NCERT concept and compare the selected option with the correct answer.",
     reason:
-     "Not classified",
-
-    source:
-     "RankForge Biology 2699",
-
-    testNumber:
-     x.q.testNumber,
-
+     "The selected answer was incorrect. Review the NCERT concept and compare the selected option with the correct answer.",
+    solution:x.q.solution||x.q.explanation||"",
+    source:"RankForge Biology 2699",
+    subject:"Biology",
+    testNumber:x.q.testNumber,
+    attemptId:attempt.id,
     createdAt:now
+   };
 
-   });
+   native.push(item);
+
+   if(!legacy.some(
+    z=>String(z.id||"")===String(item.id)
+   )){
+    legacy.push(item);
+   }
 
   });
 
   localStorage.setItem(
    "rankforgeMistakesV1",
-   JSON.stringify(
-    mistakes.slice(-5000)
-   )
+   JSON.stringify(native.slice(-5000))
   );
 
- }catch(_){}
+  localStorage.setItem(
+   "cbtMistakes",
+   JSON.stringify(legacy.slice(-5000))
+  );
 
+ }catch(error){
+  console.warn("[RankForge Biology] mistake storage",error);
+ }
 
  /*
-  * Compatibility with existing mastery flow.
+  * Preserve the existing mastery array contract.
   */
  try{
 
-  const old =
+  const raw=
    JSON.parse(
-    localStorage.getItem(
-     "cbtMasteryV2"
-    )||"{}"
+    localStorage.getItem("cbtMasteryV2")||"[]"
    );
-
-  old.lastBiologyAttempt =
-   attempt;
 
   localStorage.setItem(
    "cbtMasteryV2",
-   JSON.stringify(old)
+   JSON.stringify(
+    Array.isArray(raw)?raw:[]
+   )
   );
 
- }catch(_){}
+  localStorage.setItem(
+   "rankforgeBiologyLastAttempt",
+   JSON.stringify(attempt)
+  );
 
+ }catch(error){
+  console.warn("[RankForge Biology] mastery storage",error);
+ }
 
- return {
-  attempt,
-  correct,
-  incorrect,
-  unanswered
+ return{
+  attempt:attempt,
+  correct:correct,
+  incorrect:incorrect,
+  unanswered:unanswered,
+  unverified:unverified
  };
 
 }
@@ -877,10 +892,9 @@ function saveAttempt(){
 
 function submit(){
 
- if(submitted) return;
+ if(submitted)return;
 
  submitted=true;
-
  clearInterval(timerId);
 
  const result=saveAttempt();
@@ -888,62 +902,50 @@ function submit(){
  $("cbt").classList.add("hidden");
  $("result").classList.remove("hidden");
 
- const total=active.length;
+ const correctCount=result.correct;
+ const incorrectCount=result.incorrect.length;
+ const unansweredCount=result.unanswered.length;
+ const unverifiedCount=result.unverified.length;
 
  $("stats").innerHTML=
-  '<div class="stat">'+
-   '<b>'+result.correct+'</b>'+
-   'Correct'+
-  '</div>'+
-  '<div class="stat">'+
-   '<b>'+result.incorrect.length+'</b>'+
-   'Incorrect'+
-  '</div>'+
-  '<div class="stat">'+
-   '<b>'+result.unanswered.length+'</b>'+
-   'Unanswered'+
-  '</div>';
+  '<div class="stat"><b>'+correctCount+'</b>Correct</div>'+
+  '<div class="stat"><b>'+incorrectCount+'</b>Incorrect</div>'+
+  '<div class="stat"><b>'+unansweredCount+'</b>Unanswered</div>'+
+  '<div class="stat"><b>'+unverifiedCount+'</b>Unverified</div>';
 
  const mistakes=[
   ...result.incorrect,
-  ...result.unanswered
+  ...result.unanswered,
+  ...result.unverified
  ];
 
- if(!mistakes.length){
+ $("mistakes").innerHTML=
+  mistakes.length
+   ?mistakes.map(x=>{
+     const type=
+      result.unverified.includes(x)
+       ?"Unverified":
+      result.unanswered.includes(x)
+       ?"Unanswered":
+       "Incorrect";
 
-  $("mistakes").innerHTML=
-   "<p>Excellent. No incorrect or unanswered questions.</p>";
+     return '<div class="mistake">'+
+      '<b>Q'+(x.index+1)+' · '+type+'</b><br>'+
+      x.q.question+
+      '</div>';
+    }).join("")
+   :"<p>No incorrect, unanswered or unverified questions.</p>";
 
- }else{
-
-  $("mistakes").innerHTML =
-   mistakes.map(x=>
-    '<div class="mistake">'+
-     '<b>Q'+
-     (x.index+1)+
-     '</b><br>'+
-     x.q.question+
-    '</div>'
-   ).join("");
-
- }
-
- $("retryButton").style.display =
+ $("retryButton").style.display=
   result.incorrect.length
-   ? "inline-block"
-   : "none";
+   ?"inline-block"
+   :"none";
 
  $("retryButton").onclick=function(){
 
-  active =
-   result.incorrect.map(x=>x.q);
-
-  answers =
-   new Array(active.length).fill(null);
-
-  marked =
-   new Array(active.length).fill(false);
-
+  active=result.incorrect.map(x=>x.q);
+  answers=new Array(active.length).fill(null);
+  marked=new Array(active.length).fill(false);
   current=0;
   submitted=false;
 
@@ -957,6 +959,25 @@ function submit(){
 
  };
 
+ let nav=document.getElementById("rankforgeResultNav");
+
+ if(!nav){
+
+  nav=document.createElement("div");
+  nav.id="rankforgeResultNav";
+
+  nav.style.cssText=
+   "display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;";
+
+  $("result").appendChild(nav);
+
+ }
+
+ nav.innerHTML=
+  '<a href="history.html" style="display:inline-block;padding:12px 15px;border-radius:10px;background:#4f46e5;color:#fff;text-decoration:none;font-weight:800">📜 History</a>'+
+  '<a href="mistake.html" style="display:inline-block;padding:12px 15px;border-radius:10px;background:#0f766e;color:#fff;text-decoration:none;font-weight:800">🧠 Mistake Book</a>'+
+  '<a href="cbt.html" style="display:inline-block;padding:12px 15px;border-radius:10px;background:#475569;color:#fff;text-decoration:none;font-weight:800">🏠 New Biology CBT</a>';
+
 }
 
 
@@ -964,68 +985,89 @@ function submit(){
 
 function getBiologyRetryQuestions(){
 
-  try{
+ try{
 
-    const mistakes =
-      JSON.parse(
-        localStorage.getItem(
-          "rankforgeMistakesV1"
-        ) || "[]"
-      );
+  const all=[];
 
-    if(!Array.isArray(mistakes))
-      return [];
+  for(const key of [
+   "rankforgeMistakesV1",
+   "cbtMistakes"
+  ]){
 
-    const out=[];
-    const seen=new Set();
+   try{
 
-    for(const m of mistakes){
+    const data=
+     JSON.parse(
+      localStorage.getItem(key)||"[]"
+     );
 
-      if(
-        !String(m.source||"")
-          .includes("Biology 2699")
-      )
-        continue;
+    if(Array.isArray(data))
+     all.push(...data);
 
-      const q={
-        id:m.questionId,
-        question:m.question,
-        options:Array.isArray(m.options)
-          ? m.options
-          : [],
-        correctIndex:Number(m.correctAnswer),
-        testNumber:m.testNumber
-      };
-
-      if(
-        !q.question ||
-        q.options.length<2 ||
-        !Number.isInteger(q.correctIndex)
-      )
-        continue;
-
-      if(
-        q.correctIndex<0 ||
-        q.correctIndex>=q.options.length
-      )
-        continue;
-
-      const key=String(q.id||q.question);
-
-      if(seen.has(key))
-        continue;
-
-      seen.add(key);
-      out.push(q);
-    }
-
-    return out;
-
-  }catch(_){
-
-    return [];
+   }catch(_){}
 
   }
+
+  const out=[];
+  const seen=new Set();
+
+  for(const m of all){
+
+   if(!String(m.source||"").includes("Biology 2699"))
+    continue;
+
+   const options=
+    Array.isArray(m.options)
+     ?m.options.slice()
+     :[];
+
+   const correct=Number(m.correctIndex);
+
+   if(
+    !m.question||
+    options.length<2||
+    !Number.isInteger(correct)||
+    correct<0||
+    correct>=options.length
+   )
+    continue;
+
+   const key=String(m.questionId||m.id||m.question);
+
+   if(seen.has(key))
+    continue;
+
+   seen.add(key);
+
+   out.push({
+    id:m.questionId||m.id,
+    question:m.question,
+    options:options,
+    correctIndex:correct,
+    correctAnswer:
+     m.correctAnswer||
+     options[correct],
+    testNumber:m.testNumber,
+    subject:"Biology",
+    mistakeType:
+     m.mistakeType||
+     "🧠 Conceptual",
+    mistakeReason:
+     m.mistakeReason||
+     m.reason||
+     "Review the NCERT concept and identify why the selected answer was incorrect."
+   });
+
+  }
+
+  return out;
+
+ }catch(_){
+
+  return [];
+
+ }
+
 }
 
 
