@@ -893,6 +893,48 @@ localStorage.setItem(
 String(Date.now())
 );
 
+/*
+ * Biology mistakes belong to the authoritative Biology CBT
+ * retry engine, not the legacy generic retry.html DPP engine.
+ */
+const isBiology =
+  String(q.source || "").includes("Biology 2699") ||
+  String(q.subject || "").toLowerCase() === "biology";
+
+if (isBiology) {
+  const existing = readJSON("rankforgeMistakesV1");
+
+  if (Array.isArray(existing)) {
+    const id = String(
+      q.id || q.questionId || retryQuestion.id || ""
+    );
+
+    const exists = existing.some(x =>
+      String(x?.id || x?.questionId || "") === id
+    );
+
+    if (!exists) {
+      existing.push({
+        ...q,
+        correctIndex: retryQuestion.correctIndex,
+        correctAnswer: retryQuestion.correctAnswer,
+        options: retryQuestion.options,
+        source: "RankForge Biology 2699"
+      });
+
+      localStorage.setItem(
+        "rankforgeMistakesV1",
+        JSON.stringify(existing)
+      );
+    }
+  }
+
+  window.location.href =
+    "cbt.html?retry=biology&v=20260926";
+
+  return;
+}
+
 const saved=
 localStorage.getItem(RETRY_QUESTION_KEY);
 
