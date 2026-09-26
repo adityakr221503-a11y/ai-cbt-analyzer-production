@@ -987,15 +987,10 @@ function getBiologyRetryQuestions(){
 
  try{
 
-  const mistakesRaw=JSON.parse(
-   localStorage.getItem("cbtMistakes")||"[]"
-  );
+  const raw=JSON.parse(localStorage.getItem("cbtMistakes")||"[]");
+  const masteryRaw=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]");
 
-  const masteryRaw=JSON.parse(
-   localStorage.getItem("cbtMasteryV2")||"[]"
-  );
-
-  const mistakes=Array.isArray(mistakesRaw)?mistakesRaw:[];
+  const mistakes=Array.isArray(raw)?raw:[];
   const mastered=Array.isArray(masteryRaw)?masteryRaw:[];
 
   const masteredSet=new Set(
@@ -1008,85 +1003,115 @@ function getBiologyRetryQuestions(){
   const map=new Map();
 
   for(const m of mistakes){
-
    if(!m||!m.question) continue;
 
    const key=normalize(m.question);
-
    if(!key||masteredSet.has(key)) continue;
 
    map.set(key,m);
   }
 
-  return Array.from(map.values())
-   .map(function(m,index){
+  const out=[];
 
-    let options=
-     Array.isArray(m.options)?m.options.slice():[];
+  for(const m of map.values()){
 
-    options=options.map(function(x){
-     if(x&&typeof x==="object"){
-      return String(
-       x.text??x.value??x.label??x.option??""
-      );
-     }
-     return String(x);
+   const key=normalize(m.question);
+
+   let options=
+    Array.isArray(m.options)?m.options.slice():
+    Array.isArray(m.choices)?m.choices.slice():[];
+
+   options=options.map(function(x){
+    if(x&&typeof x==="object"){
+     return String(x.text??x.label??x.value??x.option??"");
+    }
+    return String(x);
+   });
+
+   let correct=-1;
+
+   for(const candidate of [m.correctIndex,m.answerIndex]){
+    const n=Number(candidate);
+    if(Number.isInteger(n)&&n>=0&&n<options.length){
+     correct=n;
+     break;
+    }
+   }
+
+   if(correct<0&&m.correctAnswer!=null){
+    const target=normalize(m.correctAnswer);
+    if(target){
+     correct=options.findIndex(x=>normalize(x)===target);
+    }
+   }
+
+   /*
+    Exact Mistake Book question only:
+    if its saved options are incomplete, recover the same
+    question from the verified 2699 bank by normalized text.
+   */
+   if(options.length<2||correct<0||correct>=options.length){
+
+    const original=bank.find(function(q){
+     return normalize(q.question)===key;
     });
 
-    let correct=Number(m.correctIndex);
+    if(original){
 
-    if(
-     !Number.isInteger(correct)||
-     correct<0||
-     correct>=options.length
-    ){
+     options=Array.isArray(original.options)
+      ?original.options.map(function(x){
+       if(x&&typeof x==="object"){
+        return String(x.text??x.label??x.value??x.option??"");
+       }
+       return String(x);
+      })
+      :[];
 
-     const target=normalize(m.correctAnswer||"");
+     correct=Number(original.correctIndex);
 
-     if(target){
-      correct=options.findIndex(
-       x=>normalize(x)===target
+     if(!Number.isInteger(correct)||correct<0||correct>=options.length){
+
+      const target=normalize(
+       m.correctAnswer||original.correctAnswer||""
       );
+
+      correct=target
+       ?options.findIndex(x=>normalize(x)===target)
+       :-1;
      }
     }
+   }
 
-    if(
-     options.length<2||
-     !Number.isInteger(correct)||
-     correct<0||
-     correct>=options.length
-    ){
-     return null;
-    }
+   if(options.length<2||correct<0||correct>=options.length){
+    console.warn("[RankForge] Could not prepare exact mistake:",m.question);
+    continue;
+   }
 
-    return {
-     id:m.id||m.questionId||("retry-"+index),
-     question:String(m.question),
-     options:options,
-     correctIndex:correct,
-     correctAnswer:m.correctAnswer||options[correct],
-     testNumber:m.testNumber??null,
-     subject:m.subject||"Biology",
-     topic:m.topic||m.chapter||"",
-     mistakeType:m.mistakeType||"🧠 Conceptual",
-     mistakeReason:
-      m.mistakeReason||
-      m.reason||
-      "Review the concept and identify why the answer was incorrect.",
-     solution:m.solution||m.explanation||""
-    };
+   out.push({
+    id:m.id||m.questionId||("retry-"+out.length),
+    question:String(m.question),
+    options:options,
+    correctIndex:correct,
+    correctAnswer:m.correctAnswer||options[correct],
+    testNumber:m.testNumber??null,
+    subject:m.subject||"Biology",
+    topic:m.topic||m.chapter||"",
+    mistakeType:m.mistakeType||"🧠 Conceptual",
+    mistakeReason:
+     m.mistakeReason||
+     m.reason||
+     "Review the concept and identify why the answer was incorrect.",
+    solution:m.solution||m.explanation||""
+   });
+  }
 
-   })
-   .filter(Boolean);
+  return out;
 
  }catch(error){
 
-  console.error(
-   "[RankForge] authoritative Mistake Book retry error",
-   error
-  );
-
+  console.error("[RankForge] exact Biology retry error",error);
   return [];
+
  }
 
 }
