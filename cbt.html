@@ -1013,7 +1013,11 @@ function getBiologyRetryQuestions(){
 
   for(const m of all){
 
-   if(!String(m.source||"").includes("Biology 2699"))
+   if(!/biology/i.test(
+      String(m.source||"")+" "+
+      String(m.subject||"")+" "+
+      String(m.title||"")
+    ))
     continue;
 
    const options=
@@ -1112,6 +1116,26 @@ function populateTests(){
 
 
 /* ---------- start ---------- */
+
+/* ---------- automatic Biology retry launch ---------- */
+(function(){
+ const p=new URLSearchParams(location.search);
+
+ if(p.get("retry")==="biology"){
+  const launch=()=>{
+   try{
+    $("startButton").click();
+   }catch(e){
+    console.error("[RankForge] Biology retry launch failed",e);
+   }
+  };
+
+  if(document.readyState==="loading")
+   document.addEventListener("DOMContentLoaded",launch,{once:true});
+  else
+   setTimeout(launch,0);
+ }
+})();
 
 $("startButton").onclick=function(){
 
