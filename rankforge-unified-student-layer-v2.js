@@ -12,7 +12,7 @@
     keys: {
       history: ["cbtHistory", "rankBoosterAttemptHistory", "rankerTestAttempts"],
       performance: ["rankerTestPerformance", "topper_test_pro_last_result"],
-      mistakes: ["rankforgeMistakesV1", "rankforgeMistakes", "cbtMasteryV2"],
+      mistakes: ["rankforgeMistakesV1", "rankforgeMistakes", "cbtMistakes"],
       retry: ["rankforgeRetestQueueV1", "retryHistory", "cbtAnalyzer.retryQueue", "cbtRetryQuestion"],
       next: ["rankforgeNextActionV1", "rankforgeNextActions"],
       bookmarks: ["rankforgeBookmarks"],
@@ -154,13 +154,92 @@
 
     getRetry() {
       const out = [];
+
+      /*
+       * First consume an explicit retry queue.
+       */
       for (const key of RF.keys.retry) {
         const data = RF.read(key);
-        if (Array.isArray(data)) out.push(...data);
-        else if (data && Array.isArray(data.items)) out.push(...data.items);
-        else if (data && Array.isArray(data.queue)) out.push(...data.queue);
+
+        if (Array.isArray(data)) {
+          out.push(...data);
+        } else if (data && Array.isArray(data.items)) {
+          out.push(...data.items);
+        } else if (data && Array.isArray(data.queue)) {
+          out.push(...data.queue);
+        }
       }
-      return out;
+
+      /*
+       * Biology has its own authoritative retry engine.
+       * If no generic queue exists, active Biology mistakes
+       * themselves are the retry queue.
+       */
+      if (!out.length) {
+        try {
+          const raw = RF.read("rankforgeMistakesV1");
+          const mastery = RF.read("cbtMasteryV2");
+
+          const masteredIds = new Set(
+            Array.isArray(mastery)
+              ? mastery
+                  .filter(x =>
+                    x &&
+                    (
+                      x.mastered === true ||
+                      x.status === "mastered" ||
+                      x.masteredAt
+                    )
+                  )
+                  .map(x =>
+                    String(x.id || x.questionId || "")
+                  )
+                  .filter(Boolean)
+              : []
+          );
+
+          if (Array.isArray(raw)) {
+            raw.forEach(x => {
+              if (!x) return;
+
+              const source = String(x.source || "");
+              const subject = String(x.subject || "").toLowerCase();
+
+              if (
+                source.includes("Biology 2699") ||
+                subject === "biology"
+              ) {
+                const id = String(
+                  x.id || x.questionId || ""
+                );
+
+                if (!id || !masteredIds.has(id)) {
+                  out.push(x);
+                }
+              }
+            });
+          }
+        } catch (_) {}
+      }
+
+      /*
+       * Deduplicate retry items.
+       */
+      const seen = new Set();
+
+      return out.filter(x => {
+        const id = String(
+          x?.id ||
+          x?.questionId ||
+          x?.question ||
+          ""
+        );
+
+        if (!id || seen.has(id)) return false;
+
+        seen.add(id);
+        return true;
+      });
     },
 
     getBookmarks() {
@@ -503,7 +582,7 @@
               );
 
             if (biology) {
-              location.href = "./cbt.html?retry=biology&v=20260925";
+              location.href = "./cbt.html?retry=biology&v=20260926";
               return;
             }
           } catch (_) {}

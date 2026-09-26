@@ -1190,6 +1190,262 @@ if("serviceWorker" in navigator){
 </script>
 <!-- /RANKFORGE_MISTAKE_MASTERY_V1 -->
 
+<script id="RANKFORGE_BIOLOGY_INTELLIGENCE_BRIDGE_V2">
+(function(){
+  "use strict";
+
+  /*
+   * Single source-of-truth adapter:
+   *
+   * Biology mistakes:
+   *   rankforgeMistakesV1 / cbtMistakes
+   *
+   * Biology mastery:
+   *   cbtMasteryV2
+   *
+   * The old rankforgeMistakeMasteryV1 store is only a
+   * presentation cache now. It must never make the UI
+   * report zero while the real Biology mistake bank has data.
+   */
+
+  function read(key, fallback){
+    try{
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    }catch(e){
+      return fallback;
+    }
+  }
+
+  function idOf(x){
+    return String(
+      x?.id ||
+      x?.questionId ||
+      x?.question ||
+      ""
+    ).trim();
+  }
+
+  function isBiology(x){
+    const source = String(x?.source || "");
+    const subject = String(x?.subject || "").toLowerCase();
+
+    return (
+      source.includes("Biology 2699") ||
+      subject === "biology"
+    );
+  }
+
+  function getMastered(){
+    const raw = read("cbtMasteryV2", []);
+    if(!Array.isArray(raw)) return [];
+
+    return raw.filter(function(x){
+      return x &&
+        (
+          x.mastered === true ||
+          x.status === "mastered" ||
+          x.masteredAt
+        );
+    });
+  }
+
+  function getActiveBiology(){
+    const sources = [];
+
+    const a = read("rankforgeMistakesV1", []);
+    const b = read("cbtMistakes", []);
+
+    if(Array.isArray(a)) sources.push(...a);
+    if(Array.isArray(b)) sources.push(...b);
+
+    const mastered = new Set(
+      getMastered()
+        .map(idOf)
+        .filter(Boolean)
+    );
+
+    const map = new Map();
+
+    sources.forEach(function(x){
+      if(!x || !isBiology(x)) return;
+
+      const id = idOf(x);
+      if(!id) return;
+
+      if(mastered.has(id)) return;
+
+      if(!map.has(id)){
+        map.set(id, x);
+      }
+    });
+
+    return [...map.values()];
+  }
+
+  function syncPresentationStore(){
+    try{
+      const active = getActiveBiology();
+      const mastered = getMastered();
+
+      const store = {
+        version: 2,
+        active: active.map(function(x){
+          return {
+            ...x,
+            status: "active"
+          };
+        }),
+        mastered: mastered.map(function(x){
+          return {
+            ...x,
+            status: "mastered"
+          };
+        }),
+        updatedAt: Date.now()
+      };
+
+      localStorage.setItem(
+        "rankforgeMistakeMasteryV1",
+        JSON.stringify(store)
+      );
+
+      return {
+        active: active.length,
+        mastered: mastered.length
+      };
+    }catch(e){
+      return {
+        active: 0,
+        mastered: 0
+      };
+    }
+  }
+
+  function render(){
+    const state = syncPresentationStore();
+
+    const active =
+      document.getElementById("rfMMActive");
+
+    const mastered =
+      document.getElementById("rfMMMastered");
+
+    if(active){
+      active.textContent = String(state.active);
+    }
+
+    if(mastered){
+      mastered.textContent = String(state.mastered);
+    }
+  }
+
+  function openBiologyRetry(){
+    const active = getActiveBiology();
+
+    if(!active.length){
+      alert(
+        "No Biology mistakes are currently waiting for retry."
+      );
+      return;
+    }
+
+    /*
+     * Keep the authoritative Biology mistake bank intact.
+     * Only create the retry queue metadata.
+     */
+    try{
+      localStorage.setItem(
+        "rankforgeRetestQueueV1",
+        JSON.stringify({
+          source: "RankForge Biology 2699",
+          ids: active.slice(0, 50).map(idOf),
+          createdAt: Date.now()
+        })
+      );
+
+      localStorage.setItem(
+        "cbtRetryStartedAt",
+        String(Date.now())
+      );
+    }catch(e){}
+
+    location.href =
+      "./cbt.html?retry=biology&v=20260926";
+  }
+
+  function boot(){
+    render();
+
+    /*
+     * Capture phase prevents the old presentation-only
+     * handlers from showing misleading alerts.
+     */
+    const fix =
+      document.getElementById("rfMMFixBtn");
+
+    const retest =
+      document.getElementById("rfMMRetestBtn");
+
+    if(fix){
+      fix.addEventListener(
+        "click",
+        function(e){
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openBiologyRetry();
+        },
+        true
+      );
+    }
+
+    if(retest){
+      retest.addEventListener(
+        "click",
+        function(e){
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openBiologyRetry();
+        },
+        true
+      );
+    }
+
+    /*
+     * Keep the Home numbers synchronized if another module
+     * writes the mistake bank while Home remains open.
+     */
+    window.addEventListener(
+      "storage",
+      render
+    );
+
+    setTimeout(render, 100);
+    setTimeout(render, 500);
+    setTimeout(render, 1200);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener(
+      "DOMContentLoaded",
+      boot,
+      {once:true}
+    );
+  }else{
+    boot();
+  }
+
+  window.RankForgeBiologyIntelligenceBridgeV2 = {
+    refresh: render,
+    active: getActiveBiology,
+    mastered: getMastered,
+    retry: openBiologyRetry
+  };
+
+})();
+</script>
+
+
 
 <!-- RANKFORGE_BASIC_FEATURE_INTEGRATION_V1 -->
 <style>
@@ -2738,7 +2994,7 @@ if(document.readyState === "loading"){
 </script>
 
 <script src="./rankforge-premium-experience-v1.js"></script>
-<script src="./rankforge-unified-student-layer-v2.js?v=485fa58" defer></script>
+<script src="./rankforge-unified-student-layer-v2.js?v=20260926" defer></script>
 <script src="./rankforge-universal-source-fabric-v1.js"></script>
 
 <script id="RANKFORGE_STUDENT_DASHBOARD_V1">
