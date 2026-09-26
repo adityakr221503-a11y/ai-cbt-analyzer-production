@@ -1,4 +1,4 @@
-const CACHE_NAME = "rankforge-ai-v5";
+const CACHE_NAME = "rankforge-ai-v6-20260926";
 
 const CORE = [
   "./",
@@ -6,7 +6,7 @@ const CORE = [
   "./rankforge-app.html",
   "./manifest.json",
   "./rankforge-icon.svg",
-  "./cbt.html",
+
   "./pdf-to-cbt.html",
   "./rankers-test-series.html",
   "./question-bank.html",
@@ -81,3 +81,14 @@ self.addEventListener("activate", event => {
   event.waitUntil(self.clients.claim());
 });
 /* /RANKFORGE_PWA_UPDATE_V1 */
+
+
+/* RANKFORGE_CBT_NO_SW_CACHE */
+self.addEventListener("fetch", event => {
+  const u = new URL(event.request.url);
+
+  if (u.pathname.endsWith("/cbt.html")) {
+    event.respondWith(fetch(event.request, {cache:"no-store"}));
+  }
+});
+/* /RANKFORGE_CBT_NO_SW_CACHE */
