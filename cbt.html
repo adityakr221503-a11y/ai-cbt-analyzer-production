@@ -1117,25 +1117,22 @@ function populateTests(){
 
 /* ---------- start ---------- */
 
-/* ---------- automatic Biology retry launch ---------- */
-(function(){
- const p=new URLSearchParams(location.search);
+/* ---------- Biology retry launch ---------- */
+function autoLaunchBiologyRetry(){
+ const params=new URLSearchParams(location.search);
+ if(params.get("retry")!=="biology") return;
 
- if(p.get("retry")==="biology"){
-  const launch=()=>{
-   try{
-    $("startButton").click();
-   }catch(e){
-    console.error("[RankForge] Biology retry launch failed",e);
-   }
-  };
-
-  if(document.readyState==="loading")
-   document.addEventListener("DOMContentLoaded",launch,{once:true});
-  else
-   setTimeout(launch,0);
+ try{
+  const retryQuestions=getBiologyRetryQuestions();
+  if(!retryQuestions.length){
+   console.warn("[RankForge] Biology retry requested but queue is empty");
+   return;
+  }
+  $("startButton").click();
+ }catch(e){
+  console.error("[RankForge] Biology retry launch failed",e);
  }
-})();
+}
 
 $("startButton").onclick=function(){
 
@@ -1320,6 +1317,9 @@ fetch(
   "Verified Biology bank: 2699 questions loaded.";
 
  $("startButton").disabled=false;
+
+ /* Bank is initialized and Start is enabled: retry can now launch safely. */
+ autoLaunchBiologyRetry();
 
 })
 .catch(function(error){
