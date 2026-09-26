@@ -577,12 +577,20 @@
           try {
             const mistakes = RF.read("rankforgeMistakesV1");
             const biology = Array.isArray(mistakes) &&
-              mistakes.some(x =>
-                String(x?.source || "").includes("Biology 2699")
-              );
+              mistakes.some(x => {
+                const blob = [
+                  x?.source,
+                  x?.subject,
+                  x?.title,
+                  x?.testName,
+                  x?.chapter
+                ].map(v => String(v || "")).join(" ").toLowerCase();
+
+                return blob.includes("biology");
+              });
 
             if (biology) {
-              location.href = "./cbt.html?retry=biology&v=20260926";
+              location.href = "./cbt.html?retry=biology&v=20260926-r2";
               return;
             }
           } catch (_) {}
