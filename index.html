@@ -1190,260 +1190,7 @@ if("serviceWorker" in navigator){
 </script>
 <!-- /RANKFORGE_MISTAKE_MASTERY_V1 -->
 
-<script id="RANKFORGE_BIOLOGY_INTELLIGENCE_BRIDGE_V2">
-(function(){
-  "use strict";
 
-  /*
-   * Single source-of-truth adapter:
-   *
-   * Biology mistakes:
-   *   rankforgeMistakesV1 / cbtMistakes
-   *
-   * Biology mastery:
-   *   cbtMasteryV2
-   *
-   * The old rankforgeMistakeMasteryV1 store is only a
-   * presentation cache now. It must never make the UI
-   * report zero while the real Biology mistake bank has data.
-   */
-
-  function read(key, fallback){
-    try{
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : fallback;
-    }catch(e){
-      return fallback;
-    }
-  }
-
-  function idOf(x){
-    return String(
-      x?.id ||
-      x?.questionId ||
-      x?.question ||
-      ""
-    ).trim();
-  }
-
-  function isBiology(x){
-    const source = String(x?.source || "");
-    const subject = String(x?.subject || "").toLowerCase();
-
-    return (
-      source.includes("Biology 2699") ||
-      subject === "biology"
-    );
-  }
-
-  function getMastered(){
-    const raw = read("cbtMasteryV2", []);
-    if(!Array.isArray(raw)) return [];
-
-    return raw.filter(function(x){
-      return x &&
-        (
-          x.mastered === true ||
-          x.status === "mastered" ||
-          x.masteredAt
-        );
-    });
-  }
-
-  function getActiveBiology(){
-    const sources = [];
-
-    const a = read("rankforgeMistakesV1", []);
-    const b = read("cbtMistakes", []);
-
-    if(Array.isArray(a)) sources.push(...a);
-    if(Array.isArray(b)) sources.push(...b);
-
-    const mastered = new Set(
-      getMastered()
-        .map(idOf)
-        .filter(Boolean)
-    );
-
-    const map = new Map();
-
-    sources.forEach(function(x){
-      if(!x || !isBiology(x)) return;
-
-      const id = idOf(x);
-      if(!id) return;
-
-      if(mastered.has(id)) return;
-
-      if(!map.has(id)){
-        map.set(id, x);
-      }
-    });
-
-    return [...map.values()];
-  }
-
-  function syncPresentationStore(){
-    try{
-      const active = getActiveBiology();
-      const mastered = getMastered();
-
-      const store = {
-        version: 2,
-        active: active.map(function(x){
-          return {
-            ...x,
-            status: "active"
-          };
-        }),
-        mastered: mastered.map(function(x){
-          return {
-            ...x,
-            status: "mastered"
-          };
-        }),
-        updatedAt: Date.now()
-      };
-
-      localStorage.setItem(
-        "rankforgeMistakeMasteryV1",
-        JSON.stringify(store)
-      );
-
-      return {
-        active: active.length,
-        mastered: mastered.length
-      };
-    }catch(e){
-      return {
-        active: 0,
-        mastered: 0
-      };
-    }
-  }
-
-  function render(){
-    const state = syncPresentationStore();
-
-    const active =
-      document.getElementById("rfMMActive");
-
-    const mastered =
-      document.getElementById("rfMMMastered");
-
-    if(active){
-      active.textContent = String(state.active);
-    }
-
-    if(mastered){
-      mastered.textContent = String(state.mastered);
-    }
-  }
-
-  function openBiologyRetry(){
-    const active = getActiveBiology();
-
-    if(!active.length){
-      alert(
-        "No Biology mistakes are currently waiting for retry."
-      );
-      return;
-    }
-
-    /*
-     * Keep the authoritative Biology mistake bank intact.
-     * Only create the retry queue metadata.
-     */
-    try{
-      localStorage.setItem(
-        "rankforgeRetestQueueV1",
-        JSON.stringify({
-          source: "RankForge Biology 2699",
-          ids: active.slice(0, 50).map(idOf),
-          createdAt: Date.now()
-        })
-      );
-
-      localStorage.setItem(
-        "cbtRetryStartedAt",
-        String(Date.now())
-      );
-    }catch(e){}
-
-    location.href =
-      "./cbt.html?retry=biology&v=20260926";
-  }
-
-  function boot(){
-    render();
-
-    /*
-     * Capture phase prevents the old presentation-only
-     * handlers from showing misleading alerts.
-     */
-    const fix =
-      document.getElementById("rfMMFixBtn");
-
-    const retest =
-      document.getElementById("rfMMRetestBtn");
-
-    if(fix){
-      fix.addEventListener(
-        "click",
-        function(e){
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          openBiologyRetry();
-        },
-        true
-      );
-    }
-
-    if(retest){
-      retest.addEventListener(
-        "click",
-        function(e){
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          openBiologyRetry();
-        },
-        true
-      );
-    }
-
-    /*
-     * Keep the Home numbers synchronized if another module
-     * writes the mistake bank while Home remains open.
-     */
-    window.addEventListener(
-      "storage",
-      render
-    );
-
-    setTimeout(render, 100);
-    setTimeout(render, 500);
-    setTimeout(render, 1200);
-  }
-
-  if(document.readyState === "loading"){
-    document.addEventListener(
-      "DOMContentLoaded",
-      boot,
-      {once:true}
-    );
-  }else{
-    boot();
-  }
-
-  window.RankForgeBiologyIntelligenceBridgeV2 = {
-    refresh: render,
-    active: getActiveBiology,
-    mastered: getMastered,
-    retry: openBiologyRetry
-  };
-
-})();
-</script>
 
 
 
@@ -3743,3 +3490,403 @@ window.RankForgeAllFeatures={
 
 </body>
 </html>
+
+<!-- RANKFORGE_BIOLOGY_INTELLIGENCE_BRIDGE_FINAL_20260926 -->
+<script id="RANKFORGE_BIOLOGY_INTELLIGENCE_BRIDGE_FINAL_20260926">
+(function(){
+"use strict";
+
+const MISTAKE_KEYS=[
+  "rankforgeMistakesV1",
+  "cbtMistakes"
+];
+
+function read(key,fallback){
+  try{
+    const raw=localStorage.getItem(key);
+    if(!raw)return fallback;
+    const value=JSON.parse(raw);
+    return value==null?fallback:value;
+  }catch(e){
+    return fallback;
+  }
+}
+
+function toArray(value){
+  if(Array.isArray(value))return value;
+
+  if(value && typeof value==="object"){
+    for(const key of [
+      "items",
+      "data",
+      "records",
+      "mistakes",
+      "active",
+      "questions",
+      "mastered"
+    ]){
+      if(Array.isArray(value[key])){
+        return value[key];
+      }
+    }
+  }
+
+  return [];
+}
+
+function itemId(item){
+  if(!item)return "";
+
+  return String(
+    item.id ??
+    item.questionId ??
+    item.questionID ??
+    item.qid ??
+    item.question ??
+    item.text ??
+    ""
+  ).trim();
+}
+
+function isBiology(item){
+  if(!item)return false;
+
+  const source=String(
+    item.source ??
+    item.sourceType ??
+    item.testSource ??
+    ""
+  ).toLowerCase();
+
+  const subject=String(
+    item.subject ??
+    item.section ??
+    ""
+  ).toLowerCase();
+
+  const title=String(
+    item.title ??
+    item.testTitle ??
+    item.topic ??
+    ""
+  ).toLowerCase();
+
+  return (
+    source.includes("biology") ||
+    subject.includes("biology") ||
+    title.includes("biology")
+  );
+}
+
+function masteryRecords(){
+  return toArray(read("cbtMasteryV2",[]));
+}
+
+function masteredIds(){
+  const result=new Set();
+
+  for(const item of masteryRecords()){
+    if(!item)continue;
+
+    const mastered=
+      item.mastered===true ||
+      String(item.status||"").toLowerCase()==="mastered" ||
+      !!item.masteredAt ||
+      !!item.mastered_at;
+
+    if(!mastered)continue;
+
+    const id=itemId(item);
+
+    if(id)result.add(id);
+  }
+
+  return result;
+}
+
+function biologyMistakes(){
+  const result=[];
+
+  for(const key of MISTAKE_KEYS){
+    for(const item of toArray(read(key,[]))){
+      if(item && isBiology(item)){
+        result.push(item);
+      }
+    }
+  }
+
+  return result;
+}
+
+function getActiveBiology(){
+  const mastered=masteredIds();
+  const unique=new Map();
+
+  for(const item of biologyMistakes()){
+    const id=itemId(item);
+
+    if(!id)continue;
+    if(mastered.has(id))continue;
+
+    if(!unique.has(id)){
+      unique.set(id,item);
+    }
+  }
+
+  return Array.from(unique.values());
+}
+
+function getMasteredBiology(){
+  const unique=new Map();
+
+  for(const item of masteryRecords()){
+    if(!item || !isBiology(item))continue;
+
+    const mastered=
+      item.mastered===true ||
+      String(item.status||"").toLowerCase()==="mastered" ||
+      !!item.masteredAt ||
+      !!item.mastered_at;
+
+    if(!mastered)continue;
+
+    const id=itemId(item);
+
+    if(id && !unique.has(id)){
+      unique.set(id,item);
+    }
+  }
+
+  return Array.from(unique.values());
+}
+
+function syncPresentation(){
+  const active=getActiveBiology();
+  const mastered=getMasteredBiology();
+
+  /*
+   * Presentation cache only.
+   * It is NOT an independent source of truth.
+   */
+  try{
+    localStorage.setItem(
+      "rankforgeMistakeMasteryV1",
+      JSON.stringify({
+        version:3,
+        source:"Biology authoritative bridge",
+        active:active.map(x=>({...x,status:"active"})),
+        mastered:mastered.map(x=>({...x,status:"mastered"})),
+        updatedAt:Date.now()
+      })
+    );
+  }catch(e){}
+
+  const activeEl=document.getElementById("rfMMActive");
+  const masteredEl=document.getElementById("rfMMMastered");
+
+  if(activeEl){
+    activeEl.textContent=String(active.length);
+  }
+
+  if(masteredEl){
+    masteredEl.textContent=String(mastered.length);
+  }
+
+  return {
+    active:active.length,
+    mastered:mastered.length
+  };
+}
+
+function startBiologyRetry(){
+  const questions=getActiveBiology();
+
+  if(!questions.length){
+    alert("No Biology mistakes are currently waiting for retry.");
+    return;
+  }
+
+  try{
+    localStorage.setItem(
+      "rankforgeRetestQueueV1",
+      JSON.stringify({
+        version:3,
+        source:"RankForge Biology 2699",
+        subject:"Biology",
+        ids:questions.slice(0,50).map(itemId),
+        createdAt:Date.now()
+      })
+    );
+  }catch(e){}
+
+  window.location.href=
+    "./cbt.html?retry=biology&v=20260926";
+}
+
+function bind(){
+  syncPresentation();
+
+  const fix=document.getElementById("rfMMFixBtn");
+  const retry=document.getElementById("rfMMRetestBtn");
+
+  if(fix){
+    fix.onclick=function(event){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      startBiologyRetry();
+      return false;
+    };
+  }
+
+  if(retry){
+    retry.onclick=function(event){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      startBiologyRetry();
+      return false;
+    };
+  }
+
+  window.addEventListener(
+    "storage",
+    syncPresentation
+  );
+
+  [100,500,1200,2500].forEach(function(delay){
+    setTimeout(syncPresentation,delay);
+  });
+}
+
+/*
+ * One authoritative API.
+ */
+window.RankForgeBiologyIntelligence={
+  version:3,
+  refresh:syncPresentation,
+  getActive:getActiveBiology,
+  getMastered:getMasteredBiology,
+  startRetry:startBiologyRetry
+};
+
+/*
+ * Prevent the old presentation layer from becoming
+ * another database.
+ */
+window.RankForgeMistakeMastery={
+  getActive:getActiveBiology,
+
+  read:function(){
+    return {
+      active:getActiveBiology(),
+      mastered:getMasteredBiology()
+    };
+  },
+
+  render:syncPresentation,
+
+  add:function(){},
+
+  master:function(){}
+};
+
+if(document.readyState==="loading"){
+  document.addEventListener(
+    "DOMContentLoaded",
+    bind,
+    {once:true}
+  );
+}else{
+  bind();
+}
+
+})();
+</script>
+
+<!-- RANKFORGE_FINAL_NAV_FIX_20260926 -->
+<style>
+.nav{
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  min-height:64px!important;
+  z-index:2147483647!important;
+  overflow:visible!important;
+  box-sizing:border-box!important;
+}
+
+.nav button{
+  min-width:0!important;
+  width:100%!important;
+  min-height:64px!important;
+  padding:6px 2px!important;
+  margin:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  font-size:11px!important;
+  line-height:1.15!important;
+}
+
+.nav button b{
+  display:block!important;
+  font-size:18px!important;
+  line-height:18px!important;
+}
+
+main{
+  padding-bottom:82px!important;
+}
+</style>
+
+<script>
+(function(){
+"use strict";
+
+function stabilizeNavigation(){
+  const nav=document.querySelector(".nav");
+
+  if(!nav)return;
+
+  nav.style.position="fixed";
+  nav.style.left="0";
+  nav.style.right="0";
+  nav.style.bottom="0";
+  nav.style.width="100%";
+  nav.style.display="grid";
+  nav.style.gridTemplateColumns=
+    "repeat(5,minmax(0,1fr))";
+  nav.style.zIndex="2147483647";
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener(
+    "DOMContentLoaded",
+    stabilizeNavigation,
+    {once:true}
+  );
+}else{
+  stabilizeNavigation();
+}
+
+window.addEventListener(
+  "resize",
+  stabilizeNavigation,
+  {passive:true}
+);
+
+window.addEventListener(
+  "orientationchange",
+  stabilizeNavigation,
+  {passive:true}
+);
+
+})();
+</script>
