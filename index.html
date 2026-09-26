@@ -975,220 +975,7 @@ if("serviceWorker" in navigator){
 </script>
 
 
-<!-- RANKFORGE_MISTAKE_MASTERY_V1 -->
-<style>
-.rf-mm-card{
-  margin:14px 0;
-  padding:16px;
-  border:1px solid rgba(127,127,127,.22);
-  border-radius:18px;
-  background:rgba(127,127,127,.07);
-}
-.rf-mm-title{font-size:18px;font-weight:800;margin-bottom:5px}
-.rf-mm-sub{font-size:13px;opacity:.72;margin-bottom:14px}
-.rf-mm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.rf-mm-stat{padding:12px;border-radius:14px;background:rgba(127,127,127,.08)}
-.rf-mm-num{font-size:22px;font-weight:800}
-.rf-mm-label{font-size:12px;opacity:.68}
-.rf-mm-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.rf-mm-btn{
-  border:0;border-radius:12px;padding:11px 14px;
-  font-weight:700;cursor:pointer;
-}
-.rf-mm-primary{background:#111;color:#fff}
-.rf-mm-secondary{background:rgba(127,127,127,.14);color:inherit}
-@media(max-width:480px){
-  .rf-mm-grid{grid-template-columns:1fr 1fr}
-}
-</style>
 
-<section id="rankforgeMistakeMasteryV1" class="rf-mm-card" aria-label="Mistake mastery">
-  <div class="rf-mm-title">🧠 Mistake → Fix → Retest</div>
-  <div class="rf-mm-sub">Every mistake becomes a targeted improvement task.</div>
-
-  <div class="rf-mm-grid">
-    <div class="rf-mm-stat">
-      <div id="rfMMActive" class="rf-mm-num">0</div>
-      <div class="rf-mm-label">Active Mistakes</div>
-    </div>
-    <div class="rf-mm-stat">
-      <div id="rfMMMastered" class="rf-mm-num">0</div>
-      <div class="rf-mm-label">Mastered</div>
-    </div>
-  </div>
-
-  <div class="rf-mm-actions">
-    <button type="button" class="rf-mm-btn rf-mm-primary" id="rfMMFixBtn">Fix My Mistakes</button>
-    <button type="button" class="rf-mm-btn rf-mm-secondary" id="rfMMRetestBtn">Practice Again</button>
-  </div>
-</section>
-
-<script>
-(function(){
-  "use strict";
-
-  const KEY = "rankforgeMistakeMasteryV1";
-
-  function read(){
-    try{
-      const x = JSON.parse(localStorage.getItem(KEY) || "{}");
-      return {
-        active: Array.isArray(x.active) ? x.active : [],
-        mastered: Array.isArray(x.mastered) ? x.mastered : []
-      };
-    }catch(e){
-      return {active:[], mastered:[]};
-    }
-  }
-
-  function write(x){
-    try{
-      localStorage.setItem(KEY, JSON.stringify(x));
-    }catch(e){}
-  }
-
-  function normalizeMistake(q, reason){
-    return {
-      id: String(q.id || q.questionId || ("mistake-" + Date.now())),
-      question: String(q.question || q.text || ""),
-      subject: String(q.subject || "Mixed"),
-      topic: String(q.topic || "Unknown Topic"),
-      reason: String(reason || q.mistakeReason || "Conceptual"),
-      attempts: Number(q.attempts || 1),
-      lastSeen: Date.now(),
-      status: "active"
-    };
-  }
-
-  function addMistake(q, reason){
-    if(!q) return;
-    const db = read();
-    const item = normalizeMistake(q, reason);
-
-    const existing = db.active.find(x => x.id === item.id);
-
-    if(existing){
-      existing.attempts = Math.max(1, Number(existing.attempts || 1) + 1);
-      existing.reason = item.reason;
-      existing.lastSeen = Date.now();
-    }else{
-      db.active.push(item);
-    }
-
-    db.mastered = db.mastered.filter(x => x.id !== item.id);
-    write(db);
-    render();
-  }
-
-  function master(id){
-    const db = read();
-    const i = db.active.findIndex(x => x.id === id);
-    if(i < 0) return;
-
-    const item = db.active.splice(i,1)[0];
-    item.status = "mastered";
-    item.masteredAt = Date.now();
-    db.mastered.push(item);
-
-    write(db);
-    render();
-  }
-
-  function render(){
-    const db = read();
-    const a = document.getElementById("rfMMActive");
-    const m = document.getElementById("rfMMMastered");
-
-    if(a) a.textContent = db.active.length;
-    if(m) m.textContent = db.mastered.length;
-  }
-
-  function getActive(){
-    return read().active.slice().sort(function(a,b){
-      return Number(a.lastSeen||0) - Number(b.lastSeen||0);
-    });
-  }
-
-  function openFix(){
-    const items = getActive();
-
-    if(!items.length){
-      alert("No active mistakes yet. Complete a test and your incorrect questions will appear here.");
-      return;
-    }
-
-    const top = items[0];
-
-    localStorage.setItem(
-      "rankforgeNextActionV1",
-      JSON.stringify({
-        type:"mistake-fix",
-        questionId:top.id,
-        topic:top.topic,
-        reason:top.reason,
-        createdAt:Date.now()
-      })
-    );
-
-    alert(
-      "Next Fix:\\n\\n" +
-      "Topic: " + top.topic +
-      "\\nReason: " + top.reason +
-      "\\nAttempts: " + top.attempts +
-      "\\n\\nOpen Practice → Weak Areas / Mistake Book to continue."
-    );
-  }
-
-  function openRetest(){
-    const items = getActive();
-
-    if(!items.length){
-      alert("No mistakes are waiting for a retest.");
-      return;
-    }
-
-    localStorage.setItem(
-      "rankforgeRetestQueueV1",
-      JSON.stringify({
-        ids:items.slice(0,10).map(x => x.id),
-        createdAt:Date.now()
-      })
-    );
-
-    alert(
-      "Retest queue created: " +
-      Math.min(items.length,10) +
-      " mistake(s).\\n\\n" +
-      "Practice these questions again, then mark mastered after the concept is stable."
-    );
-  }
-
-  window.RankForgeMistakeMastery = {
-    add:addMistake,
-    master:master,
-    getActive:getActive,
-    read:read,
-    render:render
-  };
-
-  const boot = function(){
-    render();
-
-    const fix = document.getElementById("rfMMFixBtn");
-    const retest = document.getElementById("rfMMRetestBtn");
-
-    if(fix) fix.addEventListener("click",openFix);
-    if(retest) retest.addEventListener("click",openRetest);
-  };
-
-  if(document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded",boot,{once:true});
-  }else{
-    boot();
-  }
-})();
-</script>
-<!-- /RANKFORGE_MISTAKE_MASTERY_V1 -->
 
 
 
@@ -3488,11 +3275,81 @@ window.RankForgeAllFeatures={
 })();
 </script>
 
-</body>
-</html>
 
-<!-- RANKFORGE_BIOLOGY_INTELLIGENCE_BRIDGE_FINAL_20260926 -->
-<script id="RANKFORGE_BIOLOGY_INTELLIGENCE_BRIDGE_FINAL_20260926">
+<!-- RANKFORGE_BIOLOGY_MISTAKE_SYSTEM_FINAL -->
+<style id="RANKFORGE_BIOLOGY_MISTAKE_SYSTEM_FINAL_STYLE">
+.rf-mm-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+
+.rf-mm-btn{
+  border:0;
+  border-radius:12px;
+  padding:11px 14px;
+  font-weight:700;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+.rf-mm-primary{
+  background:#111;
+  color:#fff;
+}
+
+.rf-mm-secondary{
+  background:rgba(127,127,127,.14);
+  color:inherit;
+}
+</style>
+
+<section
+  id="rankforgeMistakeMasteryV1"
+  class="rf-mm-card"
+  aria-label="Mistake mastery">
+
+  <div class="rf-mm-title">🧠 Mistake → Fix → Retest</div>
+
+  <div class="rf-mm-sub">
+    Every mistake becomes a targeted improvement task.
+  </div>
+
+  <div class="rf-mm-grid">
+
+    <div class="rf-mm-stat">
+      <div id="rfMMActive" class="rf-mm-num">0</div>
+      <div class="rf-mm-label">Active Mistakes</div>
+    </div>
+
+    <div class="rf-mm-stat">
+      <div id="rfMMMastered" class="rf-mm-num">0</div>
+      <div class="rf-mm-label">Mastered</div>
+    </div>
+
+  </div>
+
+  <div class="rf-mm-actions">
+
+    <button
+      type="button"
+      class="rf-mm-btn rf-mm-primary"
+      id="rfMMFixBtn">
+      Fix My Mistakes
+    </button>
+
+    <button
+      type="button"
+      class="rf-mm-btn rf-mm-secondary"
+      id="rfMMRetestBtn">
+      Practice Again
+    </button>
+
+  </div>
+</section>
+
+<script id="RANKFORGE_BIOLOGY_MISTAKE_SYSTEM_FINAL_SCRIPT">
 (function(){
 "use strict";
 
@@ -3504,15 +3361,18 @@ const MISTAKE_KEYS=[
 function read(key,fallback){
   try{
     const raw=localStorage.getItem(key);
+
     if(!raw)return fallback;
+
     const value=JSON.parse(raw);
+
     return value==null?fallback:value;
   }catch(e){
     return fallback;
   }
 }
 
-function toArray(value){
+function arrayOf(value){
   if(Array.isArray(value))return value;
 
   if(value && typeof value==="object"){
@@ -3534,7 +3394,7 @@ function toArray(value){
   return [];
 }
 
-function itemId(item){
+function getId(item){
   if(!item)return "";
 
   return String(
@@ -3542,8 +3402,6 @@ function itemId(item){
     item.questionId ??
     item.questionID ??
     item.qid ??
-    item.question ??
-    item.text ??
     ""
   ).trim();
 }
@@ -3578,15 +3436,16 @@ function isBiology(item){
   );
 }
 
-function masteryRecords(){
-  return toArray(read("cbtMasteryV2",[]));
+function getMastery(){
+  return arrayOf(
+    read("cbtMasteryV2",[])
+  );
 }
 
 function masteredIds(){
-  const result=new Set();
+  const set=new Set();
 
-  for(const item of masteryRecords()){
-    if(!item)continue;
+  for(const item of getMastery()){
 
     const mastered=
       item.mastered===true ||
@@ -3596,40 +3455,36 @@ function masteredIds(){
 
     if(!mastered)continue;
 
-    const id=itemId(item);
+    const id=getId(item);
 
-    if(id)result.add(id);
+    if(id)set.add(id);
   }
 
-  return result;
-}
-
-function biologyMistakes(){
-  const result=[];
-
-  for(const key of MISTAKE_KEYS){
-    for(const item of toArray(read(key,[]))){
-      if(item && isBiology(item)){
-        result.push(item);
-      }
-    }
-  }
-
-  return result;
+  return set;
 }
 
 function getActiveBiology(){
   const mastered=masteredIds();
   const unique=new Map();
 
-  for(const item of biologyMistakes()){
-    const id=itemId(item);
+  for(const key of MISTAKE_KEYS){
 
-    if(!id)continue;
-    if(mastered.has(id))continue;
+    const records=arrayOf(
+      read(key,[])
+    );
 
-    if(!unique.has(id)){
-      unique.set(id,item);
+    for(const item of records){
+
+      if(!item || !isBiology(item))continue;
+
+      const id=getId(item);
+
+      if(!id)continue;
+      if(mastered.has(id))continue;
+
+      if(!unique.has(id)){
+        unique.set(id,item);
+      }
     }
   }
 
@@ -3639,7 +3494,8 @@ function getActiveBiology(){
 function getMasteredBiology(){
   const unique=new Map();
 
-  for(const item of masteryRecords()){
+  for(const item of getMastery()){
+
     if(!item || !isBiology(item))continue;
 
     const mastered=
@@ -3650,7 +3506,7 @@ function getMasteredBiology(){
 
     if(!mastered)continue;
 
-    const id=itemId(item);
+    const id=getId(item);
 
     if(id && !unique.has(id)){
       unique.set(id,item);
@@ -3660,233 +3516,163 @@ function getMasteredBiology(){
   return Array.from(unique.values());
 }
 
-function syncPresentation(){
+function sync(){
+
   const active=getActiveBiology();
   const mastered=getMasteredBiology();
 
+  const activeEl=
+    document.getElementById("rfMMActive");
+
+  const masteredEl=
+    document.getElementById("rfMMMastered");
+
+  if(activeEl){
+    activeEl.textContent=
+      String(active.length);
+  }
+
+  if(masteredEl){
+    masteredEl.textContent=
+      String(mastered.length);
+  }
+
   /*
    * Presentation cache only.
-   * It is NOT an independent source of truth.
+   * Never used as authoritative source.
    */
   try{
     localStorage.setItem(
       "rankforgeMistakeMasteryV1",
       JSON.stringify({
-        version:3,
-        source:"Biology authoritative bridge",
-        active:active.map(x=>({...x,status:"active"})),
-        mastered:mastered.map(x=>({...x,status:"mastered"})),
+        version:4,
+        source:"Biology CBT authoritative state",
+        active:active,
+        mastered:mastered,
         updatedAt:Date.now()
       })
     );
   }catch(e){}
-
-  const activeEl=document.getElementById("rfMMActive");
-  const masteredEl=document.getElementById("rfMMMastered");
-
-  if(activeEl){
-    activeEl.textContent=String(active.length);
-  }
-
-  if(masteredEl){
-    masteredEl.textContent=String(mastered.length);
-  }
-
-  return {
-    active:active.length,
-    mastered:mastered.length
-  };
 }
 
-function startBiologyRetry(){
-  const questions=getActiveBiology();
+function retry(){
 
-  if(!questions.length){
-    alert("No Biology mistakes are currently waiting for retry.");
+  const items=getActiveBiology();
+
+  if(!items.length){
+
+    alert(
+      "No Biology mistakes are currently waiting for retry."
+    );
+
     return;
   }
 
+  const ids=items
+    .slice(0,50)
+    .map(getId)
+    .filter(Boolean);
+
   try{
+
     localStorage.setItem(
       "rankforgeRetestQueueV1",
       JSON.stringify({
-        version:3,
+        version:4,
         source:"RankForge Biology 2699",
         subject:"Biology",
-        ids:questions.slice(0,50).map(itemId),
+        ids:ids,
         createdAt:Date.now()
       })
     );
+
   }catch(e){}
 
+  /*
+   * THE ONLY RETRY DESTINATION.
+   */
   window.location.href=
     "./cbt.html?retry=biology&v=20260926";
 }
 
 function bind(){
-  syncPresentation();
 
-  const fix=document.getElementById("rfMMFixBtn");
-  const retry=document.getElementById("rfMMRetestBtn");
+  sync();
+
+  const fix=
+    document.getElementById("rfMMFixBtn");
+
+  const retest=
+    document.getElementById("rfMMRetestBtn");
 
   if(fix){
+
     fix.onclick=function(event){
+
       event.preventDefault();
+      event.stopPropagation();
       event.stopImmediatePropagation();
-      startBiologyRetry();
+
+      retry();
+
       return false;
     };
   }
 
-  if(retry){
-    retry.onclick=function(event){
+  if(retest){
+
+    retest.onclick=function(event){
+
       event.preventDefault();
+      event.stopPropagation();
       event.stopImmediatePropagation();
-      startBiologyRetry();
+
+      retry();
+
       return false;
     };
   }
 
   window.addEventListener(
     "storage",
-    syncPresentation
+    sync
   );
 
-  [100,500,1200,2500].forEach(function(delay){
-    setTimeout(syncPresentation,delay);
+  [100,500,1200,2500].forEach(function(ms){
+    setTimeout(sync,ms);
   });
 }
 
-/*
- * One authoritative API.
- */
-window.RankForgeBiologyIntelligence={
-  version:3,
-  refresh:syncPresentation,
-  getActive:getActiveBiology,
-  getMastered:getMasteredBiology,
-  startRetry:startBiologyRetry
-};
-
-/*
- * Prevent the old presentation layer from becoming
- * another database.
- */
 window.RankForgeMistakeMastery={
   getActive:getActiveBiology,
-
+  getMastered:getMasteredBiology,
   read:function(){
     return {
       active:getActiveBiology(),
       mastered:getMasteredBiology()
     };
   },
-
-  render:syncPresentation,
-
-  add:function(){},
-
-  master:function(){}
+  render:sync,
+  retry:retry,
+  refresh:sync
 };
 
 if(document.readyState==="loading"){
+
   document.addEventListener(
     "DOMContentLoaded",
     bind,
     {once:true}
   );
+
 }else{
+
   bind();
+
 }
 
 })();
 </script>
 
-<!-- RANKFORGE_FINAL_NAV_FIX_20260926 -->
-<style>
-.nav{
-  position:fixed!important;
-  left:0!important;
-  right:0!important;
-  bottom:0!important;
-  width:100%!important;
-  display:grid!important;
-  grid-template-columns:repeat(5,minmax(0,1fr))!important;
-  min-height:64px!important;
-  z-index:2147483647!important;
-  overflow:visible!important;
-  box-sizing:border-box!important;
-}
-
-.nav button{
-  min-width:0!important;
-  width:100%!important;
-  min-height:64px!important;
-  padding:6px 2px!important;
-  margin:0!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:3px!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  font-size:11px!important;
-  line-height:1.15!important;
-}
-
-.nav button b{
-  display:block!important;
-  font-size:18px!important;
-  line-height:18px!important;
-}
-
-main{
-  padding-bottom:82px!important;
-}
-</style>
-
-<script>
-(function(){
-"use strict";
-
-function stabilizeNavigation(){
-  const nav=document.querySelector(".nav");
-
-  if(!nav)return;
-
-  nav.style.position="fixed";
-  nav.style.left="0";
-  nav.style.right="0";
-  nav.style.bottom="0";
-  nav.style.width="100%";
-  nav.style.display="grid";
-  nav.style.gridTemplateColumns=
-    "repeat(5,minmax(0,1fr))";
-  nav.style.zIndex="2147483647";
-}
-
-if(document.readyState==="loading"){
-  document.addEventListener(
-    "DOMContentLoaded",
-    stabilizeNavigation,
-    {once:true}
-  );
-}else{
-  stabilizeNavigation();
-}
-
-window.addEventListener(
-  "resize",
-  stabilizeNavigation,
-  {passive:true}
-);
-
-window.addEventListener(
-  "orientationchange",
-  stabilizeNavigation,
-  {passive:true}
-);
-
-})();
-</script>
+</body>
+</html>
