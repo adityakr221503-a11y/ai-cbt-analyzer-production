@@ -1628,6 +1628,87 @@ async function bootCBTSource() {
   }
 }
 
+
+/* RANKFORGE V319 PDF AUTHORITY BRIDGE */
+(function enforcePDFAuthorityBeforeCBTBoot(){
+  try {
+    const params = new URLSearchParams(location.search || "");
+    const pdfMode =
+      params.get("source") === "pdf" ||
+      params.get("rf-final") === "1";
+
+    if (!pdfMode) return;
+
+    const raw = localStorage.getItem("pdfCbtQuestions");
+
+    if (!raw) {
+      console.warn("[RankForge] PDF mode requested but pdfCbtQuestions is absent");
+      return;
+    }
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      console.error("[RankForge] Invalid pdfCbtQuestions JSON", e);
+      return;
+    }
+
+    const questions =
+      Array.isArray(parsed) ? parsed :
+      Array.isArray(parsed?.questions) ? parsed.questions :
+      Array.isArray(parsed?.pool) ? parsed.pool :
+      [];
+
+    if (!questions.length) {
+      console.warn("[RankForge] PDF authority bridge found no questions");
+      return;
+    }
+
+    /*
+     * PDF mode is an explicit source request.
+     * Make the PDF question pool authoritative before the normal
+     * CBT source boot can fall back to Biology / RankForge state.
+     */
+    localStorage.setItem(
+      "CBT_ACTIVE_QUESTIONS",
+      JSON.stringify(questions)
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_SOURCE",
+      "PDF"
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_TEST_SOURCE",
+      "PDF"
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_PDF_FILENAME",
+      localStorage.getItem("PDF_ACTIVE_FILENAME") || ""
+    );
+
+    /*
+     * Remove only the competing active test object in PDF mode.
+     * Canonical Biology banks are untouched.
+     */
+    localStorage.removeItem("CBT_ACTIVE_TEST");
+    localStorage.removeItem("CBT_ACTIVE_TEST_ID");
+
+    console.info(
+      "[RankForge] PDF authority locked:",
+      questions.length,
+      "questions"
+    );
+
+  } catch (e) {
+    console.error("[RankForge] PDF authority bridge failed", e);
+  }
+})();
+
 bootCBTSource();
 
 
