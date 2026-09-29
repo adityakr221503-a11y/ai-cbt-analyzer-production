@@ -1,59 +1,129 @@
 (function(){
+  "use strict";
 
-"use strict";
+  window.RankForgeBiologyFinalHook = {
+    record: function(test, answers, mode){
+      try{
+        const questions=Array.isArray(test)?test:[];
+        const a=answers||{};
+        const now=new Date().toISOString();
+        const mistakes=[];
+        const attempt=[];
 
-window.RankForgeBiologyFinalHook = {
+        questions.forEach(function(q,i){
+          const id=String(
+            q.id||q.questionId||("BIO-NC-"+String(i+1).padStart(6,"0"))
+          );
 
-  normalize:function(q,index,selected){
+          const selected =
+            a[id]!==undefined ? a[id] :
+            a[i]!==undefined ? a[i] : null;
 
-    if(!q) return null;
+          const correct =
+            q.correctIndex!==undefined ? q.correctIndex :
+            q.answer!==undefined ? q.answer :
+            q.correctAnswer!==undefined ? q.correctAnswer :
+            q.correct!==undefined ? q.correct : null;
 
-    let options =
-      Array.isArray(q.options) ? q.options :
-      Array.isArray(q.choices) ? q.choices :
-      [q.option_a,q.option_b,q.option_c,q.option_d]
-        .filter(x=>x!=null);
+          const row={
+            id:id,
+            questionId:id,
+            question:q.question||q.questionText||q.text||"",
+            options:q.options||[],
+            selectedAnswer:selected,
+            correctAnswer:correct,
+            solution:q.solution||q.explanation||"",
+            explanation:q.explanation||q.solution||"",
+            subject:"Biology",
+            source:"BIOLOGY_7196",
+            sourceType:"BIOLOGY",
+            topic:q.topic||q.chapter||"",
+            timestamp:now
+          };
 
-    let correct =
-      Number.isInteger(q.correctIndex)
-        ? q.correctIndex
-        : Number.isInteger(q.answerIndex)
-          ? q.answerIndex
-          : -1;
+          attempt.push(row);
 
-    if(correct<0 && q.correctAnswer!=null){
+          if(
+            selected!==null &&
+            selected!==undefined &&
+            String(selected)!==String(correct)
+          ){
+            mistakes.push(row);
+          }
+        });
 
-      let target=String(q.correctAnswer)
-        .trim()
-        .toLowerCase();
+        function read(key){
+          try{
+            const x=JSON.parse(localStorage.getItem(key)||"[]");
+            return Array.isArray(x)?x:[];
+          }catch(e){return [];}
+        }
 
-      correct=options.findIndex(x=>
-        String(x).trim().toLowerCase()===target
-      );
+        function write(key,value){
+          localStorage.setItem(key,JSON.stringify(value));
+        }
+
+        write("cbtHistory",[
+          ...read("cbtHistory"),
+          {
+            timestamp:now,
+            source:"BIOLOGY_7196",
+            subject:"Biology",
+            mode:mode||"normal",
+            total:questions.length,
+            mistakes:mistakes.length,
+            questions:attempt
+          }
+        ]);
+
+        write("rankBoosterAttemptHistory",[
+          ...read("rankBoosterAttemptHistory"),
+          {
+            timestamp:now,
+            source:"BIOLOGY_7196",
+            subject:"Biology",
+            total:questions.length,
+            mistakes:mistakes.length
+          }
+        ]);
+
+        write("rankforgeMistakesV1",[
+          ...read("rankforgeMistakesV1"),
+          ...mistakes
+        ]);
+
+        write("cbtMistakes",[
+          ...read("cbtMistakes"),
+          ...mistakes
+        ]);
+
+        if(localStorage.getItem("cbtMasteryV2")===null){
+          localStorage.setItem("cbtMasteryV2","[]");
+        }
+
+        localStorage.setItem(
+          "rankforgeBiologyLastAttempt",
+          JSON.stringify({
+            timestamp:now,
+            source:"BIOLOGY_7196",
+            total:questions.length,
+            mistakes:mistakes.length
+          })
+        );
+
+        console.log(
+          "[RankForge Biology 7196]",
+          questions.length,
+          "questions;",
+          mistakes.length,
+          "mistakes saved"
+        );
+
+        return true;
+      }catch(e){
+        console.error("[RankForge Biology] persistence failed",e);
+        return false;
+      }
     }
-
-    if(correct<0 || correct>=options.length)
-      return null;
-
-    return {
-      id:String(q.id||q.questionId||("BIO-"+index)),
-      question:String(
-        q.question||q.questionText||q.text||""
-      ),
-      options:options.map(String),
-      selectedIndex:Number.isInteger(selected)?selected:-1,
-      correctIndex:correct,
-      correctAnswer:String(
-        q.correctAnswer??options[correct]??""
-      ),
-      subject:"Biology",
-      source:"BIOLOGY_7196",
-      mistakeType:q.mistakeType||"🧠 Conceptual",
-      mistakeReason:q.mistakeReason||
-        "Review the NCERT concept and identify the reason for the incorrect answer."
-    };
-  }
-
-};
-
+  };
 })();

@@ -68,7 +68,7 @@ function openRetry(){
       );
 
     if(biology){
-      go("cbt.html?retry=biology&v=20260925");
+      go("biology-7196-cbt.html?retry=biology&v=20260929");
       return;
     }
   }catch(_){}
