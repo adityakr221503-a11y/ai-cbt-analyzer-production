@@ -6,7 +6,7 @@ const FLOW = {
   rankers: "rankers-test-series.html",
   bank: "question-bank.html",
   pdf: "pdf-to-cbt.html",
-  biology: "biology360/index.html",
+  biology: "biology-7196-cbt.html",
   mistake: "mistake.html",
   retry: "retry.html",
   history: "history.html",

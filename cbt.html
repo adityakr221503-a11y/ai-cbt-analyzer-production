@@ -2,30 +2,6 @@
 <html lang="en">
 <head>
 
-<!-- RANKFORGE_AI_BIOLOGY_SINGLE_SYSTEM_ROUTER_V4 -->
-<script id="rankforge-biology-single-system-router-v4">
-(function(){
-  try{
-    const qs=new URLSearchParams(location.search||"");
-    const source=(qs.get("source")||"").toLowerCase();
-    const finalMode=qs.get("rf-final")==="1";
-    const retry=(qs.get("retry")||"").toLowerCase();
-
-    if(source==="pdf" || finalMode) return;
-
-    const target=retry==="biology"
-      ? "biology-7196-cbt.html?retry=biology&v=20260929"
-      : "biology-7196-cbt.html";
-
-    if(!location.pathname.endsWith("biology-7196-cbt.html")){
-      location.replace(target);
-    }
-  }catch(e){
-    console.warn("[RankForge] Biology router:",e);
-  }
-})();
-</script>
-
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RankForge Biology CBT</title>
