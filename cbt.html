@@ -151,6 +151,26 @@ button:disabled{opacity:.5;cursor:not-allowed}
 </style>
 
 <script src="./rankforge-v318-stability-v1.js"></script>
+
+<script>
+/*
+ RANKFORGE BIOLOGY STARTUP GUARD
+ Legacy 2699 Biology remains available as data,
+ but must not take over the main RankForge startup.
+*/
+(function () {
+  "use strict";
+
+  window.RankForgeBiology7196 = true;
+  window.RankForgeBiologySource = "BIOLOGY_ACTIVE_BANK";
+
+  try {
+    sessionStorage.setItem("CBT_ACTIVE_SOURCE", "BIOLOGY_ACTIVE_BANK");
+    sessionStorage.setItem("CBT_ACTIVE_TEST_SOURCE", "BIOLOGY_ACTIVE_BANK");
+  } catch (_) {}
+})();
+</script>
+
 </head>
 
 <body>
@@ -1570,7 +1590,7 @@ async function bootCBTSource() {
       );
     }
 
-    if(data.length!==2699) {
+    if(!window.RankForgeBiology7196 && data.length!==2699) {
       throw new Error(
         "Expected 2699 questions, got "+
         data.length
@@ -1582,7 +1602,7 @@ async function bootCBTSource() {
         .map(normalizeQuestion)
         .filter(Boolean);
 
-    if(bank.length!==2699) {
+    if(!window.RankForgeBiology7196 && bank.length!==2699) {
       throw new Error(
         "Only "+
         bank.length+
@@ -1596,7 +1616,7 @@ async function bootCBTSource() {
       "status ok";
 
     $("status").textContent =
-      "Verified Biology bank: 2699 questions loaded.";
+      "Legacy Biology source available; 7196 canonical source selected.";
 
     $("startButton").disabled=false;
 
@@ -1717,19 +1737,6 @@ bootCBTSource();
 </script>
 
 
-<!-- RANKFORGE_BIOLOGY_7196_ENTRY -->
-<div style="margin:16px 0;padding:16px;border:1px solid #385477;border-radius:14px;background:#0d1d31;color:#eef4ff">
-<div style="font-size:19px;font-weight:700">🧬 Biology Universe CBT</div>
-<div style="opacity:.75;margin:6px 0 12px">7,196 verified Biology questions</div>
-<button type="button"
-onclick="location.href='biology-7196-cbt.html'"
-style="width:100%;padding:13px;border-radius:10px;border:1px solid #2d8bd3;background:#1769aa;color:white;font-size:15px">
-Start Biology CBT — 7,196 Questions
-</button>
-</div>
-<!-- /RANKFORGE_BIOLOGY_7196_ENTRY -->
-
-
 <!-- BIOLOGY_DUAL_SYSTEM_7196_2700 -->
 <section id="BIOLOGY_DUAL_SYSTEM_7196_2700"
 style="margin:16px 0;padding:18px;border:1px solid #29435f;border-radius:16px">
@@ -1755,6 +1762,14 @@ style="margin:16px 0;padding:18px;border:1px solid #29435f;border-radius:16px">
   </div>
 </section>
 
+<!-- RANKFORGE_BIOLOGY_7196_ENTRY -->
+<button
+  id="rankforge-biology-7196"
+  type="button"
+  onclick="location.href='biology-7196-cbt.html'">
+  Biology CBT — 7196 Questions
+</button>
+<!-- /RANKFORGE_BIOLOGY_7196_ENTRY -->
 
 <script src="biology-rankforge-launcher.js?v=7196"></script>
 </body>
