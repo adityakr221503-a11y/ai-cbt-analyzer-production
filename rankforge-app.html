@@ -121,6 +121,25 @@ a{text-decoration:none;color:inherit}
 </style>
 
 <script src="./rankforge-v318-stability-v1.js"></script>
+
+<style id="rankforge-refresh-style">
+#rankforge-refresh-button{
+  position:fixed;
+  right:16px;
+  bottom:78px;
+  z-index:2147483647;
+  border:0;
+  border-radius:999px;
+  padding:10px 15px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 5px 18px rgba(0,0,0,.25);
+}
+#rankforge-refresh-button:active{
+  transform:scale(.96);
+}
+</style>
+
 </head>
 
 <body>
@@ -607,17 +626,7 @@ document
 
 
 render();
-
-
-if("serviceWorker" in navigator){
-
- window.addEventListener(
-  "load",
-  function(){
-
-   navigator.serviceWorker
-    .register("./sw.js")
-    .catch(()=>{});
+);
 
   }
  );
@@ -629,5 +638,79 @@ if("serviceWorker" in navigator){
 
 
 <div id="rankforgeLectureFallback" style="display:block !important;visibility:visible !important;opacity:1 !important;"><a href="rankforge-lecture-module/pages/lectures.html" style="display:block !important;visibility:visible !important;opacity:1 !important;">🎓 <strong>AI Lectures</strong> — NCERT-first lectures, AI explanation and practice.</a></div>
+
+<script id="rankforge-pwa-update">
+(function(){
+  if (!("serviceWorker" in navigator)) return;
+
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("./sw.js", {updateViaCache:"none"})
+      .then(function(reg){
+        console.log("[RankForge] Service Worker:", reg.scope);
+
+        reg.update().catch(function(){});
+
+        reg.addEventListener("updatefound", function(){
+          var worker = reg.installing;
+          if (!worker) return;
+
+          worker.addEventListener("statechange", function(){
+            if (worker.state === "installed" && navigator.serviceWorker.controller) {
+              worker.postMessage("SKIP_WAITING");
+            }
+          });
+        });
+      })
+      .catch(function(err){
+        console.error("[RankForge] Service Worker registration failed:", err);
+      });
+  });
+
+  navigator.serviceWorker.addEventListener("controllerchange", function(){
+    if (!window.__RANKFORGE_SW_RELOADED__) {
+      window.__RANKFORGE_SW_RELOADED__ = true;
+      window.location.reload();
+    }
+  });
+})();
+</script>
+
+
+<script id="rankforge-refresh-control">
+(function(){
+  function refreshRankForge(){
+    try{
+      if ("serviceWorker" in navigator && navigator.serviceWorker.controller){
+        navigator.serviceWorker.controller.postMessage("SKIP_WAITING");
+      }
+    }catch(e){}
+
+    setTimeout(function(){
+      window.location.reload();
+    },150);
+  }
+
+  function installRefresh(){
+    if (document.getElementById("rankforge-refresh-button")) return;
+
+    var b=document.createElement("button");
+    b.id="rankforge-refresh-button";
+    b.type="button";
+    b.textContent="↻ Refresh";
+    b.setAttribute("aria-label","Refresh RankForge AI");
+    b.onclick=refreshRankForge;
+    document.body.appendChild(b);
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",installRefresh);
+  }else{
+    installRefresh();
+  }
+
+  window.rankforgeRefresh=refreshRankForge;
+})();
+</script>
+
 </body>
 </html>
