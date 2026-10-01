@@ -464,51 +464,39 @@ function normalizeQuestion(q){
 
 function loadTest(){
 
- const testNo =
-  Number($("testSelect").value || 1);
+ const params = new URLSearchParams(location.search || "");
+ const pdfMode = params.get("source") === "pdf";
+ let q;
 
- let q =
-  bank
-   .filter(x=>Number(x.testNumber)===testNo)
-   .sort(
-    (a,b)=>
-     Number(a.questionNumber||0)-
-     Number(b.questionNumber||0)
-   );
-
- /*
-  * Test 11 has the known source exception:
-  * 89 valid questions.
-  */
- const expected =
-  testNo===11 ? 89 : 90;
-
- if(q.length!==expected){
-  throw new Error(
-   "Test "+testNo+
-   " source count is "+q.length+
-   " (expected "+expected+")"
+ if (pdfMode) {
+  // Imported PDFs have variable question counts; do not apply Biology's 90-Q rule.
+  q = bank.slice().sort(
+   (a,b) => Number(a.questionNumber||0) - Number(b.questionNumber||0)
   );
+ } else {
+  const testNo = Number($("testSelect").value || 1);
+  q = bank
+   .filter(x => Number(x.testNumber) === testNo)
+   .sort((a,b) => Number(a.questionNumber||0) - Number(b.questionNumber||0));
+
+  const expected = testNo === 11 ? 89 : 90;
+  if (q.length !== expected) {
+   throw new Error("Test " + testNo + " source count is " + q.length + " (expected " + expected + ")");
+  }
  }
 
- const count =
-  $("questionCount").value==="all"
-   ? q.length
-   : Number($("questionCount").value);
+ let count = $("questionCount").value === "all"
+  ? q.length
+  : Number($("questionCount").value);
 
- if(count>q.length){
-  throw new Error(
-   "Requested "+count+
-   " questions but source has "+q.length
-  );
+ // If a PDF has fewer questions than a preset (e.g. 10), use its real count.
+ if (pdfMode && (!Number.isFinite(count) || count > q.length)) count = q.length;
+ if (count > q.length) {
+  throw new Error("Requested " + count + " questions but source has " + q.length);
  }
 
- q=q.slice(0,count);
-
- if($("orderSelect").value==="random"){
-  q=shuffle(q);
- }
-
+ q = q.slice(0, count);
+ if ($("orderSelect").value === "random") q = shuffle(q);
  return q;
 }
 
@@ -533,29 +521,20 @@ function publishRuntime(){
   active.slice();
 
  try{
-  sessionStorage.setItem(
-   "CBT_ACTIVE_SOURCE",
-   "BIOLOGY"
-  );
-
-  sessionStorage.setItem(
-   "CBT_ACTIVE_QUESTIONS",
-   JSON.stringify(active)
-  );
-
-  sessionStorage.setItem(
-   "CBT_ACTIVE_TEST",
-   JSON.stringify({
-    source:"RankForge Biology 2699",
-    sourceType:"BIOLOGY",
-    testNumber:
-     active[0]?.testNumber ?? null,
-    title:
-     "Biology Test "+
-     (active[0]?.testNumber ?? ""),
-    questions:active
-   })
-  );
+  const pdfMode = new URLSearchParams(location.search || "").get("source") === "pdf";
+  const sourceName = pdfMode ? "PDF Import" : "RankForge Biology";
+  sessionStorage.setItem("CBT_ACTIVE_SOURCE", pdfMode ? "PDF" : "BIOLOGY");
+  sessionStorage.setItem("CBT_ACTIVE_QUESTIONS", JSON.stringify(active));
+  sessionStorage.setItem("CBT_ACTIVE_TEST", JSON.stringify({
+    source: sourceName,
+    sourceType: pdfMode ? "PDF" : "BIOLOGY",
+    testNumber: pdfMode ? null : (active[0]?.testNumber ?? null),
+    title: pdfMode
+      ? (localStorage.getItem("CBT_ACTIVE_PDF_FILENAME") || "Imported PDF")
+      : ("Biology Test " + (active[0]?.testNumber ?? "")),
+    totalQuestions: active.length,
+    questions: active
+  }));
  }
  catch(_){}
 
@@ -1245,10 +1224,13 @@ $("startButton").onclick=function(){
   $("result").classList.add("hidden");
   $("cbt").classList.remove("hidden");
 
+  const pageParams = new URLSearchParams(location.search || "");
   $("testTitle").textContent =
-   new URLSearchParams(location.search).get("retry")==="biology"
+   pageParams.get("retry") === "biology"
     ? "Biology Mistake Retry"
-    : "Biology Test "+active[0].testNumber;
+    : pageParams.get("source") === "pdf"
+      ? (localStorage.getItem("CBT_ACTIVE_PDF_FILENAME") || "Imported PDF") + " — " + active.length + " Questions"
+      : "Biology Test " + active[0].testNumber;
 
   render();
   startTimer();
@@ -1540,6 +1522,8 @@ async function bootCBTSource() {
 
     bank=pdf;
 
+    // PDF imports are variable length: start with the complete imported set.
+    $("questionCount").value = "all";
     populateTests();
 
     $("status").className =
