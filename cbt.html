@@ -725,12 +725,15 @@ function saveAttempt(){
 
  });
 
+ const pdfMode = new URLSearchParams(location.search || "").get("source") === "pdf";
  const attempt={
-  id:"bio-"+Date.now(),
-  source:"RankForge Biology 2699",
-  sourceType:"BIOLOGY",
-  title:"Biology Test "+(active[0]?.testNumber??""),
-  testNumber:active[0]?.testNumber??null,
+  id:(pdfMode ? "pdf-" : "bio-")+Date.now(),
+  source:pdfMode ? "PDF Import" : "RankForge Biology 2699",
+  sourceType:pdfMode ? "PDF" : "BIOLOGY",
+  title:pdfMode
+    ? (localStorage.getItem("CBT_ACTIVE_PDF_FILENAME") || "Imported PDF") + " — " + active.length + " Questions"
+    : "Biology Test "+(active[0]?.testNumber??""),
+  testNumber:pdfMode ? null : (active[0]?.testNumber??null),
   questionCount:active.length,
   correct:correct,
   incorrect:incorrect.length,
@@ -822,9 +825,9 @@ function saveAttempt(){
     reason:
      "The selected answer was incorrect. Review the NCERT concept and compare the selected option with the correct answer.",
     solution:x.q.solution||x.q.explanation||"",
-    source:"RankForge Biology 2699",
-    subject:"Biology",
-    testNumber:x.q.testNumber,
+    source:pdfMode ? "PDF Import" : "RankForge Biology 2699",
+    subject:pdfMode ? (x.q.subject || "PDF") : "Biology",
+    testNumber:pdfMode ? null : x.q.testNumber,
     attemptId:attempt.id,
     createdAt:now
    };
@@ -870,10 +873,12 @@ function saveAttempt(){
    )
   );
 
-  localStorage.setItem(
-   "rankforgeBiologyLastAttempt",
-   JSON.stringify(attempt)
-  );
+  if (!pdfMode) {
+   localStorage.setItem(
+    "rankforgeBiologyLastAttempt",
+    JSON.stringify(attempt)
+   );
+  }
 
  }catch(error){
   console.warn("[RankForge Biology] mastery storage",error);
