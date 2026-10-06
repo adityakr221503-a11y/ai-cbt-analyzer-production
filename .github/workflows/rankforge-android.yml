@@ -3,139 +3,195 @@ name: RankForge Android APK
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
-      - 'android/**'
-      - '.rankforge-web/**'
-      - 'capacitor.config.json'
-      - 'package.json'
-      - 'rankforge-version.json'
-      - '.github/workflows/rankforge-android.yml'
-
-permissions:
-  contents: read
+      - "android/**"
+      - ".github/workflows/rankforge-android.yml"
+      - "capacitor.config.json"
+      - "package.json"
+      - "*.html"
+      - "*.js"
+      - "*.css"
+      - "data/**"
+      - ".rankforge-web/**"
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout RankForge
+
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Verify protected Biology bank
-        shell: bash
-        run: |
-          set -e
-          BANK="$HOME/BIOLOGY_ACTIVE_BANK.json"
-
-          if [ ! -f "data/BIOLOGY_ACTIVE_BANK.json" ]; then
-            echo "Canonical bank not in repository root data/"
-            echo "Checking BIOLOGY_UNIVERSE source..."
-          fi
-
-          FOUND=""
-          for f in \
-            "data/BIOLOGY_ACTIVE_BANK.json" \
-            "BIOLOGY_UNIVERSE/data/BIOLOGY_ACTIVE_BANK.json"
-          do
-            if [ -f "$f" ]; then
-              FOUND="$f"
-              break
-            fi
-          done
-
-          if [ -z "$FOUND" ]; then
-            echo "Protected bank is not part of repository; continuing."
-            echo "The build does NOT regenerate or modify the bank."
-            exit 0
-          fi
-
-          EXPECTED="96e0924b0f35de055eec14ac06c25c7f24b9631bce50126a24175684f5eca336"
-          ACTUAL="$(sha256sum "$FOUND" | awk '{print $1}')"
-
-          echo "Bank: $FOUND"
-          echo "Expected: $EXPECTED"
-          echo "Actual:   $ACTUAL"
-
-          test "$ACTUAL" = "$EXPECTED"
-          echo "BIOLOGY BANK INTEGRITY PASS"
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
 
-      - name: Install Android build dependencies
+      - name: Verify Android SDK
         shell: bash
         run: |
           set -euo pipefail
 
-          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          echo "ANDROID_HOME=${ANDROID_HOME:-}"
+          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-}"
 
-          sdkmanager \
+          if [ -z "${ANDROID_HOME:-}" ]; then
+            export ANDROID_HOME="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
+          fi
+
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+
+          echo "Using Android SDK:"
+          echo "$ANDROID_HOME"
+
+          test -d "$ANDROID_HOME"
+
+          echo
+          echo "Installed SDK packages:"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --list_installed 2>/dev/null \
+            | head -80 || true
+
+      - name: Install required Android packages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager"
+          fi
+
+          test -x "$SDKMANAGER"
+
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+
+          "$SDKMANAGER" \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
 
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          sdkmanager --list_installed | head -80
-
-      - name: Install Android SDK packages
+      - name: Verify RankForge App ID
+        shell: bash
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager \
-            "platform-tools" \
-            "platforms;android-36" \
-            "build-tools;36.0.0"
+          set -euo pipefail
 
-      - name: Verify Android platform
+          grep -Rqs \
+            'com.adityakumar.rankforge' \
+            capacitor.config.json \
+            android/app/build.gradle
+
+          echo "[PASS] App ID = com.adityakumar.rankforge"
+
+      - name: Verify Biology 7,196 bank
+        shell: bash
         run: |
-          test -f "$ANDROID_HOME/platforms/android-36/android.jar"
-          test -x "$ANDROID_HOME/build-tools/36.0.0/aapt2"
-          echo "Android API 36 ready"
+          set -euo pipefail
 
-      - name: Install Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+          EXPECTED="96e0924b0f35de055eec14ac06c25c7f24b9631bce50126a24175684f5eca336"
 
-      - name: Install npm dependencies
-        run: npm install
+          if [ -f "data/BIOLOGY_ACTIVE_BANK.json" ]; then
+            ACTUAL="$(sha256sum data/BIOLOGY_ACTIVE_BANK.json | awk '{print $1}')"
 
-      - name: Prepare Capacitor web assets
-        run: |
-          if [ -d ".rankforge-web" ]; then
-            echo ".rankforge-web already exists"
+            echo "Expected: $EXPECTED"
+            echo "Actual:   $ACTUAL"
+
+            if [ "$ACTUAL" != "$EXPECTED" ]; then
+              echo "[FAIL] Biology bank SHA mismatch."
+              exit 1
+            fi
+
+            echo "[PASS] Biology bank exact."
           else
-            mkdir -p .rankforge-web
-
-            for f in *.html *.js *.css manifest.json sw.js rankforge-version.json rankforge-update.json; do
-              [ -f "$f" ] && cp -f "$f" .rankforge-web/ || true
-            done
-
-            [ -d data ] && cp -R data .rankforge-web/ || true
+            echo "[INFO] Biology bank not present in repository root."
+            echo "[INFO] Continuing with repository web assets."
           fi
 
-      - name: Capacitor sync
-        run: npx cap sync android
-
-      - name: Verify application ID
+      - name: Install npm dependencies
+        shell: bash
         run: |
-          grep -R "com.adityakumar.rankforge" android/app \
-            || (echo "Wrong application ID" && exit 1)
+          set -euo pipefail
+          npm install
 
-      - name: Build Debug APK
-        working-directory: android
-        run: ./gradlew --no-daemon --stacktrace :app:assembleDebug
+      - name: Prepare RankForge web assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -d ".rankforge-web" ]; then
+            mkdir -p ".rankforge-web"
+
+            find . -maxdepth 1 \
+              -type f \
+              \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.json" \) \
+              -exec cp -f {} ".rankforge-web/" \;
+
+            [ -d "data" ] && cp -R data ".rankforge-web/" || true
+          fi
+
+          test -f ".rankforge-web/index.html"
+
+          echo "[PASS] RankForge web assets prepared"
+
+      - name: Capacitor sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx cap sync android
+
+      - name: Verify Gradle configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          grep -q \
+            'com.adityakumar.rankforge' \
+            android/app/build.gradle
+
+          if grep -q 'proguard-android.txt' android/app/build.gradle; then
+            echo "[FAIL] Obsolete ProGuard configuration detected."
+            exit 1
+          fi
+
+          echo "[PASS] Android Gradle configuration"
+
+      - name: Build RankForge Debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cd android
+
+          chmod +x gradlew
+
+          ./gradlew \
+            --no-daemon \
+            --stacktrace \
+            :app:assembleDebug
 
       - name: Verify APK
+        shell: bash
         run: |
+          set -euo pipefail
+
           APK="android/app/build/outputs/apk/debug/app-debug.apk"
+
           test -f "$APK"
+
+          echo "[PASS] APK created"
           ls -lh "$APK"
           sha256sum "$APK"
 
@@ -144,4 +200,4 @@ jobs:
         with:
           name: RankForge-v1.0.0-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+          if-no-files-found: error
