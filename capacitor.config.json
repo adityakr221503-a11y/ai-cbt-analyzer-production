@@ -1,7 +1,7 @@
 {
-  "appId": "com.adityakumar.cbtanalyzer",
-  "appName": "CBT Analyzer",
-  "webDir": ".",
+  "appId": "com.adityakumar.rankforge",
+  "appName": "RankForge",
+  "webDir": ".rankforge-web",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"
