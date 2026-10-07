@@ -168,19 +168,57 @@ jobs:
           set -euo pipefail
           npx cap sync android
 
-      - name: Verify Gradle configuration
+      - name: Verify and repair Gradle configuration
         shell: bash
         run: |
           set -euo pipefail
+
+          test -f android/app/build.gradle
 
           grep -q \
             'com.adityakumar.rankforge' \
             android/app/build.gradle
 
-          if grep -q 'proguard-android.txt' android/app/build.gradle; then
-            echo "[FAIL] Obsolete ProGuard configuration detected."
+          # Modern Android Gradle tooling requires the optimizing
+          # default rules file instead of obsolete proguard-android.txt.
+          # Repair only generated Android Gradle files in this CI workspace.
+          if grep -RIl \
+              --include='build.gradle' \
+              'proguard-android.txt' \
+              android 2>/dev/null | grep -q .; then
+
+            echo "[INFO] Updating obsolete ProGuard references..."
+
+            while IFS= read -r file; do
+              [ -n "$file" ] || continue
+              sed -i \
+                "s/proguard-android\.txt/proguard-android-optimize.txt/g" \
+                "$file"
+              echo "[FIXED] $file"
+            done < <(
+              grep -RIl \
+                --include='build.gradle' \
+                'proguard-android.txt' \
+                android 2>/dev/null || true
+            )
+          fi
+
+          if grep -Rqs \
+              --include='build.gradle' \
+              'proguard-android.txt' \
+              android 2>/dev/null; then
+            echo "[FAIL] Obsolete ProGuard configuration remains."
+            grep -RIn \
+              --include='build.gradle' \
+              'proguard-android.txt' \
+              android || true
             exit 1
           fi
+
+          grep -Rqs \
+            --include='build.gradle' \
+            'proguard-android-optimize.txt' \
+            android 2>/dev/null || true
 
           echo "[PASS] Android Gradle configuration"
 
