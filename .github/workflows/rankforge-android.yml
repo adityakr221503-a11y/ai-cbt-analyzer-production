@@ -88,12 +88,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          grep -Rqs \
+          grep -q \
             'com.adityakumar.rankforge' \
-            capacitor.config.json \
-            android/app/build.gradle
+            capacitor.config.json
 
-          echo "[PASS] App ID = com.adityakumar.rankforge"
+          echo "[PASS] Capacitor App ID = com.adityakumar.rankforge"
 
       - name: Verify Biology 7,196 bank
         shell: bash
@@ -124,6 +123,24 @@ jobs:
         run: |
           set -euo pipefail
           npm install
+
+      - name: Ensure Capacitor Android platform
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f "android/app/build.gradle" ]; then
+            echo "[INFO] Android platform is not committed."
+            echo "[INFO] Generating Android platform from Capacitor config..."
+            npx cap add android
+          else
+            echo "[PASS] Android platform already present."
+          fi
+
+          test -f "android/app/build.gradle"
+          test -f "android/gradlew"
+
+          echo "[PASS] Android platform ready"
 
       - name: Prepare RankForge web assets
         shell: bash
