@@ -94,29 +94,43 @@ jobs:
 
           echo "[PASS] Capacitor App ID = com.adityakumar.rankforge"
 
-      - name: Verify Biology 7,196 bank
+      - name: Verify Biology 7,196 runtime asset
         shell: bash
         run: |
           set -euo pipefail
 
-          EXPECTED="96e0924b0f35de055eec14ac06c25c7f24b9631bce50126a24175684f5eca336"
+          RUNTIME="biology-7196-bank-readonly.json"
 
-          if [ -f "data/BIOLOGY_ACTIVE_BANK.json" ]; then
-            ACTUAL="$(sha256sum data/BIOLOGY_ACTIVE_BANK.json | awk '{print $1}')"
+          test -s "$RUNTIME"
 
-            echo "Expected: $EXPECTED"
-            echo "Actual:   $ACTUAL"
+          python - "$RUNTIME" <<'PYTHON'
+          import json
+          import sys
 
-            if [ "$ACTUAL" != "$EXPECTED" ]; then
-              echo "[FAIL] Biology bank SHA mismatch."
-              exit 1
-            fi
+          with open(sys.argv[1], encoding="utf-8") as f:
+              data=json.load(f)
 
-            echo "[PASS] Biology bank exact."
-          else
-            echo "[INFO] Biology bank not present in repository root."
-            echo "[INFO] Continuing with repository web assets."
-          fi
+          if isinstance(data,list):
+              questions=data
+          elif isinstance(data,dict):
+              questions=(
+                  data.get("questions")
+                  or data.get("data")
+                  or data.get("items")
+                  or []
+              )
+          else:
+              questions=[]
+
+          if len(questions) != 7196:
+              raise SystemExit(
+                  f"Biology runtime asset contains {len(questions)} questions; expected 7196"
+              )
+
+          print("[PASS] Biology runtime asset contains exactly 7,196 questions")
+          PYTHON
+
+          echo "[PASS] Biology runtime asset available to Android build"
 
       - name: Install npm dependencies
         shell: bash
@@ -147,20 +161,24 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ ! -d ".rankforge-web" ]; then
-            mkdir -p ".rankforge-web"
+          rm -rf ".rankforge-web"
+          mkdir -p ".rankforge-web"
 
-            find . -maxdepth 1 \
-              -type f \
-              \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.json" \) \
-              -exec cp -f {} ".rankforge-web/" \;
+          find . -maxdepth 1 \
+            -type f \
+            \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.json" \) \
+            -exec cp -f {} ".rankforge-web/" \;
 
-            [ -d "data" ] && cp -R data ".rankforge-web/" || true
-          fi
+          [ -d "data" ] && cp -R data ".rankforge-web/" || true
 
           test -f ".rankforge-web/index.html"
+          test -f ".rankforge-web/biology-7196-cbt.html"
+          test -f ".rankforge-web/biology-7196-bank-readonly.json"
+          test -f ".rankforge-web/biology-rankforge-bridge.js"
+          test -f ".rankforge-web/biology-rankforge-final-hook.js"
 
           echo "[PASS] RankForge web assets prepared"
+          echo "[PASS] Biology CBT + 7,196 runtime asset bundled"
 
       - name: Capacitor sync
         shell: bash
