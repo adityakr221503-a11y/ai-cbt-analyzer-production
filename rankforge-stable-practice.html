@@ -1,0 +1,1735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<meta name="theme-color" content="#111827">
+
+<title>RankForge — Stable Practice</title>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:#f6f7fb;
+  color:#111827;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+body{
+  min-height:100vh;
+}
+
+.app{
+  max-width:760px;
+  margin:auto;
+  padding:14px 14px 40px;
+}
+
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 0 15px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:#111827;
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+}
+
+.brand h1{
+  margin:0;
+  font-size:18px;
+}
+
+.brand p{
+  margin:2px 0 0;
+  color:#6b7280;
+  font-size:10px;
+}
+
+.back{
+  border:1px solid #e5e7eb;
+  background:#fff;
+  border-radius:11px;
+  padding:9px 11px;
+  font-weight:800;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 3px 14px rgba(0,0,0,.05);
+}
+
+.hero{
+  background:#111827;
+  color:#fff;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:14px;
+}
+
+.hero small{
+  color:#9ca3af;
+  font-size:10px;
+  font-weight:800;
+}
+
+.hero h2{
+  margin:7px 0;
+  font-size:25px;
+}
+
+.hero p{
+  color:#d1d5db;
+  font-size:12px;
+  line-height:1.5;
+}
+
+label{
+  display:block;
+  margin-top:13px;
+  font-size:12px;
+  font-weight:800;
+}
+
+select,
+button{
+  font:inherit;
+}
+
+select{
+  width:100%;
+  padding:13px;
+  margin-top:7px;
+  border:1px solid #d1d5db;
+  border-radius:11px;
+  background:#fff;
+}
+
+.primary{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:14px;
+  margin-top:15px;
+  background:#111827;
+  color:#fff;
+  font-weight:900;
+  touch-action:manipulation;
+}
+
+.secondary{
+  width:100%;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  padding:13px;
+  margin-top:9px;
+  background:#fff;
+  color:#111827;
+  font-weight:800;
+}
+
+.status{
+  padding:11px;
+  border-radius:10px;
+  background:#f3f4f6;
+  color:#374151;
+  font-size:12px;
+  margin-top:10px;
+}
+
+.status.ok{
+  background:#ecfdf5;
+  color:#166534;
+}
+
+.status.err{
+  background:#fef2f2;
+  color:#991b1b;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.topline{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:12px;
+  font-weight:800;
+  color:#6b7280;
+}
+
+.timer{
+  color:#111827;
+}
+
+.progress{
+  height:8px;
+  background:#e5e7eb;
+  border-radius:99px;
+  overflow:hidden;
+  margin:13px 0 18px;
+}
+
+.progress span{
+  display:block;
+  height:100%;
+  width:0;
+  background:#111827;
+  transition:.2s;
+}
+
+.question{
+  font-size:20px;
+  line-height:1.55;
+  font-weight:750;
+  margin-bottom:16px;
+}
+
+.option{
+  width:100%;
+  display:block;
+  text-align:left;
+  padding:14px;
+  margin:9px 0;
+  border:2px solid #e5e7eb;
+  border-radius:12px;
+  background:#fff;
+  color:#111827;
+  font-size:15px;
+  touch-action:manipulation;
+}
+
+.option.selected{
+  border-color:#111827;
+  background:#f3f4f6;
+}
+
+.navrow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:15px;
+}
+
+.navrow button{
+  width:100%;
+  padding:13px;
+  border-radius:11px;
+  border:1px solid #d1d5db;
+  background:#fff;
+  font-weight:800;
+}
+
+.navrow .next{
+  background:#111827;
+  color:#fff;
+  border-color:#111827;
+}
+
+.resultStat{
+  background:#f8fafc;
+  border-radius:12px;
+  padding:14px;
+  margin-top:9px;
+}
+
+.resultStat b{
+  font-size:22px;
+}
+
+.resumeBox{
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  color:#1e40af;
+  padding:13px;
+  border-radius:12px;
+  margin-top:12px;
+  line-height:1.5;
+  font-size:12px;
+}
+
+@media(max-width:430px){
+  .question{font-size:18px}
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+<header>
+  <div class="brand">
+    <div class="logo">RF</div>
+    <div>
+      <h1>RankForge Practice</h1>
+      <p>STABLE CBT SESSION</p>
+    </div>
+  </div>
+
+  <button class="back" id="backBtn">
+    ← App
+  </button>
+</header>
+
+<!-- SETUP -->
+
+<section id="setup">
+
+  <div class="hero">
+    <small>STABLE PRACTICE ENGINE</small>
+    <h2>Practice without leaving RankForge.</h2>
+    <p>
+      Your Biology practice session runs inside the RankForge app
+      and saves progress locally.
+    </p>
+  </div>
+
+  <div class="card">
+
+    <h3>🧬 Biology Practice</h3>
+
+    <div id="bankStatus" class="status">
+      Loading protected 7,196-question bank...
+    </div>
+
+    <label for="count">
+      Questions
+    </label>
+
+    <select id="count">
+      <option value="10">10 Questions</option>
+      <option value="20">20 Questions</option>
+      <option value="30">30 Questions</option>
+      <option value="50">50 Questions</option>
+      <option value="90">90 Questions</option>
+      <option value="180">180 Questions</option>
+    </select>
+
+    <label for="order">
+      Question order
+    </label>
+
+    <select id="order">
+      <option value="random">Random practice</option>
+      <option value="sequential">Sequential</option>
+    </select>
+
+    <div id="resumeBox" class="resumeBox hidden"></div>
+
+    <button
+      id="startBtn"
+      class="primary"
+      disabled>
+      Start Practice
+    </button>
+
+    <button
+      id="resumeBtn"
+      class="secondary hidden">
+      Resume Previous Session
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- QUIZ -->
+
+<section id="quiz" class="hidden">
+
+  <div class="card">
+
+    <div class="topline">
+      <span id="progressText">Question</span>
+      <span id="timer" class="timer">00:00</span>
+    </div>
+
+    <div class="progress">
+      <span id="progressBar"></span>
+    </div>
+
+    <div id="question" class="question"></div>
+
+    <div id="options"></div>
+
+    <div class="navrow">
+
+      <button id="prevBtn">
+        ← Previous
+      </button>
+
+      <button id="nextBtn" class="next">
+        Next →
+      </button>
+
+    </div>
+
+    <button
+      id="submitBtn"
+      class="primary hidden">
+      Submit Test
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- RESULT -->
+
+<section id="result" class="hidden">
+
+  <div class="hero">
+    <small>PRACTICE COMPLETE</small>
+    <h2>Session finished.</h2>
+    <p id="resultSummary"></p>
+  </div>
+
+  <div class="card">
+
+    <div class="resultStat">
+      <b id="rCorrect">0</b>
+      <br>Correct
+    </div>
+
+    <div class="resultStat">
+      <b id="rWrong">0</b>
+      <br>Wrong
+    </div>
+
+    <div class="resultStat">
+      <b id="rSkipped">0</b>
+      <br>Unanswered
+    </div>
+
+    <div class="resultStat">
+      <b id="rScore">0%</b>
+      <br>Accuracy
+    </div>
+
+    <button
+      id="againBtn"
+      class="primary">
+      Start Another Practice
+    </button>
+
+    <button
+      id="mistakeBtn"
+      class="secondary">
+      Open Mistake Book
+    </button>
+
+    <button
+      id="historyBtn"
+      class="secondary">
+      Open History
+    </button>
+
+  </div>
+
+</section>
+
+</main>
+
+<script>
+(function(){
+
+"use strict";
+
+/* =====================================================
+   CONSTANTS
+===================================================== */
+
+const BANK_URL="./data/BIOLOGY_ACTIVE_BANK.json";
+
+const SESSION_KEY=
+  "rankforgeStablePracticeSessionV1";
+
+const HISTORY_KEY=
+  "cbtHistory";
+
+const MISTAKE_KEY=
+  "cbtMistakes";
+
+const BIOLOGY_SOURCE=
+  "BIOLOGY_7196";
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let BANK=[];
+let TEST=[];
+let answers=[];
+let current=0;
+
+let timer=null;
+let seconds=0;
+
+let submitted=false;
+
+
+/* =====================================================
+   DOM
+===================================================== */
+
+const $=id=>
+  document.getElementById(id);
+
+
+/* =====================================================
+   NORMALIZATION
+===================================================== */
+
+function questionsFromBank(data){
+
+  if(Array.isArray(data))
+    return data;
+
+  if(data && Array.isArray(data.questions))
+    return data.questions;
+
+  if(data && Array.isArray(data.items))
+    return data.items;
+
+  return [];
+}
+
+
+function optionsOf(q){
+
+  if(Array.isArray(q.options))
+    return q.options.map(String);
+
+  if(Array.isArray(q.choices))
+    return q.choices.map(String);
+
+  if(Array.isArray(q.answers))
+    return q.answers.map(String);
+
+  return [
+    q.option_a,
+    q.option_b,
+    q.option_c,
+    q.option_d
+  ]
+  .filter(v=>
+    v!==undefined &&
+    v!==null &&
+    String(v)!==""
+  )
+  .map(String);
+}
+
+
+function questionText(q){
+
+  return String(
+    q.question ??
+    q.question_text ??
+    q.text ??
+    q.stem ??
+    ""
+  );
+}
+
+
+function answerIndex(q){
+
+  let v=
+    q.correctIndex ??
+    q.answerIndex ??
+    q.correctAnswer ??
+    q.correct_answer ??
+    q.answer ??
+    q.correct;
+
+  if(typeof v==="number")
+    return Number.isInteger(v) ? v : -1;
+
+  if(v===null || v===undefined)
+    return -1;
+
+  const s=
+    String(v)
+      .trim()
+      .toUpperCase();
+
+  if(/^[ABCD]$/.test(s))
+    return "ABCD".indexOf(s);
+
+  if(/^[1-4]$/.test(s))
+    return Number(s)-1;
+
+  const opts=optionsOf(q);
+
+  const exact=
+    opts.findIndex(x=>
+      String(x).trim()===String(v).trim()
+    );
+
+  return exact;
+}
+
+
+/* =====================================================
+   LOAD BANK
+===================================================== */
+
+async function loadBank(){
+
+  try{
+
+    const response=
+      await fetch(
+        BANK_URL,
+        {
+          cache:"no-store"
+        }
+      );
+
+    if(!response.ok)
+      throw new Error(
+        "HTTP "+response.status
+      );
+
+    const data=
+      await response.json();
+
+    BANK=
+      questionsFromBank(data);
+
+    if(BANK.length!==7196)
+      throw new Error(
+        "Expected 7196 questions, received "+
+        BANK.length
+      );
+
+    $("bankStatus").className=
+      "status ok";
+
+    $("bankStatus").textContent=
+      "✓ 7,196 verified Biology questions ready.";
+
+    $("startBtn").disabled=false;
+
+    checkResume();
+
+  }catch(error){
+
+    console.error(
+      "[RankForge Stable Practice]",
+      error
+    );
+
+    $("bankStatus").className=
+      "status err";
+
+    $("bankStatus").textContent=
+      "Biology bank failed to load: "+
+      error.message;
+
+  }
+
+}
+
+
+/* =====================================================
+   SHUFFLE
+===================================================== */
+
+function shuffle(list){
+
+  const x=list.slice();
+
+  for(
+    let i=x.length-1;
+    i>0;
+    i--
+  ){
+
+    const j=
+      Math.floor(
+        Math.random()*(i+1)
+      );
+
+    [x[i],x[j]]=
+      [x[j],x[i]];
+  }
+
+  return x;
+}
+
+
+/* =====================================================
+   BUILD SESSION
+===================================================== */
+
+function buildTest(){
+
+  const count=
+    Math.min(
+      Number($("count").value),
+      BANK.length
+    );
+
+  const order=
+    $("order").value;
+
+  if(order==="random"){
+
+    TEST=
+      shuffle(BANK)
+      .slice(0,count);
+
+  }else{
+
+    TEST=
+      BANK.slice(0,count);
+
+  }
+
+  answers=
+    new Array(TEST.length)
+      .fill(null);
+
+  current=0;
+
+  submitted=false;
+
+  seconds=
+    Math.max(
+      10*60,
+      TEST.length*60
+    );
+
+}
+
+
+/* =====================================================
+   SAVE RESUME
+===================================================== */
+
+function saveSession(){
+
+  if(!TEST.length || submitted)
+    return;
+
+  try{
+
+    localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({
+        version:1,
+        source:BIOLOGY_SOURCE,
+        timestamp:Date.now(),
+        count:TEST.length,
+        current:current,
+        answers:answers,
+        questions:TEST.map(q=>q.id),
+        seconds:seconds
+      })
+    );
+
+  }catch(error){
+
+    console.warn(
+      "[RankForge] resume save failed",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   CLEAR RESUME
+===================================================== */
+
+function clearSession(){
+
+  try{
+    localStorage.removeItem(
+      SESSION_KEY
+    );
+  }catch(_){}
+
+}
+
+
+/* =====================================================
+   RESUME DETECTION
+===================================================== */
+
+function checkResume(){
+
+  try{
+
+    const raw=
+      localStorage.getItem(
+        SESSION_KEY
+      );
+
+    if(!raw)
+      return;
+
+    const saved=
+      JSON.parse(raw);
+
+    if(
+      !saved ||
+      saved.source!==BIOLOGY_SOURCE ||
+      !Array.isArray(saved.questions) ||
+      !saved.questions.length
+    ){
+
+      clearSession();
+      return;
+
+    }
+
+    const map=
+      new Map(
+        BANK.map(q=>[
+          String(q.id),
+          q
+        ])
+      );
+
+    const recovered=
+      saved.questions
+        .map(id=>
+          map.get(String(id))
+        )
+        .filter(Boolean);
+
+    if(
+      recovered.length!==saved.questions.length
+    ){
+
+      clearSession();
+      return;
+
+    }
+
+    $("resumeBox").classList.remove(
+      "hidden"
+    );
+
+    $("resumeBox").textContent=
+      "A previous "+
+      recovered.length+
+      "-question session is saved locally.";
+
+    $("resumeBtn").classList.remove(
+      "hidden"
+    );
+
+  }catch(error){
+
+    clearSession();
+
+  }
+
+}
+
+
+/* =====================================================
+   START NEW
+===================================================== */
+
+function startNew(){
+
+  clearSession();
+
+  buildTest();
+
+  openQuiz();
+
+}
+
+
+/* =====================================================
+   RESUME
+===================================================== */
+
+function resume(){
+
+  try{
+
+    const saved=
+      JSON.parse(
+        localStorage.getItem(
+          SESSION_KEY
+        )
+      );
+
+    const map=
+      new Map(
+        BANK.map(q=>[
+          String(q.id),
+          q
+        ])
+      );
+
+    TEST=
+      saved.questions
+        .map(id=>
+          map.get(String(id))
+        )
+        .filter(Boolean);
+
+    if(!TEST.length)
+      throw new Error(
+        "Saved session is no longer available."
+      );
+
+    answers=
+      Array.isArray(saved.answers)
+        ?saved.answers.slice(0,TEST.length)
+        :new Array(TEST.length).fill(null);
+
+    while(
+      answers.length<TEST.length
+    ){
+      answers.push(null);
+    }
+
+    current=
+      Math.max(
+        0,
+        Math.min(
+          Number(saved.current)||0,
+          TEST.length-1
+        )
+      );
+
+    seconds=
+      Number(saved.seconds)||
+      Math.max(
+        10*60,
+        TEST.length*60
+      );
+
+    submitted=false;
+
+    openQuiz();
+
+  }catch(error){
+
+    clearSession();
+
+    alert(
+      "Previous session could not be resumed. "+
+      "A new session will start."
+    );
+
+    startNew();
+
+  }
+
+}
+
+
+/* =====================================================
+   OPEN QUIZ
+===================================================== */
+
+function openQuiz(){
+
+  $("setup").classList.add(
+    "hidden"
+  );
+
+  $("result").classList.add(
+    "hidden"
+  );
+
+  $("quiz").classList.remove(
+    "hidden"
+  );
+
+  render();
+
+  clearInterval(timer);
+
+  timer=
+    setInterval(
+      tick,
+      1000
+    );
+
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function tick(){
+
+  if(submitted)
+    return;
+
+  seconds--;
+
+  if(seconds<=0){
+
+    seconds=0;
+
+    renderTimer();
+
+    finish();
+
+    return;
+
+  }
+
+  renderTimer();
+
+  saveSession();
+
+}
+
+
+function renderTimer(){
+
+  const min=
+    Math.floor(seconds/60);
+
+  const sec=
+    seconds%60;
+
+  $("timer").textContent=
+    "⏱ "+
+    String(min).padStart(2,"0")+
+    ":"+
+    String(sec).padStart(2,"0");
+
+}
+
+
+/* =====================================================
+   RENDER
+===================================================== */
+
+function render(){
+
+  const q=
+    TEST[current];
+
+  if(!q)
+    return;
+
+  const opts=
+    optionsOf(q);
+
+  $("progressText").textContent=
+    "Question "+
+    (current+1)+
+    " / "+
+    TEST.length;
+
+  $("progressBar").style.width=
+    (
+      ((current+1)/TEST.length)*100
+    )+
+    "%";
+
+  $("question").textContent=
+    questionText(q);
+
+  const box=
+    $("options");
+
+  box.innerHTML="";
+
+  opts.forEach(
+    function(opt,i){
+
+      const button=
+        document.createElement(
+          "button"
+        );
+
+      button.type="button";
+
+      button.className=
+        "option";
+
+      button.textContent=
+        String.fromCharCode(65+i)+
+        ". "+
+        String(opt);
+
+      if(
+        Number(answers[current])===i
+      ){
+
+        button.classList.add(
+          "selected"
+        );
+
+      }
+
+      button.addEventListener(
+        "click",
+        function(){
+
+          if(submitted)
+            return;
+
+          answers[current]=i;
+
+          box
+            .querySelectorAll(".option")
+            .forEach(x=>
+              x.classList.remove(
+                "selected"
+              )
+            );
+
+          button.classList.add(
+            "selected"
+          );
+
+          saveSession();
+
+        }
+      );
+
+      box.appendChild(button);
+
+    }
+  );
+
+  $("prevBtn").disabled=
+    current===0;
+
+  if(
+    current===TEST.length-1
+  ){
+
+    $("nextBtn").classList.add(
+      "hidden"
+    );
+
+    $("submitBtn").classList.remove(
+      "hidden"
+    );
+
+  }else{
+
+    $("nextBtn").classList.remove(
+      "hidden"
+    );
+
+    $("submitBtn").classList.add(
+      "hidden"
+    );
+
+  }
+
+  renderTimer();
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+function next(){
+
+  if(
+    current<
+    TEST.length-1
+  ){
+
+    current++;
+
+    saveSession();
+
+    render();
+
+  }
+
+}
+
+
+/* =====================================================
+   PREVIOUS
+===================================================== */
+
+function previous(){
+
+  if(current>0){
+
+    current--;
+
+    saveSession();
+
+    render();
+
+  }
+
+}
+
+
+/* =====================================================
+   FINISH
+===================================================== */
+
+function finish(){
+
+  if(submitted)
+    return;
+
+  submitted=true;
+
+  clearInterval(timer);
+
+  let correct=0;
+  let attempted=0;
+  const mistakes=[];
+
+  TEST.forEach(
+    function(q,i){
+
+      const selected=
+        answers[i];
+
+      if(
+        selected===null ||
+        selected===undefined
+      ){
+
+        return;
+
+      }
+
+      attempted++;
+
+      const ci=
+        answerIndex(q);
+
+      if(
+        ci>=0 &&
+        Number(selected)===ci
+      ){
+
+        correct++;
+
+      }else{
+
+        mistakes.push({
+          id:
+            q.id ||
+            "BIO-NC-"+(i+1),
+
+          question:
+            questionText(q),
+
+          options:
+            optionsOf(q),
+
+          selectedIndex:
+            Number(selected),
+
+          correctIndex:
+            ci,
+
+          correctAnswer:
+            ci>=0
+              ?optionsOf(q)[ci]||""
+              :"",
+
+          solution:
+            q.solution||
+            q.explanation||
+            "",
+
+          explanation:
+            q.explanation||
+            q.solution||
+            "",
+
+          source:
+            BIOLOGY_SOURCE,
+
+          subject:"Biology",
+
+          topic:
+            q.topic||
+            q.chapter||
+            "",
+
+          chapter:
+            q.chapter||
+            "",
+
+          createdAt:
+            new Date().toISOString(),
+
+          mistakeType:
+            "🧠 Conceptual",
+
+          mistakeReason:
+            "Review the concept and compare the selected answer with the verified answer."
+        });
+
+      }
+
+    }
+  );
+
+  const wrong=
+    mistakes.length;
+
+  const skipped=
+    TEST.length-attempted;
+
+  const accuracy=
+    attempted
+      ?Math.round(
+        (correct/attempted)*100
+      )
+      :0;
+
+  saveAttempt(
+    correct,
+    wrong,
+    skipped,
+    accuracy,
+    mistakes
+  );
+
+  clearSession();
+
+  $("quiz").classList.add(
+    "hidden"
+  );
+
+  $("result").classList.remove(
+    "hidden"
+  );
+
+  $("rCorrect").textContent=
+    correct;
+
+  $("rWrong").textContent=
+    wrong;
+
+  $("rSkipped").textContent=
+    skipped;
+
+  $("rScore").textContent=
+    accuracy+"%";
+
+  $("resultSummary").textContent=
+    correct+
+    " correct • "+
+    wrong+
+    " wrong • "+
+    skipped+
+    " unanswered";
+
+}
+
+
+/* =====================================================
+   SAFE ARRAY STORAGE
+===================================================== */
+
+function readArray(key){
+
+  try{
+
+    const value=
+      JSON.parse(
+        localStorage.getItem(key)||"[]"
+      );
+
+    return Array.isArray(value)
+      ?value
+      :[];
+
+  }catch(_){
+
+    return [];
+
+  }
+
+}
+
+
+function writeArray(
+  key,
+  value
+){
+
+  try{
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(value)
+    );
+
+  }catch(error){
+
+    console.warn(
+      "[RankForge] storage write failed",
+      key,
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   SAVE ATTEMPT
+===================================================== */
+
+function saveAttempt(
+  correct,
+  wrong,
+  skipped,
+  accuracy,
+  mistakes
+){
+
+  const now=
+    new Date().toISOString();
+
+  const attempt={
+    id:
+      "rf-practice-"+Date.now(),
+
+    timestamp:now,
+    date:now,
+
+    source:BIOLOGY_SOURCE,
+    sourceType:"BIOLOGY",
+
+    title:
+      "RankForge Biology Practice",
+
+    subject:"Biology",
+
+    questionCount:
+      TEST.length,
+
+    total:
+      TEST.length,
+
+    correct,
+    incorrect:wrong,
+    wrong,
+    unanswered:skipped,
+    skipped,
+
+    score:correct,
+
+    accuracy,
+
+    mode:"stable-practice",
+
+    questions:
+      TEST.map(
+        function(q,i){
+
+          const ci=
+            answerIndex(q);
+
+          return {
+            id:q.id,
+            question:
+              questionText(q),
+            options:
+              optionsOf(q),
+
+            selectedIndex:
+              answers[i]===null
+                ?null
+                :Number(answers[i]),
+
+            correctIndex:ci,
+
+            correctAnswer:
+              ci>=0
+                ?optionsOf(q)[ci]||""
+                :""
+          };
+
+        }
+      )
+  };
+
+
+  const history=
+    readArray(
+      HISTORY_KEY
+    );
+
+  history.push(
+    attempt
+  );
+
+  writeArray(
+    HISTORY_KEY,
+    history.slice(-100)
+  );
+
+
+  const oldMistakes=
+    readArray(
+      MISTAKE_KEY
+    );
+
+  const merged=
+    oldMistakes.concat(
+      mistakes
+    );
+
+  writeArray(
+    MISTAKE_KEY,
+    merged.slice(-5000)
+  );
+
+
+  /*
+   * Keep the legacy mastery store
+   * alive without destroying it.
+   */
+
+  if(
+    localStorage.getItem(
+      "cbtMasteryV2"
+    )===null
+  ){
+
+    localStorage.setItem(
+      "cbtMasteryV2",
+      "[]"
+    );
+
+  }
+
+
+  localStorage.setItem(
+    "rankforgeBiologyLastAttempt",
+    JSON.stringify({
+      timestamp:now,
+      source:BIOLOGY_SOURCE,
+      total:TEST.length,
+      correct,
+      wrong,
+      skipped,
+      accuracy
+    })
+  );
+
+
+  try{
+
+    if(
+      window.RankForgeBiologyFinalHook &&
+      typeof
+      window.RankForgeBiologyFinalHook.record===
+      "function"
+    ){
+
+      window.RankForgeBiologyFinalHook.record(
+        TEST,
+        answers,
+        "stable-practice"
+      );
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "[RankForge] existing result bridge failed",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+$("startBtn").addEventListener(
+  "click",
+  startNew
+);
+
+$("resumeBtn").addEventListener(
+  "click",
+  resume
+);
+
+$("nextBtn").addEventListener(
+  "click",
+  next
+);
+
+$("prevBtn").addEventListener(
+  "click",
+  previous
+);
+
+$("submitBtn").addEventListener(
+  "click",
+  function(){
+
+    if(
+      confirm(
+        "Submit this practice test?"
+      )
+    ){
+
+      finish();
+
+    }
+
+  }
+);
+
+$("againBtn").addEventListener(
+  "click",
+  function(){
+
+    $("result").classList.add(
+      "hidden"
+    );
+
+    $("setup").classList.remove(
+      "hidden"
+    );
+
+    $("resumeBtn").classList.add(
+      "hidden"
+    );
+
+    $("resumeBox").classList.add(
+      "hidden"
+    );
+
+    checkResume();
+
+  }
+);
+
+$("mistakeBtn").addEventListener(
+  "click",
+  function(){
+
+    location.href=
+      "mistake.html";
+
+  }
+);
+
+$("historyBtn").addEventListener(
+  "click",
+  function(){
+
+    location.href=
+      "history.html";
+
+  }
+);
+
+$("backBtn").addEventListener(
+  "click",
+  function(){
+
+    location.href=
+      "index.html";
+
+  }
+);
+
+
+/* =====================================================
+   ANDROID / BACK / VISIBILITY SAFETY
+===================================================== */
+
+document.addEventListener(
+  "visibilitychange",
+  function(){
+
+    if(
+      document.visibilityState===
+      "hidden"
+    ){
+
+      saveSession();
+
+    }
+
+  }
+);
+
+window.addEventListener(
+  "pagehide",
+  saveSession
+);
+
+window.addEventListener(
+  "beforeunload",
+  saveSession
+);
+
+
+/* =====================================================
+   BOOT
+===================================================== */
+
+loadBank();
+
+})();
+</script>
+
+<!-- Existing Biology result bridge -->
+<script src="./biology-rankforge-final-hook.js"></script>
+
+</body>
+</html>
