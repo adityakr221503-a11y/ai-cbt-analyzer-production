@@ -1,3 +1,20 @@
+
+/* RANKFORGE_REFRESH_RUNTIME_V2 */
+(function(){
+  "use strict";
+
+  window.RankForgeRefresh = {
+    reload:function(){
+      location.reload();
+    },
+    hardReload:function(){
+      var u=new URL(location.href);
+      u.searchParams.set("rf_refresh",Date.now());
+      location.replace(u.toString());
+    }
+  };
+})();
+
 /*
 =========================================================
  RANKFORGE V318 STABILITY LAYER

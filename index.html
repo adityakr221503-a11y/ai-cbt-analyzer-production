@@ -3786,5 +3786,75 @@ if(document.readyState==="loading"){
 })();
 </script>
 
+
+<!-- RANKFORGE_REFRESH_BUTTON_V2 -->
+<style>
+#rankforgeRefreshButton{
+  position:fixed;
+  right:14px;
+  bottom:76px;
+  z-index:99999;
+  border:0;
+  border-radius:999px;
+  padding:10px 15px;
+  background:#111827;
+  color:#fff;
+  font:600 14px system-ui,-apple-system,sans-serif;
+  box-shadow:0 4px 16px rgba(0,0,0,.22);
+  cursor:pointer;
+  touch-action:manipulation;
+}
+#rankforgeRefreshButton:active{
+  transform:scale(.96);
+}
+@media (min-width:700px){
+  #rankforgeRefreshButton{
+    right:22px;
+    bottom:22px;
+  }
+}
+</style>
+
+<button
+  id="rankforgeRefreshButton"
+  type="button"
+  aria-label="Refresh RankForge">
+  ↻ Refresh
+</button>
+
+<script>
+(function(){
+  "use strict";
+
+  function setup(){
+    var b=document.getElementById("rankforgeRefreshButton");
+    if(!b || b.dataset.ready==="1") return;
+
+    b.dataset.ready="1";
+
+    b.addEventListener("click",function(){
+      b.disabled=true;
+      b.textContent="↻ Refreshing…";
+
+      try{
+        var u=new URL(location.href);
+        u.searchParams.set("rf_refresh",Date.now());
+        location.replace(u.toString());
+      }catch(e){
+        location.reload();
+      }
+    });
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",setup,{once:true});
+  }else{
+    setup();
+  }
+
+  window.addEventListener("pageshow",setup);
+})();
+</script>
+
 </body>
 </html>
