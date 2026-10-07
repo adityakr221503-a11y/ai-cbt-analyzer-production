@@ -1,416 +1,210 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RankForge Biology CBT — 7196</title>
-
+<title>Biology Universe — 7196 CBT</title>
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
-  background:#07111f;
-  color:#eef4ff;
-}
-header{
-  padding:18px;
-  background:#0c1b30;
-  border-bottom:1px solid #223957;
-  position:sticky;
-  top:0;
-  z-index:5;
-}
-h1{margin:0;font-size:22px}
-.sub{opacity:.7;font-size:13px;margin-top:4px}
-
-.wrap{
-  max-width:900px;
-  margin:auto;
-  padding:16px;
-}
-
-.card{
-  background:#0d1d31;
-  border:1px solid #223957;
-  border-radius:16px;
-  padding:18px;
-  margin-bottom:16px;
-}
-
-button,select{
-  width:100%;
-  padding:13px;
-  margin-top:10px;
-  border-radius:10px;
-  border:1px solid #385477;
-  background:#132944;
-  color:white;
-  font-size:15px;
-}
-
-button{cursor:pointer}
-
-.primary{
-  background:#1769aa;
-  border-color:#2d8bd3;
-}
-
-.choice{
-  text-align:left;
-  margin-top:10px;
-  background:#10243d;
-}
-
-.choice.selected{
-  outline:2px solid #4ca3ff;
-}
-
-#quiz{display:none}
-
-.question{
-  font-size:19px;
-  line-height:1.55;
-  margin-bottom:18px;
-}
-
-.meta{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  opacity:.75;
-  font-size:13px;
-  margin-bottom:14px;
-}
-
-#result{display:none}
-
-.stat{
-  padding:12px;
-  background:#10243d;
-  border-radius:10px;
-  margin-top:8px;
-}
+:root{color-scheme:dark}*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:#eef2ff;font:16px system-ui}
+main{max-width:850px;margin:auto;padding:18px}
+.card{background:#151d32;border:1px solid #2b3858;border-radius:16px;padding:18px;margin:12px 0}
+button,select{padding:12px;border-radius:10px;border:1px solid #53658c;background:#202c47;color:white;font-size:16px}
+button{cursor:pointer;margin:4px}.muted{color:#b6c3df}.opt{display:block;padding:12px;border:1px solid #465779;border-radius:10px;margin:8px 0}
+.opt input{margin-right:10px}.good{color:#71e5a7}.bad{color:#ffb3b3}
 </style>
-<script src="biology-rankforge-bridge.js?v=7196"></script>
-</head>
-
-<body>
-
-<header>
-  <h1>🧬 RankForge Biology CBT</h1>
-  <div class="sub">Protected Biology Universe bank • 7,196 questions</div>
-</header>
-
-<div class="wrap">
-
-<section id="setup" class="card">
-  <h2>Biology Universe</h2>
-  <p id="bankStatus">Loading verified question bank...</p>
-
-  <label>Questions per test</label>
-  <select id="count">
-    <option value="10">10</option>
-    <option value="20">20</option>
-    <option value="30">30</option>
-    <option value="50">50</option>
-    <option value="90">90</option>
-    <option value="180">180</option>
-  </select>
-
-  <button class="primary" id="startBtn" disabled>
-    Start Biology CBT
-  </button>
-</section>
-
-<section id="quiz" class="card">
-  <div class="meta">
-    <span id="progress"></span>
-    <span id="timer"></span>
-  </div>
-
-  <div id="question" class="question"></div>
-  <div id="choices"></div>
-
-  <button class="primary" id="nextBtn">Next</button>
-</section>
-
-<section id="result" class="card">
-  <h2>CBT Result</h2>
-  <div id="resultText"></div>
-  <button onclick="location.reload()">New Biology CBT</button>
-</section>
-
-</div>
-
 <script>
+/*
+ RANKFORGE_7196_CANONICAL_RUNTIME_GUARD
+
+ This page is the dedicated 7,196 Biology CBT.
+ The canonical JSON is read-only.
+*/
 (function(){
 
-"use strict";
+  window.RankForgeBiology7196=true;
+  window.RankForgeBiologySource="BIOLOGY_ACTIVE_BANK";
+  window.RankForgeBiologyExpectedCount=7196;
 
-const BANK_URL="./data/BIOLOGY_ACTIVE_BANK.json";
-let BANK=[];
-let TEST=[];
-let index=0;
-let answers=[];
-let seconds=0;
-let timer=null;
+  window.addEventListener("error",function(e){
 
-const $=id=>document.getElementById(id);
+    console.error(
+      "[RankForge 7196] runtime error:",
+      e.error || e.message
+    );
 
-function questionsFromBank(data){
-  if(Array.isArray(data)) return data;
-  if(Array.isArray(data.questions)) return data.questions;
-  if(Array.isArray(data.items)) return data.items;
-  return [];
-}
-
-function textOf(q){
-  return q.question || q.question_text || q.text || q.stem || "";
-}
-
-function optionsOf(q){
-  if(Array.isArray(q.options)) return q.options;
-  if(Array.isArray(q.choices)) return q.choices;
-  if(Array.isArray(q.answers)) return q.answers;
-  return [
-    q.option_a,q.option_b,q.option_c,q.option_d
-  ].filter(x=>x!==undefined && x!==null && x!=="");
-}
-
-function correctOf(q){
-  if(q.correctAnswer!==undefined) return q.correctAnswer;
-  if(q.correct_answer!==undefined) return q.correct_answer;
-  if(q.answer!==undefined) return q.answer;
-  if(q.correct!==undefined) return q.correct;
-  return null;
-}
-
-function normalizeAnswer(v){
-  if(typeof v==="number") return v;
-  if(typeof v!=="string") return v;
-  const s=v.trim().toUpperCase();
-
-  if(["A","B","C","D"].includes(s))
-    return "ABCD".indexOf(s);
-
-  if(/^[0-3]$/.test(s))
-    return Number(s);
-
-  return v.trim();
-}
-
-function isCorrect(q,selected){
-  const c=normalizeAnswer(correctOf(q));
-
-  if(typeof c==="number"){
-    return c===selected;
-  }
-
-  const opts=optionsOf(q);
-  if(typeof c==="string" && opts[selected]!==undefined){
-    return String(opts[selected]).trim()===String(c).trim();
-  }
-
-  return false;
-}
-
-async function loadBank(){
-
-  try{
-
-    const r=await fetch(BANK_URL+"?v="+Date.now(),{
-      cache:"no-store"
-    });
-
-    if(!r.ok)
-      throw new Error("HTTP "+r.status);
-
-    const data=await r.json();
-
-    BANK=questionsFromBank(data);
-
-    if(BANK.length!==7196)
-      throw new Error("Expected 7196 questions, received "+BANK.length);
-
-    $("bankStatus").textContent=
-      "✓ 7,196 Biology questions verified and ready.";
-
-    $("startBtn").disabled=false;
-
-  }catch(e){
-
-    console.error(e);
-
-    $("bankStatus").textContent=
-      "❌ Biology bank failed to load: "+e.message;
-  }
-}
-
-function shuffle(a){
-  const x=a.slice();
-
-  for(let i=x.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [x[i],x[j]]=[x[j],x[i]];
-  }
-
-  return x;
-}
-
-function start(){
-
-  const n=Math.min(
-    Number($("count").value),
-    BANK.length
-  );
-
-  TEST=shuffle(BANK).slice(0,n);
-  index=0;
-  answers=new Array(TEST.length).fill(null);
-
-  seconds=TEST.length*60;
-
-  $("setup").style.display="none";
-  $("quiz").style.display="block";
-  $("result").style.display="none";
-
-  render();
-
-  clearInterval(timer);
-
-  timer=setInterval(()=>{
-    seconds--;
-
-    if(seconds<=0){
-      seconds=0;
-      finish();
-    }
-
-    updateTimer();
-
-  },1000);
-}
-
-function updateTimer(){
-
-  const m=Math.floor(seconds/60);
-  const s=seconds%60;
-
-  $("timer").textContent=
-    "⏱ "+String(m).padStart(2,"0")+":"+
-    String(s).padStart(2,"0");
-}
-
-function render(){
-
-  const q=TEST[index];
-  const opts=optionsOf(q);
-
-  $("progress").textContent=
-    "Question "+(index+1)+" / "+TEST.length;
-
-  $("question").textContent=textOf(q);
-
-  const box=$("choices");
-  box.innerHTML="";
-
-  opts.forEach((opt,i)=>{
-
-    const b=document.createElement("button");
-
-    b.className="choice";
-
-    b.textContent=
-      String.fromCharCode(65+i)+". "+String(opt);
-
-    if(answers[index]===i)
-      b.classList.add("selected");
-
-    b.onclick=()=>{
-
-      answers[index]=i;
-
-      [...box.children].forEach(x=>
-        x.classList.remove("selected")
-      );
-
-      b.classList.add("selected");
-    };
-
-    box.appendChild(b);
   });
-
-  $("nextBtn").textContent=
-    index===TEST.length-1 ? "Submit Test" : "Next";
-
-  updateTimer();
-}
-
-function finish(){
-
-  clearInterval(timer);
-
-  let attempted=0;
-  let correct=0;
-
-  TEST.forEach((q,i)=>{
-
-    if(answers[i]!==null){
-
-      attempted++;
-
-      if(isCorrect(q,answers[i]))
-        correct++;
-    }
-  });
-
-  const wrong=attempted-correct;
-  const unattempted=TEST.length-attempted;
-
-  $("quiz").style.display="none";
-  $("result").style.display="block";
-
-  $("resultText").innerHTML=
-    '<div class="stat">Total: <b>'+TEST.length+
-    '</b></div>'+
-    '<div class="stat">Attempted: <b>'+attempted+
-    '</b></div>'+
-    '<div class="stat">Correct: <b>'+correct+
-    '</b></div>'+
-    '<div class="stat">Wrong: <b>'+wrong+
-    '</b></div>'+
-    '<div class="stat">Unattempted: <b>'+unattempted+
-    '</b></div>';
-
-  window.RANKFORGE_BIOLOGY_CBT_RESULT={
-    total:TEST.length,
-    attempted,
-    correct,
-    wrong,
-    unattempted,
-    questionIds:TEST.map(q=>q.id)
-  };
-}
-
-$("startBtn").onclick=start;
-
-$("nextBtn").onclick=()=>{
-
-  if(index<TEST.length-1){
-    index++;
-    render();
-  }else{
-    finish();
-  }
-};
-
-loadBank();
 
 })();
 </script>
 
+</head><body>
+<div id="rankforgeBackBar" style="padding:10px 16px;">
+<button id="rankforgeBackButton" type="button"
+style="padding:10px 16px;border:0;border-radius:10px;font-size:16px;">
+← Back
+</button>
+</div>
+<main>
+<h1>Biology Universe · 7,196 CBT</h1>
+<p class="muted">Separate viewer. Canonical bank is not modified.</p>
+<div class="card" id="status">Loading local bank…</div>
+<div class="card" id="setup" hidden>
+<label>Questions <select id="count"><option>10</option><option>20</option><option>30</option><option>45</option><option>50</option><option>90</option><option>180</option></select></label>
+<label>Minutes <select id="minutes"><option>10</option><option>20</option><option>30</option><option>45</option><option>60</option><option>90</option><option>180</option></select></label>
+<button id="start">Start CBT</button>
+</div>
+<div id="test" hidden>
+<div class="card"><b id="progress"></b><span style="float:right" id="timer"></span></div>
+<div class="card"><h3 id="question"></h3><div id="options"></div></div>
+<div class="card"><button id="prev">Previous</button><button id="next">Next</button><button id="submit">Submit Test</button></div>
+</div><div id="result"></div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+let bank=[],session=[],answers={},index=0,seconds=0,tick=null,submitted=false;
 
-<script src="./biology-rankforge-final-hook.js"></script>
-</body>
-</html>
+const norm=s=>String(s??"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const qKeys=["question","questiontext","questionstatement","stem","prompt","qtext"];
+const optKeys=["options","choices","option","answers","answerchoices"];
+const ansKeys=["correctIndex","correctanswer","correctoption","answerkey","correctanswerindex","answer"];
+const solKeys=["solution","explanation","detailedsolution","answerexplanation","reasoning"];
+function getField(o,keys){
+  if(!o||typeof o!=="object")return undefined;
+  for(const k of keys){const found=Object.keys(o).find(x=>norm(x)===norm(k));if(found&&o[found]!=null)return o[found];}
+}
+function findRecords(data){
+  const seen=new Set(),candidates=[];
+  function walk(x,depth=0){
+    if(!x||typeof x!=="object"||depth>8||seen.has(x))return;
+    seen.add(x);
+    if(Array.isArray(x)){
+      if(x.length&&x.some(v=>v&&typeof v==="object"&&!Array.isArray(v))){
+        const objects=x.filter(v=>v&&typeof v==="object"&&!Array.isArray(v));
+        const qCount=objects.filter(v=>getField(v,qKeys)!=null).length;
+        if(qCount)candidates.push({rows:objects,score:qCount});
+      }
+      for(const v of x.slice(0,100000))walk(v,depth+1);
+    }else for(const v of Object.values(x))walk(v,depth+1);
+  }
+  walk(data);
+  candidates.sort((a,b)=>b.score-a.score);
+  return candidates[0]?.rows||[];
+}
+function textOf(v){
+  if(v==null)return "";
+  if(typeof v==="string"||typeof v==="number")return String(v);
+  if(Array.isArray(v))return v.map(textOf).join("\n");
+  if(typeof v==="object"){
+    const t=getField(v,["text","value","label","content","optiontext"]);
+    return t==null?JSON.stringify(v):textOf(t);
+  }
+  return "";
+}
+function normalizeRow(row){
+  const question=textOf(getField(row,qKeys));
+  const rawOpts=getField(row,optKeys);
+  let options=[];
+  if(Array.isArray(rawOpts)) options=rawOpts.map(textOf);
+  else if(rawOpts&&typeof rawOpts==="object")
+    options=Object.entries(rawOpts).map(([k,v])=>({key:k,text:textOf(v)}));
+  else if(typeof rawOpts==="string"){
+    try{const parsed=JSON.parse(rawOpts);if(Array.isArray(parsed))options=parsed.map(textOf)}catch{}
+  }
+  options=options.map((v,i)=>typeof v==="string"?{key:String(i),text:v}:v)
+    .filter(o=>o.text?.trim());
+  const answer=getField(row,ansKeys);
+  const solution=getField(row,solKeys);
+  return {raw:row,question,options,answer,solution:textOf(solution)};
+}
+function answerIndex(q){
+  if(q.answer==null)return -1;
+  const a=textOf(q.answer).trim();
+  const n=Number(a);
+  if(a!==""&&Number.isInteger(n)){
+    if(n>=0&&n<q.options.length)return n;
+    if(n>=1&&n<=q.options.length)return n-1;
+  }
+  const letter=a.toUpperCase().replace(/[^A-D]/g,"");
+  if(letter.length===1){
+    const i=letter.charCodeAt(0)-65;if(i<q.options.length)return i;
+  }
+  const idx=q.options.findIndex(o=>norm(o.text)===norm(a)||norm(o.key)===norm(a));
+  return idx;
+}
+function showStatus(msg,err=false){
+  $("status").hidden=false;$("status").textContent=msg;
+  $("status").className="card "+(err?"bad":"");
+}
+async function init(){
+  try{
+    const r=await fetch("./biology-7196-bank-readonly.json",{cache:"no-store"});
+    if(!r.ok)throw Error("HTTP "+r.status+" fetching local bank");
+    const data=await r.json();
+    const rows=findRecords(data);
+    bank=rows.map(normalizeRow).filter(q=>q.question&&q.options.length>=2);
+    if(!bank.length)throw Error("Question/option fields were not recognized. No questions were fabricated. See the schema printed in Termux.");
+    $("setup").hidden=false;
+    showStatus("Loaded "+bank.length+" recognizable questions from the protected-bank copy. Some answer/solution fields may need schema mapping if they are not recognized.");
+  }catch(e){showStatus("Bank load failed: "+e.message,true)}
+}
+function render(){
+  const q=session[index];$("progress").textContent=`Question ${index+1} / ${session.length}`;
+  $("question").textContent=q.question;$("options").replaceChildren();
+  q.options.forEach((o,i)=>{
+    const label=document.createElement("label");label.className="opt";
+    const input=document.createElement("input");input.type="radio";input.name="answer";input.value=i;
+    input.checked=answers[index]===i;input.disabled=submitted;
+    input.addEventListener("change",()=>answers[index]=i);
+    label.append(input,document.createTextNode(o.text));$("options").append(label);
+  });
+  $("prev").disabled=index===0;$("next").disabled=index===session.length-1;
+}
+function start(){
+  const n=Number($("count").value),mins=Number($("minutes").value);
+  if(n>bank.length){showStatus(`Only ${bank.length} recognizable questions available.`,true);return}
+  session=bank.slice().sort(()=>Math.random()-.5).slice(0,n);
+  answers={};index=0;seconds=mins*60;submitted=false;
+  $("setup").hidden=true;$("test").hidden=false;$("result").replaceChildren();render();
+  clearInterval(tick);updateTimer();tick=setInterval(()=>{if(seconds>0){seconds--;updateTimer()}else submit()},1000);
+}
+function updateTimer(){$("timer").textContent=`${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`}
+function submit(){
+  if(submitted)return;submitted=true;clearInterval(tick);
+  let score=0,known=0,review=[];
+  session.forEach((q,i)=>{
+    const ci=answerIndex(q);
+    if(ci>=0){known++;if(answers[i]===ci)score++}
+    review.push({q,i,ci});
+  });
+  $("test").hidden=true;$("result").replaceChildren();
+  const summary=document.createElement("div");summary.className="card";
+  summary.innerHTML=`<h2>Result</h2><p>Score: ${score} / ${session.length}</p><p>Correct answers recognized: ${known} / ${session.length}</p>`;
+  $("result").append(summary);
+  review.forEach(({q,i,ci},j)=>{
+    const card=document.createElement("div");card.className="card";
+    const h=document.createElement("h3");h.textContent=`Q${j+1}. ${q.question}`;card.append(h);
+    q.options.forEach((o,k)=>{
+      const p=document.createElement("p");
+      p.textContent=(k===ci?"✓ ":"")+(answers[i]===k?"Your answer: ":"")+o.text;
+      if(k===ci)p.className="good";else if(answers[i]===k)p.className="bad";
+      card.append(p);
+    });
+    const s=document.createElement("p");s.textContent=ci<0?"Correct answer field not recognized for this question.":(q.solution||"No explanation field recognized for this question.");
+    s.className="muted";card.append(s);$("result").append(card);
+  });
+  const again=document.createElement("button");again.textContent="New Test";again.onclick=()=>location.reload();$("result").prepend(again);
+}
+$("start").onclick=start;$("prev").onclick=()=>{if(index>0){index--;render()}};$("next").onclick=()=>{if(index<session.length-1){index++;render()}};$("submit").onclick=()=>{if(confirm("Submit this test?"))submit()};
+init();
+</script></main>
+<script id="rankforge-back-navigation-v1">
+(function(){
+  const b=document.getElementById("rankforgeBackButton");
+  if(!b)return;
+  b.addEventListener("click",function(){
+    if(history.length>1) history.back();
+    else location.href="index.html";
+  });
+})();
+</script>
+
+</body></html>

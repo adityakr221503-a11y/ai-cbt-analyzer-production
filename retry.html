@@ -245,6 +245,13 @@ header{
 </head>
 
 <body>
+<div id="rankforgeBackBar" style="padding:10px 16px;">
+<button id="rankforgeBackButton" type="button"
+style="padding:10px 16px;border:0;border-radius:10px;font-size:16px;">
+← Back
+</button>
+</div>
+
 
 <header>
   <div class="header">
@@ -1378,5 +1385,17 @@ else
 <script src="./rankforge-unified-student-layer-v2.js" defer></script>
 
 <div id="rankforgeLectureFallback" style="display:block !important;visibility:visible !important;opacity:1 !important;"><a href="rankforge-lecture-module/pages/lectures.html" style="display:block !important;visibility:visible !important;opacity:1 !important;">🎓 <strong>AI Lectures</strong> — NCERT-first lectures, AI explanation and practice.</a></div>
+
+<script id="rankforge-back-navigation-v1">
+(function(){
+  const b=document.getElementById("rankforgeBackButton");
+  if(!b)return;
+  b.addEventListener("click",function(){
+    if(history.length>1) history.back();
+    else location.href="index.html";
+  });
+})();
+</script>
+
 </body>
 </html>

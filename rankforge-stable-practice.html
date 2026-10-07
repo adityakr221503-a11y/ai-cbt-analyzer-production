@@ -281,6 +281,13 @@ select{
 </head>
 
 <body>
+<div id="rankforgeBackBar" style="padding:10px 16px;">
+<button id="rankforgeBackButton" type="button"
+style="padding:10px 16px;border:0;border-radius:10px;font-size:16px;">
+← Back
+</button>
+</div>
+
 
 <main class="app">
 
@@ -1730,6 +1737,18 @@ loadBank();
 
 <!-- Existing Biology result bridge -->
 <script src="./biology-rankforge-final-hook.js"></script>
+
+
+<script id="rankforge-back-navigation-v1">
+(function(){
+  const b=document.getElementById("rankforgeBackButton");
+  if(!b)return;
+  b.addEventListener("click",function(){
+    if(history.length>1) history.back();
+    else location.href="index.html";
+  });
+})();
+</script>
 
 </body>
 </html>
