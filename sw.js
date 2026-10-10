@@ -1,4 +1,4 @@
-const CACHE_NAME = "rankforge-ai-v7-20260929";
+const CACHE_NAME = "rankforge-ai-v8-20261010";
 
 const APP_SHELL = [
   "./",

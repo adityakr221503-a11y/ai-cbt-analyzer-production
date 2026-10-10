@@ -1378,6 +1378,24 @@ list.appendChild(div);
 DASHBOARD
 ================================ */
 
+function updateCounts(){
+
+var a=document.getElementById("activeCount");
+var m=document.getElementById("masteredCount");
+var act=0,mas=0;
+
+try{act=getActive().length;}catch(e){}
+
+try{
+var x=getMastered();
+mas=Array.isArray(x)?x.length:Object.keys(x||{}).length;
+}catch(e){}
+
+if(a)a.textContent=act;
+if(m)m.textContent=mas;
+
+}
+
 function goDashboard(){
 
 window.location.href="index.html";

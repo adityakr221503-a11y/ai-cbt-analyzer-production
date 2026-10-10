@@ -104,9 +104,21 @@
           : [input];
     } else {
       const text = String(input || "").trim();
-      rows = text.split(/\r?\n/).length > 1
-        ? parseJSONL(text)
-        : [JSON.parse(text)];
+      let parsed = null;
+
+      try { parsed = JSON.parse(text); } catch (_) { parsed = null; }
+
+      if (parsed !== null && typeof parsed === "object") {
+        rows = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray(parsed.questions)
+            ? parsed.questions
+            : Array.isArray(parsed.items)
+              ? parsed.items
+              : [parsed];
+      } else {
+        rows = parseJSONL(text);
+      }
     }
 
     const normalized = [];

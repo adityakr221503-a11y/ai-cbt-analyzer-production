@@ -1094,7 +1094,7 @@
     return true;
   }
 
-  window.CBTAnalyzerRecovery = {
+  window.CBTAnalyzerRecovery = Object.assign({}, window.CBTAnalyzerRecovery || {}, {
     version: "2.0.0",
     sync: sync,
     getQueue: getQueue,
@@ -1102,7 +1102,7 @@
     stats: stats,
     retry: retry,
     markMastered: markMastered
-  };
+  });
 
   window.dispatchEvent(
     new CustomEvent(

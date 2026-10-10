@@ -962,12 +962,6 @@ document
 
 
 render();
-);
-
-  }
- );
-
-}
 
 })();
 </script>
@@ -1479,15 +1473,32 @@ render();
   }
 
   function countMistakes(){
-    const db = parse(MISTAKE_KEY);
-    if(!db || typeof db !== "object"){
-      return {active:0, mastered:0, items:[]};
-    }
+    /* Same source of truth as the Mistake Book page:
+       cbtMistakes (wrong answers) minus cbtMasteryV2 (mastered). */
+    const norm = function(v){
+      return String(v || "").trim().toLowerCase().replace(/\s+/g, " ");
+    };
+
+    const masteredSet = new Set();
+    arr(parse("cbtMasteryV2")).forEach(function(m){
+      if(m && m.question) masteredSet.add(norm(m.question));
+    });
+
+    const activeMap = {};
+    arr(parse("cbtMistakes")).forEach(function(q){
+      if(!q || !q.question) return;
+      const k = norm(q.question);
+      if(!masteredSet.has(k)) activeMap[k] = q;
+    });
+
+    const items = Object.keys(activeMap).map(function(k){
+      return activeMap[k];
+    });
 
     return {
-      active:arr(db.active).length,
-      mastered:arr(db.mastered).length,
-      items:arr(db.active)
+      active:items.length,
+      mastered:masteredSet.size,
+      items:items
     };
   }
 
@@ -1530,8 +1541,11 @@ render();
 
   function findWeakTopic(mistakes){
     const map = {};
+    const list = Array.isArray(mistakes)
+      ? mistakes
+      : (mistakes && Array.isArray(mistakes.items) ? mistakes.items : []);
 
-    mistakes.forEach(function(m){
+    list.forEach(function(m){
       const topic = String(
         m.topic ||
         m.chapter ||
@@ -2621,9 +2635,25 @@ function build(){
 
   const m=mastery();
 
-  const mistakes=Array.isArray(m.mistakes)?m.mistakes:[];
-  const mastered=Array.isArray(m.mastered)?m.mastered:[];
-  const retries=Array.isArray(m.retries)?m.retries:[];
+  /* cbtMasteryV2 is a plain array in the current CBT, so fall back to
+     the real stored data (same source as the Mistake Book page). */
+  const nz=v=>String(v||"").trim().toLowerCase().replace(/\s+/g," ");
+  const realMast=(Array.isArray(m)?m:[]).filter(x=>x&&x.question);
+  const mSet=new Set(realMast.map(x=>nz(x.question)));
+  const rawMist=read("cbtMistakes",[]);
+  const seenQ=new Set();
+  const realActive=[];
+  (Array.isArray(rawMist)?rawMist:[]).forEach(q=>{
+    if(!q||!q.question)return;
+    const k=nz(q.question);
+    if(mSet.has(k)||seenQ.has(k))return;
+    seenQ.add(k);
+    realActive.push(q);
+  });
+  const rawRetry=read("cbtAnalyzer.retryQueue",[]);
+  const mistakes=Array.isArray(m.mistakes)?m.mistakes:realActive;
+  const mastered=Array.isArray(m.mastered)?m.mastered:realMast;
+  const retries=Array.isArray(m.retries)?m.retries:(Array.isArray(rawRetry)?rawRetry:[]);
   const improvement=Array.isArray(m.improvement)?m.improvement:[];
 
   const hist=history();

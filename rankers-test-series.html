@@ -17,6 +17,7 @@ button{cursor:pointer;font-weight:700;background:#172033;color:#fff;border:0}
 @media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 <script src="./nichod/engine/cbt-unified-question-loader.js"></script>
+<script src="./nichod/engine/cbt-source-isolation-v1.js"></script>
 <script src="./owner-imports/rankforge-owner-access.js"></script><script src="./owner-imports/rankforge-student-source-guard.js"></script><script src="./owner-imports/rankforge-practice-source-policy.js"></script></head>
 <body>
 <div class="wrap">
@@ -273,7 +274,10 @@ function checkBankCount() {
  try{attempts=typeof getRBHistory==="function"?getRBHistory():JSON.parse(localStorage.getItem("rankBoosterAttemptHistory") || "[]")}catch(e){attempts=[]}
  try{mastered=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]")}catch(e){}
  $("qCount").textContent=bank.length;$("attempts").textContent=Number(CBTSourceIsolation.read("SERIES","ATTEMPT_COUNT",0)||"0");
-const perf=JSON.parse(CBTSourceIsolation.read("SERIES","PERFORMANCE",[])||"[]");
+const perfRaw=CBTSourceIsolation.read("SERIES","PERFORMANCE",[]);
+let perf=[];
+try{perf=Array.isArray(perfRaw)?perfRaw:JSON.parse(perfRaw||"[]");}catch(e){perf=[];}
+if(!Array.isArray(perf))perf=[];
 if(perf.length){
  const acc=perf.map(x=>Number(x.accuracy)||0);
  $("avgAccuracy").textContent=Math.round(acc.reduce((a,b)=>a+b,0)/acc.length)+"%";
@@ -900,6 +904,46 @@ Open Ranker Command Center
     if (document.getElementById("pcbNichodLiveReport"))
       return;
 
+    const box = document.createElement("div");
+
+    box.id = "pcbNichodLiveReport";
+
+    box.style.cssText =
+      "position:fixed;" +
+      "right:12px;" +
+      "bottom:12px;" +
+      "z-index:999999;" +
+      "background:#111827;" +
+      "color:#fff;" +
+      "padding:12px;" +
+      "border-radius:12px;" +
+      "font:14px monospace;" +
+      "max-width:90vw;" +
+      "box-shadow:0 8px 30px rgba(0,0,0,.35);";
+
+    box.innerHTML =
+      '<b>🧪 PCB NICHOD LIVE</b>' +
+      '<div id="pcbNichodLiveStatus" style="margin-top:8px">' +
+      'Reading flow…</div>' +
+      '<button id="pcbNichodLiveRefresh" ' +
+      'style="margin-top:8px;padding:8px;border-radius:8px">' +
+      'Refresh</button>' +
+      '<button id="pcbNichodLiveCopy" ' +
+      'style="margin-top:8px;margin-left:6px;padding:8px;border-radius:8px">' +
+      'Copy Report</button>';
+
+    document.body.appendChild(box);
+
+    document
+      .getElementById("pcbNichodLiveRefresh")
+      .onclick = render;
+
+    document
+      .getElementById("pcbNichodLiveCopy")
+      .onclick = copyReport;
+
+    render();
+  }
 
   function getJSON(key) {
 
@@ -932,7 +976,7 @@ Open Ranker Command Center
   function render() {
 
     const pdf =
-      getJSON("pdfCbtQuestions");
+      window.getIsolatedPDFCBTQuestions ? window.getIsolatedPDFCBTQuestions() : [];
 
     const selected =
       getJSON("rbSelectedQuestions");
@@ -1008,7 +1052,7 @@ Open Ranker Command Center
 
       pdfQuestions:
         lengthOf(
-          getJSON("pdfCbtQuestions")
+          window.getIsolatedPDFCBTQuestions ? window.getIsolatedPDFCBTQuestions() : []
         ),
 
       selectedQuestions:
