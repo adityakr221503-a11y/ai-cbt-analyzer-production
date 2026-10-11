@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Biology Mistake Book — Exact Retry</title>
+<style>
+body{margin:0;background:#07111f;color:#eef5ff;font-family:system-ui;padding:18px}
+.wrap{max-width:850px;margin:auto}
+.card{background:#0e1b2d;border:1px solid #29435f;border-radius:16px;padding:18px;margin:12px 0}
+button{border:0;border-radius:10px;padding:12px 15px;background:#176b4d;color:white;font-weight:700;margin:5px}
+.option{display:block;width:100%;text-align:left;background:#13263d}
+.selected{outline:2px solid #67b7ff}
+.hidden{display:none}
+.small{opacity:.7;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div id="home" class="card">
+<h1>🧬 Biology Mistake Book</h1>
+<p>Wrong questions from both Biology systems.</p>
+<div id="count"></div>
+<button onclick="startRetry()">Retry All Mistakes</button>
+<button onclick="location.href='cbt.html'">Back to CBT</button>
+<div id="list"></div>
+</div>
+
+<div id="test" class="card hidden">
+<div id="progress"></div>
+<h2 id="question"></h2>
+<div id="options"></div>
+<br>
+<button onclick="prevQ()">← Previous</button>
+<button onclick="nextQ()">Next →</button>
+<button onclick="finish()">Submit Retry</button>
+</div>
+
+<div id="result" class="card hidden">
+<h2>Retry Result</h2>
+<div id="resultText"></div>
+<button onclick="location.reload()">Back</button>
+</div>
+
+</div>
+
+<script src="./biology-mistake-engine.js"></script>
+<script>
+
+let mistakes=[];
+let answers=[];
+let index=0;
+
+function renderHome(){
+
+mistakes=RFBiologyMistakeEngine.all();
+
+document.getElementById("count").innerHTML=
+  "<b>"+mistakes.length+"</b> questions currently in Mistake Book.";
+
+const list=document.getElementById("list");
+list.innerHTML="";
+
+mistakes.slice(0,50).forEach((q,i)=>{
+ const d=document.createElement("div");
+ d.className="card";
+ d.innerHTML=
+   "<b>"+(i+1)+".</b> "+
+   escapeHtml(q.question||"")+
+   "<div class='small'>Source: "+
+   escapeHtml(q.source||"Biology")+"</div>";
+ list.appendChild(d);
+});
+
+}
+
+function startRetry(){
+
+mistakes=RFBiologyMistakeEngine.all();
+
+if(!mistakes.length){
+ alert("Mistake Book is empty.");
+ return;
+}
+
+answers=new Array(mistakes.length).fill(-1);
+index=0;
+
+document.getElementById("home").classList.add("hidden");
+document.getElementById("result").classList.add("hidden");
+document.getElementById("test").classList.remove("hidden");
+
+renderQuestion();
+}
+
+function renderQuestion(){
+
+const q=mistakes[index];
+
+document.getElementById("progress").textContent=
+ "Retry "+(index+1)+" / "+mistakes.length+
+ " • "+(q.source||"Biology");
+
+document.getElementById("question").textContent=q.question||"";
+
+const box=document.getElementById("options");
+box.innerHTML="";
+
+(q.options||[]).forEach((o,i)=>{
+
+const b=document.createElement("button");
+b.className="option"+
+ (answers[index]===i?" selected":"");
+
+b.textContent=
+ String.fromCharCode(65+i)+". "+o;
+
+b.onclick=()=>{
+ answers[index]=i;
+ renderQuestion();
+ };
+
+box.appendChild(b);
+
+});
+}
+
+function prevQ(){
+if(index>0){index--;renderQuestion();}
+}
+
+function nextQ(){
+if(index<mistakes.length-1){index++;renderQuestion();}
+}
+
+function finish(){
+
+let correct=0;
+
+mistakes.forEach((q,i)=>{
+ if(answers[i]===q.correctAnswer) correct++;
+});
+
+document.getElementById("test").classList.add("hidden");
+document.getElementById("result").classList.remove("hidden");
+
+document.getElementById("resultText").innerHTML=
+ "<b>"+correct+"</b> / "+mistakes.length+
+ " correct.";
+
+}
+
+function escapeHtml(s){
+return String(s)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;");
+}
+
+renderHome();
+
+</script>
+</body>
+</html>

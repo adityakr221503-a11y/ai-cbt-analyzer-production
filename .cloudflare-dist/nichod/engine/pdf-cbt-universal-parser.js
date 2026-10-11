@@ -1,0 +1,715 @@
+(function () {
+  "use strict";
+
+  const STORAGE = {
+    PDF: "pdfCbtQuestions",
+    ACTIVE: "CBT_ACTIVE_TEST",
+    SOURCE: "CBT_ACTIVE_SOURCE"
+  };
+
+  function clean(v) {
+    return String(v || "")
+      .replace(/\u00a0/g, " ")
+      .replace(/[ \t]+/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function answerIndex(v) {
+    const m = String(v || "")
+      .trim()
+      .toUpperCase()
+      .match(/^(?:OPTION\s*)?([A-D])$/);
+
+    return m ? "ABCD".indexOf(m[1]) : -1;
+  }
+
+  
+/* ================================================================
+   PDF ENGLISH-FIRST TEXT NORMALIZER V1
+   Removes legacy Hindi-font extraction noise WITHOUT translating
+   or modifying already-correct English text.
+   ================================================================ */
+
+function pcbEnglishFirstNormalize(text) {
+  if (text == null) return "";
+
+  let s = String(text)
+    .replace(/\u00a0/g, " ")
+    .replace(/\r\n?/g, "\n");
+
+  /*
+   * Legacy Hindi-font extraction commonly produces ASCII-looking
+   * garbage such as dFku, pkyd, lEiw.kZ, nksuksa, etc.
+   *
+   * We deliberately DO NOT globally translate these tokens.
+   * Instead, when a line contains a valid English equivalent and
+   * a corrupted Hindi-font fragment, retain the English portion.
+   */
+
+  const legacyMarkers = [
+    "dFku",
+    "dkj.k",
+    "pkyd",
+    "lEiw.kZ",
+    "nksuksa",
+    "lgh",
+    "O;k[;k",
+    "LFkkukUrfjr",
+    "lEHko",
+    "foyfxr"
+  ];
+
+  function looksLegacy(x) {
+    if (!x) return false;
+    return legacyMarkers.some(function (m) {
+      return x.includes(m);
+    });
+  }
+
+  function englishScore(x) {
+    if (!x) return 0;
+
+    const letters = (x.match(/[A-Za-z]/g) || []).length;
+    const words = (x.match(/\b[A-Za-z]{2,}\b/g) || []).length;
+
+    return letters + words * 3;
+  }
+
+  /*
+   * If the same logical sentence has both clean English and
+   * legacy-font noise, keep the clean English sentence.
+   */
+  const lines = s.split("\n");
+  const cleaned = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (!looksLegacy(line)) {
+      cleaned.push(line);
+      continue;
+    }
+
+    const chunks = line
+      .split(/\s{2,}|(?=\b(?:Assertion|Reason|Option|Question)\s*:)/i)
+      .map(function (x) {
+        return x.trim();
+      })
+      .filter(Boolean);
+
+    const good = chunks
+      .filter(function (x) {
+        return !looksLegacy(x);
+      })
+      .sort(function (a, b) {
+        return englishScore(b) - englishScore(a);
+      });
+
+    if (good.length) {
+      cleaned.push(good.join(" "));
+    } else {
+      /*
+       * Do not expose obvious legacy-font-only garbage.
+       * Preserve formulas/numbers/symbols when present.
+       */
+      const safe = line
+        .replace(/[A-Za-z]+(?:[.'-][A-Za-z]+)*/g, function (token) {
+          return looksLegacy(token) ? "" : token;
+        })
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+      if (safe) cleaned.push(safe);
+    }
+  }
+
+  return cleaned
+    .join("\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/* Make available to existing parser/normalizer code. */
+if (typeof window !== "undefined") {
+  window.pcbEnglishFirstNormalize =
+    pcbEnglishFirstNormalize;
+}
+
+
+function normalizeQuestion(q, index) {
+    if (!q) return null;
+
+    const text = clean(
+      q.question ||
+      q.questionText ||
+      q.text ||
+      q.q
+    );
+
+    let options = Array.isArray(q.options)
+      ? q.options
+          .map(clean)
+          .filter(Boolean)
+          .slice(0, 4)
+      : [];
+
+    if (!text || options.length < 2) {
+      return null;
+    }
+
+    const answer =
+      q.correctAnswer ||
+      q.answer ||
+      q.correct_option ||
+      q.correctOption ||
+      "";
+
+    return {
+      id:
+        q.id ||
+        "pdf-" +
+        Date.now() +
+        "-" +
+        index,
+
+      question: text,
+
+      options,
+
+      correctAnswer:
+        typeof answer === "number"
+          ? answer
+          : answerIndex(answer) >= 0
+            ? answerIndex(answer)
+            : answer,
+
+      answer:
+        q.answer || answer || "",
+
+      solution:
+        clean(
+          q.solution ||
+          q.explanation ||
+          q.explain ||
+          ""
+        ),
+
+      subject:
+        clean(q.subject || "General"),
+
+      chapter:
+        clean(q.chapter || ""),
+
+      source:
+        "PDF Import",
+
+      sourceType:
+        "pdf"
+    };
+  }
+
+  function parseBlocks(text) {
+    text = String(text || "")
+      .replace(/\r/g, "\n")
+      .replace(/[ \t]+/g, " ");
+
+    const lines = text
+      .split("\n")
+      .map(clean)
+      .filter(Boolean);
+
+    const questions = [];
+    let current = null;
+
+    const qStart =
+      /^(?:Q(?:uestion)?\.?\s*)?(\d{1,3})[\)\.:\-]\s*(.+)$/i;
+
+    const optionStart =
+      /^\(?([A-D])\)?[\.\):\-]\s*(.+)$/i;
+
+    function flush() {
+      if (!current) return;
+
+      const q = normalizeQuestion(
+        current,
+        questions.length
+      );
+
+      if (q) questions.push(q);
+
+      current = null;
+    }
+
+    for (const line of lines) {
+      const qm = line.match(qStart);
+
+      if (qm) {
+        flush();
+
+        current = {
+          question: qm[2],
+          options: []
+        };
+
+        continue;
+      }
+
+      const om = line.match(optionStart);
+
+      if (om && current) {
+        current.options.push(
+          clean(om[2])
+        );
+
+        continue;
+      }
+
+      if (current) {
+        if (
+          current.options.length
+        ) {
+          const i =
+            current.options.length - 1;
+
+          current.options[i] =
+            clean(
+              current.options[i] +
+              " " +
+              line
+            );
+        } else {
+          current.question =
+            clean(
+              current.question +
+              " " +
+              line
+            );
+        }
+      }
+    }
+
+    flush();
+
+    return questions;
+  }
+
+  function parseNumberedLoose(text) {
+    const matches = String(text || "")
+      .split(/(?=\b\d{1,3}[\.\)]\s+)/)
+      .map(clean)
+      .filter(Boolean);
+
+    const result = [];
+
+    for (const block of matches) {
+      const lines = block
+        .split("\n")
+        .map(clean)
+        .filter(Boolean);
+
+      if (!lines.length) continue;
+
+      const joined = lines.join("\n");
+
+      const q = parseBlocks(joined);
+
+      if (q.length) {
+        result.push.apply(result, q);
+      }
+    }
+
+    return result;
+  }
+
+  function dedupe(list) {
+    const seen = new Set();
+    const out = [];
+
+    for (const q of list) {
+      const key = clean(q.question)
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+
+      if (!key || seen.has(key)) continue;
+
+      seen.add(key);
+      out.push(q);
+    }
+
+    return out.map(function (q, i) {
+      q.id =
+        q.id ||
+        "pdf-" +
+        Date.now() +
+        "-" +
+        i;
+
+      return q;
+    });
+  }
+
+  function createTest(questions, meta) {
+    const id =
+      "PDF-" +
+      Date.now() +
+      "-" +
+      Math.random()
+        .toString(36)
+        .slice(2, 8);
+
+    const test = {
+      id,
+
+      testId: id,
+
+      title:
+        meta.title ||
+        "PDF Test " +
+        new Date().toLocaleString(),
+
+      name:
+        meta.title ||
+        "PDF Test",
+
+      source:
+        "PDF Import",
+
+      sourceType:
+        "pdf",
+
+      fileName:
+        meta.fileName || "",
+
+      createdAt:
+        new Date().toISOString(),
+
+      questions,
+
+      questionCount:
+        questions.length,
+
+      nichod: {
+        enabled: true,
+        source: "PDF",
+        version: "universal-parser-v1"
+      }
+    };
+
+    localStorage.setItem(
+      STORAGE.PDF,
+      JSON.stringify(questions)
+    );
+
+    localStorage.setItem(
+      STORAGE.ACTIVE,
+      JSON.stringify(test)
+    );
+
+    localStorage.setItem(
+      STORAGE.SOURCE,
+      "PDF"
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_TEST_ID",
+      id
+    );
+
+    localStorage.setItem(
+      "CBT_ACTIVE_TEST_SOURCE",
+      "PDF Import"
+    );
+
+    localStorage.setItem(
+      "CBT_PDF_FILE_NAME",
+      meta.fileName || ""
+    );
+
+    window.dispatchEvent(
+      new CustomEvent(
+        "PCB_PDF_TEST_CREATED",
+        {
+          detail: test
+        }
+      )
+    );
+
+    return test;
+  }
+
+  async function parsePdfDocument(
+    pdf,
+    fileName
+  ) {
+    if (
+      !window.pdfjsLib ||
+      !pdfjsLib.getDocument
+    ) {
+      throw new Error(
+        "PDF.js is not available"
+      );
+    }
+
+    const loadingTask =
+      pdfjsLib.getDocument({
+        data: pdf
+      });
+
+    const document =
+      await loadingTask.promise;
+
+    /*
+     * Rebuild real PDF lines using PDF.js coordinates.
+     * Do not flatten every text item into one giant string.
+     */
+    function pageToLines(items) {
+      const rows = [];
+
+      for (const item of items || []) {
+        const value =
+          String(item.str || "").trim();
+
+        if (!value) continue;
+
+        const tr =
+          Array.isArray(item.transform)
+            ? item.transform
+            : [];
+
+        const x =
+          Number(tr[4] || 0);
+
+        const y =
+          Number(tr[5] || 0);
+
+        let row = null;
+
+        for (const r of rows) {
+          if (Math.abs(r.y - y) <= 3.5) {
+            row = r;
+            break;
+          }
+        }
+
+        if (!row) {
+          row = {
+            y: y,
+            items: []
+          };
+
+          rows.push(row);
+        }
+
+        row.items.push({
+          x: x,
+          text: value
+        });
+      }
+
+      rows.sort(function (a, b) {
+        return b.y - a.y;
+      });
+
+      return rows
+        .map(function (row) {
+          row.items.sort(function (a, b) {
+            return a.x - b.x;
+          });
+
+          return row.items
+            .map(function (x) {
+              return x.text;
+            })
+            .join(" ")
+            .replace(/\s+/g, " ")
+            .trim();
+        })
+        .filter(Boolean);
+    }
+
+    const allLines = [];
+
+    for (
+      let pageNo = 1;
+      pageNo <= document.numPages;
+      pageNo++
+    ) {
+      const page =
+        await document.getPage(pageNo);
+
+      const content =
+        await page.getTextContent();
+
+      const lines =
+        pageToLines(
+          content.items
+        );
+
+      allLines.push.apply(
+        allLines,
+        lines
+      );
+    }
+
+    const fullText =
+      allLines.join("\n");
+
+    /*
+     * Primary parser.
+     *
+     * Question numbers are recognized only when they
+     * begin a reconstructed PDF line.
+     *
+     * Therefore text such as:
+     * "conductor 11 . dFku ..."
+     * cannot become Question 11.
+     */
+    let questions =
+      parseBlocks(fullText);
+
+    /*
+     * Keep loose parser only as fallback for PDFs whose
+     * primary line parser finds nothing.
+     */
+    if (!questions.length) {
+      questions =
+        parseNumberedLoose(fullText);
+    }
+
+    questions =
+      dedupe(questions);
+
+    /*
+     * HARD CBT LIMIT.
+     *
+     * One PDF CBT can never launch with more than 180.
+     */
+    if (questions.length > 180) {
+      questions =
+        questions.slice(0, 180);
+    }
+
+    if (!questions.length) {
+      throw new Error(
+        "No MCQ questions could be detected from this PDF. The PDF may require OCR."
+      );
+    }
+
+    const test =
+      createTest(
+        questions,
+        {
+          fileName:
+            fileName || "PDF",
+
+          title:
+            fileName
+              ? fileName.replace(
+                  /\.pdf$/i,
+                  ""
+                )
+              : "PDF Test"
+        }
+      );
+
+    return {
+      success: true,
+
+      test: test,
+
+      questionCount:
+        questions.length,
+
+      pages:
+        document.numPages
+    };
+  }
+
+
+  window.PCBUniversalPDFParser = {
+    parsePdfDocument,
+    parseBlocks,
+    normalizeQuestion
+  };
+
+})();
+
+
+
+/* ============================================================
+   FINAL PDF CBT TEXT SAFETY LAYER
+   English-first + legacy-font noise protection
+   ============================================================ */
+(function () {
+  function cleanPdfText(value) {
+    if (value == null) return "";
+
+    let s = String(value)
+      .replace(/\u00a0/g, " ")
+      .replace(/\r\n?/g, "\n");
+
+    /*
+     * Do NOT translate English.
+     * Remove only obvious legacy-Hindi-font extraction fragments
+     * when clean English content exists in the same line.
+     */
+    const legacy = [
+      "dFku","dkj.k","pkyd","lEiw.kZ","nksuksa",
+      "lgh","O;k[;k","LFkkukUrfjr","lEHko","foyfxr",
+      "vkos'k","nwljs","nwljs","LFkkukUrfjr"
+    ];
+
+    const isLegacy = function (x) {
+      return legacy.some(function (m) {
+        return String(x).includes(m);
+      });
+    };
+
+    const lines = s.split("\n");
+    const out = [];
+
+    for (const line of lines) {
+      if (!isLegacy(line)) {
+        out.push(line);
+        continue;
+      }
+
+      /*
+       * If a line contains recognizable English, preserve the
+       * English portion and discard legacy-font noise.
+       */
+      const english = line.match(
+        /(?:Assertion|Reason|Question|Which|What|The|A|An|After|Before|Find|Calculate|Consider|Statement|Option)\b.*$/i
+      );
+
+      if (english && english[0].length >= 12) {
+        out.push(english[0].trim());
+        continue;
+      }
+
+      /*
+       * Remove only known legacy tokens.
+       */
+      let x = line;
+      for (const token of legacy) {
+        x = x.split(token).join(" ");
+      }
+
+      x = x
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+      if (x) out.push(x);
+    }
+
+    return out
+      .join("\n")
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  window.cleanPdfText = cleanPdfText;
+})();

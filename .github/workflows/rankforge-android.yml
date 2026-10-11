@@ -1,0 +1,275 @@
+name: RankForge Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "android/**"
+      - ".github/workflows/rankforge-android.yml"
+      - "capacitor.config.json"
+      - "package.json"
+      - "*.html"
+      - "*.js"
+      - "*.css"
+      - "data/**"
+      - ".rankforge-web/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Verify Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "ANDROID_HOME=${ANDROID_HOME:-}"
+          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-}"
+
+          if [ -z "${ANDROID_HOME:-}" ]; then
+            export ANDROID_HOME="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
+          fi
+
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+
+          echo "Using Android SDK:"
+          echo "$ANDROID_HOME"
+
+          test -d "$ANDROID_HOME"
+
+          echo
+          echo "Installed SDK packages:"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --list_installed 2>/dev/null \
+            | head -80 || true
+
+      - name: Install required Android packages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager"
+          fi
+
+          test -x "$SDKMANAGER"
+
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+
+          "$SDKMANAGER" \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
+
+      - name: Verify RankForge App ID
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          grep -q \
+            'com.adityakumar.rankforge' \
+            capacitor.config.json
+
+          echo "[PASS] Capacitor App ID = com.adityakumar.rankforge"
+
+      - name: Verify Biology 7,196 runtime asset
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          RUNTIME="biology-7196-bank-readonly.json"
+
+          test -s "$RUNTIME"
+
+          python - "$RUNTIME" <<'PYTHON'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as f:
+              data=json.load(f)
+
+          if isinstance(data,list):
+              questions=data
+          elif isinstance(data,dict):
+              questions=(
+                  data.get("questions")
+                  or data.get("data")
+                  or data.get("items")
+                  or []
+              )
+          else:
+              questions=[]
+
+          if len(questions) != 7196:
+              raise SystemExit(
+                  f"Biology runtime asset contains {len(questions)} questions; expected 7196"
+              )
+
+          print("[PASS] Biology runtime asset contains exactly 7,196 questions")
+          PYTHON
+
+          echo "[PASS] Biology runtime asset available to Android build"
+
+      - name: Install npm dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install
+
+      - name: Ensure Capacitor Android platform
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f "android/app/build.gradle" ]; then
+            echo "[INFO] Android platform is not committed."
+            echo "[INFO] Generating Android platform from Capacitor config..."
+            npx cap add android
+          else
+            echo "[PASS] Android platform already present."
+          fi
+
+          test -f "android/app/build.gradle"
+          test -f "android/gradlew"
+
+          echo "[PASS] Android platform ready"
+
+      - name: Prepare RankForge web assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf ".rankforge-web"
+          mkdir -p ".rankforge-web"
+
+          find . -maxdepth 1 \
+            -type f \
+            \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.json" \) \
+            -exec cp -f {} ".rankforge-web/" \;
+
+          [ -d "data" ] && cp -R data ".rankforge-web/" || true
+
+          test -f ".rankforge-web/index.html"
+          test -f ".rankforge-web/biology-7196-cbt.html"
+          test -f ".rankforge-web/biology-7196-bank-readonly.json"
+          test -f ".rankforge-web/biology-rankforge-bridge.js"
+          test -f ".rankforge-web/biology-rankforge-final-hook.js"
+
+          echo "[PASS] RankForge web assets prepared"
+          echo "[PASS] Biology CBT + 7,196 runtime asset bundled"
+
+      - name: Capacitor sync
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx cap sync android
+
+      - name: Verify and repair Gradle configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f android/app/build.gradle
+
+          grep -q \
+            'com.adityakumar.rankforge' \
+            android/app/build.gradle
+
+          # Modern Android Gradle tooling requires the optimizing
+          # default rules file instead of obsolete proguard-android.txt.
+          # Repair only generated Android Gradle files in this CI workspace.
+          if grep -RIl \
+              --include='build.gradle' \
+              'proguard-android.txt' \
+              android 2>/dev/null | grep -q .; then
+
+            echo "[INFO] Updating obsolete ProGuard references..."
+
+            while IFS= read -r file; do
+              [ -n "$file" ] || continue
+              sed -i \
+                "s/proguard-android\.txt/proguard-android-optimize.txt/g" \
+                "$file"
+              echo "[FIXED] $file"
+            done < <(
+              grep -RIl \
+                --include='build.gradle' \
+                'proguard-android.txt' \
+                android 2>/dev/null || true
+            )
+          fi
+
+          if grep -Rqs \
+              --include='build.gradle' \
+              'proguard-android.txt' \
+              android 2>/dev/null; then
+            echo "[FAIL] Obsolete ProGuard configuration remains."
+            grep -RIn \
+              --include='build.gradle' \
+              'proguard-android.txt' \
+              android || true
+            exit 1
+          fi
+
+          grep -Rqs \
+            --include='build.gradle' \
+            'proguard-android-optimize.txt' \
+            android 2>/dev/null || true
+
+          echo "[PASS] Android Gradle configuration"
+
+      - name: Build RankForge Debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cd android
+
+          chmod +x gradlew
+
+          ./gradlew \
+            --no-daemon \
+            --stacktrace \
+            :app:assembleDebug
+
+      - name: Verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+
+          test -f "$APK"
+
+          echo "[PASS] APK created"
+          ls -lh "$APK"
+          sha256sum "$APK"
+
+      - name: Upload RankForge APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: RankForge-v1.0.0-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

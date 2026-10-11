@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="./rankforge-core-v1.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RankForge AI — Owner Source Hub</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#080b12;color:#eef2ff}
+header{padding:22px;background:#101522;border-bottom:1px solid #242b3d}
+h1{margin:0;font-size:24px}
+.sub{color:#9ca8c2;margin-top:6px}
+main{max-width:1200px;margin:auto;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.card{background:#111827;border:1px solid #273149;border-radius:14px;padding:16px}
+.num{font-size:28px;font-weight:800}
+.label{color:#9ca8c2;font-size:13px}
+section{margin-top:18px;background:#0f1521;border:1px solid #273149;border-radius:16px;padding:18px}
+h2{font-size:17px;margin:0 0 14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button,label.upload{border:1px solid #35415b;background:#182238;color:#fff;border-radius:10px;padding:10px 14px;cursor:pointer}
+button:hover,label.upload:hover{background:#202d47}
+input[type=file]{display:none}
+pre{white-space:pre-wrap;background:#080c14;border-radius:10px;padding:12px;color:#b9c5dd;max-height:300px;overflow:auto}
+.ok{color:#73e6a8}.warn{color:#ffd166}.bad{color:#ff7b8a}
+.small{font-size:12px;color:#8f9bb4}
+</style>
+</head>
+<body>
+<script src="./owner-imports/rankforge-owner-access.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  const access = window.RankForgeOwnerAccess;
+
+  if (!access || !access.isOwner || !access.isOwner()) {
+    location.replace("./owner-access.html");
+    throw new Error("RankForge Owner Source Hub blocked: owner verification required.");
+  }
+})();
+</script>
+
+<header>
+<h1>RankForge AI — Owner Source Hub</h1>
+<div class="sub">V10/V11 extraction → OCR → QC → Owner Review → Approved Master Pool</div>
+</header>
+
+<main>
+<div class="grid" id="stats"></div>
+
+<section>
+<h2>Module Source Import</h2>
+<div class="row">
+<label class="upload">
+Select PDF / ZIP / Scan / Data
+<input id="sourceFile" type="file"
+accept=".pdf,.zip,.png,.jpg,.jpeg,.webp,.json,.jsonl,.ndjson,.csv,.tsv,.txt,.md,.xlsx,.xls,.docx">
+</label>
+<span id="selectedFile" class="small">No file selected</span>
+<button id="importBtn" type="button" onclick="runImport()">Import to Owner Inbox</button>
+<button onclick="refresh()">Refresh</button>
+</div>
+<div class="small">
+V10/V11 extraction is owner-controlled. Uncertain reconstruction is quarantined.
+No answer guessing.
+</div>
+</section>
+
+<section>
+<h2>AI Question Import</h2>
+<div class="row">
+<label class="upload">
+Select AI JSON / JSONL
+<input id="aiFile" type="file" accept=".json,.jsonl,.ndjson">
+</label>
+<button onclick="runAIImport()">Import AI Questions</button>
+</div>
+</section>
+
+<section>
+<h2>Quality Control</h2>
+<div class="row">
+<button onclick="show('inbox')">Owner Inbox</button>
+<button onclick="show('review')">Review Queue</button>
+<button onclick="show('quarantine')">Quarantine</button>
+<button onclick="show('approved')">Approved Master</button>
+<button onclick="approveClean()">Approve Clean</button>
+<button onclick="recheck()">Recheck</button>
+<button onclick="rebuild()">Rebuild Index</button>
+</div>
+<pre id="output">Owner Source Hub ready.</pre>
+</section>
+
+<section>
+<h2>Extraction Architecture</h2>
+<div class="small">
+V10 canonicalization → exact duplicate removal → near-duplicate/family checks →
+V11 OCR/recovery → question reconstruction → quality gates → quarantine/review →
+Owner approval → Canonical Question Pool → Master Pool V2.
+</div>
+</section>
+</main>
+
+<script src="./rankforge-source-engine.js"></script>
+<script src="./rankforge-owner-pdf-auto-adapter.js"></script>
+<script>
+(function(){
+"use strict";
+
+const E=()=>window.RankForgeSourceEngine;
+const A=()=>window.RankForgeOwnerPDFAutoAdapterV4 ||
+          window.RankForgeOwnerPDFAutoAdapter;
+
+function out(x){
+  document.getElementById("output").textContent=
+    typeof x==="string"?x:JSON.stringify(x,null,2);
+}
+
+function refresh(){
+  const e=E();
+  if(!e){out("Source Engine unavailable");return}
+  let s={};
+  try{s=e.stats()}catch(_){}
+  document.getElementById("stats").innerHTML=[
+    ["Owner Inbox",s.ownerInbox ?? s.inbox ?? 0],
+    ["Review Queue",s.review ?? s.reviewQueue ?? 0],
+    ["Quarantine",s.quarantine ?? 0],
+    ["Approved",s.approved ?? 0],
+    ["AI Questions",s.ai ?? s.aiQuestions ?? 0]
+  ].map(x=>'<div class="card"><div class="num">'+x[1]+'</div><div class="label">'+x[0]+'</div></div>').join("");
+}
+
+async function runImport(){
+  const input=document.getElementById("sourceFile");
+  const f=input && input.files && input.files[0];
+
+  if(!f){
+    out("No source selected. Choose a PDF, ZIP, scan, or supported data file first.");
+    return;
+  }
+
+  out(
+    "Selected: " + f.name +
+    "\nSize: " + Math.round(f.size/1024) + " KB" +
+    "\n\nStarting V10/V11 Owner import..."
+  );
+
+  const ext=f.name.split(".").pop().toLowerCase();
+  out("Starting V10/V11 owner import: "+f.name);
+
+  try{
+    if(ext==="zip" &&
+       window.RankForgeOwnerZIPV4 &&
+       typeof window.RankForgeOwnerZIPV4.importZIP==="function"){
+      const r=await window.RankForgeOwnerZIPV4.importZIP(f,{
+        source:"owner-source-hub",
+        pipeline:"V10-V11"
+      });
+      out(r);
+    }
+    else if(["png","jpg","jpeg","webp"].includes(ext) &&
+            A() && typeof A().importScan==="function"){
+      const r=await A().importScan(f,{
+        source:"owner-source-hub",
+        pipeline:"V11-OCR"
+      },{
+        status:x=>out(x)
+      });
+      out(r);
+    }
+    else if(ext==="pdf" &&
+            A() && typeof A().importPDF==="function"){
+      const r=await A().importPDF(f,{
+        source:"owner-source-hub",
+        pipeline:"V10-V11-PDF"
+      },{
+        status:x=>out(x)
+      });
+      out(r);
+    }
+    else if(["json","jsonl","ndjson"].includes(ext)){
+      const text=await f.text();
+      const rows=text.trim().split(/\r?\n/)
+        .filter(Boolean)
+        .map(x=>JSON.parse(x));
+
+      const qs=Array.isArray(rows)?rows:
+        (rows.questions||[]);
+
+      const r=E().submitModuleQuestions(qs,{
+        source:"owner-source-hub",
+        sourceFile:f.name,
+        pipeline:"structured"
+      });
+      out(r);
+    }
+    else{
+      out("No connected extraction adapter for: "+ext+
+          "\nThe file is NOT silently converted.");
+    }
+  }catch(err){
+    out("IMPORT ERROR\n"+(err&&err.stack||err));
+  }
+  refresh();
+}
+
+async function runAIImport(){
+  const f=document.getElementById("aiFile").files[0];
+  if(!f){out("Select AI JSON/JSONL first.");return}
+  try{
+    const text=await f.text();
+    let qs;
+    if(f.name.toLowerCase().endsWith(".jsonl")||
+       f.name.toLowerCase().endsWith(".ndjson")){
+      qs=text.trim().split(/\r?\n/).filter(Boolean).map(JSON.parse);
+    }else{
+      qs=JSON.parse(text);
+    }
+    if(!Array.isArray(qs)) qs=qs.questions||[];
+    const r=E().submitAIQuestions(qs,{
+      source:"owner-source-hub",
+      sourceFile:f.name
+    });
+    out(r);
+    refresh();
+  }catch(err){out("AI IMPORT ERROR\n"+(err.stack||err))}
+}
+
+function show(type){
+  const e=E();
+  const map={
+    inbox:"getOwnerInbox",
+    review:"getReviewQueue",
+    quarantine:"getQuarantine",
+    approved:"getApproved"
+  };
+  try{out(e[map[type]]())}catch(err){out(err.stack||err)}
+}
+
+function approveClean(){
+  try{out(E().bulkApproveClean())}catch(err){out(err.stack||err)}
+  refresh();
+}
+function recheck(){
+  try{out(E().recheckAll())}catch(err){out(err.stack||err)}
+  refresh();
+}
+function rebuild(){
+  try{out(E().rebuildIndex())}catch(err){out(err.stack||err)}
+  refresh();
+}
+
+window.runImport=runImport;
+window.runAIImport=runAIImport;
+window.show=show;
+window.approveClean=approveClean;
+window.recheck=recheck;
+window.rebuild=rebuild;
+window.refresh=refresh;
+
+/* OWNER SOURCE HUB FILE PICKER FIX */
+(function(){
+  const input = document.getElementById("sourceFile");
+  const selected = document.getElementById("selectedFile");
+  const button = document.getElementById("importBtn");
+
+  if (!input) {
+    console.error("Owner Hub: sourceFile input missing");
+    return;
+  }
+
+  input.addEventListener("change", function(){
+    const file = input.files && input.files[0];
+
+    if (!file) {
+      if (selected) selected.textContent = "No file selected";
+      if (button) button.disabled = true;
+      return;
+    }
+
+    if (selected) {
+      selected.textContent =
+        file.name + " • " +
+        Math.round(file.size / 1024) + " KB";
+    }
+
+    if (button) button.disabled = false;
+
+    const outEl = document.getElementById("output");
+    if (outEl) {
+      outEl.textContent =
+        "Selected source:\n" +
+        file.name +
+        "\n\nReady for V10/V11 Owner import.";
+    }
+  });
+
+  if (button) {
+    button.disabled = !(input.files && input.files.length);
+  }
+})();
+
+refresh();
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  function rfBindPicker(){
+    const input=document.getElementById("sourceFile");
+    const selected=document.getElementById("selectedFile");
+    const btn=document.getElementById("importBtn");
+
+    if(!input) return false;
+
+    if(input.dataset.rfPickerBound==="1") return true;
+    input.dataset.rfPickerBound="1";
+
+    input.removeAttribute("disabled");
+
+    input.addEventListener("change",function(){
+      const file=input.files && input.files[0];
+
+      if(selected){
+        selected.textContent=file
+          ? file.name+" ("+Math.round(file.size/1024)+" KB)"
+          : "No file selected";
+      }
+
+      if(btn){
+        btn.disabled=!file;
+      }
+
+      console.log("[RankForge Owner Picker]",file ? {
+        name:file.name,
+        size:file.size,
+        type:file.type
+      } : "NO FILE");
+    });
+
+    if(btn){
+      btn.disabled=!(input.files && input.files.length);
+    }
+
+    return true;
+  }
+
+  if(!rfBindPicker()){
+    const observer=new MutationObserver(function(){
+      if(rfBindPicker()) observer.disconnect();
+    });
+    observer.observe(document.documentElement,{childList:true,subtree:true});
+  }
+})();
+</script>
+<script src="rankforge-owner-pdf-engine-v6.js"></script>
+<script src="./rankforge-universal-source-fabric-v1.js"></script>
+
+<section id="rankforge-owner-module-upload" style="
+  margin:24px 0;
+  padding:20px;
+  border:1px solid rgba(120,140,180,.25);
+  border-radius:18px;
+  background:rgba(20,25,40,.04);
+">
+  <h2 style="margin:0 0 8px">Owner Module Upload</h2>
+  <p style="margin:0 0 16px;opacity:.72">
+    Upload an owner module. It will enter the RankForge ingestion pipeline
+    and remain subject to validation, duplicate, quality and review gates.
+  </p>
+
+  <input
+    id="rankforgeModuleUpload"
+    type="file"
+    accept=".pdf,.json,.jsonl,.ndjson,.xml"
+  />
+
+  <button
+    id="rankforgeModuleUploadButton"
+    type="button"
+    style="margin-top:12px;padding:10px 16px;border-radius:10px"
+  >
+    Import Module
+  </button>
+
+  <button
+    id="rankforgeOwnerPipelineCheck"
+    type="button"
+    style="margin:10px 0;padding:9px 14px;border-radius:10px"
+  >
+    Check Ingestion Pipeline
+  </button>
+
+  <div
+    id="rankforgeModuleUploadStatus"
+    aria-live="polite"
+    style="margin-top:12px"
+  >
+    Ready.
+  </div>
+</section>
+
+
+<script src="./rankforge-module-ingestion-contract-v1.js"></script>
+<script src="./rankforge-module-ingestion-orchestrator-v1.js"></script>
+<script src="./rankforge-owner-pdf-engine-v6.js"></script>
+<script src="./rankforge-module-upload-adapter-v1.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  function boot(){
+    const A=window.RankForgeModuleUploadAdapterV1;
+    if(!A){
+      console.error("[RankForge] Upload Adapter unavailable");
+      return;
+    }
+
+    const input=document.getElementById("rankforgeModuleUpload");
+    const button=document.getElementById("rankforgeModuleUploadButton");
+    const status=document.getElementById("rankforgeModuleUploadStatus");
+    const pipelineCheck=document.getElementById("rankforgeOwnerPipelineCheck");
+
+    if(pipelineCheck){
+      pipelineCheck.addEventListener("click",function(){
+        const A=window.RankForgeModuleUploadAdapterV1;
+        const C=window.RankForgeModuleIngestionContractV1;
+        const O=window.RankForgeModuleIngestionOrchestratorV1;
+        const F=window.RankForgeUniversalSourceFabric;
+        const S=window.RankForgeSourceEngine;
+        const P=window.RankForgeOwnerPDFExtractionEngineV6;
+
+        const report={
+          uploadAdapter:!!A,
+          ingestionContract:!!C,
+          orchestrator:!!O,
+          universalFabric:!!F,
+          sourceEngine:!!S,
+          pdfEngineV6:!!P,
+          importPDF:!!(P && typeof P.importPDF==="function"),
+          canonicalSubmit:!!(
+            S &&
+            typeof S.submitModuleQuestions==="function"
+          ),
+          answerGuessing:false,
+          parallelQuestionDatabase:false,
+          realUpload:false
+        };
+
+        report.pass=
+          Object.values(report).every(v=>v===true || v===false) &&
+          report.uploadAdapter &&
+          report.ingestionContract &&
+          report.orchestrator &&
+          report.universalFabric &&
+          report.sourceEngine &&
+          report.pdfEngineV6 &&
+          report.importPDF &&
+          report.canonicalSubmit &&
+          !report.answerGuessing &&
+          !report.parallelQuestionDatabase &&
+          !report.realUpload;
+
+        console.table(report);
+        status.textContent=report.pass
+          ? "Pipeline ready • PDF V6 → Source Engine → Canonical Pool"
+          : "Pipeline check failed. No upload was started.";
+
+        window.RankForgeOwnerPipelineReport=report;
+      });
+    }
+
+    if(!input || !button || !status) return;
+
+    button.addEventListener("click",async function(){
+      const file=input.files && input.files[0];
+
+      if(button.dataset.ingesting==="1"){
+        return;
+      }
+
+      if(!file){
+        status.textContent="Select a module first.";
+        return;
+      }
+
+      const detected=A.detect(file);
+
+      if(!detected.supported){
+        status.textContent="Unsupported module format.";
+        return;
+      }
+
+      button.dataset.ingesting="1";
+      button.disabled=true;
+      const originalButtonText=button.textContent;
+      button.textContent="Processing…";
+
+      status.textContent=
+        "Module received • "+detected.sourceType+" • processing…";
+
+      try{
+        const result=await A.ingest(file,{
+          owner:true,
+          sourceName:file.name,
+          sourceReference:"owner-module-upload"
+        },{
+          progress:function(x){
+            if(x && x.data && typeof x.data.progress==="number"){
+              status.textContent=
+                "Processing… "+Math.round(x.data.progress*100)+"%";
+            }
+          }
+        });
+
+        const data=(result && result.data) || result || {};
+        const counts=data.counts || data.stats || {};
+
+        const parsed=counts.parsed ?? data.parsed ?? 0;
+        const valid=counts.validated ?? counts.valid ?? data.validated ?? 0;
+        const duplicate=counts.duplicates ?? counts.duplicate ?? data.duplicates ?? 0;
+        const review=counts.review ?? counts.quarantine ?? data.review ?? 0;
+        const approved=counts.approved ?? data.approved ?? 0;
+
+        status.textContent=
+          "Ingestion complete • Parsed: "+parsed+
+          " • Valid: "+valid+
+          " • Duplicate: "+duplicate+
+          " • Review: "+review+
+          " • Approved: "+approved;
+
+        console.log("[RankForge] OWNER MODULE INGESTION RESULT",{
+          file:file.name,
+          parsed,
+          valid,
+          duplicate,
+          review,
+          approved,
+          raw:result
+        });
+
+      }catch(error){
+        console.error("[RankForge] Module ingestion failed",error);
+        status.textContent=
+          "Module processing failed safely. Check the source/review queue.";
+      }finally{
+        button.dataset.ingesting="";
+        button.disabled=false;
+        button.textContent=originalButtonText;
+      }
+    });
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",boot,{once:true});
+  }else{
+    boot();
+  }
+})();
+</script>
+
+<script src="./rankforge-owner-upload-e2e-test.js"></script>
+</body>
+</html>

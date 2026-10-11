@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rank Booster Question Bank</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Arial,sans-serif;background:#f1f5f9;color:#0f172a}
+.wrap{max-width:1100px;margin:auto;padding:18px}
+.hero,.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 3px 14px rgba(0,0,0,.07)}
+h1{margin:0 0 6px}.muted{color:#64748b}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{text-align:center}.num{font-size:26px;font-weight:800}
+.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+select,button{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit}
+button{font-weight:700;cursor:pointer}.primary{background:#4f46e5;color:#fff;border-color:#4f46e5}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #e2e8f0}
+.row:last-child{border-bottom:0}.badge{padding:4px 8px;border-radius:999px;background:#eef2ff;font-size:12px}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<h1>🎯 Rank Booster Question Bank</h1>
+<div class="muted">No fixed question count. A topic is complete only when meaningful concepts, subtopics and genuinely different question patterns are covered.</div>
+</section>
+
+<section class="card grid">
+<div class="stat"><div class="num" id="total">0</div><div class="muted">Questions</div></div>
+<div class="stat"><div class="num" id="topics">0</div><div class="muted">Topics</div></div>
+<div class="stat"><div class="num" id="attempted">0</div><div class="muted">Attempted</div></div>
+<div class="stat"><div class="num" id="mastered">0</div><div class="muted">Mastered</div></div>
+</section>
+
+<section class="card">
+<h2>Choose coverage</h2>
+<div class="filters">
+<select id="subject"><option value="">All Subjects</option><option>Physics</option><option>Chemistry</option><option>Biology</option></select>
+<select id="chapter"><option value="">All Chapters</option></select>
+<select id="mode">
+<option value="all">All covered questions</option>
+<option value="new">New / unattempted</option>
+<option value="weak">Weak topics</option>
+</select>
+</div>
+<button class="primary" style="margin-top:10px" id="start">Start Mastery Test</button>
+</section>
+
+<section class="card">
+<h2>Coverage audit</h2>
+<div id="coverage" class="muted">Loading question-bank data…</div>
+</section>
+</div>
+
+<script src="rank-booster/question-bank.js"></script>
+<script>
+(function(){
+"use strict";
+const bank=window.RankBoosterQuestionBank;
+const qs=bank&&typeof bank.getAll==="function"?bank.getAll():[];
+let attempts=[];
+try{attempts=JSON.parse(localStorage.getItem("rankBoosterAttemptHistory")||"[]")}catch(e){}
+let mastery=[];
+try{mastery=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]")}catch(e){}
+
+document.getElementById("total").textContent=qs.length;
+document.getElementById("attempted").textContent=attempts.length;
+document.getElementById("mastered").textContent=Array.isArray(mastery)?mastery.length:0;
+
+const topicKeys=[...new Set(qs.map(q=>(q.subject||"")+"|"+(q.chapter||"")+"|"+(q.topic||"")))];
+document.getElementById("topics").textContent=topicKeys.filter(Boolean).length;
+
+const subject=document.getElementById("subject");
+const chapter=document.getElementById("chapter");
+const mode=document.getElementById("mode");
+
+function esc(v){
+return String(v==null?"":v).replace(/[&<>"']/g,function(c){
+return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+});
+}
+
+function rebuildChapters(){
+const s=subject.value;
+chapter.innerHTML='<option value="">All Chapters</option>';
+[...new Set(qs.filter(q=>!s||q.subject===s).map(q=>q.chapter).filter(Boolean))]
+.sort().forEach(function(c){
+const o=document.createElement("option");o.value=c;o.textContent=c;chapter.appendChild(o);
+});
+}
+
+function selected(){
+const s=subject.value,c=chapter.value,m=mode.value;
+let data=qs.filter(q=>(!s||q.subject===s)&&(!c||q.chapter===c));
+if(m==="new"){
+const seen=new Set(attempts.map(a=>a.questionId||a.id).filter(Boolean));
+data=data.filter(q=>!seen.has(q.id));
+}
+if(m==="weak"){
+const weak=new Set(attempts.filter(a=>a.correct===false||a.isCorrect===false).map(a=>a.topic).filter(Boolean));
+if(weak.size)data=data.filter(q=>weak.has(q.topic));
+}
+return data;
+}
+
+function render(){
+const data=selected(),groups={};
+data.forEach(function(q){
+const k=[q.subject,q.chapter,q.topic||"Unspecified"].join(" → ");
+groups[k]=(groups[k]||0)+1;
+});
+const keys=Object.keys(groups).sort();
+document.getElementById("coverage").innerHTML=keys.length
+?keys.map(k=>'<div class="row"><span>'+esc(k)+'</span><span class="badge">'+groups[k]+' Q</span></div>').join("")
+:'No questions loaded for this selection yet. Add only verified, non-duplicate Rank Booster questions.';
+}
+
+subject.addEventListener("change",function(){rebuildChapters();render()});
+chapter.addEventListener("change",render);
+mode.addEventListener("change",render);
+
+document.getElementById("start").addEventListener("click",function(){
+const data=selected();
+if(!data.length){alert("No questions are loaded for this selection yet.");return;}
+localStorage.setItem("rbSelectedQuestions",JSON.stringify(data));
+location.href="cbt.html?source=rank-booster";
+});
+
+rebuildChapters();
+render();
+})();
+</script>
+</body>
+</html>

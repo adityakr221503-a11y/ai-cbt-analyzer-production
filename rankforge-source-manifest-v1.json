@@ -1,0 +1,54 @@
+{
+  "version": "RANKFORGE_SOURCE_MANIFEST_V1",
+  "policy": {
+    "requireLicenseVerification": true,
+    "allowCommercialRestrictedContent": false,
+    "allowUnknownProvenance": false,
+    "allowAnswerGuessing": false,
+    "canonicalPoolOnly": true
+  },
+  "sources": [
+    {
+      "id": "owner-upload",
+      "enabled": true,
+      "type": "owner",
+      "adapter": "owner-json",
+      "license": "owner"
+    },
+    {
+      "id": "owner-pdf-v6",
+      "enabled": true,
+      "type": "owner",
+      "adapter": "owner-pdf-v6",
+      "license": "owner"
+    },
+    {
+      "id": "qti",
+      "enabled": true,
+      "type": "standard",
+      "adapter": "qti",
+      "license": "source-dependent"
+    },
+    {
+      "id": "licensed-api",
+      "enabled": false,
+      "type": "external",
+      "adapter": "licensed-api",
+      "license": "requires-verification"
+    },
+    {
+      "id": "open-source-api",
+      "enabled": false,
+      "type": "external",
+      "adapter": "licensed-api",
+      "license": "requires-verification"
+    },
+    {
+      "id": "rankforge-ai",
+      "enabled": true,
+      "type": "generated",
+      "adapter": "rankforge-ai",
+      "license": "rankforge-generated"
+    }
+  ]
+}

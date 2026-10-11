@@ -1,0 +1,617 @@
+"use strict";
+
+(function () {
+
+  const KEY = "pcbNichodE2EReport";
+
+  const results = [];
+
+  function pass(name, detail) {
+    results.push({
+      name,
+      status: "PASS",
+      detail: detail || ""
+    });
+  }
+
+  function fail(name, detail) {
+    results.push({
+      name,
+      status: "FAIL",
+      detail: detail || ""
+    });
+  }
+
+  function check(name, condition, detail) {
+    condition
+      ? pass(name, detail)
+      : fail(name, detail);
+  }
+
+  function getJSON(key) {
+    try {
+      return JSON.parse(
+        localStorage.getItem(key) || "null"
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function countQuestions(value) {
+
+    if (Array.isArray(value))
+      return value.length;
+
+    if (
+      value &&
+      Array.isArray(value.questions)
+    )
+      return value.questions.length;
+
+    if (
+      value &&
+      Array.isArray(value.data)
+    )
+      return value.data.length;
+
+    return 0;
+  }
+
+  function run() {
+
+    results.length = 0;
+
+    /*
+    =========================================
+    1. CORE OBJECTS
+    =========================================
+    */
+
+    check(
+      "NICHOD Unified",
+      !!window.PCBNICHODUnified
+    );
+
+    check(
+      "NICHOD Health",
+      !!window.PCBNICHODHealth
+    );
+
+    check(
+      "PDF Bridge",
+      !!window.PCBNICHODPDF
+    );
+
+    const pagePath =
+      String(
+        location.pathname || ""
+      ).toLowerCase();
+
+    const activeSource =
+      String(
+        localStorage.getItem(
+          "CBT_ACTIVE_SOURCE"
+        ) || ""
+      ).toLowerCase();
+
+    const rankerContext =
+      pagePath.includes(
+        "rankers-test-series"
+      ) ||
+      (
+        pagePath.endsWith("cbt.html") &&
+        activeSource.includes("ranker")
+      );
+
+    check(
+      "Ranker Lifecycle",
+      !rankerContext ||
+      !!window.RankerV11Lifecycle,
+      rankerContext
+        ? (
+            window.RankerV11Lifecycle
+              ? "loaded"
+              : "required but missing"
+          )
+        : "not required on this page"
+    );
+
+    /*
+    =========================================
+    2. SUBJECT SUPPORT
+    =========================================
+    */
+
+    const subjects =
+      window.PCBNICHODUnified?.SUBJECTS;
+
+    check(
+      "Physics support",
+      !!subjects?.Physics
+    );
+
+    check(
+      "Chemistry support",
+      !!subjects?.Chemistry
+    );
+
+    check(
+      "Biology support",
+      !!subjects?.Biology
+    );
+
+    /*
+    =========================================
+    3. PDF QUESTION POOL
+    =========================================
+    */
+
+    const pdf =
+      getJSON(
+        "pdfCbtQuestions"
+      );
+
+    const pdfCount =
+      countQuestions(pdf);
+
+    check(
+      "PDF question pool",
+      pdfCount > 0,
+      pdfCount +
+      " question(s)"
+    );
+
+    /*
+    =========================================
+    4. RANKER SELECTION
+    =========================================
+    */
+
+    const selected =
+      getJSON(
+        "rbSelectedQuestions"
+      );
+
+    const selectedCount =
+      countQuestions(selected);
+
+    check(
+      "Ranker selection pool",
+      selectedCount > 0,
+      selectedCount +
+      " question(s)"
+    );
+
+    /*
+    =========================================
+    5. CBT SOURCE
+    =========================================
+    */
+
+    const source =
+      localStorage.getItem(
+        "CBT_ACTIVE_SOURCE"
+      );
+
+    check(
+      "CBT source recorded",
+      !!source,
+      source || "not recorded"
+    );
+
+    /*
+    =========================================
+    6. NICHOD PLAN
+    =========================================
+    */
+
+    const plan =
+      getJSON(
+        "pcbNichodAdaptivePlan"
+      );
+
+    check(
+      "Adaptive plan",
+      !!plan
+    );
+
+    check(
+      "Adaptive next action",
+      !!plan?.nextAction
+    );
+
+    /*
+    =========================================
+    7. MENTOR EVIDENCE
+    =========================================
+    */
+
+    const evidence =
+      getJSON(
+        "pcbNichodMentorEvidence"
+      );
+
+    const historyForMentor =
+      getJSON(
+        "cbtHistory"
+      );
+
+    /*
+     * Mentor evidence is produced by the post-test flow.
+     * Before the first completed attempt, absence is expected.
+     */
+    const mentorEvidenceReady =
+      !!evidence ||
+      !Array.isArray(historyForMentor) ||
+      historyForMentor.length === 0;
+
+    check(
+      "Mentor evidence store",
+      mentorEvidenceReady,
+      mentorEvidenceReady
+        ? (
+            evidence
+              ? "available"
+              : "awaiting first completed test"
+          )
+        : "missing after completed test"
+    );
+
+    /*
+    =========================================
+    8. HISTORY
+    =========================================
+    */
+
+    const history =
+      getJSON(
+        "cbtHistory"
+      );
+
+    check(
+      "CBT history store",
+      history !== null
+    );
+
+    /*
+    =========================================
+    9. HEALTH REPORT
+    =========================================
+    */
+
+    const health =
+      window.PCBNICHODHealth?.getReport?.();
+
+    check(
+      "NICHOD health report",
+      !!health
+    );
+
+    if (health) {
+
+      const healthStatus =
+        health.status ||
+        (
+          health.health &&
+          health.health.percentage === 100
+            ? "PASS"
+            : "ATTENTION"
+        );
+
+      check(
+        "Health status",
+        healthStatus === "PASS",
+        healthStatus
+      );
+
+    }
+
+    /*
+    =========================================
+    10. ADAPTIVE FUNCTION
+    =========================================
+    */
+
+    const unified =
+      window.PCBNICHODUnified;
+
+    let adaptiveOK = false;
+
+    try {
+
+      const action =
+        unified?.buildNextAction?.();
+
+      adaptiveOK =
+        !!action &&
+        typeof action === "object";
+
+    } catch (_) {}
+
+    check(
+      "Adaptive next-action engine",
+      adaptiveOK
+    );
+
+    /*
+    =========================================
+    FINAL
+    =========================================
+    */
+
+    const passed =
+      results.filter(
+        x => x.status === "PASS"
+      ).length;
+
+    const failed =
+      results.filter(
+        x => x.status === "FAIL"
+      ).length;
+
+    const report = {
+
+      version: 1,
+
+      timestamp:
+        new Date().toISOString(),
+
+      page:
+        location.pathname,
+
+      passed,
+
+      failed,
+
+      total:
+        results.length,
+
+      status:
+        failed === 0
+          ? "PASS"
+          : "ATTENTION",
+
+      results
+
+    };
+
+    localStorage.setItem(
+      KEY,
+      JSON.stringify(
+        report,
+        null,
+        2
+      )
+    );
+
+    render(report);
+
+    return report;
+
+  }
+
+  function render(report) {
+
+    const old =
+      document.getElementById(
+        "nichodE2EPanel"
+      );
+
+    if (old)
+      old.remove();
+
+    const panel =
+      document.createElement(
+        "section"
+      );
+
+    panel.id =
+      "nichodE2EPanel";
+
+    panel.style.cssText =
+      [
+        "position:relative",
+        "margin:16px",
+        "padding:18px",
+        "border:2px solid #888",
+        "border-radius:16px",
+        "background:#fff",
+        "font-family:system-ui",
+        "z-index:9999"
+      ].join(";");
+
+    let html =
+      "<h2>🧪 PCB NICHOD E2E Test</h2>";
+
+    html +=
+      "<p><b>Status:</b> " +
+      report.status +
+      "</p>";
+
+    html +=
+      "<p>PASS: " +
+      report.passed +
+      " | FAIL: " +
+      report.failed +
+      "</p>";
+
+    html += "<hr>";
+
+    report.results.forEach(
+      item => {
+
+        html +=
+          "<div style='margin:6px 0'>" +
+          (
+            item.status === "PASS"
+              ? "✅ "
+              : "❌ "
+          ) +
+          "<b>" +
+          item.name +
+          "</b>" +
+          (
+            item.detail
+              ? " — " +
+                item.detail
+              : ""
+          ) +
+          "</div>";
+
+      }
+    );
+
+    html +=
+      "<hr><button id='nichodE2ERun' " +
+      "style='padding:10px 16px'>" +
+      "Run Again" +
+      "</button>";
+
+    panel.innerHTML =
+      html;
+
+    document.body.prepend(
+      panel
+    );
+
+    document
+      .getElementById(
+        "nichodE2ERun"
+      )
+      ?.addEventListener(
+        "click",
+        run
+      );
+
+  }
+
+  window.PCBNICHODE2E = {
+    run,
+    getReport:
+      () =>
+        getJSON(KEY)
+  };
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+
+        setTimeout(
+          run,
+          1000
+        );
+
+      }
+    );
+
+  } else {
+
+    setTimeout(
+      run,
+      1000
+    );
+
+  }
+
+})();
+
+
+/* RANKFORGE_NICHOD_E2E_UI_HIDDEN_V1
+ * E2E diagnostics remain available to the engine,
+ * but raw PASS/FAIL diagnostics are never shown to students.
+ */
+(function(){
+  "use strict";
+
+  function hideNichodE2EUI(){
+    function hideNode(el){
+      if(!el || el.nodeType !== 1) return;
+
+      el.style.setProperty("display","none","important");
+      el.style.setProperty("visibility","hidden","important");
+      el.style.setProperty("opacity","0","important");
+      el.setAttribute("aria-hidden","true");
+      el.setAttribute("data-rankforge-internal","nichod-e2e");
+
+      /*
+       * The harness may create the visible diagnostic card inside
+       * another wrapper. Hide the nearest meaningful container too.
+       */
+      let parent = el.parentElement;
+      for(let i=0; i<4 && parent; i++){
+        const text = (parent.innerText || parent.textContent || "").trim();
+        if(
+          text.includes("PCB NICHOD E2E Test") ||
+          (
+            text.includes("NICHOD Unified") &&
+            text.includes("NICHOD Health") &&
+            (text.includes("PASS:") || text.includes("FAIL:"))
+          )
+        ){
+          parent.style.setProperty("display","none","important");
+          parent.style.setProperty("visibility","hidden","important");
+          parent.style.setProperty("opacity","0","important");
+          parent.setAttribute("aria-hidden","true");
+          parent.setAttribute("data-rankforge-internal","nichod-e2e");
+        }
+        parent = parent.parentElement;
+      }
+    }
+
+    function scan(){
+      const selectors = [
+        "#nichod-e2e-overlay",
+        ".nichod-e2e",
+        ".nichod-e2e-panel",
+        ".nichod-e2e-overlay",
+        ".pcb-nichod-e2e",
+        "[data-nichod-e2e]",
+        '[data-testid="nichod-e2e"]',
+        '[id*="nichod-e2e"]',
+        '[class*="nichod-e2e"]'
+      ];
+
+      document.querySelectorAll(selectors.join(",")).forEach(hideNode);
+
+      document.querySelectorAll("body *").forEach(el=>{
+        const text = (el.innerText || el.textContent || "").trim();
+        if(
+          text === "PCB NICHOD E2E Test" ||
+          text.includes("PCB NICHOD E2E Test") ||
+          (
+            text.includes("NICHOD Unified") &&
+            text.includes("NICHOD Health") &&
+            text.includes("PASS:")
+          )
+        ){
+          hideNode(el);
+        }
+      });
+    }
+
+    scan();
+
+    if(!window.__RANKFORGE_NICHOD_HIDE_OBSERVER__){
+      window.__RANKFORGE_NICHOD_HIDE_OBSERVER__ = new MutationObserver(function(){
+        scan();
+      });
+
+      if(document.body){
+        window.__RANKFORGE_NICHOD_HIDE_OBSERVER__.observe(document.body,{
+          childList:true,
+          subtree:true
+        });
+      }
+    }
+  }
+
+  window.addEventListener("load", function(){
+    setTimeout(hideNichodE2EUI, 100);
+  }, {once:true});
+})();
