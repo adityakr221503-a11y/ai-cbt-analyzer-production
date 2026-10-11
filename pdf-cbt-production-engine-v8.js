@@ -876,10 +876,101 @@ console.info(
     };
   }
 
+  /* ---- RankForge importer upgrade: inline options + answer keys ---- */
+  function rfSplitInline(line,kind){
+    const x=rfCleanLine(line);
+    const first=kind==='num' ? rfNumericOptionStart(x) : rfOptionStart(x);
+    if(!first) return [];
+    const firstKey=kind==='num' ? String(first.index+1) : first.letter;
+    const paren=/^[\(\[]/.test(x);
+    const body=kind==='num' ? '[1-4]' : '[A-Da-d]';
+    const re=paren
+      ? new RegExp('(?:^|\\s)[\\(\\[]\\s*('+body+')\\s*[\\)\\]]\\s*','g')
+      : new RegExp('(?:^|\\s)('+body+')\\)\\s+','g');
+    const marks=[];
+    let m;
+    while((m=re.exec(x))!==null){
+      marks.push({key:m[1].toUpperCase(),start:m.index,end:re.lastIndex});
+    }
+    let expect=firstKey.charCodeAt(0);
+    const seq=[];
+    for(const mk of marks){
+      if(mk.key.charCodeAt(0)===expect){ seq.push(mk); expect++; }
+    }
+    const part=function(key,text){
+      return kind==='num'
+        ? {index:Number(key)-1,text:rfCleanLine(text)}
+        : {letter:key,text:rfCleanLine(text)};
+    };
+    if(seq.length<2){
+      return [kind==='num'
+        ? {index:first.index,text:first.text}
+        : {letter:first.letter,text:first.text}];
+    }
+    return seq.map(function(mk,i){
+      return part(mk.key,x.slice(mk.end,i+1<seq.length ? seq[i+1].start : x.length));
+    });
+  }
+  function rfAnswerToIndex(tok){
+    const t=String(tok||'').trim().toUpperCase();
+    if(/^[A-D]$/.test(t)) return t.charCodeAt(0)-65;
+    if(/^[1-4]$/.test(t)) return Number(t)-1;
+    return -1;
+  }
+  function rfInlineAnswer(line){
+    const m=rfCleanLine(line).match(/^(?:correct\s*answer|answer|ans)\s*[:\-\u2013=]?\s*[\(\[]?\s*([A-Da-d1-4])\s*[\)\]]?(?=\s|$|[.,;])/i);
+    return m ? rfAnswerToIndex(m[1]) : -1;
+  }
+  function rfAttachAnswer(q,idx){
+    if(q && idx>=0 && idx<4 && q.options && q.options[idx]){
+      q.correctIndex=idx;
+      q.correctAnswer=q.options[idx];
+      q.answerSource='pdf-inline';
+    }
+    return q;
+  }
+  function rfApplyKeyTable(pages,out){
+    const map=new Map();
+    let inKey=false;
+    const pair=/(\d{1,3})\s*[\.\-\u2013:\)]?\s*[\(\[]?\s*([A-Da-d1-4])\s*[\)\]]?(?=\s|$|[,;])/g;
+    for(const pg of (pages||[])){
+      for(const row of (pg.rows||[])){
+        const t=rfCleanLine(row && row.text);
+        if(!t) continue;
+        if(/^(answer\s*keys?|answers|key\s*to\s*answers|ans\.?\s*key)\b/i.test(t)){ inKey=true; }
+        if(!inKey) continue;
+        const found=[]; let m;
+        pair.lastIndex=0;
+        while((m=pair.exec(t))!==null) found.push(m);
+        if(!found.length) continue;
+        const rest=t.replace(pair,' ').replace(/^(answer\s*keys?|answers|key\s*to\s*answers|ans\.?\s*key)[\s:.\-]*/i,'');
+        if(!/^[\s,;|.\-\u2013:]*$/.test(rest)) continue;
+        for(const f of found){
+          const n=Number(f[1]);
+          if(!map.has(n)) map.set(n,rfAnswerToIndex(f[2]));
+        }
+      }
+    }
+    if(!map.size) return 0;
+    let applied=0;
+    for(const q of out){
+      if(q.correctIndex>=0) continue;
+      const idx=map.get(Number(q.number));
+      if(idx>=0 && idx<4 && q.options[idx]){
+        q.correctIndex=idx;
+        q.correctAnswer=q.options[idx];
+        q.answerSource='pdf-key';
+        applied++;
+      }
+    }
+    return applied;
+  }
+
   function parseGroup(lines,number,page,hasImages){
     let stem=[];
     const opts={A:'',B:'',C:'',D:''};
     let current='';
+    let answerIndex=-1;
 
     for(const raw of lines){
       let line=rfCleanLine(raw);
@@ -893,15 +984,21 @@ console.info(
       /*
        * Answer keys are NOT part of the visible test question.
        */
-      if(/^(answer|ans|correct\s*answer|answer\s*key)\b/i.test(line))
+      if(/^(answer|ans|correct\s*answer|answer\s*key)\b/i.test(line)){
+        const ak=rfInlineAnswer(line);
+        if(ak>=0) answerIndex=ak;
         continue;
+      }
 
       const os=rfOptionStart(line);
 
       if(os){
-        current=os.letter;
-        if(!opts[current]) opts[current]=os.text;
-        else opts[current]=rfCleanLine(opts[current]+' '+os.text);
+        const parts=rfSplitInline(line,'alpha');
+        for(const part of parts){
+          current=part.letter;
+          if(!opts[current]) opts[current]=part.text;
+          else opts[current]=rfCleanLine(opts[current]+' '+part.text);
+        }
         continue;
       }
 
@@ -912,33 +1009,43 @@ console.info(
       }
     }
 
-    return rfMakeQuestion(
+    return rfAttachAnswer(rfMakeQuestion(
       number,
       stem.join(' '),
       ['A','B','C','D'].map(k=>opts[k]),
       page,
       hasImages
-    );
+    ),answerIndex);
   }
 
   function parseNumericGroup(lines,number,page,hasImages){
     let stem=[];
     const opts=['','','',''];
     let current=-1;
+    let answerIndex=-1;
 
     for(const raw of lines){
       const line=rfCleanLine(raw);
       if(!line) continue;
       if(rfLooksGarbage(line)) continue;
 
-      if(/^(answer|ans|correct\s*answer|answer\s*key)\b/i.test(line))
+      if(/^(answer|ans|correct\s*answer|answer\s*key)\b/i.test(line)){
+        const ak=rfInlineAnswer(line);
+        if(ak>=0) answerIndex=ak;
         continue;
+      }
 
       const os=rfNumericOptionStart(line);
 
       if(os && os.index>=0 && os.index<4){
-        current=os.index;
-        opts[current]=os.text;
+        const parts=rfSplitInline(line,'num');
+        for(const part of parts){
+          if(part.index<0 || part.index>3) continue;
+          current=part.index;
+          opts[current]=opts[current]
+            ? rfCleanLine(opts[current]+' '+part.text)
+            : part.text;
+        }
         continue;
       }
 
@@ -948,13 +1055,13 @@ console.info(
         stem.push(line);
     }
 
-    return rfMakeQuestion(
+    return rfAttachAnswer(rfMakeQuestion(
       number,
       stem.join(' '),
       opts,
       page,
       hasImages
-    );
+    ),answerIndex);
   }
 
   function parsePages(pages){
@@ -1069,6 +1176,7 @@ console.info(
         Math.random().toString(36).slice(2,8);
     });
 
+    diagnostics.keysApplied=rfApplyKeyTable(pages,out);
     diagnostics.final=out.length;
     diagnostics.duplicatesRemoved=diagnostics.valid-out.length;
 

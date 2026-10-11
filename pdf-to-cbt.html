@@ -479,7 +479,7 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
   <title>PDF → CBT | CBT Analyzer Pro</title>
@@ -3941,7 +3941,7 @@ function openCBTWithPDFQuestions() {
     /* Optional global bridge for same-page integrations */
     window.CBT_ACTIVE_TEST = activeTest;
 
-    window.location.href = "./cbt.html";
+    window.location.href = "./cbt.html?source=pdf";
   } catch (error) {
     console.error("PDF → CBT handoff failed:", error);
     alert(
@@ -4433,7 +4433,7 @@ function openTest180InCBT() {
 
 
   window.location.href =
-    "./cbt.html";
+    "./cbt.html?source=pdf";
 
 }
 
@@ -4942,7 +4942,7 @@ function startTest180() {
 
 
   window.location.href =
-    "./cbt.html";
+    "./cbt.html?source=pdf";
 
 }
 

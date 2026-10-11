@@ -578,6 +578,8 @@
   }
 
   function render() {
+    /* Disabled: Mistake Book page has its own list; this duplicate panel used an incompatible data format. */
+    return;
     if (!document.body) return;
 
     const page = location.pathname.toLowerCase();

@@ -173,6 +173,7 @@ input.txt{width:100%;padding:13px;border-radius:14px;border:1px solid var(--line
   <div class="list" id="tools">
     <a class="glass row" href="nichod-hub.html"><span class="ic c-purple">🧠</span><div><strong>NICHOD Hub</strong><span>Pattern, concept, mistake and mastery intelligence</span></div></a>
     <a class="glass row" href="study-vault/"><span class="ic c-blue">📚</span><div><strong>Study Vault</strong><span>Notes, screenshots, PDFs and important questions</span></div></a>
+    <a class="glass row" href="rankforge-system-check.html"><span class="ic c-green">✅</span><div><strong>System Check</strong><span>One-tap health check of data, banks and pages</span></div></a>
     <a class="glass row" href="privacy.html"><span class="ic c-teal">🛡️</span><div><strong>Privacy</strong><span>Your study data stays under your control</span></div></a>
     <a class="glass row" href="security.html"><span class="ic c-green">🔐</span><div><strong>Security</strong><span>How local data and protected modules are handled</span></div></a>
     <a class="glass row" data-owner-only href="rankforge-owner-ai.html"><span class="ic c-pink">🧰</span><div><strong>Owner AI Guardian</strong><span>Diagnostics, verified repair and evidence</span></div></a>
@@ -213,6 +214,7 @@ input.txt{width:100%;padding:13px;border-radius:14px;border:1px solid var(--line
   </div>
 </div>
 
+<script src="./rankforge-canonical-v1.js"></script>
 <script src="./rankforge-v318-stability-v1.js"></script>
 <script src="./rankforge-universal-source-fabric-v1.js"></script>
 <script>
@@ -233,7 +235,8 @@ var NAV = {
     ["🎯","Adaptive DPP","Performance-based deliberate practice","ranker-command-center.html","c-purple"],
     ["✨","AI Practice","AI-generated questions with explanations","ai-question-lab.html","c-pink"],
     ["🧪","AI Test Generator","Build a test from your weak topics","ai-test-generator.html","c-blue"],
-    ["🔁","Retry Mistakes","Re-attempt questions you got wrong","retry.html","c-teal"]]},
+    ["🔁","Retry Mistakes","Re-attempt questions you got wrong","retry.html","c-teal"],
+    ["🏷️","Tag Based Questions","Drill by question type: statement, matching, A-R and more","tag-practice.html","c-pink"]]},
   tests:{k:"TESTS",t:"Attempt. Analyse. Improve.",d:"Real exam-style CBT with full analysis.",items:[
     ["🏆","Ranker Test Series","Pre-test → CBT → post-test analysis","rankers-test-series.html","c-amber"],
     ["⏱️","CBT","Computer-based testing","cbt.html","c-blue"],
@@ -279,11 +282,11 @@ function pct(a){var n=Number(a.questionCount)||0;return n?Math.round((Number(a.c
 function ago(t){if(!t)return"";var m=Math.round((Date.now()-t)/60000);if(m<1)return"just now";if(m<60)return m+" min ago";var h=Math.round(m/60);if(h<24)return h+" h ago";return Math.round(h/24)+" d ago"}
 
 function render(){
-  var hist=list("cbtHistory").filter(function(a){return a&&typeof a==="object"}).sort(function(a,b){return ts(a)-ts(b)});
+  var hist=list("cbtHistory").filter(function(a){return a&&typeof a==="object"&&Number(a.questionCount)>0}).sort(function(a,b){return ts(a)-ts(b)});
   var tests=hist.length, last=tests?pct(hist[tests-1]):null;
   var qs=0,ok=0; hist.forEach(function(a){qs+=Number(a.questionCount)||0;ok+=Number(a.correct)||0});
   var acc=qs?Math.round(ok/qs*100):0;
-  var mist=list("rankforgeMistakesV1").filter(function(m){return m&&m.status!=="mastered"}).length;
+  var mist=(window.RFData?RFData.active().length:list("rankforgeMistakesV1").filter(function(m){return m&&m.status!=="mastered"}).length);
   var start=new Date();start.setHours(0,0,0,0);
   var today=0; hist.forEach(function(a){if(ts(a)>=start.getTime())today+=Number(a.questionCount)||0});
   var prem=read(PREMIUM_KEY,{}), goal=Math.max(1,Number(prem.dailyTarget)||30);

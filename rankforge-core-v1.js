@@ -147,7 +147,8 @@ document.addEventListener("click", function(e) {
   if (go) {
     const target = go.getAttribute("data-go");
 
-    if (target && target !== "#") {
+    /* Only real page links navigate; in-page tab ids (home, learn, practice...) belong to the page itself. */
+    if (target && /(\.html?($|[?#])|^\.{0,2}\/|^https?:)/i.test(target)) {
       e.preventDefault();
       location.href = target;
     }

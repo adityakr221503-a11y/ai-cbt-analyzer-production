@@ -3,7 +3,7 @@
 <head>
 
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover">
 <title>RankForge Biology CBT</title>
 
 <style>
@@ -172,6 +172,16 @@ button:disabled{opacity:.5;cursor:not-allowed}
 })();
 </script>
 
+<style id="rf-cbt-polish">
+.option{display:flex!important;align-items:center;gap:12px;text-align:left;padding:12px 14px!important;border-radius:16px!important;min-height:56px;line-height:1.45}
+.option .rf-letter{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eef0ff;color:#4338ca;font-weight:800}
+.option.selected{border-color:#4f46e5!important;background:#eef0ff!important}
+.option.selected .rf-letter{background:#4f46e5;color:#fff}
+.option .rf-optx{flex:1;overflow-wrap:anywhere}
+#cbt .actions{position:sticky;bottom:0;z-index:30;background:rgba(255,255,255,.96);padding:10px 4px calc(10px + env(safe-area-inset-bottom,0px));margin-top:12px;border-top:1px solid #e5e7eb;gap:8px}
+#cbt .actions{display:flex!important;flex-wrap:nowrap!important}#cbt .actions button{flex:1 1 0;min-height:46px;border-radius:14px;padding:10px 4px;font-size:14px;margin:0}#cbt .actions #nextButton{flex:1.5 1 0}
+@media print{body{background:#fff!important}header,#setup,#cbt,#pdfButton,#retryButton,#backButton,#rankforgeResultNav,.actions{display:none!important}#result{display:block!important}#result.hidden{display:block!important}}
+</style>
 </head>
 
 <body>
@@ -309,6 +319,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <button id="backButton" class="secondary">
    Back to Tests
   </button>
+  <button id="pdfButton" class="secondary" type="button">Save as PDF</button>
  </div>
 
 </section>
@@ -483,6 +494,11 @@ function loadTest(){
   if (q.length !== expected) {
    throw new Error("Test " + testNo + " source count is " + q.length + " (expected " + expected + ")");
   }
+  /* Skip questions whose options/text could not be recovered from the PDF. */
+  q = q.filter(x => !x.needsReview);
+  if (!q.length) {
+   throw new Error("Test " + testNo + " has no usable questions.");
+  }
  }
 
  let count = $("questionCount").value === "all"
@@ -491,9 +507,7 @@ function loadTest(){
 
  // If a PDF has fewer questions than a preset (e.g. 10), use its real count.
  if (pdfMode && (!Number.isFinite(count) || count > q.length)) count = q.length;
- if (count > q.length) {
-  throw new Error("Requested " + count + " questions but source has " + q.length);
- }
+ if (count > q.length) count = q.length;
 
  q = q.slice(0, count);
  if ($("orderSelect").value === "random") q = shuffle(q);
@@ -573,10 +587,7 @@ function render(){
     ?" selected"
     :"");
 
-  button.textContent =
-   String.fromCharCode(65+index)+
-   ". "+
-   text;
+  {const lt=document.createElement("b");lt.className="rf-letter";lt.textContent=String.fromCharCode(65+index);const tx=document.createElement("span");tx.className="rf-optx";tx.textContent=String(text);button.appendChild(lt);button.appendChild(tx);}
 
   button.onclick=function(){
 
@@ -1730,5 +1741,8 @@ bootCBTSource();
 
 
 
+<script>
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("#pdfButton");if(!b)return;var t=document.title;document.title="RankForge CBT result";window.print();document.title=t;});
+</script>
 </body>
 </html>

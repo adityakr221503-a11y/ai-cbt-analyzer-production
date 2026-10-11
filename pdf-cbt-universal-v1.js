@@ -431,7 +431,7 @@ function install(){const input=$("#pdfInput"),button=$("#convertButton");if(!inp
   sessionStorage.setItem(ACTIVE_SOURCE,"PDF");
   sessionStorage.setItem("CBT_ACTIVE_TEST_ID",testId);
 
-  location.href="./cbt.html";
+  location.href="./cbt.html?source=pdf";
 });row.appendChild(open)}preview(safeGet(KEY,[]))}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install);else install();
 window.PDFCBTUniversalV1={convert,extractTextPages,ocrPages,parsePages,resolveAI};

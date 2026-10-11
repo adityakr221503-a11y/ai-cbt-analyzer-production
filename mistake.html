@@ -952,8 +952,7 @@ if (isBiology) {
     }
   }
 
-  window.location.href =
-    "biology-7196-cbt.html?retry=biology&v=20260929&v=20260929&v=20260926";
+  window.location.href = "retry.html?id=" + encodeURIComponent(String(q.id || q.questionId || retryQuestion.id || ""));
 
   return;
 }
@@ -981,11 +980,7 @@ status.textContent=
 
 }
 
-setTimeout(function(){
-
-window.location.href="retry.html";
-
-},250);
+setTimeout(function(){window.location.href="retry.html?id="+encodeURIComponent(String(q.id||q.questionId||""));},250);
 
 }catch(error){
 
@@ -1161,6 +1156,8 @@ type="button">
 🔄 Retry This Question
 
 </button>
+<button class="mastered-btn" type="button" style="margin-top:8px;width:100%;padding:12px;border:0;border-radius:12px;background:#16a34a;color:#fff;font-weight:700">✓ Mark Mastered</button>
+
 
 `;
 
@@ -1176,9 +1173,9 @@ event.preventDefault();
 event.stopPropagation();
 
 practiceQuestion(q);
-
 });
-
+const mbtn=div.querySelector(".mastered-btn");
+if(mbtn){mbtn.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();if(window.RFData&&RFData.markMastered(q)){updateCounts();showActive();}});}
 list.appendChild(div);
 
 });
@@ -1491,6 +1488,7 @@ else
 })();
 </script>
 <!-- /RANKFORGE_MISTAKE_BOOK_BRIDGE_V1 -->
+<script src="./rankforge-canonical-v1.js"></script>
 <script src="./rankforge-unified-student-layer-v2.js" defer></script>
 
 <div id="rankforgeLectureFallback" style="display:block !important;visibility:visible !important;opacity:1 !important;"><a href="rankforge-lecture-module/pages/lectures.html" style="display:block !important;visibility:visible !important;opacity:1 !important;">🎓 <strong>AI Lectures</strong> — NCERT-first lectures, AI explanation and practice.</a></div>

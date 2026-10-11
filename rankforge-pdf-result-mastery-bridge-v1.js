@@ -223,6 +223,8 @@
    * RankForge mistake system.
    */
   function syncMistakes() {
+    /* Disabled: the CBT already saves mistakes; this bridge re-added correct answers as mistakes. */
+    return [];
     const test = activeTest();
     if (!test || !Array.isArray(test.questions)) return [];
 

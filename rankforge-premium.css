@@ -1,0 +1,83 @@
+/* RankForge premium theme v1 - shared tokens and components */
+:root{--rf-bg:#070b1a;--rf-bg2:#10133a;--rf-card:rgba(255,255,255,.06);--rf-card2:rgba(255,255,255,.1);--rf-line:rgba(130,140,255,.28);--rf-ink:#eaf0ff;--rf-mute:#a3aed0;--rf-a:#6366f1;--rf-b:#8b5cf6;--rf-c:#22d3ee;--rf-ok:#34d399;--rf-bad:#f87171;--rf-warn:#fbbf24;--rf-r:20px}
+html{background:var(--rf-bg);-webkit-text-size-adjust:100%}
+body.rf-page{margin:0;min-height:100vh;color:var(--rf-ink);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(900px 520px at 90% -8%,rgba(139,92,246,.38),transparent 60%),radial-gradient(700px 480px at -10% 8%,rgba(34,211,238,.18),transparent 55%),linear-gradient(180deg,var(--rf-bg),var(--rf-bg2));background-attachment:fixed;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+.rf-page *{box-sizing:border-box}
+.rf-top{display:flex;align-items:center;gap:12px;padding:12px 16px;position:sticky;top:0;z-index:20;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);background:rgba(7,11,26,.78);border-bottom:1px solid var(--rf-line)}
+.rf-top h1{font-size:19px;margin:0;line-height:1.2}.rf-top p{margin:0;color:var(--rf-mute);font-size:12.5px}
+.rf-top>div{flex:1;min-width:0}
+.rf-back{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--rf-card2);border:1px solid var(--rf-line);color:var(--rf-ink);text-decoration:none;font-size:20px}
+.rf-pill,.rf-chip{display:inline-block;padding:4px 11px;border-radius:99px;background:rgba(99,102,241,.2);border:1px solid var(--rf-line);color:#c7d2fe;font-size:12.5px;font-weight:600}
+.rf-chip{margin:0 0 10px}
+.rf-wrap{max-width:640px;margin:0 auto;padding:16px}
+.rf-card{background:var(--rf-card);border:1px solid var(--rf-line);border-radius:var(--rf-r);padding:16px;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.rf-hero{background:linear-gradient(135deg,rgba(99,102,241,.35),rgba(139,92,246,.22) 55%,rgba(34,211,238,.14));border-color:rgba(165,180,252,.5)}
+.rf-hero h2{margin:4px 0 6px;font-size:24px;line-height:1.25}
+.rf-eyebrow{font-size:11.5px;letter-spacing:.12em;font-weight:700;color:#a5b4fc}
+.rf-mute{color:var(--rf-mute);margin:6px 0 0}
+.rf-note{color:var(--rf-warn);font-size:13.5px;margin:0 0 12px}
+.rf-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.rf-stat{background:var(--rf-card);border:1px solid var(--rf-line);border-radius:18px;padding:14px}
+.rf-stat b{display:block;font-size:28px;line-height:1.1}.rf-stat span{color:var(--rf-mute);font-size:13px}
+.rf-btn{display:block;width:100%;border:0;border-radius:16px;padding:14px 18px;font:inherit;font-weight:700;color:#fff;background:linear-gradient(90deg,var(--rf-a),var(--rf-b));box-shadow:0 8px 24px rgba(99,102,241,.45);cursor:pointer;text-align:center;text-decoration:none;margin:0 0 10px;min-height:50px}
+.rf-btn.ghost{background:var(--rf-card2);box-shadow:none;border:1px solid var(--rf-line)}
+.rf-btn.small{display:inline-block;width:auto;padding:10px 16px;min-height:0;font-size:14px}
+.rf-bar{height:8px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;margin:0 0 14px}
+.rf-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--rf-c),var(--rf-b));border-radius:9px;transition:width .35s}
+.rf-q{font-size:18px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.rf-opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--rf-card);color:var(--rf-ink);border:1.5px solid var(--rf-line);border-radius:16px;padding:12px 14px;margin:0 0 10px;font:inherit;cursor:pointer;min-height:56px}
+.rf-opt b{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(99,102,241,.25)}
+.rf-opt span{overflow-wrap:anywhere}
+.rf-opt.ok{border-color:var(--rf-ok);background:rgba(52,211,153,.15)}
+.rf-opt.bad{border-color:var(--rf-bad);background:rgba(248,113,113,.15)}
+.rf-ok{color:var(--rf-ok)}.rf-bad{color:var(--rf-bad)}.rf-warn{color:var(--rf-warn)}
+.rf-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.rf-row:last-child{border-bottom:0}.rf-row .ic{flex:none;width:24px;text-align:center}.rf-row .tx{flex:1;min-width:0}.rf-row .tx small{display:block;color:var(--rf-mute);overflow-wrap:anywhere}
+.rf-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(9,13,33,.92);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--rf-line)}
+.rf-nav a{flex:1;text-align:center;color:var(--rf-mute);text-decoration:none;font-size:11px;padding:6px 0;border-radius:14px;line-height:1.3}
+.rf-nav a span{display:block;font-size:19px}.rf-nav a.on{color:#fff;background:rgba(99,102,241,.25)}
+
+/* ===== HOME SKIN (index.html only: body.rf-home) ===== */
+body.rf-home{margin:0;min-height:100vh;color:var(--rf-ink)!important;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif!important;background:radial-gradient(900px 520px at 90% -8%,rgba(139,92,246,.38),transparent 60%),radial-gradient(700px 480px at -10% 8%,rgba(34,211,238,.18),transparent 55%),linear-gradient(180deg,var(--rf-bg),var(--rf-bg2))!important;background-attachment:fixed!important;display:flex;flex-direction:column;align-items:center;padding:calc(10px + env(safe-area-inset-top,0px)) 0 calc(140px + env(safe-area-inset-bottom,0px))}
+body.rf-home>main.app{display:contents}
+body.rf-home .top,body.rf-home .page,body.rf-home .note,body.rf-home #rankforge-student-dashboard,body.rf-home #rf-unified-student-v2,body.rf-home #rankforgePremiumPanel,body.rf-home #rankforgeBasicFeaturesV1,body.rf-home #rankforgeNichodNextActionV1,body.rf-home #rankforgeMistakeMasteryV1,body.rf-home #rankforgeResetCard,body.rf-home #rankforge-ai-generator-entry{width:calc(100% - 28px)!important;max-width:680px;margin-left:auto!important;margin-right:auto!important;margin-top:0!important;margin-bottom:14px!important}
+body.rf-home .top{order:1}body.rf-home .page{order:2}
+body.rf-home #rf-unified-student-v2,body.rf-home #rankforge-student-dashboard,body.rf-home #rankforge-ai-generator-entry{order:3}
+body.rf-home #rankforgeBasicFeaturesV1{order:4}body.rf-home #rankforgeMistakeMasteryV1{order:5}body.rf-home #rankforgeNichodNextActionV1{order:6}body.rf-home #rankforgePremiumPanel{order:7}body.rf-home .note{order:8}body.rf-home #rankforgeResetCard{order:9}
+body.rf-home[data-rf-tab]:not([data-rf-tab="home"]) :is(#rf-unified-student-v2,#rankforgeBasicFeaturesV1,#rankforgeNichodNextActionV1,#rankforgePremiumPanel){display:none!important}
+body.rf-home:not([data-rf-tab="progress"]) :is(#rankforge-student-dashboard,#rankforgeResetCard){display:none!important}
+body.rf-home:not([data-rf-tab="practice"]) #rankforge-ai-generator-entry{display:none!important}
+body.rf-home:is([data-rf-tab="learn"],[data-rf-tab="practice"],[data-rf-tab="tests"]) #rankforgeMistakeMasteryV1{display:none!important}
+body.rf-home :is(#rankforge-student-dashboard,#rf-unified-student-v2,#rankforgeBasicFeaturesV1,#rankforgeNichodNextActionV1,#rankforgeMistakeMasteryV1,#rankforgeResetCard,#rankforgePremiumPanel){background:var(--rf-card)!important;border:1px solid var(--rf-line)!important;border-radius:var(--rf-r)!important;box-shadow:0 10px 30px rgba(0,0,0,.35)!important;padding:16px!important;color:var(--rf-ink)}
+body.rf-home .logo{background:linear-gradient(135deg,var(--rf-a),var(--rf-b))!important;box-shadow:0 6px 18px rgba(99,102,241,.5)}
+body.rf-home .brand p,body.rf-home .card span,body.rf-home .stat small,body.rf-home .row span,body.rf-home .note{color:var(--rf-mute)!important}
+body.rf-home .mentor{background:var(--rf-card2)!important;border:1px solid var(--rf-line)!important;color:var(--rf-ink)!important}
+body.rf-home .hero{background:linear-gradient(135deg,rgba(99,102,241,.42),rgba(139,92,246,.26) 55%,rgba(34,211,238,.16))!important;border:1px solid rgba(165,180,252,.5)!important;box-shadow:0 12px 34px rgba(0,0,0,.4)}
+body.rf-home .hero .btn,body.rf-home .btn{background:linear-gradient(90deg,var(--rf-a),var(--rf-b))!important;color:#fff!important;box-shadow:0 8px 22px rgba(99,102,241,.45);border-radius:14px}
+body.rf-home :is(.card,.stat,.row,.practice,.option,.rf-basic-card){background:var(--rf-card)!important;border:1px solid var(--rf-line)!important;color:var(--rf-ink)!important}
+body.rf-home .option.ok{background:rgba(52,211,153,.16)!important;border-color:var(--rf-ok)!important}
+body.rf-home #rankforgeLectureEntry{display:block!important}
+body.rf-home #rankforgeLectureEntry>*{display:block!important;float:none!important;position:static!important;width:auto!important}
+body.rf-home :is(#rankforge-student-dashboard,#rf-unified-student-v2,#rankforgeBasicFeaturesV1,#rankforgeNichodNextActionV1,#rankforgeMistakeMasteryV1,#rankforgeResetCard,#rankforgePremiumPanel) *{color:var(--rf-ink)}
+body.rf-home :is(#rankforge-student-dashboard,#rf-unified-student-v2,#rankforgeBasicFeaturesV1,#rankforgeNichodNextActionV1,#rankforgeMistakeMasteryV1,#rankforgeResetCard,#rankforgePremiumPanel) :is(p,small,span){color:var(--rf-mute)}
+body.rf-home :is(#rankforge-student-dashboard,#rf-unified-student-v2,#rankforgeBasicFeaturesV1,#rankforgeNichodNextActionV1,#rankforgeMistakeMasteryV1,#rankforgeResetCard,#rankforgePremiumPanel) :is(button,a.rf-basic-card){border:1px solid var(--rf-line)!important}
+body.rf-home .nav{background:rgba(9,13,33,.94)!important;border-top:1px solid var(--rf-line)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))!important;gap:4px}
+body.rf-home .nav button{border:0!important;background:none!important;box-shadow:none!important;color:var(--rf-mute)!important;border-radius:14px;min-height:54px}
+body.rf-home .nav button b{color:var(--rf-mute)!important}
+body.rf-home .nav button.active,body.rf-home .nav button.on{background:rgba(99,102,241,.25)!important;color:#fff!important}
+body.rf-home .nav button.active b,body.rf-home .nav button.on b{color:#fff!important}
+body.rf-home #rankforge-refresh-button{display:none!important}
+body.rf-home #rankforgeRefreshButton{right:14px!important;left:auto!important;bottom:calc(84px + env(safe-area-inset-bottom,0px))!important;background:var(--rf-card2)!important;color:var(--rf-ink)!important;border:1px solid var(--rf-line)!important;border-radius:99px!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+body.rf-home :where(#rankforge-student-dashboard,#rf-unified-student-v2,#rankforgeBasicFeaturesV1,#rankforgeNichodNextActionV1,#rankforgeMistakeMasteryV1,#rankforgeResetCard,#rankforgePremiumPanel) button{background-color:var(--rf-card2);color:var(--rf-ink);border-radius:14px;padding:10px 14px;font-weight:700}
+body.rf-home :is(.rf-v2-btn,.rf-nba-action,.rf-sd-btn,.rf-mm-btn){background:linear-gradient(90deg,var(--rf-a),var(--rf-b))!important;color:#fff!important;border:0!important;box-shadow:0 6px 18px rgba(99,102,241,.4)}
+body.rf-home #rankforgeResetCard p{color:var(--rf-mute)!important}
+body.rf-home #rankforgeResetAllBtn{background:rgba(248,113,113,.18)!important;color:#fecaca!important;border:1px solid rgba(248,113,113,.5)!important}
+body.rf-home .rf-mm-title{font-weight:800;font-size:17px}
+body.rf-home .rf-mm-sub{color:var(--rf-mute)!important;font-size:13px;margin:4px 0 12px}
+body.rf-home .rf-mm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+body.rf-home .rf-mm-stat{background:var(--rf-card);border:1px solid var(--rf-line);border-radius:16px;padding:12px}
+body.rf-home .rf-mm-num{font-size:26px;font-weight:800;line-height:1.1}
+body.rf-home .rf-mm-label{font-size:12.5px;color:var(--rf-mute)!important}
+body.rf-home .rf-mm-actions{display:flex;gap:8px;flex-wrap:wrap}
+body.rf-home .rf-mm-secondary{background:var(--rf-card2)!important;box-shadow:none!important;border:1px solid var(--rf-line)!important}
+body.inquiz{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
