@@ -1,9 +1,0 @@
-{
-  "appId": "com.adityakumar.rankforge",
-  "appName": "RankForge",
-  "webDir": ".rankforge-web",
-  "bundledWebRuntime": false,
-  "server": {
-    "androidScheme": "https"
-  }
-}
