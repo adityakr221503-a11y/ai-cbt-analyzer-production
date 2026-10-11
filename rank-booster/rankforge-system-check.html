@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070b1a">
+<title>System Check - RankForge AI</title>
+<link rel="stylesheet" href="./rankforge-premium.css">
+</head>
+<body class="rf-page">
+<header class="rf-top"><a class="rf-back" href="index.html" aria-label="Back">&larr;</a><div><h1>System Check</h1><p>One-tap health check for your app</p></div><span class="rf-pill" id="pill">Ready</span></header>
+<main class="rf-wrap">
+<section class="rf-card rf-hero"><div class="rf-eyebrow">VERIFICATION</div><h2 id="headline">Run the full check</h2><p class="rf-mute" id="sub">Checks storage, your mistake data, both question banks, pages, scripts, PDF import and the optional AI server. Takes a few seconds.</p></section>
+<button class="rf-btn" id="run" type="button">Run all checks</button>
+<button class="rf-btn ghost" id="repair" type="button">Repair mistake data</button>
+<p class="rf-note" id="repairMsg" style="display:none"></p>
+<div id="out"></div>
+<button class="rf-btn ghost" id="copy" type="button">Copy report</button>
+</main>
+<nav class="rf-nav" aria-label="Main"><a href="index.html"><span>🏠</span>Home</a><a href="mistake.html"><span>🧠</span>Mistakes</a><a href="retry.html"><span>🔁</span>Retry</a><a href="cbt.html"><span>📝</span>Tests</a><a href="rankforge-system-check.html" class="on"><span>✅</span>Check</a></nav>
+<script src="./rankforge-canonical-v1.js"></script>
+<script>
+(function () {
+  "use strict";
+  var R = [], out = document.getElementById("out"), pill = document.getElementById("pill"), running = false;
+  var PAGES = ["index.html","cbt.html","rankforge-stable-practice.html","biology-7196-cbt.html","mistake.html","retry.html","history.html","analysis.html","attempt.html","question-bank.html","rankers-test-series.html","pdf-to-cbt.html","command-center.html","ranker-command-center.html","orbit-test-analysis.html","nichod-hub.html","ai-test-generator.html","ai-question-lab.html","study-vault/index.html","ranker-revision/index.html","rankforge-lecture-module/pages/lectures.html","privacy.html","security.html"];
+  var SCRIPTS = ["rankforge-canonical-v1.js","rankforge-core-v1.js","ranker-common-engine.js","orbit-engine.js","pdf-cbt-production-engine-v8.js","pdf-cbt-universal-v1.js","rankforge-unified-student-layer-v2.js","rankforge-universal-source-fabric-v1.js","rankforge-result-mistake-engine-v1.js","rankforge-pdf-result-mastery-bridge-v1.js","rank-booster/ai-new-question-module-v1.js","nichod/engine/cbt-source-isolation-v1.js","sw.js"];
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function add(g, n, s, d) { R.push({ g: g, n: n, s: s, d: d || "" }); paint(); }
+  function icon(s) { return s === "pass" ? "\u2705" : s === "warn" ? "\u26A0\uFE0F" : "\u274C"; }
+  function paint() {
+    while (out.firstChild) out.removeChild(out.firstChild);
+    var groups = [];
+    R.forEach(function (r) { if (groups.indexOf(r.g) < 0) groups.push(r.g); });
+    groups.forEach(function (g) {
+      var c = el("section", "rf-card"); c.appendChild(el("div", "rf-eyebrow", g.toUpperCase()));
+      R.filter(function (r) { return r.g === g; }).forEach(function (r) {
+        var row = el("div", "rf-row"); row.appendChild(el("div", "ic", icon(r.s)));
+        var tx = el("div", "tx"); tx.appendChild(el("div", r.s === "fail" ? "rf-bad" : "", r.n));
+        if (r.d) tx.appendChild(el("small", "", r.d)); row.appendChild(tx); c.appendChild(row);
+      });
+      out.appendChild(c);
+    });
+  }
+  function timeout(ms) { var c = new AbortController(); setTimeout(function () { c.abort(); }, ms); return c.signal; }
+  async function get(url, text, ms) {
+    var r = await fetch(url + (url.indexOf("?") < 0 ? "?" : "&") + "chk=" + Date.now(), { cache: "no-store", signal: timeout(ms || 20000) });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return text ? r.text() : r.json();
+  }
+  function records(d) { return Array.isArray(d) ? d : (Object.keys(d).map(function (k) { return d[k]; }).find(function (v) { return Array.isArray(v) && v.length && typeof v[0] === "object"; }) || []); }
+  function okQ(q) {
+    var o = q && (q.options || q.choices);
+    if (!q || !o || o.length !== 4 || o.some(function (x) { return !String(x == null ? "" : x).trim(); })) return false;
+    if (String(q.question || q.text || "").trim().length < 3) return false;
+    return Number.isInteger(q.correctIndex) && q.correctIndex >= 0 && q.correctIndex < 4;
+  }
+  function hash(list) {
+    var h = 5381;
+    list.forEach(function (q) {
+      var s = (q.id || "") + "|" + (q.question || q.text || "") + "|" + (q.options || []).join("~") + "|" + q.correctIndex;
+      for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+    });
+    return (h >>> 0).toString(16);
+  }
+  async function run() {
+    if (running) return; running = true; R = []; paint(); pill.textContent = "Running..";
+    document.getElementById("headline").textContent = "Checking..."; 
+    var G;
+    G = "Device";
+    try { localStorage.setItem("__rfchk", "1"); var ok = localStorage.getItem("__rfchk") === "1"; localStorage.removeItem("__rfchk"); add(G, "Local storage read/write", ok ? "pass" : "fail"); } catch (e) { add(G, "Local storage read/write", "fail", String(e)); }
+    try { var reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); add(G, "Offline mode (service worker)", reg ? "pass" : "warn", reg ? "Registered" : "Not registered yet. Open the app once with internet."); } catch (e) { add(G, "Offline mode (service worker)", "warn", String(e)); }
+    G = "Your study data";
+    var rm = RFData.read("cbtMistakes", []), rs = RFData.read("cbtMasteryV2", []);
+    add(G, "Mistake list format", Array.isArray(rm) ? "pass" : "fail", Array.isArray(rm) ? (rm.length + " saved") : "Wrong format. Tap Repair mistake data.");
+    add(G, "Mastered list format", Array.isArray(rs) ? "pass" : "fail", Array.isArray(rs) ? (rs.length + " saved") : "Wrong format. Tap Repair mistake data.");
+    if (Array.isArray(rm)) {
+      var seen = {}, dup = 0, right = 0, bad = 0;
+      rm.forEach(function (q) {
+        if (!q || !q.question) return; var k = RFData.norm(q.question); if (seen[k]) dup++; seen[k] = 1;
+        var ua = q.userAnswer != null ? q.userAnswer : q.selectedAnswer;
+        if ((Number.isInteger(q.selectedIndex) && q.selectedIndex === q.correctIndex) || (ua != null && String(ua).trim() && q.correctAnswer != null && RFData.norm(ua) === RFData.norm(q.correctAnswer))) right++;
+        if (!RFData.retryable(q)) bad++;
+      });
+      add(G, "Duplicate mistakes", dup ? "warn" : "pass", dup ? dup + " duplicate(s). Repair will remove them." : "None");
+      add(G, "Correct answers wrongly saved as mistakes", right ? "warn" : "pass", right ? right + " found. Repair will remove them." : "None");
+      add(G, "Mistakes that can be retried", bad ? "warn" : "pass", bad ? bad + " cannot be retried (options not saved)." : "All retryable");
+    }
+    var act = RFData.active().length, ms = RFData.mastered().filter(function (x) { return x && x.question; }).length;
+    add(G, "Active vs mastered", "pass", act + " active, " + ms + " mastered (same numbers on Home, Mistake Book and Retry)");
+    G = "Question banks";
+    try {
+      var d = await get("biology-7196-bank-readonly.json", false, 60000), L = records(d), inv = L.filter(function (q) { return !okQ(q); }).length;
+      add(G, "Biology bank: " + L.length + " questions", L.length === 7196 ? "pass" : "warn", L.length === 7196 ? "Exactly 7,196" : "Expected 7,196");
+      add(G, "Biology bank: every question has 4 options and a valid answer", inv ? "fail" : "pass", inv ? inv + " invalid" : "All valid");
+      var fp = hash(L), base = RFData.read("rankforgeBankFingerprintV1", null), rebase = /rebase=1/.test(location.search);
+      if (!base || rebase) { RFData.write("rankforgeBankFingerprintV1", { count: L.length, hash: fp, at: new Date().toISOString() }); add(G, "Biology bank unchanged check", "pass", "Baseline saved on this device (" + fp + ")"); }
+      else add(G, "Biology bank unchanged since " + String(base.at).slice(0, 10), base.hash === fp && base.count === L.length ? "pass" : "fail", base.hash === fp ? "Fingerprint " + fp : "Bank content changed. Baseline " + base.hash + ", now " + fp + ". Open this page with ?rebase=1 only if you changed it on purpose.");
+    } catch (e) { add(G, "Biology 7,196 bank", "fail", String(e)); }
+    try {
+      var s = records(await get("rank-booster/biology-test-series-2699.json", false, 60000)), per = {}, usable = 0, flagged = 0;
+      s.forEach(function (q) { per[q.testNumber] = (per[q.testNumber] || 0) + 1; if (q.needsReview) flagged++; else if (okQ(q)) usable++; });
+      var tests = Object.keys(per), wrong = tests.filter(function (t) { return per[t] !== (Number(t) === 11 ? 89 : 90); }).length;
+      add(G, "Biology test series: " + s.length + " records in " + tests.length + " tests", s.length === 2699 && !wrong ? "pass" : "fail", wrong ? wrong + " test(s) with a wrong record count" : "Counts match the source");
+      add(G, "Test series usable questions", usable + flagged === s.length && usable > 2000 ? "pass" : "warn", usable + " usable, " + flagged + " flagged (figure/table questions are skipped in tests)");
+    } catch (e) { add(G, "Biology test series", "fail", String(e)); }
+    G = "Pages";
+    var q1 = PAGES.slice(), bad1 = [];
+    async function worker() { while (q1.length) { var p = q1.shift(); try { var t = await get(p, true, 15000); if (!/<body/i.test(t)) throw new Error("not a page"); } catch (e) { bad1.push(p + " (" + e.message + ")"); } } }
+    await Promise.all([worker(), worker(), worker(), worker()]);
+    add(G, PAGES.length - bad1.length + " of " + PAGES.length + " pages open", bad1.length ? "fail" : "pass", bad1.join(", "));
+    G = "Scripts";
+    var q2 = SCRIPTS.slice(), bad2 = [];
+    async function sw() { while (q2.length) { var p = q2.shift(); try { var t = await get(p, true, 15000); new Function(t); } catch (e) { bad2.push(p + " (" + e.message + ")"); } } }
+    await Promise.all([sw(), sw(), sw()]);
+    add(G, SCRIPTS.length - bad2.length + " of " + SCRIPTS.length + " core scripts load and parse", bad2.length ? "fail" : "pass", bad2.join(", "));
+    G = "PDF to CBT";
+    try { await get("vendor/pdf.min.js", true, 20000); await get("vendor/pdf.worker.min.js", true, 20000); add(G, "PDF reader files available (works offline)", "pass"); } catch (e) { add(G, "PDF reader files", "fail", String(e)); }
+    G = "AI (optional)";
+    try { var r = await fetch("http://localhost:11434/api/tags", { signal: timeout(3000) }); add(G, "Local AI server (Ollama)", r.ok ? "pass" : "warn", r.ok ? "Reachable" : "HTTP " + r.status); }
+    catch (e) { add(G, "Local AI server (Ollama)", "warn", "Not reachable from this device. Fine if you do not use AI generation. Tests, practice, PDF import and mistakes work without it."); }
+    var f = R.filter(function (r) { return r.s === "fail"; }).length, w = R.filter(function (r) { return r.s === "warn"; }).length, p = R.length - f - w;
+    document.getElementById("headline").textContent = f ? f + " problem" + (f > 1 ? "s" : "") + " found" : (w ? "All critical checks passed" : "Everything passed");
+    document.getElementById("sub").textContent = p + " passed, " + w + " warning" + (w === 1 ? "" : "s") + ", " + f + " failed. " + new Date().toLocaleString();
+    pill.textContent = f ? "Fix needed" : "Healthy"; running = false;
+  }
+  function report() {
+    return "RankForge System Check - " + new Date().toISOString() + "\n" + R.map(function (r) { return "[" + r.s.toUpperCase() + "] " + r.g + " - " + r.n + (r.d ? ": " + r.d : ""); }).join("\n");
+  }
+  document.getElementById("run").addEventListener("click", run);
+  document.getElementById("repair").addEventListener("click", function () {
+    var x = RFData.repair(), m = document.getElementById("repairMsg"); m.style.display = "block";
+    m.textContent = "Repaired: " + x.removedCorrect + " correct answers removed from mistakes, " + x.removedDuplicates + " duplicates removed, " + x.fixedShape + " format fix(es). Running the check again...";
+    run();
+  });
+  document.getElementById("copy").addEventListener("click", function () {
+    var t = report(), b = this;
+    function done() { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy report"; }, 1500); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, function () { window.prompt("Copy this report:", t); });
+    else window.prompt("Copy this report:", t);
+  });
+  if (/auto=1/.test(location.search)) run();
+})();
+</script>
+</body></html>
