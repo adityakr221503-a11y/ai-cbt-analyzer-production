@@ -8,7 +8,7 @@
 import {
   addItem,
   getItem
-} from "../storage/storage.js";
+} from "./storage/storage.js";
 
 
 /* =====================================================

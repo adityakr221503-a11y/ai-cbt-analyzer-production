@@ -6,6 +6,7 @@
 
 import { getItem, addItem } from "../storage/storage.js";
 import { recordPracticeResult } from "../mistakes/mistakeEngine.js";
+import { getDPPStage } from "../dppEngine.js";
 
 export function getMistakeForPractice(mistakeId) {
   const mistake = getItem("mistakes", mistakeId);
@@ -20,12 +21,15 @@ export function getMistakeForPractice(mistakeId) {
 export function recordPractice({
   mistakeId,
   successful,
+  practiceType,
+  timeSpent = 0,
 } = {}) {
   const mistake = getMistakeForPractice(mistakeId);
 
   const updatedMistake = recordPracticeResult(
     mistake,
-    Boolean(successful)
+    Boolean(successful),
+    { practiceType, timeSpent: Number(timeSpent) || 0 }
   );
 
   addItem("mistakes", updatedMistake);
@@ -48,4 +52,10 @@ export function getPracticeProgress(mistake) {
         : 0,
     status: mistake.status,
   };
+}
+
+/* Next stage of the Deliberate Practice ladder for a mistake:
+   familiar -> novel -> transfer -> mastered (single source: dppEngine). */
+export function getNextPracticeType(mistake) {
+  return getDPPStage(mistake);
 }

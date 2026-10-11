@@ -25,7 +25,7 @@
 import {
   readCollection,
   addItem,
-} from "../storage/storage.js";
+} from "./storage/storage.js";
 
 
 /* =====================================================

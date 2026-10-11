@@ -16,6 +16,7 @@ function toggleAnswer(i){
 }
 
 function field(title,text){
+  if(text===undefined||text===null||text==="") return "";
   return `<div class="section"><b>${title}</b>${text}</div>`;
 }
 
@@ -42,9 +43,9 @@ function render(){
     return `
     <article class="card">
       <div class="keyword">${x.keyword}</div>
-      <div class="meta">Class ${x.class} · ${x.chapters.length} NCERT connections</div>
-      <span class="tag">Priority ${x.priority}/5</span>
-      <span class="tag">Trap ${x.trap}/5</span>
+      <div class="meta">Class ${x.class} · ${(x.chapters||[]).length} NCERT connections</div>
+      <span class="tag">Priority ${x.priority||0}/5</span>
+      <span class="tag">Trap ${x.trap||0}/5</span>
 
       ${field("WHAT",x.what)}
       ${field("WHY",x.why)}
@@ -57,24 +58,24 @@ function render(){
 
       <div class="section">
         <b>🔗 360° Connections</b>
-        ${x.connections.map(c=>`<div>→ ${c}</div>`).join("")}
+        ${(x.connections||[]).map(c=>`<div>→ ${c}</div>`).join("")}
       </div>
 
       <div class="section">
         <b>🎯 Examiner Attack</b>
-        ${x.attack}
+        ${x.attack||""}
       </div>
 
       <div class="section">
         <b>↔️ Confusion</b>
-        ${x.confusion}
+        ${x.confusion||""}
       </div>
 
       <div class="section">
         <b>🧠 Active Recall</b>
-        ${x.recall}
+        ${x.recall||""}
         <br><button onclick="toggleAnswer(${i})">Reveal Answer</button>
-        <div id="answer-${i}" class="answer">${x.answer}</div>
+        <div id="answer-${i}" class="answer">${x.answer||""}</div>
       </div>
 
       <div class="actions">

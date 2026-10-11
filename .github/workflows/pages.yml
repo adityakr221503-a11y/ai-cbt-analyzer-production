@@ -30,10 +30,25 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      - name: Verify (syntax, links, protected bank, learning loop)
+        run: node tools/verify.js
+
+      - name: Build site (app files only)
+        run: |
+          mkdir -p _site
+          rsync -a ./ _site/ \
+            --exclude='.git*' --exclude='.github' --exclude='_site' --exclude='node_modules' \
+            --exclude='tools' --exclude='server' --exclude='android' --exclude='.cloudflare-dist' \
+            --exclude='.rankforge-web' --exclude='rankforge-ai-worker' --exclude='rankforge-local-ai' \
+            --exclude='rankforge-lecture-security/server' \
+            --exclude='*.md' --exclude='*.sh' --exclude='*.py' --exclude='*.txt' \
+            --exclude='package*.json' --exclude='wrangler.jsonc' --exclude='capacitor.config.json'
+          test -f _site/index.html
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy Pages
         id: deployment

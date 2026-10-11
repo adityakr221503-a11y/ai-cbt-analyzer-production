@@ -5,6 +5,8 @@
  * v10.0.0 — Rank Booster / TOPPER
  */
 
+import { readCollection, getItem } from "../storage/storage.js";
+
 const VALID_REASONS = [
   "concept_gap",
   "calculation_error",
@@ -211,6 +213,27 @@ export function createMistake({
             )
           ),
   });
+}
+
+export function getMistakeBook() {
+  const list = readCollection("mistakes");
+  return Array.isArray(list) ? list : Object.values(list || {});
+}
+
+export function getMistake(id) {
+  return getItem("mistakes", id) || null;
+}
+
+export function getMistakesByReason(reason) {
+  return getMistakeBook().filter((m) => m.reason === reason);
+}
+
+export function getMistakesByStatus(status) {
+  return getMistakeBook().filter((m) => m.status === status);
+}
+
+export function getActiveMistakes() {
+  return getMistakeBook().filter((m) => m.status !== "mastered");
 }
 
 export {

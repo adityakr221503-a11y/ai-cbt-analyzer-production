@@ -245,11 +245,6 @@ global.RankForgeAINewQuestionModuleV1={
   getHistory:()=>arr(read(HISTORY_KEY))
 };
 
-global.RankForgeAINewQuestionModuleV1={
- importAndValidate,
- getBank:()=>arr(read(AI_KEY)),
- getHistory:()=>arr(read(HISTORY_KEY))
-};
 })(window);
 
 /* RANKFORGE_TARGETED_DPP_V1 */

@@ -4,12 +4,13 @@
   "private": true,
   "description": "AI-powered CBT analysis and examination platform",
   "scripts": {
-    "dev": "echo \"Frontend setup coming next\"",
-    "test": "echo \"Tests coming next\"",
+    "dev": "npx serve . -l 8080",
+    "test": "node tools/verify.js",
     "android:add": "npx cap add android",
     "android:sync": "npx cap sync android",
     "android:open": "npx cap open android",
-    "android:build": "cd android && ./gradlew assembleDebug"
+    "android:build": "cd android && ./gradlew assembleDebug",
+    "verify": "node tools/verify.js"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.0.0"
