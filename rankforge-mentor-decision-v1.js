@@ -40,7 +40,7 @@ function topicOf(x){
       x.subjectTopic||
       x.subtopic
     )
-  )||"Unknown";
+  )||((typeof window!=="undefined"&&window.RankForgeFix)?window.RankForgeFix.inferTopic(x).topic:"Unknown");
 }
 
 function activeMistakes(){

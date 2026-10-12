@@ -242,7 +242,7 @@
         q.subjectTopic ||
         q.subject
       )
-    ) || "Unknown";
+    ) || ((typeof window!=="undefined" && window.RankForgeFix) ? window.RankForgeFix.inferTopic(q).topic : "Unknown");
   }
 
   function subjectOf(q) {
@@ -253,7 +253,7 @@
         q.sub ||
         ""
       )
-    ) || "Unknown";
+    ) || ((typeof window!=="undefined" && window.RankForgeFix) ? window.RankForgeFix.inferTopic(q).subject : "Unknown");
   }
 
   function getTests() {

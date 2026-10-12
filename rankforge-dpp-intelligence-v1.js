@@ -120,7 +120,7 @@
         q.subjectTopic ||
         q.subtopic
       )
-    ) || "Unknown";
+    ) || ((typeof window!=="undefined" && window.RankForgeFix) ? window.RankForgeFix.inferTopic(q).topic : "Unknown");
   }
 
   function subject(q) {
@@ -130,7 +130,7 @@
         q.section ||
         q.sub
       )
-    ) || "Unknown";
+    ) || ((typeof window!=="undefined" && window.RankForgeFix) ? window.RankForgeFix.inferTopic(q).subject : "Unknown");
   }
 
   function difficulty(q) {
