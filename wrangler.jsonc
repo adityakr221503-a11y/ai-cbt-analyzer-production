@@ -1,11 +1,10 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "ai-cbt-analyzer-production",
-  "compatibility_date": "2026-09-11",
-  "observability": {
-    "enabled": true
-  },
-  "assets": {
-    "directory": "./.cloudflare-dist"
+  "name": "rankforge-ai",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-12",
+  "ai": { "binding": "AI" },
+  "vars": {
+    "AI_MODEL": "@cf/meta/llama-3.1-8b-instruct",
+    "ALLOWED_ORIGIN": "https://adityakr221503-a11y.github.io"
   }
 }
