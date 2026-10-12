@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RankForge Owner Hub</title>
+<script src="./rf-fixpack-v1.js"></script>
+<script src="./owner-imports/rankforge-owner-access.js"></script>
+<style>
+:root{--ink:#111827;--mute:#6b7280;--line:#e5e7eb;--bg:#f3f4fb;--a:#4f46e5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:#111827;color:#fff;padding:16px}header h1{margin:0;font-size:20px}header small{color:#9ca3af}
+main{max-width:760px;margin:0 auto;padding:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 10px;font-size:17px}
+label{display:block;font-weight:700;font-size:13px;margin:10px 0 5px}
+input,button{font:inherit;width:100%;padding:12px;border-radius:12px;border:1px solid #d1d5db}
+button{border:0;background:var(--a);color:#fff;font-weight:800;margin-top:10px;cursor:pointer}
+button.sec{background:#e5e7eb;color:var(--ink)}button.danger{background:#fff;color:#b91c1c;border:1px solid #fecaca}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.chk{display:flex;gap:10px;align-items:flex-start;border-bottom:1px solid var(--line);padding:10px 0}
+.chk:last-child{border:0}.dot{flex:none;width:12px;height:12px;border-radius:50%;margin-top:5px}
+.ok{background:#10b981}.warn{background:#f59e0b}.fail{background:#ef4444}
+.chk b{display:block}.chk small{color:var(--mute);line-height:1.45}
+.links{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.links a{display:block;padding:14px 10px;border-radius:14px;background:#eef0ff;color:#3730a3;font-weight:700;text-decoration:none;text-align:center;font-size:14px}
+.gate{background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:12px;border-radius:14px;margin-bottom:14px}
+.msg{margin-top:10px;padding:10px 12px;border-radius:12px;background:#ecfdf5;color:#065f46;font-size:14px;display:none}
+.msg.err{background:#fef2f2;color:#991b1b}
+</style>
+</head>
+<body>
+<header><h1>🛠 RankForge Owner Hub</h1><small>Upload, connect, diagnose — in one place</small></header>
+<main>
+  <div id="gate" class="gate" style="display:none">Owner mode is off. Diagnostics still work, but uploading modules needs owner mode. <a href="owner-access.html">Enable owner mode →</a></div>
+
+  <div class="card">
+    <h2>System Doctor</h2>
+    <div id="doctor">Running checks…</div>
+    <div class="row"><button id="rerun" class="sec">Re-run checks</button><button id="copyRep" class="sec">Copy report</button></div>
+  </div>
+
+  <div class="card">
+    <h2>AI Server (one setting for every AI feature)</h2>
+    <p style="color:#6b7280;font-size:13px;line-height:1.5;margin:0">AI Question Lab, AI Test Generator, AI Question Studio and Notebook Studio all use this one URL. Paste your deployed Cloudflare Worker address. It uses free Cloudflare Workers AI — no OpenAI key, no token bill. When the free daily limit is used up, Notebook Studio switches to its offline generator automatically.</p>
+    <label for="ep">Worker URL</label>
+    <input id="ep" placeholder="https://rankforge-ai.YOURNAME.workers.dev/api/ai/generate" inputmode="url" autocapitalize="off">
+    <div class="row"><button id="epSave">Save</button><button id="epTest" class="sec">Save &amp; test</button></div>
+    <div id="epMsg" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Repair &amp; reset</h2>
+    <button id="fixTopics" class="sec">Repair "Unknown" topics in my mistakes</button>
+    <button id="clearHand" class="sec">Clear stuck hand-off (fixes wrong test opening)</button>
+    <button id="hardRefresh" class="sec">Refresh app files (clear cache)</button>
+    <button id="clearPdf" class="danger">Clear imported PDF pool</button>
+    <div id="fixMsg" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Modules</h2>
+    <div class="links">
+      <a href="pdf-to-cbt.html">📄 PDF → CBT</a>
+      <a href="owner-source.html">📥 Owner upload</a>
+      <a href="rankforge-source-importer.html">🧾 Source importer (OCR)</a>
+      <a href="notebook-studio.html">📓 Notebook Studio</a>
+      <a href="ai-question-lab.html">🤖 AI Question Lab</a>
+      <a href="ai-test-generator.html">🧪 AI Test Generator</a>
+      <a href="rankers-test-series.html">🏆 Rankers Test Series</a>
+      <a href="rankers-ai-new-questions.html">✨ AI New Questions</a>
+      <a href="ranker-command-center.html">🎯 Command Center</a>
+      <a href="mistake.html">🧠 Mistakes &amp; DPP</a>
+      <a href="cbt.html?source=biology">🧬 Biology CBT</a>
+      <a href="rankforge-system-check.html">✅ System check</a>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+"use strict";
+var Fix = window.RankForgeFix, report = [];
+var $ = function(i){return document.getElementById(i);};
+function J(k,s){ try{return JSON.parse((s?sessionStorage:localStorage).getItem(k));}catch(_){return null;} }
+function arr(v){ return Array.isArray(v)?v:(v&&Array.isArray(v.questions)?v.questions:[]); }
+function show(id,msg,err){ var e=$(id); e.style.display="block"; e.className="msg"+(err?" err":""); e.textContent=msg; }
+
+async function doctor(){
+  var rows=[];
+  function add(level,name,detail){ rows.push({level:level,name:name,detail:detail}); }
+
+  add(Fix?"ok":"fail","Fix-pack layer", Fix?("Loaded "+Fix.version):"rf-fixpack-v1.js did not load — pages will fall back to old behaviour.");
+
+  var own = window.RankForgeOwnerAccess && window.RankForgeOwnerAccess.isOwner();
+  $("gate").style.display = own ? "none" : "block";
+  add(own?"ok":"warn","Owner mode", own?"Enabled on this device.":"Off on this device.");
+
+  try{
+    var r=await fetch("./rank-booster/biology-test-series-2699.json",{cache:"no-store"}); var d=await r.json();
+    add(Array.isArray(d)&&d.length>0?"ok":"fail","Biology question file", (Array.isArray(d)?d.length:0)+" questions in rank-booster/biology-test-series-2699.json (Biology CBT uses tests of 90).");
+  }catch(e){ add("fail","Biology question file","Could not load: "+e.message); }
+
+  var pdf=arr(J("pdfCbtQuestions")), sa=arr(J("CBT_ACTIVE_QUESTIONS",true));
+  var pl = pdf.length;
+  add(pl===0?"warn":(pl<180?"warn":"ok"),"Imported PDF pool", pl===0?"Empty. Import a PDF in PDF → CBT.":(pl+" questions saved."+(pl<180?" A full NEET paper has 180 — the parser found fewer. Re-import or provide the answer-key PDF.":" Full paper detected.")));
+
+  var tag=(sessionStorage.getItem("CBT_ACTIVE_SOURCE")||"").replace(/^"|"$/g,""), ts=Number(sessionStorage.getItem("RF_HANDOFF_TS"))||0;
+  var age = ts?Math.round((Date.now()-ts)/1000)+"s ago":"none";
+  add("ok","Test hand-off state","Active source: "+(tag||"none")+" · questions: "+sa.length+" · last hand-off: "+age+(sessionStorage.getItem("RF_HANDOFF_CONSUMED")?" (already opened)":""));
+
+  var ep = Fix?Fix.getEndpoint():"";
+  if(!ep) add("fail","AI server","Not connected. "+(Fix?Fix.endpointProblem():""));
+  else {
+    try{ var t0=Date.now(); var rr=await fetch(ep,{method:"GET"}); add(rr.status<500?"ok":"warn","AI server","Reachable ("+rr.status+", "+(Date.now()-t0)+" ms): "+ep+(rr.status===405?" — responds (POST required is normal).":"")); }
+    catch(e){ add("fail","AI server","Cannot reach "+ep+". Wrong URL, Worker not deployed, or blocked by CORS (the Worker's ALLOWED_ORIGIN must equal this site's address)."); }
+  }
+
+  var m = arr(J("rankforgeMistakesV1")), unk = m.filter(function(x){var t=String((x&&(x.topic||x.chapter))||"").trim();return !t||/^unknown$/i.test(t);}).length;
+  add(unk?"warn":"ok","Mistake topics", m.length+" mistakes saved, "+unk+" without a topic."+(unk?" Use “Repair Unknown topics”.":""));
+
+  var nb=0; try{ nb=(J("rfNotebooksV1")||[]).reduce(function(a,b){return a+b.sources.length;},0); }catch(_){}
+  add("ok","Notebook Studio", nb+" source(s) saved on this device.");
+
+  try{ var used=0; for(var i=0;i<localStorage.length;i++){ used+=(localStorage.getItem(localStorage.key(i))||"").length; } var mb=(used*2/1048576);
+    add(mb>4?"warn":"ok","Browser storage", mb.toFixed(2)+" MB used (limit is about 5 MB)."+(mb>4?" Clear the PDF pool or old notebooks.":"")); }catch(_){}
+
+  report=rows;
+  $("doctor").innerHTML = rows.map(function(r){return '<div class="chk"><span class="dot '+r.level+'"></span><div><b>'+r.name+'</b><small>'+String(r.detail).replace(/[<>&]/g,function(c){return {"<":"&lt;",">":"&gt;","&":"&amp;"}[c];})+'</small></div></div>';}).join("");
+}
+
+$("rerun").onclick=doctor;
+$("copyRep").onclick=function(){ var t="RankForge Doctor "+new Date().toISOString()+"\n"+report.map(function(r){return "["+r.level.toUpperCase()+"] "+r.name+": "+r.detail;}).join("\n"); (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){show("fixMsg","Report copied.");},function(){show("fixMsg",t);}); };
+
+$("ep").value = Fix?Fix.getEndpoint():"";
+function saveEp(){ var v=$("ep").value.trim(); if(v&&!/^https?:\/\//i.test(v)){ show("epMsg","The URL must start with https://",true); return false; } Fix.setEndpoint(v); show("epMsg",v?"Saved. All AI features now use this server.":"Cleared."); return !!v; }
+$("epSave").onclick=function(){ saveEp(); doctor(); };
+$("epTest").onclick=async function(){
+  if(!saveEp()) return; show("epMsg","Asking the server for 1 test question…");
+  try{ var r=await Fix.generateQuestions({count:1,subject:"Biology",difficulty:"Rank Booster",topic:"Cell: The Unit of Life"}); show("epMsg",r.questions.length?"AI server works — it returned a valid question.":"Server answered but returned no valid question (check the Worker has the AI binding and AI_MODEL is a valid Workers AI model).",!r.questions.length); }
+  catch(e){ show("epMsg",e.message,true); }
+  doctor();
+};
+
+$("fixTopics").onclick=function(){
+  var m=arr(J("rankforgeMistakesV1")), n=0;
+  m.forEach(function(x){ if(!x) return; var t=String(x.topic||x.chapter||"").trim(); if(!t||/^unknown$/i.test(t)){ var i=Fix.inferTopic(x); x.topic=i.topic; x.chapter=x.chapter&&!/^unknown$/i.test(x.chapter)?x.chapter:i.topic; if(!x.subject||/^unknown$/i.test(x.subject)) x.subject=i.subject; n++; } });
+  try{ localStorage.setItem("rankforgeMistakesV1",JSON.stringify(m)); show("fixMsg","Repaired "+n+" mistake(s). Adaptive DPP will now group them by real topic."); }catch(e){ show("fixMsg","Could not save: "+e.message,true); }
+  doctor();
+};
+$("clearHand").onclick=function(){ ["RF_HANDOFF_TS","RF_HANDOFF_CONSUMED","CBT_ACTIVE_QUESTIONS","CBT_ACTIVE_SOURCE","CBT_ACTIVE_TEST","CBT_ACTIVE_TEST_ID","CBT_ACTIVE_TEST_SOURCE"].forEach(function(k){try{sessionStorage.removeItem(k);}catch(_){}}); show("fixMsg","Cleared. The next test you start opens the right questions."); doctor(); };
+$("clearPdf").onclick=function(){ if(!confirm("Delete the imported PDF questions on this device?")) return; ["pdfCbtQuestions","CBT_ACTIVE_PDF_FILENAME","PDF_ACTIVE_FILENAME","TOPPER_TEST_180"].forEach(function(k){try{localStorage.removeItem(k);}catch(_){}}); show("fixMsg","PDF pool cleared."); doctor(); };
+$("hardRefresh").onclick=async function(){ try{ if(navigator.serviceWorker){ (await navigator.serviceWorker.getRegistrations()).forEach(function(r){r.unregister();}); } if(window.caches){ (await caches.keys()).forEach(function(k){caches.delete(k);}); } show("fixMsg","Cache cleared. Reloading…"); setTimeout(function(){location.reload();},700); }catch(e){ show("fixMsg",e.message,true); } };
+
+doctor();
+})();
+</script>
+</body>
+</html>

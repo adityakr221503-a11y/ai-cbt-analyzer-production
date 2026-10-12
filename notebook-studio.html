@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RankForge Notebook Studio</title>
+<script src="./rf-fixpack-v1.js"></script>
+<style>
+:root{--ink:#111827;--mute:#6b7280;--line:#e5e7eb;--bg:#f3f4fb;--card:#fff;--a:#4f46e5;--ok:#047857;--bad:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:84px}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:19px}header h1 span{color:var(--a)}
+header small{color:var(--mute)}
+main{max-width:760px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 10px;font-size:17px}
+label{display:block;font-weight:700;font-size:13px;margin:10px 0 5px}
+input,select,textarea,button{font:inherit;width:100%;padding:12px;border-radius:12px;border:1px solid #d1d5db;background:#fff;color:var(--ink)}
+textarea{min-height:130px;resize:vertical}
+button{border:0;background:var(--a);color:#fff;font-weight:800;margin-top:10px;cursor:pointer}
+button.sec{background:#e5e7eb;color:var(--ink)}button.ok{background:var(--ok)}button.warn{background:#fff;color:var(--bad);border:1px solid #fecaca}
+button:disabled{opacity:.5}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:#eef0ff;color:#4338ca;font-size:12px;font-weight:700;margin:2px 4px 2px 0}
+.src{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px}
+.src b{display:block}.src small{color:var(--mute)}.src button{width:auto;margin:0;padding:8px 12px}
+.msg{padding:10px 12px;border-radius:14px;margin:8px 0;line-height:1.5}
+.me{background:#eef0ff;margin-left:28px}.bot{background:#f8fafc;border:1px solid var(--line);margin-right:12px}
+.cite{font-size:12px;color:var(--mute);border-left:3px solid #c7d2fe;padding-left:8px;margin-top:6px}
+.status{padding:10px 12px;border-radius:12px;background:#ecfdf5;color:#065f46;margin:10px 0;font-size:14px}
+.status.err{background:#fef2f2;color:#991b1b}.status.warn{background:#fffbeb;color:#92400e}
+.q{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
+.q .opt{padding:7px 10px;border-radius:10px;margin:5px 0;background:#f8fafc}
+.q .opt.right{background:#dcfce7;font-weight:700}
+.q small{color:var(--mute);display:block;margin-top:6px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0)}
+nav.tabs button{margin:0;border-radius:0;background:#fff;color:var(--mute);padding:14px 4px;font-size:13px;border:0}
+nav.tabs button.on{color:var(--a);border-top:3px solid var(--a)}
+section.tab{display:none}section.tab.on{display:block}
+ul.plain{padding-left:18px;line-height:1.55}
+</style>
+</head>
+<body>
+<header>
+  <h1>📓 RankForge <span>Notebook Studio</span></h1>
+  <small>Answers and questions come only from <b>your</b> sources, with citations.</small>
+</header>
+
+<main>
+  <div class="card">
+    <label for="nbSelect">Notebook</label>
+    <select id="nbSelect"></select>
+    <div class="row">
+      <button class="sec" id="nbNew">+ New notebook</button>
+      <button class="warn" id="nbDelete">Delete</button>
+    </div>
+  </div>
+
+  <section class="tab on" id="tab-sources">
+    <div class="card">
+      <h2>Add a source</h2>
+      <label for="srcTitle">Title</label>
+      <input id="srcTitle" placeholder="e.g. NCERT Biology 11 – Chapter 1">
+      <label for="srcText">Paste text</label>
+      <textarea id="srcText" placeholder="Paste notes, NCERT text, lecture transcript…"></textarea>
+      <button id="addText">Add pasted text</button>
+      <label for="srcFile">…or upload a PDF / .txt / .md</label>
+      <input id="srcFile" type="file" accept=".pdf,.txt,.md,text/plain,application/pdf">
+      <div id="srcStatus" class="status" style="display:none"></div>
+    </div>
+    <div class="card"><h2>Sources</h2><div id="srcList"></div></div>
+  </section>
+
+  <section class="tab" id="tab-chat">
+    <div class="card">
+      <h2>Ask your notebook</h2>
+      <div id="chatLog"></div>
+      <textarea id="chatQ" style="min-height:70px" placeholder="Ask something that your sources answer…"></textarea>
+      <button id="chatSend">Ask</button>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-guide">
+    <div class="card"><h2>Summary</h2><ul class="plain" id="gSummary"></ul></div>
+    <div class="card"><h2>Key terms</h2><div id="gTerms"></div></div>
+    <div class="card"><h2>Must-know lines</h2><ul class="plain" id="gMust"></ul></div>
+    <div class="card"><h2>FAQ</h2><div id="gFaq"></div></div>
+  </section>
+
+  <section class="tab" id="tab-q">
+    <div class="card">
+      <h2>Generate practice questions</h2>
+      <div class="row">
+        <div><label for="qCount">How many</label><select id="qCount"><option>5</option><option selected>10</option><option>20</option></select></div>
+        <div><label for="qSubject">Subject</label><select id="qSubject"><option>Biology</option><option>Physics</option><option>Chemistry</option><option>Notebook</option></select></div>
+      </div>
+      <label for="qFocus">Focus (optional)</label>
+      <input id="qFocus" placeholder="e.g. mitochondria">
+      <div class="row">
+        <button id="qGen">Generate</button>
+        <button class="sec" id="qOffline">Offline only</button>
+      </div>
+      <div id="qStatus" class="status" style="display:none"></div>
+    </div>
+    <div id="qList"></div>
+    <div class="card" id="qActions" style="display:none">
+      <button class="ok" id="qPractice">▶ Practice these in CBT</button>
+      <button class="sec" id="qBank">Save to my bank (for DPP &amp; analysis)</button>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs">
+  <button class="on" data-tab="sources">Sources</button>
+  <button data-tab="chat">Chat</button>
+  <button data-tab="guide">Guide</button>
+  <button data-tab="q">Questions</button>
+</nav>
+
+<script src="./rankforge-notebook-v1.js"></script>
+<script>
+(function(){
+"use strict";
+var NB = window.RankForgeNotebook, Fix = window.RankForgeFix;
+var books = NB.load(), cur = null, lastQs = [], lastTitle = "";
+var $ = function(id){return document.getElementById(id);};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+function ensure(){
+  if(!books.length){ books.push({id:"nb"+Date.now(),title:"My notebook",sources:[]}); persist(); }
+  if(!cur || !books.some(function(b){return b.id===cur.id;})) cur = books[0];
+}
+function persist(){ var r=NB.save(books); if(!r.ok) say("srcStatus",r.error,"err"); }
+function say(id,msg,kind){ var e=$(id); e.style.display="block"; e.className="status"+(kind?" "+kind:""); e.textContent=msg; }
+
+function renderBooks(){
+  ensure();
+  $("nbSelect").innerHTML = books.map(function(b){return '<option value="'+b.id+'"'+(b.id===cur.id?' selected':'')+'>'+esc(b.title)+' ('+b.sources.length+' sources)</option>';}).join("");
+}
+function renderSources(){
+  $("srcList").innerHTML = cur.sources.length ? cur.sources.map(function(s,i){
+    return '<div class="src"><div><b>'+esc(s.title)+'</b><small>'+s.text.split(/\s+/).length+' words</small></div><button class="warn" data-del="'+i+'">Remove</button></div>';
+  }).join("") : "<p style='color:#6b7280'>No sources yet. Add text or a PDF above.</p>";
+}
+function renderGuide(){
+  var ch = NB.chunksOf(cur);
+  if(!ch.length){ ["gSummary","gMust"].forEach(function(i){$(i).innerHTML="<li>Add a source first.</li>";}); $("gTerms").innerHTML=""; $("gFaq").innerHTML=""; return; }
+  var g = NB.studyGuide(ch);
+  $("gSummary").innerHTML = g.summary.map(function(s){return "<li>"+esc(s)+"</li>";}).join("");
+  $("gTerms").innerHTML = g.keyTerms.map(function(t){return '<span class="pill">'+esc(t)+'</span>';}).join("");
+  $("gMust").innerHTML = g.mustKnow.map(function(s){return "<li>"+esc(s)+"</li>";}).join("");
+  var f = NB.faq(ch,8);
+  $("gFaq").innerHTML = f.length ? f.map(function(x){return "<p><b>"+esc(x.q)+"</b><br>"+esc(x.a)+"</p>";}).join("") : "<p style='color:#6b7280'>No definition-style sentences found.</p>";
+}
+function refresh(){ renderBooks(); renderSources(); renderGuide(); }
+
+/* tabs */
+document.querySelectorAll("nav.tabs button").forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll("nav.tabs button").forEach(function(x){x.classList.toggle("on",x===b);});
+    document.querySelectorAll("section.tab").forEach(function(s){s.classList.toggle("on",s.id==="tab-"+b.dataset.tab);});
+    if(b.dataset.tab==="guide") renderGuide();
+    window.scrollTo(0,0);
+  };
+});
+
+/* notebooks */
+$("nbSelect").onchange=function(){ cur=books.filter(function(b){return b.id===$("nbSelect").value;})[0]; refresh(); };
+$("nbNew").onclick=function(){ var t=prompt("Notebook name?","New notebook"); if(!t) return; var b={id:"nb"+Date.now(),title:t.trim()||"Notebook",sources:[]}; books.push(b); cur=b; persist(); refresh(); };
+$("nbDelete").onclick=function(){ if(!confirm("Delete notebook \""+cur.title+"\"?")) return; books=books.filter(function(b){return b.id!==cur.id;}); cur=null; persist(); refresh(); };
+
+/* sources */
+$("addText").onclick=function(){
+  try{ NB.addSource(cur,$("srcTitle").value.trim()||"Pasted text",$("srcText").value); persist(); $("srcText").value=""; $("srcTitle").value=""; say("srcStatus","Source added.","" ); refresh(); }
+  catch(e){ say("srcStatus",e.message,"err"); }
+};
+$("srcList").onclick=function(e){ var i=e.target.getAttribute&&e.target.getAttribute("data-del"); if(i==null) return; cur.sources.splice(Number(i),1); persist(); refresh(); };
+
+async function readPDF(file){
+  if(!window.pdfjsLib){
+    await new Promise(function(res,rej){ var s=document.createElement("script"); s.src="./vendor/pdf.min.js"; s.onload=res; s.onerror=function(){rej(new Error("Could not load PDF reader."));}; document.head.appendChild(s); });
+  }
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc="./vendor/pdf.worker.min.js";
+  var pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise, out=[];
+  for(var p=1;p<=pdf.numPages;p++){
+    var page=await pdf.getPage(p), tc=await page.getTextContent(), line=[], y=null, txt="";
+    tc.items.forEach(function(it){ var yy=Math.round(it.transform[5]); if(y!==null&&Math.abs(yy-y)>3){txt+=line.join(" ")+"\n";line=[];} line.push(it.str); y=yy; });
+    txt+=line.join(" "); out.push(txt);
+    say("srcStatus","Reading PDF page "+p+" of "+pdf.numPages+"…","warn");
+  }
+  return out.join("\n\n");
+}
+$("srcFile").onchange=async function(){
+  var f=this.files[0]; if(!f) return;
+  try{
+    var text = /\.pdf$/i.test(f.name)||f.type==="application/pdf" ? await readPDF(f) : await f.text();
+    if(text.replace(/\s/g,"").length<80) throw new Error("No selectable text found. If this is a scanned PDF, run it through the OCR importer first.");
+    NB.addSource(cur,f.name.replace(/\.[^.]+$/,""),text); persist(); say("srcStatus","Added \""+f.name+"\".",""); refresh();
+  }catch(e){ say("srcStatus",e.message||String(e),"err"); }
+  this.value="";
+};
+
+/* chat */
+$("chatSend").onclick=function(){
+  var q=$("chatQ").value.trim(); if(!q) return;
+  var ch=NB.chunksOf(cur);
+  $("chatLog").insertAdjacentHTML("beforeend",'<div class="msg me">'+esc(q)+"</div>");
+  if(!ch.length){ $("chatLog").insertAdjacentHTML("beforeend",'<div class="msg bot">Add a source first (Sources tab).</div>'); return; }
+  var r=NB.answer(NB.buildIndex(ch),q);
+  var cites=r.citations.map(function(c){return '<div class="cite">['+c.n+'] '+esc(c.sourceTitle)+': '+esc(c.text)+'…</div>';}).join("");
+  $("chatLog").insertAdjacentHTML("beforeend",'<div class="msg bot">'+esc(r.text)+cites+"</div>");
+  $("chatQ").value="";
+};
+
+/* questions */
+function renderQs(){
+  $("qList").innerHTML = lastQs.map(function(q,i){
+    return '<div class="card q"><b>Q'+(i+1)+'.</b> '+(Fix?Fix.richHTML(q.question):esc(q.question))+
+      q.options.map(function(o,j){return '<div class="opt'+(j===q.correctIndex?' right':'')+'">'+String.fromCharCode(65+j)+'. '+esc(o)+'</div>';}).join("")+
+      '<small>'+esc(q.explanation||"")+(q.needsReview?' · <b>offline draft — review before relying on it</b>':'')+'</small></div>';
+  }).join("");
+  $("qActions").style.display = lastQs.length ? "block" : "none";
+}
+async function gen(offlineOnly){
+  var ch=NB.chunksOf(cur);
+  if(!ch.length){ say("qStatus","Add a source first (Sources tab).","err"); return; }
+  say("qStatus","Generating…","warn"); $("qGen").disabled=$("qOffline").disabled=true;
+  try{
+    var focus=$("qFocus").value.trim(), hits=focus?NB.search(NB.buildIndex(ch),focus,6):[];
+    /* topic used for analysis: focus > the single source's title > notebook name */
+    var tTitle = focus ? focus.charAt(0).toUpperCase()+focus.slice(1) : (cur.sources.length===1 ? cur.sources[0].title : cur.title);
+    var r=await NB.generateQuestions(ch,tTitle,{count:Number($("qCount").value),subject:$("qSubject").value,focus:focus,focusHits:hits,fix:Fix,offlineOnly:offlineOnly});
+    lastQs=Fix?Fix.enrichQuestions(r.questions):r.questions; lastTitle=tTitle; renderQs();
+    say("qStatus",(lastQs.length?lastQs.length+" question(s) ready ("+r.mode+"). ":"No questions could be made. ")+(r.note||""),lastQs.length?"":"err");
+  }catch(e){ say("qStatus",e.message||String(e),"err"); }
+  $("qGen").disabled=$("qOffline").disabled=false;
+}
+$("qGen").onclick=function(){gen(false);};
+$("qOffline").onclick=function(){gen(true);};
+$("qPractice").onclick=function(){ if(!lastQs.length) return; NB.toPractice(lastQs,lastTitle); location.href="./cbt.html?source=notebook"; };
+$("qBank").onclick=function(){ var r=NB.publishToBank(lastQs); say("qStatus",r.ok?("Saved "+r.added+" new question(s) to your bank. DPP and analysis can now use them."):r.error,r.ok?"":"err"); };
+
+refresh();
+})();
+</script>
+</body>
+</html>
