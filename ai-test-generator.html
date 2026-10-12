@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="./rf-fixpack-v1.js"></script>
 <script src="./rankforge-core-v1.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -79,10 +80,11 @@ async function generate(){
     updateStatus('Core + AI bank me '+generated.length+'/'+count+' questions mile. Secure AI se '+need+' new questions generate ho rahe hain...');
 
     try{
-      const endpoint =
-        window.RANKFORGE_AI_ENDPOINT ||
-        localStorage.getItem('rankforgeAiEndpoint') ||
-        '/api/ai/generate';
+      const endpoint = window.RankForgeFix ? window.RankForgeFix.getEndpoint() :
+        (window.RANKFORGE_AI_ENDPOINT || localStorage.getItem('rankforgeAiEndpoint') || '');
+      if(!endpoint){
+        throw new Error(window.RankForgeFix ? window.RankForgeFix.endpointProblem() : 'AI endpoint not configured');
+      }
 
       const payload = {
         count: Math.min(need, 20),
