@@ -97,12 +97,20 @@ function launch(options={}){
     throw new Error("RankForgeQuestionEngineV2 is not loaded");
   }
 
-  const config=makeConfig(options);
-  const result=engine.practice
-    ? engine.practice(config)
-    : engine.select(config);
-
-  const questions=arr(result).map(normalizeQuestion);
+  let config=makeConfig(options);
+  let result=engine.practice ? engine.practice(config) : engine.select(config);
+  const pickQ=function(r){return Array.isArray(r)?r:(r&&Array.isArray(r.questions)?r.questions:[]);};
+  let questions=pickQ(result).map(normalizeQuestion);
+  /* Nothing matched the exact weak-topic/difficulty target: widen step by step instead of failing. */
+  if(!questions.length){
+    const widen=[{difficulty:"mixed"},{difficulty:"mixed",topic:"",chapter:""},{difficulty:"mixed",topic:"",chapter:"",subject:"mixed"}];
+    for(const w of widen){
+      const c2=Object.assign({},config,w);
+      const r2=engine.practice ? engine.practice(c2) : engine.select(c2);
+      const q2=pickQ(r2).map(normalizeQuestion);
+      if(q2.length){ config=c2; result=r2; questions=q2; break; }
+    }
+  }
 
   if(!questions.length){
     return {

@@ -1064,7 +1064,20 @@ console.info(
     ),answerIndex);
   }
 
-  function parsePages(pages){
+    /* Questions often continue onto the next page. Read the whole PDF as one stream so they are not cut in half. */
+  function rfMergePages(pages){
+    const list=Array.isArray(pages)?pages:[];
+    if(!list.length) return [];
+    const rows=[];
+    list.forEach(function(pg){
+      (Array.isArray(pg.rows)?pg.rows:[]).forEach(function(r){
+        rows.push(Object.assign({},r,{_page:pg.page,_img:pg.hasImages}));
+      });
+    });
+    return [{page:list[0].page,hasImages:list[0].hasImages,rows:rows}];
+  }
+
+function parsePages(pages){
     const all=[];
     const diagnostics={
       pages:Array.isArray(pages)?pages.length:0,
@@ -1074,7 +1087,7 @@ console.info(
       rejected:0
     };
 
-    for(const pg of (pages||[])){
+    for(const pg of rfMergePages(pages)){
       const rows=Array.isArray(pg.rows)?pg.rows:[];
       if(!rows.length) continue;
 
@@ -1117,8 +1130,8 @@ console.info(
         let q=parseGroup(
           block,
           a.number,
-          pg.page,
-          pg.hasImages
+          (rows[a.index]&&rows[a.index]._page)||pg.page,
+          (rows[a.index]&&rows[a.index]._img)||pg.hasImages
         );
 
         /*
@@ -1128,8 +1141,8 @@ console.info(
           q=parseNumericGroup(
             block,
             a.number,
-            pg.page,
-            pg.hasImages
+            (rows[a.index]&&rows[a.index]._page)||pg.page,
+            (rows[a.index]&&rows[a.index]._img)||pg.hasImages
           );
         }
 

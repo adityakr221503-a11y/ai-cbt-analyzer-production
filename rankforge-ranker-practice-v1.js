@@ -31,7 +31,7 @@ async function start(){
     }
 
     localStorage.setItem(ACTIVE,JSON.stringify(test));
-    location.href="./cbt.html";
+    if(window.RankForgeFix&&window.RankForgeFix.handoff){window.RankForgeFix.handoff(test,"rankforge-practice");}else{location.href="./cbt.html";}
 
   }catch(e){
     console.error("RankForge V2 practice:",e);

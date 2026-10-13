@@ -1577,14 +1577,21 @@ async function bootCBTSource() {
     // PDF imports are variable length: start with the complete imported set.
     $("questionCount").value = "all";
     populateTests();
-
+    (function(){
+      const H=window.__RF_HANDOFF||{};
+      const label=String(H.title||localStorage.getItem("CBT_ACTIVE_PDF_FILENAME")||"Imported test");
+      try{
+        $("testSelect").innerHTML='<option value="1">'+label.replace(/[<>&]/g,"")+' \u00b7 '+pdf.length+' questions</option>';
+        const h1=document.querySelector("h1"); if(h1) h1.textContent=label.replace(/[<>&]/g,"");
+        $("startButton").textContent="Start test";
+      }catch(_){}
+    })();
     $("status").className =
       "status ok";
-
     $("status").textContent =
-      "PDF CBT ready: "+
+      "Ready: "+
       pdf.length+
-      " imported questions.";
+      " questions loaded. Choose the count and press Start.";
 
     /*
      * Explicitly mark source.

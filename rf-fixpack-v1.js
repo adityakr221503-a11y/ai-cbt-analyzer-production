@@ -593,8 +593,27 @@
     (document.head || document.documentElement).appendChild(s);
   }
 
+  /* One shared way for every launcher (practice, adaptive, DPP, unified test) to open a prepared test in the CBT. */
+  function handoff(test, source) {
+    source = String(source || (test && test.source) || "handoff");
+    try {
+      var t = Object.assign({}, test || {});
+      t.source = t.source || source; t.sourceType = t.sourceType || source;
+      var TITLES = {"rankforge-unified":"AI + Bank Test","rankforge-practice":"Practice","rankforge-adaptive":"Adaptive Practice","rankforge-dpp":"Adaptive DPP"};
+      if (!t.title || /^rankforge/i.test(t.title) === false && false) t.title = t.title || TITLES[source] || source;
+      var json = JSON.stringify(t);
+      localStorage.setItem("CBT_ACTIVE_TEST", json);
+      sessionStorage.setItem("CBT_ACTIVE_TEST", json);
+      sessionStorage.setItem("CBT_ACTIVE_SOURCE", source.toUpperCase());
+      sessionStorage.setItem("RF_HANDOFF_TS", String(Date.now()));
+      sessionStorage.removeItem("RF_HANDOFF_CONSUMED");
+    } catch (e) {}
+    location.href = "./cbt.html?source=" + encodeURIComponent(source);
+  }
+
   var API = {
     version: VERSION,
+    handoff: handoff,
     normalizeAny: normalizeAny,
     normalizeList: normalizeList,
     chooseSource: chooseSource,

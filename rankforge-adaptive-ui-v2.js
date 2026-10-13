@@ -30,14 +30,19 @@ function start(){
   }
 
   if(!result || !result.ok){
-    alert(
-      "Adaptive Practice needs more validated questions for the selected target.\n\n"+
-      (result?.reason || "No eligible questions found.")
-    );
+    /* Fallback: use the Adaptive DPP engine, which works from your own mistakes and the question bank. */
+    try{
+      const d=global.RankForgeAdaptiveDPPV1 && global.RankForgeAdaptiveDPPV1.start(15);
+      if(d && d.ok && d.dpp && d.dpp.questions && d.dpp.questions.length && window.RankForgeFix && window.RankForgeFix.handoff){
+        window.RankForgeFix.handoff({title:"Adaptive Practice",source:"rankforge-adaptive",questions:d.dpp.questions},"rankforge-adaptive");
+        return;
+      }
+    }catch(_){}
+    alert("Adaptive Practice needs a few more questions to personalise. Take one test first, then try again.");
     return;
   }
 
-  window.location.href="./cbt.html";
+  if(window.RankForgeFix&&window.RankForgeFix.handoff){window.RankForgeFix.handoff({title:"RankForge Adaptive Practice",source:"rankforge-adaptive",questions:result.questions},"rankforge-adaptive");}else{window.location.href="./cbt.html";}
 }
 
 function install(){

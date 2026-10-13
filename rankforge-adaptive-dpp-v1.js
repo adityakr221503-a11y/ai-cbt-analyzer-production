@@ -599,7 +599,8 @@
             " questions prepared. Opening CBT…";
 
           setTimeout(function () {
-            location.href = "cbt.html";
+            if (window.RankForgeFix && window.RankForgeFix.handoff) window.RankForgeFix.handoff({ title: "Adaptive DPP", source: "rankforge-dpp", questions: result.dpp.questions }, "rankforge-dpp");
+            else location.href = "cbt.html";
           }, 300);
         });
       });
