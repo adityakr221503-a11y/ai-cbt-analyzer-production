@@ -40,3 +40,31 @@ Run on 2026-10-15 under a GitHub-Pages-style base path (/ai-cbt-analyzer-product
 | Forge | no JS errors during the whole Forge flow | PASS |
 | Forge | works without any AI server (offline generator) | PASS |
 | Safety | canonical Biology bank unchanged (7196 questions, 3 copies, same hashes) | PASS |
+
+## Local-address safety (added after the 127.0.0.1 report)
+
+**7 of 7 checks passed.**
+
+| Check | Result |
+|---|---|
+| rankers-test-series.html makes no request to 127.0.0.1 / local AI ports | PASS |
+| local AI is off by default and says so (code LOCAL_AI_OFF) | PASS |
+| system check skips the Ollama probe on the live site and explains why | PASS |
+| rankforge-system-check.html makes no request to 127.0.0.1 / local AI ports | PASS |
+| index.html makes no request to 127.0.0.1 / local AI ports | PASS |
+| owner-hub.html makes no request to 127.0.0.1 / local AI ports | PASS |
+| when switched on, local AI uses the server's real path /api/ai/generate | PASS |
+
+
+## Home bottom bar (the Progress tab pushed below the screen)
+
+**6 of 6 checks passed.**
+
+| Check | Result |
+|---|---|
+| home bottom bar at 390px wide: 6 items, one row, all inside the bar, labels on one line | PASS |
+| home bottom bar at 360px wide: 6 items, one row, all inside the bar, labels on one line | PASS |
+| every tab opens with a real finger tap at its position (Progress dashboard included) | PASS |
+| Nexus tab opens the Notebook studio | PASS |
+| home bottom bar at 320px wide: 6 items, one row, all inside the bar, labels on one line | PASS |
+| Notebook studio bottom tabs (6, including Predict) all fit on screen at 360px | PASS |

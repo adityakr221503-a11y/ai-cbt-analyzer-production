@@ -9,6 +9,7 @@
    - New **Predict** tab: compares your NTA syllabus with your PYQs, shows filled/dashed coverage boxes and a "Study next" list (rarest first). Tap a topic to generate questions on it.
    - Generate, then **Practice these in CBT**. The test opens in your own CBT, and the result is saved for history and analysis.
 3. The service worker cache name was bumped so phones pick up the update.
+4. **Home bottom bar fixed.** The bar held six items (Nexus plus five tabs) in a five-column layout, so the Progress tab (your dashboard) wrapped onto a second row below the screen. All six now sit in one row: Home, Learn, Practice, Tests, Progress, Nexus. This is the only change in `index.html`.
 
 ## Install (about 2 minutes)
 1. Unzip `rankforge-stable-nav-forge.zip`.
@@ -16,6 +17,13 @@
    Or copy the files over your local repo and run `git add -A && git commit -m "Stable navigation + Forge" && git push`.
 3. Wait about a minute, open the site and refresh once.
 4. If you also deploy to Cloudflare, run `tools/sync-dist.sh` before `wrangler deploy` (the Cloudflare copy is a separate folder).
+
+## If your app shows "This site can't be reached - 127.0.0.1 refused to connect"
+`127.0.0.1` means "this same device". An address that starts with it only works while a program on that device is serving the app. Nothing in your app sends you there, so the app was opened from a saved local address: a bookmark, a home-screen icon or installed app made while testing locally, or a typed address.
+1. Open the live app: https://adityakr221503-a11y.github.io/ai-cbt-analyzer-production/
+2. Delete the old bookmark and the old home-screen icon / installed app.
+3. Install again from the live address (Chrome menu > Add to Home screen or Install app).
+Also fixed: the optional "local AI" helper (rankforge-local-provider.js, rankers-test-series.html) no longer calls 127.0.0.1 from the live site. It was pointed at a path the local server does not have, so every local AI request failed or timed out. It now stays off unless you run the app on your own computer or turn it on, and it says so plainly.
 
 ## Not touched
 The 7,196-question Biology bank (all 3 copies verified byte-identical), the CBT engine, the Worker, and all exam screens.
