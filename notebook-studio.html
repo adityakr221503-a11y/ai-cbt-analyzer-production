@@ -39,6 +39,7 @@ nav.tabs button{margin:0;border-radius:0;background:#fff;color:var(--mute);paddi
 nav.tabs button.on{color:var(--a);border-top:3px solid var(--a)}
 section.tab{display:none}section.tab.on{display:block}
 ul.plain{padding-left:18px;line-height:1.55}
+.covgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(20px,1fr));gap:5px;margin:10px 0}.covgrid i{aspect-ratio:1;border-radius:5px;background:#22d3ee}.covgrid i.z{background:none;border:1.5px dashed #fb7185}.pr{cursor:pointer;border:1px solid #c7d2fe;background:#eef2ff;color:#1e1b4b;margin:3px;padding:7px 11px;border-radius:999px;font:inherit}
 </style>
 <link rel="stylesheet" href="./rankforge-ui-security-v1.css">
 </head>
@@ -61,13 +62,16 @@ ul.plain{padding-left:18px;line-height:1.55}
   <section class="tab on" id="tab-sources">
     <div class="card">
       <h2>Add a source</h2>
+      <label for="srcType">Source type</label>
+      <select id="srcType"><option>NCERT</option><option>PYQ</option><option>Own module</option><option>Test series</option><option>NTA syllabus</option></select>
+      <p style="color:#6b7280;margin:4px 0 0;font-size:13px">NTA syllabus: one topic per line. PYQ: one question per paragraph.</p>
       <label for="srcTitle">Title</label>
       <input id="srcTitle" placeholder="e.g. NCERT Biology 11 – Chapter 1">
       <label for="srcText">Paste text</label>
       <textarea id="srcText" placeholder="Paste notes, NCERT text, lecture transcript…"></textarea>
       <button id="addText">Add pasted text</button>
-      <label for="srcFile">…or upload a PDF / .txt / .md</label>
-      <input id="srcFile" type="file" accept=".pdf,.txt,.md,text/plain,application/pdf">
+      <label for="srcFile">…or upload PDFs / .txt / .md / .csv (several at once)</label>
+      <input id="srcFile" type="file" accept=".pdf,.txt,.md,.csv,.json,text/plain,application/pdf" multiple>
       <div id="srcStatus" class="status" style="display:none"></div>
     </div>
     <div class="card"><h2>Sources</h2><div id="srcList"></div></div>
@@ -96,6 +100,7 @@ ul.plain{padding-left:18px;line-height:1.55}
         <div><label for="qCount">How many</label><select id="qCount"><option>5</option><option selected>10</option><option>20</option></select></div>
         <div><label for="qSubject">Subject</label><select id="qSubject"><option>Biology</option><option>Physics</option><option>Chemistry</option><option>Notebook</option></select></div>
       </div>
+      <label for="qDiff">Difficulty</label><select id="qDiff"><option>NEET mix</option><option>Easy</option><option>Medium</option><option>Hard</option><option>Rank Booster</option></select>
       <label for="qFocus">Focus (optional)</label>
       <input id="qFocus" placeholder="e.g. mitochondria">
       <div class="row">
@@ -110,6 +115,14 @@ ul.plain{padding-left:18px;line-height:1.55}
       <button class="sec" id="qBank">Save to my bank (for DPP &amp; analysis)</button>
     </div>
   </section>
+  <section class="tab" id="tab-predict">
+    <div class="card">
+      <h2>Coverage and likely topics</h2>
+      <p>Compares your NTA syllabus source with your PYQ sources. Filled boxes appear in your PYQs; dashed boxes never do. Topics are ranked by how rarely they appear, so the top ones are the best to study and practise next. This is an estimate from your own sources, not a guarantee.</p>
+      <button id="covRun">Check coverage</button>
+      <div id="covOut"></div>
+    </div>
+  </section>
 </main>
 
 <nav class="tabs">
@@ -117,9 +130,11 @@ ul.plain{padding-left:18px;line-height:1.55}
   <button data-tab="chat">Chat</button>
   <button data-tab="guide">Guide</button>
   <button data-tab="q">Questions</button>
+  <button data-tab="predict">Predict</button>
 </nav>
 
 <script src="./rankforge-notebook-v1.js"></script>
+<script src="./rankforge-forge-v1.js"></script>
 <script>
 (function(){
 "use strict";
@@ -141,7 +156,7 @@ function renderBooks(){
 }
 function renderSources(){
   $("srcList").innerHTML = cur.sources.length ? cur.sources.map(function(s,i){
-    return '<div class="src"><div><b>'+esc(s.title)+'</b><small>'+s.text.split(/\s+/).length+' words</small></div><button class="warn" data-del="'+i+'">Remove</button></div>';
+    return '<div class="src"><div><b>'+esc(s.title)+'</b><small>'+esc(s.type||"Source")+' · '+s.text.split(/\s+/).length+' words</small></div><button class="warn" data-del="'+i+'">Remove</button></div>';
   }).join("") : "<p style='color:#6b7280'>No sources yet. Add text or a PDF above.</p>";
 }
 function renderGuide(){
@@ -173,7 +188,7 @@ $("nbDelete").onclick=function(){ if(!confirm("Delete notebook \""+cur.title+"\"
 
 /* sources */
 $("addText").onclick=function(){
-  try{ NB.addSource(cur,$("srcTitle").value.trim()||"Pasted text",$("srcText").value); persist(); $("srcText").value=""; $("srcTitle").value=""; say("srcStatus","Source added.","" ); refresh(); }
+  try{ NB.addSource(cur,$("srcTitle").value.trim()||"Pasted text",$("srcText").value).type=$("srcType").value; persist(); $("srcText").value=""; $("srcTitle").value=""; say("srcStatus","Source added.","" ); refresh(); }
   catch(e){ say("srcStatus",e.message,"err"); }
 };
 $("srcList").onclick=function(e){ var i=e.target.getAttribute&&e.target.getAttribute("data-del"); if(i==null) return; cur.sources.splice(Number(i),1); persist(); refresh(); };
@@ -193,13 +208,19 @@ async function readPDF(file){
   return out.join("\n\n");
 }
 $("srcFile").onchange=async function(){
-  var f=this.files[0]; if(!f) return;
-  try{
-    var text = /\.pdf$/i.test(f.name)||f.type==="application/pdf" ? await readPDF(f) : await f.text();
-    if(text.replace(/\s/g,"").length<80) throw new Error("No selectable text found. If this is a scanned PDF, run it through the OCR importer first.");
-    NB.addSource(cur,f.name.replace(/\.[^.]+$/,""),text); persist(); say("srcStatus","Added \""+f.name+"\".",""); refresh();
-  }catch(e){ say("srcStatus",e.message||String(e),"err"); }
-  this.value="";
+  var fs=Array.prototype.slice.call(this.files||[]); this.value="";
+  var added=0, skipped=[];
+  for(var i=0;i<fs.length;i++){
+    var f=fs[i];
+    try{
+      var isPdf=/\.pdf$/i.test(f.name)||f.type==="application/pdf", isTxt=/\.(txt|md|csv|json|tsv)$/i.test(f.name)||/^text\//.test(f.type);
+      if(!isPdf&&!isTxt) throw new Error(f.name+": unsupported type. Use PDF, TXT, MD, CSV or JSON.");
+      var text = isPdf ? await readPDF(f) : await f.text();
+      if(text.replace(/\s/g,"").length<80) throw new Error(f.name+": no selectable text found. If this is a scanned PDF, run it through the OCR importer first.");
+      NB.addSource(cur,f.name.replace(/\.[^.]+$/,""),text).type=$("srcType").value; persist(); added++; refresh();
+    }catch(e){ skipped.push(e.message||String(e)); }
+  }
+  say("srcStatus",(added?"Added "+added+" file(s) as "+$("srcType").value+". ":"")+skipped.join(" "),skipped.length&&!added?"err":"");
 };
 
 /* chat */
@@ -231,7 +252,7 @@ async function gen(offlineOnly){
     var focus=$("qFocus").value.trim(), hits=focus?NB.search(NB.buildIndex(ch),focus,6):[];
     /* topic used for analysis: focus > the single source's title > notebook name */
     var tTitle = focus ? focus.charAt(0).toUpperCase()+focus.slice(1) : (cur.sources.length===1 ? cur.sources[0].title : cur.title);
-    var r=await NB.generateQuestions(ch,tTitle,{count:Number($("qCount").value),subject:$("qSubject").value,focus:focus,focusHits:hits,fix:Fix,offlineOnly:offlineOnly});
+    var r=await NB.generateQuestions(ch,tTitle,{count:Number($("qCount").value),subject:$("qSubject").value,difficulty:$("qDiff").value,focus:focus,focusHits:hits,fix:Fix,offlineOnly:offlineOnly});
     lastQs=Fix?Fix.enrichQuestions(r.questions):r.questions; lastTitle=tTitle; renderQs();
     say("qStatus",(lastQs.length?lastQs.length+" question(s) ready ("+r.mode+"). ":"No questions could be made. ")+(r.note||""),lastQs.length?"":"err");
   }catch(e){ say("qStatus",e.message||String(e),"err"); }
@@ -242,9 +263,19 @@ $("qOffline").onclick=function(){gen(true);};
 $("qPractice").onclick=function(){ if(!lastQs.length) return; NB.toPractice(lastQs,lastTitle); location.href="./cbt.html?source=notebook"; };
 $("qBank").onclick=function(){ var r=NB.publishToBank(lastQs); say("qStatus",r.ok?("Saved "+r.added+" new question(s) to your bank. DPP and analysis can now use them."):r.error,r.ok?"":"err"); };
 
+var COV=null;
+$("covRun").onclick=function(){
+  var r=window.RankForgeForge.coverage(cur.sources);
+  if(r.error){ $("covOut").innerHTML='<p class="status err" style="display:block">'+esc(r.error)+'</p>'; return; }
+  COV=r;
+  $("covOut").innerHTML='<p>'+r.asked+' of '+r.topics.length+' syllabus topics appear in your PYQs. '+(r.topics.length-r.asked)+' never asked.</p><div class="covgrid">'+r.topics.map(function(t){return '<i class="'+(t.n?'':'z')+'" title="'+esc(t.t)+' ('+t.n+')"></i>';}).join("")+'</div><h3>Study next</h3><div>'+r.priority.slice(0,15).map(function(t){return '<button class="pr" data-topic="'+esc(t.t)+'">'+esc(t.t)+(t.n?' · '+t.n+' in PYQs':' · never asked')+'</button>';}).join("")+'</div><p style="color:#6b7280">Tap a topic to generate questions on it.</p>';
+};
+$("covOut").onclick=function(e){ var t=e.target.getAttribute&&e.target.getAttribute("data-topic"); if(!t) return; $("qFocus").value=t; document.querySelector('nav.tabs button[data-tab="q"]').click(); };
+
 refresh();
 })();
 </script>
 <script src="./rankforge-study-upgrade-v1.js"></script>
+<script src="./rf-nav-v1.js"></script>
 </body>
 </html>
