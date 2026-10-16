@@ -15,6 +15,12 @@ on:
       - "*.css"
       - "data/**"
       - ".rankforge-web/**"
+      - "*.png"
+      - "vendor/**"
+      - "owner-imports/**"
+      - "rank-booster/**"
+      - "nichod/**"
+      - "assets/**"
 
 jobs:
   build:
@@ -166,16 +172,27 @@ jobs:
 
           find . -maxdepth 1 \
             -type f \
-            \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.json" \) \
+            \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.json" \
+               -o -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" \
+               -o -name "*.webp" -o -name "*.ico" -o -name "*.webmanifest" \) \
             -exec cp -f {} ".rankforge-web/" \;
 
-          [ -d "data" ] && cp -R data ".rankforge-web/" || true
+          rm -f ".rankforge-web/package.json" ".rankforge-web/package-lock.json" ".rankforge-web/capacitor.config.json"
+
+          # The app loads scripts, data and images from these folders at runtime.
+          for d in data assets vendor owner-imports rank-booster nichod ranker-revision rankforge-lecture-module rankforge-local-ai study-vault biology360 src; do
+            if [ -d "$d" ]; then cp -R "$d" ".rankforge-web/"; fi
+          done
 
           test -f ".rankforge-web/index.html"
           test -f ".rankforge-web/biology-7196-cbt.html"
           test -f ".rankforge-web/biology-7196-bank-readonly.json"
           test -f ".rankforge-web/biology-rankforge-bridge.js"
           test -f ".rankforge-web/biology-rankforge-final-hook.js"
+          test -f ".rankforge-web/vendor/pdf.min.js"
+          test -f ".rankforge-web/owner-imports/rankforge-owner-access.js"
+          test -f ".rankforge-web/rank-booster/question-bank.js"
+          test -f ".rankforge-web/nichod/engine/nichod-unseen-generator.js"
 
           echo "[PASS] RankForge web assets prepared"
           echo "[PASS] Biology CBT + 7,196 runtime asset bundled"
