@@ -8,6 +8,7 @@
   function localEnabled() {
     try {
       var h = location.hostname;
+      if (window.Capacitor) return localStorage.getItem("rankforgeLocalAi") === "on";
       if (h === "localhost" || h === "127.0.0.1") return true;
       return localStorage.getItem("rankforgeLocalAi") === "on";
     } catch (e) { return false; }

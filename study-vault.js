@@ -1102,7 +1102,7 @@ item.title+
 (item.chapter?" → "+item.chapter:"")+
 (item.topic?" → "+item.topic:"");
 
-navigator.clipboard?.writeText(text);
+try { var cp = navigator.clipboard && navigator.clipboard.writeText(text); if (cp && cp.catch) cp.catch(function () {}); } catch (e) {}
 
 alert("Reference copied.");
 }

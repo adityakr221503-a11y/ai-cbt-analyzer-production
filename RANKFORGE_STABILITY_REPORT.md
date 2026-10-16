@@ -1,6 +1,6 @@
 # RankForge stability and Forge verification report
 
-Run on 2026-10-15 under a GitHub-Pages-style base path (/ai-cbt-analyzer-production/), mobile viewport 390x844, Chromium.
+Run on 2026-10-16 under a GitHub-Pages-style base path (/ai-cbt-analyzer-production/), mobile viewport 390x844, Chromium.
 
 **Result: 34 of 34 checks passed.**
 
@@ -55,7 +55,6 @@ Run on 2026-10-15 under a GitHub-Pages-style base path (/ai-cbt-analyzer-product
 | owner-hub.html makes no request to 127.0.0.1 / local AI ports | PASS |
 | when switched on, local AI uses the server's real path /api/ai/generate | PASS |
 
-
 ## Home bottom bar (the Progress tab pushed below the screen)
 
 **6 of 6 checks passed.**
@@ -68,3 +67,39 @@ Run on 2026-10-15 under a GitHub-Pages-style base path (/ai-cbt-analyzer-product
 | Nexus tab opens the Notebook studio | PASS |
 | home bottom bar at 320px wide: 6 items, one row, all inside the bar, labels on one line | PASS |
 | Notebook studio bottom tabs (6, including Predict) all fit on screen at 360px | PASS |
+
+## Android app bundle (what goes inside the APK)
+
+**7 of 7 checks passed.** The Gradle build itself needs the Android SDK and could not be run here; GitHub Actions runs it.
+
+| Check | Result |
+|---|---|
+| Android workflow file is valid and its "Prepare web assets" step runs to success | PASS |
+| bundle contains every runtime folder and file the app loads | PASS |
+| bundle has no build files (package.json, capacitor.config.json) | PASS |
+| Biology bank in the app bundle is byte-identical to your 7,196-question bank | PASS |
+| app bundle: all 38 pages load with no missing scripts, data or images | PASS |
+| app bundle: no JS errors on any page (owner-only gate excluded) | PASS |
+| inside the Android app (https://localhost) local AI stays off and makes no 127.0.0.1 request | PASS |
+
+## PDF reading without the internet
+
+**3 of 3 checks passed.**
+
+| Check | Result |
+|---|---|
+| PDF reader (test series import) loads from the bundled copy with the internet blocked | PASS |
+| a real PDF is parsed using the bundled worker (no internet) | PASS |
+| no request to a third-party PDF host was made | PASS |
+
+## Bugs found by tapping through every page, now fixed
+
+**5 of 5 checks passed.**
+
+| Check | Result |
+|---|---|
+| IMPORT TEST 180 now imports the 150 text questions (before: all 180 were rejected); the 30 picture-option questions are skipped | PASS |
+| imported Test 180 questions are saved in the Rank Booster bank | PASS |
+| importing twice creates no duplicates (second run: 0 new, 150 already there) | PASS |
+| no errors logged during the import | PASS |
+| Copy Specification gives clear feedback and throws no error when the clipboard is blocked | PASS |

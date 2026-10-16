@@ -207,7 +207,7 @@ function checkBankCount() {
 </script>
 
 <script src="rank-booster/import-test180.js?v=2eca0b1"></script>
-<button id="importTest180Btn" type="button" onclick="importTest180Questions().then(r => alert(JSON.stringify(r)))">IMPORT TEST 180</button>
+<button id="importTest180Btn" type="button" onclick="importTest180Questions().then(r => alert(r.error || r.summary || JSON.stringify(r)))">IMPORT TEST 180</button>
 <button type="button" onclick="checkBankCount()">CHECK BANK COUNT</button>
 <script>
 (function(){

@@ -102,7 +102,7 @@ btn.addEventListener("click",async function(){
      const result=await window.importTest180Questions();
      status.textContent=
        "Restore complete: "+
-       JSON.stringify(result);
+       (result.error||result.summary||JSON.stringify(result));
      setTimeout(()=>location.reload(),700);
      return;
    }

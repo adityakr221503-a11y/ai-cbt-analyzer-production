@@ -48,7 +48,7 @@ small{color:#667085}
 <div class="card">
 <h3>Strict AI specification</h3>
 <textarea id="rfAISpec" readonly></textarea>
-<button onclick="navigator.clipboard?.writeText(document.getElementById('rfAISpec').value)">Copy Specification</button>
+<button onclick="rfCopy(document.getElementById('rfAISpec').value,this)">Copy Specification</button>
 </div>
 
 <div class="card">
@@ -171,5 +171,6 @@ renderStaged();
 
 <div id="rankforgeLectureFallback" style="display:block !important;visibility:visible !important;opacity:1 !important;"><a href="rankforge-lecture-module/pages/lectures.html" style="display:block !important;visibility:visible !important;opacity:1 !important;">🎓 <strong>AI Lectures</strong> — NCERT-first lectures, AI explanation and practice.</a></div>
 <script src="./rf-nav-v1.js"></script>
+<script src="./rf-copy-v1.js"></script>
 </body>
 </html>

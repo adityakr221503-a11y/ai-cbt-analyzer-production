@@ -10,6 +10,20 @@
    - Generate, then **Practice these in CBT**. The test opens in your own CBT, and the result is saved for history and analysis.
 3. The service worker cache name was bumped so phones pick up the update.
 4. **Home bottom bar fixed.** The bar held six items (Nexus plus five tabs) in a five-column layout, so the Progress tab (your dashboard) wrapped onto a second row below the screen. All six now sit in one row: Home, Learn, Practice, Tests, Progress, Nexus. This is the only change in `index.html`.
+5. **Test 180 import repaired.** The "IMPORT TEST 180" button called a function that no longer exists, so all 180 questions were rejected. It now imports the 150 text questions, reports the result in plain words, creates no duplicates on a second tap, and retries once if the file is slow to load. The 30 questions whose options are pictures are skipped, because that bank holds text questions only.
+6. **PDF reading works without the internet.** Test-series PDF import and the owner PDF adapter now use the PDF reader bundled in `vendor/` first; the internet copy is only a fallback. Tested by parsing a real PDF with the internet blocked.
+7. **Copy buttons no longer fail silently.** "Copy Specification" and the Study Vault copy now cope with a blocked clipboard and say what happened (new file `rf-copy-v1.js`).
+
+## Get the app on your phone (pick one)
+**Option A: install from the live link (fastest, works on any phone)**
+1. Open https://adityakr221503-a11y.github.io/ai-cbt-analyzer-production/ in Chrome. Wait for it to load once.
+2. Delete any old RankForge icon first. Then Chrome menu (three dots) > **Install app** (or Add to Home screen).
+**Option B: Android APK (an installable file)**
+1. After you upload these files, GitHub builds the APK by itself (about 8 to 12 minutes). To start it by hand: your repo > **Actions** > **RankForge Android APK** > **Run workflow**.
+2. When the run shows a green tick, open it and scroll to **Artifacts**. Tap **RankForge-v1.0.0-debug** to download a zip.
+3. Unzip it, tap **app-debug.apk**, and allow "Install unknown apps" for your browser or Files app when Android asks.
+4. If the run shows a red cross, open the failing step and send me its last 30 lines.
+5. Android APK fix in this update: the old build copied only top-level files, so the APK was missing the owner-imports, rank-booster, nichod and vendor folders and the question images. Test Series, PDF reading and the owner guard would not have worked inside the app. The build now bundles them and fails early if any is missing.
 
 ## Install (about 2 minutes)
 1. Unzip `rankforge-stable-nav-forge.zip`.
@@ -31,6 +45,8 @@ The 7,196-question Biology bank (all 3 copies verified byte-identical), the CBT 
 ## Known limits
 - Real AI generation needs your Worker URL saved in Owner Hub. Without it, the offline generator is used (those questions are marked "review before relying").
 - The offline generator ignores difficulty.
+- The APK itself could not be built here (no Android SDK). I verified the web files that go inside it; GitHub Actions does the real build.
+- The `.github` folder is hidden on some phones and computers. If you cannot upload it, open `.github/workflows/rankforge-android.yml` on GitHub, tap the pencil (edit), paste the contents of the separate `rankforge-android.yml` file, and commit.
 - Coverage and "Study next" are keyword matches on your own text: an estimate, not a guarantee. A syllabus source should contain one topic per line, because every line counts as a topic.
 - Tested in Chromium at phone size with a stand-in AI server. Not tested on a real iPhone or Android device, or against your real Worker.
 - pdf.html and rankforge-source-importer.html load scripts from the internet (tesseract, jszip); they could not be exercised offline.

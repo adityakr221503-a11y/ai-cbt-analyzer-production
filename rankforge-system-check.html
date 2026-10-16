@@ -116,7 +116,7 @@
     G = "PDF to CBT";
     try { await get("vendor/pdf.min.js", true, 20000); await get("vendor/pdf.worker.min.js", true, 20000); add(G, "PDF reader files available (works offline)", "pass"); } catch (e) { add(G, "PDF reader files", "fail", String(e)); }
     G = "AI (optional)";
-    if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) { add(G, "Local AI server (Ollama)", "warn", "Skipped on the live site. It is only checked when you run the app on your own computer. Tests, practice, PDF import and mistakes work without it."); }
+    if (window.Capacitor || !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) { add(G, "Local AI server (Ollama)", "warn", "Skipped on the live site. It is only checked when you run the app on your own computer. Tests, practice, PDF import and mistakes work without it."); }
     else {
     try { var r = await fetch("http://localhost:11434/api/tags", { signal: timeout(3000) }); add(G, "Local AI server (Ollama)", r.ok ? "pass" : "warn", r.ok ? "Reachable" : "HTTP " + r.status); }
     catch (e) { add(G, "Local AI server (Ollama)", "warn", "Not reachable from this device. Fine if you do not use AI generation. Tests, practice, PDF import and mistakes work without it."); }
