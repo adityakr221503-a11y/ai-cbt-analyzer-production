@@ -4,6 +4,10 @@
   "webDir": ".rankforge-web",
   "bundledWebRuntime": false,
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "url": "https://adityakr221503-a11y.github.io/ai-cbt-analyzer-production/",
+    "allowNavigation": [
+      "adityakr221503-a11y.github.io"
+    ]
   }
 }

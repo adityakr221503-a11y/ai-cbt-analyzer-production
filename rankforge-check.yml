@@ -1,0 +1,101 @@
+name: RankForge Check
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check the app is healthy
+        run: |
+          set +e
+          fail=0
+          bad() { echo "::error::$1"; fail=1; }
+
+          # 1. The home page must really be the home page
+          if ! grep -q 'data-tab="home"' index.html || ! grep -q 'RankForge AI' index.html; then
+            bad "index.html is not the RankForge home page. A different index.html (for example the one from ranker-revision or study-vault) may have been uploaded to the main page by mistake."
+          fi
+
+          # 2. Files that must not sit in the main page
+          for f in rankforge-android.yml rankforge-check.yml; do
+            [ ! -f "$f" ] || bad "$f is in the main page. It belongs in .github/workflows/"
+          done
+
+          # 3. The Biology bank must stay unchanged: 7,196 questions, and any copy must be identical
+          node -e 'const q=JSON.parse(require("fs").readFileSync("data/BIOLOGY_ACTIVE_BANK.json","utf8")).questions; process.exit(Array.isArray(q)&&q.length===7196?0:1)' 2>/dev/null || bad "data/BIOLOGY_ACTIVE_BANK.json must contain exactly 7,196 questions."
+          h1=$(sha256sum data/BIOLOGY_ACTIVE_BANK.json 2>/dev/null | cut -d' ' -f1)
+          [ -n "$h1" ] || bad "data/BIOLOGY_ACTIVE_BANK.json is missing."
+          for c in BIOLOGY_ACTIVE_BANK.json biology-7196-bank-readonly.json; do
+            if [ -f "$c" ] && [ "$(sha256sum "$c" | cut -d' ' -f1)" != "$h1" ]; then
+              bad "$c is different from data/BIOLOGY_ACTIVE_BANK.json. The canonical 7,196-question bank must stay unchanged."
+            fi
+          done
+
+          # 4. Core files
+          for f in sw.js manifest.json capacitor.config.json; do
+            [ -f "$f" ] || bad "$f is missing from the main page."
+          done
+
+          # 5. Files changed in this push: syntax and links
+          changed=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD 2>/dev/null)
+          [ -n "$changed" ] || echo "No earlier commit to compare with, so only the basic checks ran."
+          for f in $changed; do
+            [ -f "$f" ] || continue
+            case "$f" in
+              .cloudflare-dist/*|vendor/*|node_modules/*) continue ;;
+              *.json)
+                node -e 'JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))' "$f" 2>/dev/null || bad "Invalid JSON: $f"
+                ;;
+              *.js)
+                if ! node --check "$f" 2>/dev/null; then
+                  cp "$f" /tmp/rf-check.mjs
+                  node --check /tmp/rf-check.mjs 2>/dev/null || bad "JavaScript syntax error: $f"
+                fi
+                ;;
+              *.html)
+                out=$(node - "$f" <<'JS'
+          const fs = require("fs"), path = require("path");
+          const f = process.argv[2], dir = path.dirname(f);
+          const h = fs.readFileSync(f, "utf8");
+          const out = [];
+          const re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
+          let m;
+          while ((m = re.exec(h))) {
+            const attrs = m[1], body = m[2];
+            const src = /\bsrc\s*=\s*["']([^"']+)["']/i.exec(attrs);
+            if (src) {
+              const u = src[1];
+              if (/^(https?:)?\/\/|^data:|^blob:/.test(u) || u.indexOf("{") >= 0 || u.indexOf("'+") >= 0) continue;
+              const p = path.join(dir, u.split("?")[0].split("#")[0]);
+              if (!fs.existsSync(p)) out.push("Missing script in " + f + ": " + u);
+            } else if (body.trim()) {
+              const t = /\btype\s*=\s*["']([^"']+)["']/i.exec(attrs);
+              if (t && !/javascript/i.test(t[1])) continue;
+              try { new Function(body); } catch (e) { out.push("Inline script error in " + f + ": " + e.message); }
+            }
+          }
+          console.log(out.join("\n"));
+          JS
+                )
+                while IFS= read -r line; do
+                  [ -n "$line" ] && bad "$line"
+                done <<< "$out"
+                ;;
+            esac
+          done
+
+          if [ "$fail" -ne 0 ]; then
+            echo "Some checks failed. Read the red messages above."
+            exit 1
+          fi
+          echo "All RankForge checks passed."

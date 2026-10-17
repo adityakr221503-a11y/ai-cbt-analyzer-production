@@ -29,5 +29,30 @@
     });
     document.body.insertBefore(nav, document.body.firstChild);
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount); else mount();
+  /* Shows when the app was last updated, so you can see a new push has arrived (reads version.json). */
+  function stamp() {
+    try {
+      fetch(base + "version.json?ts=" + Date.now(), { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (v) {
+          if (!v || !v.updated || document.getElementById("rf-ver")) return;
+          var span = document.createElement("span");
+          span.id = "rf-ver";
+          span.textContent = "Updated " + v.updated + (v.note ? " \u00b7 " + v.note : "");
+          var foot = document.querySelector(".foot");
+          if (foot) {
+            span.style.cssText = "display:block;opacity:.7;margin-top:4px";
+            foot.appendChild(span);
+          } else {
+            var bar = document.getElementById("rf-nav");
+            if (!bar) return;
+            span.style.cssText = "flex:none;margin-left:auto;padding:0 6px;opacity:.65;font-size:11px;white-space:nowrap";
+            bar.appendChild(span);
+          }
+        })
+        .catch(function () {});
+    } catch (e) {}
+  }
+  function start() { mount(); stamp(); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
