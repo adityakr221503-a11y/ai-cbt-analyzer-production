@@ -170,12 +170,24 @@ jobs:
             -exec cp -f {} ".rankforge-web/" \;
 
           [ -d "data" ] && cp -R data ".rankforge-web/" || true
+# RANKFORGE_EXTRA_RUNTIME_ASSETS_V1
+          # Copy runtime assets while preserving their relative paths.
+          cp -f "biology-7196-bank-readonly.json" ".rankforge-web/"
+          mkdir -p ".rankforge-web/vendor" ".rankforge-web/rank-booster" ".rankforge-web/owner-imports"
+          cp -f "vendor/pdf.min.js" ".rankforge-web/vendor/"
+          cp -f "vendor/pdf.worker.min.js" ".rankforge-web/vendor/"
+          cp -f "rank-booster/biology-test-series-2699.json" ".rankforge-web/rank-booster/"
+          cp -f "owner-imports/rankforge-owner-access.js" ".rankforge-web/owner-imports/"
 
           test -f ".rankforge-web/index.html"
           test -f ".rankforge-web/biology-7196-cbt.html"
           test -f ".rankforge-web/biology-7196-bank-readonly.json"
           test -f ".rankforge-web/biology-rankforge-bridge.js"
           test -f ".rankforge-web/biology-rankforge-final-hook.js"
+          test -f ".rankforge-web/vendor/pdf.min.js"
+          test -f ".rankforge-web/vendor/pdf.worker.min.js"
+          test -f ".rankforge-web/rank-booster/biology-test-series-2699.json"
+          test -f ".rankforge-web/owner-imports/rankforge-owner-access.js"
 
           echo "[PASS] RankForge web assets prepared"
           echo "[PASS] Biology CBT + 7,196 runtime asset bundled"
