@@ -145,10 +145,27 @@
     if (src === "pdf" || params.get("rf-final") === "1" || params.get("pdfcbt") === "1") {
       add("local.pdfCbtQuestions", env.local("pdfCbtQuestions"), "PDF");
       add("local.CBT_ACTIVE_QUESTIONS", env.local("CBT_ACTIVE_QUESTIONS"), "PDF");
-      add("local.TOPPER_TEST_180", env.local("TOPPER_TEST_180"), "PDF");
-      /* a PDF import can legitimately be 180+: always take the biggest complete set */
-      cands.sort(function (a, b) { return b.list.length - a.list.length; });
-      if (cands.length) return done(cands[0], "pdf");
+
+      /*
+       * PDF handoff must preserve the just-imported test. Never choose by
+       * question count: a stale TOPPER_TEST_180 or old pool can be larger
+       * than the file the user selected. Prefer the current session payload,
+       * then its active-test wrapper, then the persisted PDF pool. Deliberately
+       * do not treat TOPPER_TEST_180 as a PDF fallback.
+       */
+      var pick = cands.find(function (c) {
+        return c.label === "session.CBT_ACTIVE_QUESTIONS" && /pdf/i.test(c.tag);
+      });
+      if (!pick) pick = cands.find(function (c) {
+        return c.label === "CBT_ACTIVE_TEST" && /pdf/i.test(c.tag);
+      });
+      if (!pick) pick = cands.find(function (c) {
+        return c.label === "local.pdfCbtQuestions";
+      });
+      if (!pick) pick = cands.find(function (c) {
+        return c.label === "local.CBT_ACTIVE_QUESTIONS" && /pdf/i.test(c.tag);
+      });
+      if (pick) return done(pick, "pdf");
       return { mode: "handoff", source: "pdf", questions: [], reason: "pdf-empty" };
     }
 
