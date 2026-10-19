@@ -1,5 +1,13 @@
-const RANKER_BIOLOGY_REVISION = [];
+export {
+  createMistakesFromAttempt,
+  updateMistakeReason,
+  recordPracticeResult,
+} from "./mistakeEngine.js";
 
-if (typeof window !== "undefined") {
-  window.RANKER_BIOLOGY_REVISION = RANKER_BIOLOGY_REVISION;
-}
+export {
+  getMistakeBook,
+  getMistake,
+  getMistakesByReason,
+  getMistakesByStatus,
+  getActiveMistakes,
+} from "./mistakeBook.js";

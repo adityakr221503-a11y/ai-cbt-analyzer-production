@@ -23,33 +23,24 @@
     if (x) x.textContent = String(msg);
   }
 
-  function loadScriptOnce(src) {
+  function loadPDFJS() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+
     return new Promise((resolve, reject) => {
       const s = document.createElement("script");
-      s.src = src;
-      s.onload = () => resolve();
-      s.onerror = () => reject(new Error("load failed: " + src));
+      s.src = PDFJS;
+      s.onload = function () {
+        try {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = WORKER;
+        } catch (_) {}
+        resolve(window.pdfjsLib);
+      };
+      s.onerror = function () {
+        reject(new Error("PDF.js could not be loaded."));
+      };
       document.head.appendChild(s);
     });
   }
-
-  /* Local copy first (works offline and inside the Android app); the internet copy is the fallback. */
-  function loadPDFJS() {
-    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
-    const sources = [["./vendor/pdf.min.js", "./vendor/pdf.worker.min.js"], [PDFJS, WORKER]];
-    let chain = Promise.reject(new Error("start"));
-    sources.forEach(function (pair) {
-      chain = chain.catch(function () {
-        return loadScriptOnce(pair[0]).then(function () {
-          if (!window.pdfjsLib) throw new Error("pdfjsLib missing");
-          try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = pair[1]; } catch (_) {}
-          return window.pdfjsLib;
-        });
-      });
-    });
-    return chain.catch(function () { throw new Error("PDF.js could not be loaded."); });
-  }
-  window.RF_loadPDFJS = loadPDFJS;
 
   /*
    * Rebuild PDF.js text into lines using Y coordinates.

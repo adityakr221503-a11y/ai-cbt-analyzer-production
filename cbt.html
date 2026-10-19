@@ -1,1791 +1,201 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="../rankforge-core-v1.js"></script>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover">
-<title>RankForge Biology CBT</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CBT Test</title>
 
-<style>
-*{box-sizing:border-box}
-body{
- margin:0;
- font-family:system-ui,-apple-system,Segoe UI,sans-serif;
- background:#f1f5f9;
- color:#0f172a
-}
-header{
- background:#fff;
- border-bottom:1px solid #e2e8f0;
- padding:14px 18px;
- position:sticky;
- top:0;
- z-index:5
-}
-.wrap{max-width:1100px;margin:auto}
-.brand{font-size:21px;font-weight:900}
-.brand span{color:#4f46e5}
-main{max-width:1100px;margin:18px auto;padding:0 14px}
-.card{
- background:#fff;
- border-radius:16px;
- padding:20px;
- box-shadow:0 3px 14px rgba(15,23,42,.07);
- margin-bottom:16px
-}
-.grid{
- display:grid;
- grid-template-columns:1fr 290px;
- gap:16px
-}
-@media(max-width:800px){.grid{grid-template-columns:1fr}}
-h1,h2,h3{margin-top:0}
-.muted{color:#64748b}
-.status{
- padding:12px;
- border-radius:10px;
- background:#eef2ff;
- margin:12px 0;
- font-weight:800
-}
-.status.ok{background:#dcfce7;color:#166534}
-.status.err{background:#fee2e2;color:#991b1b}
-.field{margin:14px 0}
-.field label{
- display:block;
- font-weight:800;
- margin-bottom:6px
-}
-select{
- width:100%;
- padding:12px;
- border:1px solid #cbd5e1;
- border-radius:10px;
- background:#fff;
- font:inherit
-}
-button{
- font:inherit;
- border:0;
- border-radius:10px;
- padding:12px 15px;
- font-weight:800;
- cursor:pointer
-}
-button:disabled{opacity:.5;cursor:not-allowed}
-.primary{background:#4f46e5;color:#fff}
-.secondary{background:#e2e8f0;color:#0f172a}
-.danger{background:#dc2626;color:#fff}
-.actions{
- display:flex;
- gap:9px;
- flex-wrap:wrap
-}
-.top{
- display:flex;
- justify-content:space-between;
- align-items:center;
- gap:12px;
- flex-wrap:wrap
-}
-.timer{font-size:20px;font-weight:900}
-.question-no{
- color:#64748b;
- font-weight:800;
- margin:16px 0 10px
-}
-.question{
- font-size:20px;
- line-height:1.55;
- font-weight:800;
- white-space:pre-wrap
-}
-.option{
- display:block;
- width:100%;
- text-align:left;
- background:#fff;
- border:2px solid #e2e8f0;
- margin:10px 0;
- padding:14px
-}
-.option.selected{
- border-color:#4f46e5;
- background:#eef2ff
-}
-.palette{
- display:grid;
- grid-template-columns:repeat(5,1fr);
- gap:7px
-}
-.palette button{
- padding:9px 4px;
- background:#e2e8f0
-}
-.palette button.current{
- outline:3px solid #4f46e5
-}
-.palette button.answered{background:#bbf7d0}
-.palette button.review{background:#fde68a}
-.hidden{display:none!important}
-.stats{
- display:grid;
- grid-template-columns:repeat(3,1fr);
- gap:10px
-}
-@media(max-width:600px){.stats{grid-template-columns:1fr}}
-.stat{
- background:#f8fafc;
- border-radius:10px;
- padding:15px;
- text-align:center
-}
-.stat b{display:block;font-size:27px}
-.mistake{
- border-left:4px solid #dc2626;
- background:#f8fafc;
- padding:11px 13px;
- margin:8px 0;
- border-radius:7px
-}
-.small{font-size:13px;color:#64748b}
-</style>
-
-<script src="./rankforge-v318-stability-v1.js"></script>
-<script src="./rf-fixpack-v1.js"></script>
-
-<script>
-/*
- RANKFORGE BIOLOGY STARTUP GUARD
- Legacy 2699 Biology remains available as data,
- but must not take over the main RankForge startup.
-*/
-(function () {
-  "use strict";
-
-  window.RankForgeBiology7196 = true;
-  window.RankForgeBiologySource = "BIOLOGY_ACTIVE_BANK";
-
-  /* FIX: only claim the session for Biology when nothing else was handed over
-     (previously this ALWAYS overwrote the PDF / AI / DPP source -> Biology 90Q) */
-  try {
-    var __rfc = window.RankForgeFix ? window.RankForgeFix.browserChoose() : { mode: "biology" };
-    window.__RF_HANDOFF = __rfc.mode === "handoff" ? __rfc : null;
-    if (!window.__RF_HANDOFF) {
-      sessionStorage.setItem("CBT_ACTIVE_SOURCE", "BIOLOGY_ACTIVE_BANK");
-      sessionStorage.setItem("CBT_ACTIVE_TEST_SOURCE", "BIOLOGY_ACTIVE_BANK");
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
     }
-  } catch (_) {}
-})();
-</script>
 
-<style id="rf-cbt-polish">
-.option{display:flex!important;align-items:center;gap:12px;text-align:left;padding:12px 14px!important;border-radius:16px!important;min-height:56px;line-height:1.45}
-.option .rf-letter{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eef0ff;color:#4338ca;font-weight:800}
-.option.selected{border-color:#4f46e5!important;background:#eef0ff!important}
-.option.selected .rf-letter{background:#4f46e5;color:#fff}
-.option .rf-optx{flex:1;overflow-wrap:anywhere}
-#cbt .actions{position:sticky;bottom:0;z-index:30;background:rgba(255,255,255,.96);padding:10px 4px calc(10px + env(safe-area-inset-bottom,0px));margin-top:12px;border-top:1px solid #e5e7eb;gap:8px}
-#cbt .actions{display:flex!important;flex-wrap:nowrap!important}#cbt .actions button{flex:1 1 0;min-height:46px;border-radius:14px;padding:10px 4px;font-size:14px;margin:0}#cbt .actions #nextButton{flex:1.5 1 0}
-@media print{body{background:#fff!important}header,#setup,#cbt,#pdfButton,#retryButton,#backButton,#rankforgeResultNav,.actions{display:none!important}#result{display:block!important}#result.hidden{display:block!important}}
-</style>
+    .card {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: 0;
+      border-radius: 8px;
+      background: #4f46e5;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .option {
+      background: #f1f5f9;
+      color: #1e293b;
+      text-align: left;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 12px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
- <div class="wrap">
-  <div class="brand" id="rfBrand">
-   RankForge <span>Biology CBT</span>
+  <div class="card">
+    <h1 id="testTitle">CBT Test</h1>
+
+    <div id="questionArea">
+      Loading question...
+    </div>
+
+    <button id="nextButton">Next Question</button>
+
+    <div id="result"></div>
   </div>
- </div>
-</header>
 
-<main>
-
-<section id="setup" class="card">
-
- <h1 id="rfSetupTitle">Biology Test Series</h1>
-
- <p class="muted">
-  RankForge AI Biology · Canonical 7,196 Questions
- </p>
-
- <div id="status" class="status">
-  Loading RankForge AI Biology bank...
- </div>
-
- <div class="field">
-  <label for="testSelect">Test</label>
-  <select id="testSelect"></select>
- </div>
-
- <div class="field">
-  <label for="questionCount">Question Count</label>
-  <select id="questionCount">
-   <option value="all">All Questions</option>
-   <option value="90" selected>90 Questions</option>
-   <option value="45">45 Questions</option>
-   <option value="10">10 Questions</option>
-  </select>
- </div>
-
- <div class="field">
-  <label for="orderSelect">Question Order</label>
-  <select id="orderSelect">
-   <option value="sequential">Sequential</option>
-   <option value="random">Random</option>
-  </select>
- </div>
-
- <div class="actions">
-  <button id="startButton" class="primary" disabled>
-   Start Biology CBT
-  </button>
- </div>
-
-</section>
-
-
-<section id="cbt" class="hidden">
-
- <div class="grid">
-
-  <main class="card">
-
-   <div class="top">
-    <h2 id="testTitle">Biology CBT</h2>
-    <div id="timer" class="timer">30:00</div>
-   </div>
-
-   <div id="questionNumber" class="question-no"></div>
-
-   <div id="questionText" class="question"></div>
-
-   <div id="options"></div>
-
-   <div class="actions" style="margin-top:18px">
-    <button id="previousButton" class="secondary">
-     Previous
-    </button>
-
-    <button id="reviewButton" class="secondary">
-     Mark Review
-    </button>
-
-    <button id="clearButton" class="secondary">
-     Clear
-    </button>
-
-    <button id="nextButton" class="primary">
-     Next
-    </button>
-   </div>
-
-  </main>
-
-
-  <aside class="card">
-
-   <h3>Question Palette</h3>
-
-   <div id="palette" class="palette"></div>
-
-   <button
-    id="submitButton"
-    class="danger"
-    style="width:100%;margin-top:16px"
-   >
-    Submit Test
-   </button>
-
-  </aside>
-
- </div>
-
-</section>
-
-
-<section id="result" class="card hidden">
-
- <h2>Test Completed</h2>
-
- <div id="stats" class="stats"></div>
-
- <h3 style="margin-top:22px">
-  Mistakes / Unanswered
- </h3>
-
- <div id="mistakes"></div>
-
- <div class="actions" style="margin-top:16px">
-  <button id="retryButton" class="primary">
-   Retry Mistakes
-  </button>
-
-  <button id="backButton" class="secondary">
-   Back to Tests
-  </button>
-  <button id="pdfButton" class="secondary" type="button">Save as PDF</button>
- </div>
-
-</section>
-
-</main>
-
-
-<script>
-(function(){
-
-"use strict";
-
-const BANK =
- "./rank-booster/biology-test-series-2699.json";
-
-let bank = [];
-let active = [];
-let answers = [];
-let marked = [];
-let current = 0;
-let seconds = 0;
-let timerId = null;
-let submitted = false;
-
-
-/* ---------- helpers ---------- */
-
-function $(id){
- return document.getElementById(id);
-}
-
-function shuffle(list){
- const a = list.slice();
-
- for(let i=a.length-1;i>0;i--){
-  const j=Math.floor(Math.random()*(i+1));
-  [a[i],a[j]]=[a[j],a[i]];
- }
-
- return a;
-}
-
-
-/* ---------- question normalization ---------- */
-
-function normalizeQuestion(q){
-
- if(!q || typeof q!=="object") return null;
-
- /*
-  * Canonical Biology 2699 bank is authoritative.
-  * Never discard a canonical record merely because
-  * its answer key or option representation is incomplete.
-  */
-
- const text =
-   q.question ??
-   q.text ??
-   q.questionText ??
-   q.prompt ??
-   q.stem ??
-   "";
-
- let options =
-   q.options ??
-   q.choices ??
-   q.answers ??
-   [];
-
- if(!Array.isArray(options)){
-   options=Object.values(options||{});
- }
-
- options=options.map(x=>{
-   if(x && typeof x==="object"){
-     return String(
-       x.text ??
-       x.value ??
-       x.label ??
-       x.option ??
-       ""
-     );
-   }
-   return String(x);
- });
-
- /*
-  * Preserve every canonical record.
-  * The source count must remain exactly 2699.
-  */
- if(!String(text).trim() || options.length<2){
-   return {
-     ...q,
-     question:String(text || "Question"),
-     options:
-       options.length>=2
-        ? options
-        : ["Option A","Option B"],
-     correctIndex:null
-   };
- }
-
- let correct =
-   q.correctIndex ??
-   q.correctAnswer ??
-   q.answer ??
-   q.correct ??
-   null;
-
- if(typeof correct==="string"){
-
-   const v=correct.trim();
-
-   if(/^[A-D]$/i.test(v)){
-     correct=
-       v.toUpperCase().charCodeAt(0)-65;
-   }
-   else if(/^\d+$/.test(v)){
-     const n=Number(v);
-
-     if(n>=0 && n<options.length)
-       correct=n;
-     else if(n>=1 && n<=options.length)
-       correct=n-1;
-   }
-   else{
-     const idx=options.findIndex(
-       x=>x.trim()===v
-     );
-
-     if(idx>=0)
-       correct=idx;
-   }
- }
-
- if(
-   !Number.isInteger(correct) ||
-   correct<0 ||
-   correct>=options.length
- ){
-   correct=null;
- }
-
- return {
-   ...q,
-   question:String(text),
-   options,
-   correctIndex:correct
- };
-}
-
-/* ---------- source ---------- */
-
-function loadTest(){
-
- const params = new URLSearchParams(location.search || "");
- const pdfMode = !!window.__RF_HANDOFF;
- let q;
-
- if (pdfMode) {
-  // Imported PDFs have variable question counts; do not apply Biology's 90-Q rule.
-  q = bank.slice().sort(
-   (a,b) => Number(a.questionNumber||0) - Number(b.questionNumber||0)
-  );
- } else {
-  const testNo = Number($("testSelect").value || 1);
-  q = bank
-   .filter(x => Number(x.testNumber) === testNo)
-   .sort((a,b) => Number(a.questionNumber||0) - Number(b.questionNumber||0));
-
-  const expected = testNo === 11 ? 89 : 90;
-  if (q.length !== expected) {
-   throw new Error("Test " + testNo + " source count is " + q.length + " (expected " + expected + ")");
-  }
-  /* Skip questions whose options/text could not be recovered from the PDF. */
-  q = q.filter(x => !x.needsReview);
-  if (!q.length) {
-   throw new Error("Test " + testNo + " has no usable questions.");
-  }
- }
-
- let count = $("questionCount").value === "all"
-  ? q.length
-  : Number($("questionCount").value);
-
- // If a PDF has fewer questions than a preset (e.g. 10), use its real count.
- if (pdfMode && (!Number.isFinite(count) || count > q.length)) count = q.length;
- if (count > q.length) count = q.length;
-
- q = q.slice(0, count);
- if ($("orderSelect").value === "random") q = shuffle(q);
- return q;
-}
-
-
-/* ---------- runtime state ---------- */
-
-function publishRuntime(){
-
- /*
-  * Compatibility bridge for existing RankForge
-  * result/history modules.
-  *
-  * This page is authoritative; these are mirrors only.
-  */
- window.RANKFORGE_ACTIVE_QUESTIONS =
-  active.slice();
-
- window.CBT_ACTIVE_QUESTIONS =
-  active.slice();
-
- window.selectedQuestions =
-  active.slice();
-
- try{
-  const pdfMode = !!window.__RF_HANDOFF;
-  const hSrc = pdfMode ? String(window.__RF_HANDOFF.source || "PDF").toUpperCase() : "";
-  const sourceName = pdfMode ? ({PDF:"PDF Import",NOTEBOOK:"Notebook",AI:"AI Practice"}[hSrc] || (hSrc+" Practice")) : "RankForge Biology";
-  sessionStorage.setItem("CBT_ACTIVE_SOURCE", pdfMode ? hSrc : "BIOLOGY");
-  sessionStorage.setItem("CBT_ACTIVE_QUESTIONS", JSON.stringify(active));
-  sessionStorage.setItem("CBT_ACTIVE_TEST", JSON.stringify({
-    source: sourceName,
-    sourceType: pdfMode ? hSrc : "BIOLOGY",
-    testNumber: pdfMode ? null : (active[0]?.testNumber ?? null),
-    title: pdfMode
-      ? (localStorage.getItem("CBT_ACTIVE_PDF_FILENAME") || "Imported PDF")
-      : ("Biology Test " + (active[0]?.testNumber ?? "")),
-    totalQuestions: active.length,
-    questions: active
-  }));
- }
- catch(_){}
-
-}
-
-
-/* ---------- render ---------- */
-
-function render(){
-
- const q=active[current];
-
- if(!q) return;
-
- $("questionNumber").textContent =
-  "Question "+
-  (current+1)+
-  " of "+
-  active.length;
-
- $("questionText").classList.add("rf-rich");
- $("questionText").innerHTML = window.RankForgeFix ? window.RankForgeFix.richHTML(q.question) : String(q.question).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});
-
- $("options").innerHTML="";
-
- q.options.forEach((text,index)=>{
-
-  const button =
-   document.createElement("button");
-
-  button.type="button";
-
-  button.className =
-   "option"+
-   (answers[current]===index
-    ?" selected"
-    :"");
-
-  {const lt=document.createElement("b");lt.className="rf-letter";lt.textContent=String.fromCharCode(65+index);const tx=document.createElement("span");tx.className="rf-optx";tx.classList.add("rf-rich");tx.innerHTML=window.RankForgeFix?window.RankForgeFix.richHTML(text).replace(/^<p>|<\/p>$/g,""):String(text).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});button.appendChild(lt);button.appendChild(tx);}
-
-  button.onclick=function(){
-
-   answers[current]=index;
-
-   render();
-
-  };
-
-  $("options").appendChild(button);
-
- });
-
-
- $("palette").innerHTML="";
-
- active.forEach((_,index)=>{
-
-  const button =
-   document.createElement("button");
-
-  button.type="button";
-
-  button.textContent =
-   marked[index]
-    ? "★"+(index+1)
-    : String(index+1);
-
-  if(index===current)
-   button.classList.add("current");
-
-  if(answers[index]!==null)
-   button.classList.add("answered");
-
-  if(marked[index])
-   button.classList.add("review");
-
-  button.onclick=function(){
-   current=index;
-   render();
-  };
-
-  $("palette").appendChild(button);
-
- });
-
- $("previousButton").disabled =
-  current===0;
-
- $("nextButton").textContent =
-  current===active.length-1
-   ? "Finish"
-   : "Next";
-
-}
-
-
-/* ---------- timer ---------- */
-
-function startTimer(){
-
- clearInterval(timerId);
-
- /*
-  * 30 min for 90-question CBT.
-  * Scales for other sizes.
-  */
- seconds = window.RankForgeFix ? window.RankForgeFix.durationSeconds(active.length) : (active.length===90 ? 30*60 : Math.max(10*60, active.length*20));
-
- function tick(){
-
-  const m =
-   Math.floor(seconds/60);
-
-  const s =
-   seconds%60;
-
-  $("timer").textContent =
-   String(m).padStart(2,"0")+
-   ":"+
-   String(s).padStart(2,"0");
-
-  if(seconds<=0){
-
-   clearInterval(timerId);
-
-   submit();
-
-   return;
-  }
-
-  seconds--;
-
- }
-
- tick();
-
- timerId=setInterval(tick,1000);
-
-}
-
-
-/* ---------- persistence ---------- */
-
-function saveAttempt(){
-
- const now=new Date().toISOString();
-
- let correct=0;
- const incorrect=[];
- const unanswered=[];
- const unverified=[];
-
- active.forEach((q,i)=>{
-
-  const userAnswer=answers[i];
-
-  if(
-   userAnswer===null||
-   userAnswer===undefined
-  ){
-   unanswered.push({q:q,index:i});
-   return;
-  }
-
-  const validAnswer=
-   Number.isInteger(q.correctIndex)&&
-   q.correctIndex>=0&&
-   Array.isArray(q.options)&&
-   q.correctIndex<q.options.length;
-
-  if(!validAnswer){
-   unverified.push({q:q,index:i});
-   return;
-  }
-
-  if(Number(userAnswer)===Number(q.correctIndex)){
-   correct++;
-  }else{
-   incorrect.push({q:q,index:i});
-  }
-
- });
-
- const pdfMode = new URLSearchParams(location.search || "").get("source") === "pdf";
- const attempt={
-  id:(pdfMode ? "pdf-" : "bio-")+Date.now(),
-  source:pdfMode ? "PDF Import" : "RankForge Biology 2699",
-  sourceType:pdfMode ? "PDF" : "BIOLOGY",
-  title:pdfMode
-    ? (localStorage.getItem("CBT_ACTIVE_PDF_FILENAME") || "Imported PDF") + " — " + active.length + " Questions"
-    : "Biology Test "+(active[0]?.testNumber??""),
-  testNumber:pdfMode ? null : (active[0]?.testNumber??null),
-  questionCount:active.length,
-  correct:correct,
-  incorrect:incorrect.length,
-  unanswered:unanswered.length,
-  unverified:unverified.length,
-  skipped:unanswered.length,
-  score:correct,
-  answers:answers.slice(),
-  questions:active.slice(),
-  submittedAt:now,
-  date:now
- };
-
- function append(key,value){
-
-  try{
-
-   const old=
-    JSON.parse(
-     localStorage.getItem(key)||"[]"
-    );
-
-   const list=
-    Array.isArray(old)?old:[];
-
-   list.push(value);
-
-   localStorage.setItem(
-    key,
-    JSON.stringify(list.slice(-100))
-   );
-
-  }catch(error){
-   console.warn("[RankForge]",key,error);
-  }
-
- }
-
- append("cbtHistory",attempt);
- append("rankBoosterAttemptHistory",attempt);
-
- /*
-  * Biology-native + legacy Mistake Book stores.
-  */
- try{
-
-  const nativeRaw=
-   JSON.parse(
-    localStorage.getItem("rankforgeMistakesV1")||"[]"
-   );
-
-  const legacyRaw=
-   JSON.parse(
-    localStorage.getItem("cbtMistakes")||"[]"
-   );
-
-  const native=
-   Array.isArray(nativeRaw)?nativeRaw:[];
-
-  const legacy=
-   Array.isArray(legacyRaw)?legacyRaw:[];
-
-  incorrect.forEach(x=>{
-
-   const options=
-    Array.isArray(x.q.options)
-     ?x.q.options.slice()
-     :[];
-
-   const selectedIndex=
-    Number(answers[x.index]);
-
-   const correctIndex=
-    Number(x.q.correctIndex);
-
-   const item={
-    id:"mistake-"+attempt.id+"-"+x.index,
-    questionId:x.q.id,
-    question:x.q.question,
-    options:options,
-    correctIndex:correctIndex,
-    correctAnswer:options[correctIndex]??"",
-    userAnswer:selectedIndex,
-    selectedIndex:selectedIndex,
-    selectedAnswer:options[selectedIndex]??"",
-    mistakeType:"🧠 Conceptual",
-    mistakeReason:
-     "The selected answer was incorrect. Review the NCERT concept and compare the selected option with the correct answer.",
-    reason:
-     "The selected answer was incorrect. Review the NCERT concept and compare the selected option with the correct answer.",
-    solution:x.q.solution||x.q.explanation||"",
-    source:pdfMode ? "PDF Import" : "RankForge Biology 2699",
-    subject:pdfMode ? (x.q.subject || "PDF") : "Biology",
-    testNumber:pdfMode ? null : x.q.testNumber,
-    attemptId:attempt.id,
-    createdAt:now
-   };
-
-   native.push(item);
-
-   if(!legacy.some(
-    z=>String(z.id||"")===String(item.id)
-   )){
-    legacy.push(item);
-   }
-
-  });
-
-  localStorage.setItem(
-   "rankforgeMistakesV1",
-   JSON.stringify(native.slice(-5000))
-  );
-
-  localStorage.setItem(
-   "cbtMistakes",
-   JSON.stringify(legacy.slice(-5000))
-  );
-
- }catch(error){
-  console.warn("[RankForge Biology] mistake storage",error);
- }
-
- /*
-  * Preserve the existing mastery array contract.
-  */
- try{
-
-  const raw=
-   JSON.parse(
-    localStorage.getItem("cbtMasteryV2")||"[]"
-   );
-
-  localStorage.setItem(
-   "cbtMasteryV2",
-   JSON.stringify(
-    Array.isArray(raw)?raw:[]
-   )
-  );
-
-  if (!pdfMode) {
-   localStorage.setItem(
-    "rankforgeBiologyLastAttempt",
-    JSON.stringify(attempt)
-   );
-  }
-
- }catch(error){
-  console.warn("[RankForge Biology] mastery storage",error);
- }
-
- return{
-  attempt:attempt,
-  correct:correct,
-  incorrect:incorrect,
-  unanswered:unanswered,
-  unverified:unverified
- };
-
-}
-
-
-/* ---------- submit ---------- */
-
-function submit(){
-
- if(submitted)return;
-
- submitted=true;
- clearInterval(timerId);
-
- const result=saveAttempt();
-
- $("cbt").classList.add("hidden");
- $("result").classList.remove("hidden");
-
- const correctCount=result.correct;
- const incorrectCount=result.incorrect.length;
- const unansweredCount=result.unanswered.length;
- const unverifiedCount=result.unverified.length;
-
- $("stats").innerHTML=
-  '<div class="stat"><b>'+correctCount+'</b>Correct</div>'+
-  '<div class="stat"><b>'+incorrectCount+'</b>Incorrect</div>'+
-  '<div class="stat"><b>'+unansweredCount+'</b>Unanswered</div>'+
-  '<div class="stat"><b>'+unverifiedCount+'</b>Unverified</div>';
-
- const mistakes=[
-  ...result.incorrect,
-  ...result.unanswered,
-  ...result.unverified
- ];
-
- $("mistakes").innerHTML=
-  mistakes.length
-   ?mistakes.map(x=>{
-     const type=
-      result.unverified.includes(x)
-       ?"Unverified":
-      result.unanswered.includes(x)
-       ?"Unanswered":
-       "Incorrect";
-
-     return '<div class="mistake">'+
-      '<b>Q'+(x.index+1)+' · '+type+'</b><br>'+
-      (window.RankForgeFix?window.RankForgeFix.richHTML(x.q.question):'')+'</div>';
-    }).join("")
-   :"<p>No incorrect, unanswered or unverified questions.</p>";
-
- $("retryButton").style.display=
-  result.incorrect.length
-   ?"inline-block"
-   :"none";
-
- $("retryButton").onclick=function(){
-
-  active=result.incorrect.map(x=>x.q);
-  answers=new Array(active.length).fill(null);
-  marked=new Array(active.length).fill(false);
-  current=0;
-  submitted=false;
-
-  publishRuntime();
-
-  $("result").classList.add("hidden");
-  $("cbt").classList.remove("hidden");
-
-  render();
-  startTimer();
-
- };
-
- let nav=document.getElementById("rankforgeResultNav");
-
- if(!nav){
-
-  nav=document.createElement("div");
-  nav.id="rankforgeResultNav";
-
-  nav.style.cssText=
-   "display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;";
-
-  $("result").appendChild(nav);
-
- }
-
- nav.innerHTML=
-  '<a href="history.html" style="display:inline-block;padding:12px 15px;border-radius:10px;background:#4f46e5;color:#fff;text-decoration:none;font-weight:800">📜 History</a>'+
-  '<a href="mistake.html" style="display:inline-block;padding:12px 15px;border-radius:10px;background:#0f766e;color:#fff;text-decoration:none;font-weight:800">🧠 Mistake Book</a>'+
-  '<a href="cbt.html" style="display:inline-block;padding:12px 15px;border-radius:10px;background:#475569;color:#fff;text-decoration:none;font-weight:800">🏠 New Biology CBT</a>';
-
-}
-
-
-/* ---------- Biology mistake retry ---------- */
-
-function getBiologyRetryQuestions(){
-
- try{
-
-  const raw=JSON.parse(localStorage.getItem("cbtMistakes")||"[]");
-  const masteryRaw=JSON.parse(localStorage.getItem("cbtMasteryV2")||"[]");
-
-  const mistakes=Array.isArray(raw)?raw:[];
-  const mastered=Array.isArray(masteryRaw)?masteryRaw:[];
-
-  const masteredSet=new Set(
-   mastered
-    .filter(x=>x&&x.question)
-    .map(x=>normalize(x.question))
-    .filter(Boolean)
-  );
-
-  const map=new Map();
-
-  for(const m of mistakes){
-   if(!m||!m.question) continue;
-
-   const key=normalize(m.question);
-   if(!key||masteredSet.has(key)) continue;
-
-   map.set(key,m);
-  }
-
-  const out=[];
-
-  for(const m of map.values()){
-
-   const key=normalize(m.question);
-
-   let options=
-    Array.isArray(m.options)?m.options.slice():
-    Array.isArray(m.choices)?m.choices.slice():[];
-
-   options=options.map(function(x){
-    if(x&&typeof x==="object"){
-     return String(x.text??x.label??x.value??x.option??"");
-    }
-    return String(x);
-   });
-
-   let correct=-1;
-
-   for(const candidate of [m.correctIndex,m.answerIndex]){
-    const n=Number(candidate);
-    if(Number.isInteger(n)&&n>=0&&n<options.length){
-     correct=n;
-     break;
-    }
-   }
-
-   if(correct<0&&m.correctAnswer!=null){
-    const target=normalize(m.correctAnswer);
-    if(target){
-     correct=options.findIndex(x=>normalize(x)===target);
-    }
-   }
-
-   /*
-    Exact Mistake Book question only:
-    if its saved options are incomplete, recover the same
-    question from the verified 2699 bank by normalized text.
-   */
-   if(options.length<2||correct<0||correct>=options.length){
-
-    const original=bank.find(function(q){
-     return normalize(q.question)===key;
-    });
-
-    if(original){
-
-     options=Array.isArray(original.options)
-      ?original.options.map(function(x){
-       if(x&&typeof x==="object"){
-        return String(x.text??x.label??x.value??x.option??"");
-       }
-       return String(x);
+  <script type="module">
+    import {
+      createQuestion,
+      createTest,
+      startAttempt,
+      saveAnswer,
+      submitAttempt
+    } from "./core/index.js";
+
+    const questions = [
+      createQuestion({
+        id: "demo-q1",
+        text: "Which planet is known as the Red Planet?",
+        options: ["Earth", "Mars", "Jupiter", "Venus"],
+        correctAnswer: "Mars",
+        subject: "General Science",
+        topic: "Solar System"
+      }),
+
+      createQuestion({
+        id: "demo-q2",
+        text: "What is 2 + 2?",
+        options: ["3", "4", "5", "6"],
+        correctAnswer: "4",
+        subject: "Mathematics",
+        topic: "Arithmetic"
       })
-      :[];
-
-     correct=Number(original.correctIndex);
-
-     if(!Number.isInteger(correct)||correct<0||correct>=options.length){
-
-      const target=normalize(
-       m.correctAnswer||original.correctAnswer||""
-      );
-
-      correct=target
-       ?options.findIndex(x=>normalize(x)===target)
-       :-1;
-     }
-    }
-   }
-
-   if(options.length<2||correct<0||correct>=options.length){
-    console.warn("[RankForge] Could not prepare exact mistake:",m.question);
-    continue;
-   }
-
-   out.push({
-    id:m.id||m.questionId||("retry-"+out.length),
-    question:String(m.question),
-    options:options,
-    correctIndex:correct,
-    correctAnswer:m.correctAnswer||options[correct],
-    testNumber:m.testNumber??null,
-    subject:m.subject||"Biology",
-    topic:m.topic||m.chapter||"",
-    mistakeType:m.mistakeType||"🧠 Conceptual",
-    mistakeReason:
-     m.mistakeReason||
-     m.reason||
-     "Review the concept and identify why the answer was incorrect.",
-    solution:m.solution||m.explanation||""
-   });
-  }
-
-  return out;
-
- }catch(error){
-
-  console.error("[RankForge] exact Biology retry error",error);
-  return [];
-
- }
-
-}
-
-/* ---------- setup ---------- */
-
-function populateTests(){
-
- const numbers =
-  [...new Set(
-   bank.map(q=>Number(q.testNumber))
-  )].sort((a,b)=>a-b);
-
- $("testSelect").innerHTML =
-  numbers.map(n=>{
-
-   const count =
-    bank.filter(
-     q=>Number(q.testNumber)===n
-    ).length;
-
-   return (
-    '<option value="'+n+'">'+
-    'Biology Test '+n+
-    ' ('+count+' Q)'+
-    '</option>'
-   );
-
-  }).join("");
-
- const params =
-  new URLSearchParams(
-   location.search
-  );
-
- const requested =
-  Number(params.get("test")||1);
-
- if(numbers.includes(requested))
-  $("testSelect").value=requested;
-
-}
-
-
-/* ---------- start ---------- */
-
-/* ---------- Biology retry launch ---------- */
-function autoLaunchBiologyRetry(){
- const params=new URLSearchParams(location.search);
- if(params.get("retry")!=="biology") return;
-
- try{
-  const retryQuestions=getBiologyRetryQuestions();
-  if(!retryQuestions.length){
-   console.warn("[RankForge] Biology retry requested but queue is empty");
-   return;
-  }
-  $("startButton").click();
- }catch(e){
-  console.error("[RankForge] Biology retry launch failed",e);
- }
-}
-
-$("startButton").onclick=function(){
-
- try{
-
-  const params =
-    new URLSearchParams(
-      location.search
-    );
-
-  if(params.get("retry")==="biology"){
-
-    active=getBiologyRetryQuestions();
-
-    if(!active.length){
-      throw new Error(
-        "No Biology mistakes are available for retry."
-      );
-    }
-
-  }else{
-
-    active=loadTest();
-
-  }
-
-  if(!active.length)
-   throw new Error(
-    "No Biology questions available"
-   );
-
-  answers =
-   new Array(active.length)
-    .fill(null);
-
-  marked =
-   new Array(active.length)
-    .fill(false);
-
-  current=0;
-  submitted=false;
-
-  publishRuntime();
-
-  $("setup").classList.add("hidden");
-  $("result").classList.add("hidden");
-  $("cbt").classList.remove("hidden");
-
-  const pageParams = new URLSearchParams(location.search || "");
-  $("testTitle").textContent =
-   pageParams.get("retry") === "biology"
-    ? "Biology Mistake Retry"
-    : window.__RF_HANDOFF
-      ? ((window.__RF_HANDOFF.title || localStorage.getItem("CBT_ACTIVE_PDF_FILENAME") || (String(window.__RF_HANDOFF.source||"Imported").toUpperCase()+" Test")) + " — " + active.length + " Questions")
-      : "Biology Test " + active[0].testNumber;
-  if (window.RankForgeFix) window.RankForgeFix.markConsumed();
-
-  render();
-  startTimer();
-
- }catch(e){
-
-  $("status").className =
-   "status err";
-
-  $("status").textContent =
-   e.message;
-
- }
-
-};
-
-
-/* ---------- navigation ---------- */
-
-$("previousButton").onclick=function(){
-
- if(current>0){
-
-  current--;
-  render();
-
- }
-
-};
-
-$("nextButton").onclick=function(){
-
- if(current<active.length-1){
-
-  current++;
-  render();
-
- }else{
-
-  submit();
-
- }
-
-};
-
-$("reviewButton").onclick=function(){
-
- marked[current]=
-  !marked[current];
-
- render();
-
-};
-
-$("clearButton").onclick=function(){
-
- answers[current]=null;
-
- render();
-
-};
-
-$("submitButton").onclick=function(){
-
- if(
-  confirm(
-   "Submit this Biology CBT?"
-  )
- ){
-
-  submit();
-
- }
-
-};
-
-$("backButton").onclick=function(){
-
- location.reload();
-
-};
-
-
-/* ---------- V318 source-aware loader ---------- */
-
-async function loadJSONWithRetry(url, attempts) {
-
-  let lastError = null;
-
-  for (let i = 1; i <= attempts; i++) {
-
-    try {
-
-      const separator =
-        url.includes("?") ? "&" : "?";
-
-      const finalURL =
-        url +
-        separator +
-        "rfv318=" +
-        Date.now() +
-        "_" +
-        i;
-
-      const response =
-        await fetch(
-          finalURL,
-          {cache:"no-store"}
-        );
-
-      if(!response.ok) {
-        throw new Error(
-          "HTTP "+response.status
-        );
-      }
-
-      return await response.json();
-
-    } catch(error) {
-
-      lastError=error;
-
-      console.warn(
-        "[RankForge V318] Biology bank attempt",
-        i,
-        error
-      );
-
-      if(i<attempts) {
-        await new Promise(
-          resolve =>
-            setTimeout(
-              resolve,
-              500*i
-            )
-        );
-      }
-    }
-  }
-
-  throw lastError ||
-    new Error("Biology bank load failed");
-}
-
-
-function normalizePDFForCBT(list) {
-
-  if(!Array.isArray(list))
-    return [];
-
-  return list
-    .map(function(q,index){
-
-      q =
-        q &&
-        typeof q==="object"
-          ? q
-          : {};
-
-      let options =
-        q.options ??
-        q.choices ??
-        q.answers ??
-        [];
-
-      if(
-        !Array.isArray(options) &&
-        options &&
-        typeof options==="object"
-      ){
-        options=Object.values(options);
-      }
-
-      options =
-        Array.isArray(options)
-          ?options.map(function(x){
-              if(
-                x &&
-                typeof x==="object"
-              ){
-                return String(
-                  x.text ??
-                  x.value ??
-                  x.label ??
-                  x.option ??
-                  ""
-                );
-              }
-
-              return String(x ?? "");
-            }).filter(Boolean)
-          :[];
-
-      return {
-        ...q,
-
-        id:
-          q.id ||
-          "PDF-"+(index+1),
-
-        question:String(
-          q.question ??
-          q.text ??
-          q.questionText ??
-          q.prompt ??
-          q.stem ??
-          ""
-        ),
-
-        options,
-
-        source:"PDF Import",
-        sourceType:"PDF",
-
-        testNumber:1,
-        questionNumber:index+1
-      };
-
-    })
-    .filter(function(q){
-
-      return (
-        q.question.trim() &&
-        q.options.length>=2
-      );
-
+    ];
+
+    const test = createTest({
+      id: "demo-test-1",
+      title: "Demo CBT Test",
+      subject: "General",
+      questions: questions.map(q => q.id)
     });
-}
 
+    let attempt = startAttempt({
+      id: `attempt-${Date.now()}`,
+      testId: test.id
+    });
 
-async function bootCBTSource() {
+    let currentIndex = 0;
+    let selectedAnswer = null;
 
-  const params =
-    new URLSearchParams(
-      location.search
-    );
+    const questionArea =
+      document.getElementById("questionArea");
 
-  const source =
-    params.get("source");
+    const nextButton =
+      document.getElementById("nextButton");
 
-  /*
-   * ======================================================
-   * PDF MODE
-   * ======================================================
-   *
-   * PDF mode MUST win only when explicitly requested.
-   * Ordinary Biology CBT never reads the PDF pool.
-   */
-  /* FIX: ANY non-Biology hand-off (PDF 180, AI, Adaptive DPP, Ranker, Notebook) */
-  if(window.__RF_HANDOFF) {
-    const h = window.__RF_HANDOFF;
-    let list = (window.RankForgeFix ? window.RankForgeFix.enrichQuestions(h.questions) : h.questions)
-      .map(function(q,i){
-        return Object.assign({}, q, {
-          id: q.id || ("HF-"+(i+1)),
-          testNumber: 1,
-          questionNumber: i+1,
-          source: q.source || String(h.source||"handoff").toUpperCase(),
-          sourceType: q.sourceType || String(h.source||"PDF").toUpperCase()
-        });
+    const result =
+      document.getElementById("result");
+
+    function renderQuestion() {
+      const question = questions[currentIndex];
+
+      selectedAnswer = null;
+
+      questionArea.innerHTML = `
+        <h2>Question ${currentIndex + 1} of ${questions.length}</h2>
+        <p>${question.text}</p>
+      `;
+
+      question.options.forEach(option => {
+        const button = document.createElement("button");
+
+        button.textContent = option;
+        button.className = "option";
+
+        button.onclick = () => {
+          selectedAnswer = option;
+
+          document
+            .querySelectorAll(".option")
+            .forEach(btn => {
+              btn.style.fontWeight = "normal";
+            });
+
+          button.style.fontWeight = "bold";
+        };
+
+        questionArea.appendChild(button);
       });
-    if(!list.length){
-      $("status").className = "status err";
-      $("status").textContent = "No questions were handed over from "+(h.source||"the previous page")+". Go back and generate/import again.";
-      $("startButton").disabled = true;
-      return;
+
+      nextButton.textContent =
+        currentIndex === questions.length - 1
+          ? "Submit Test"
+          : "Next Question";
     }
-    bank = list;
-    $("questionCount").value = "all";
-    populateTests();
-    var label = {pdf:"Imported PDF",notebook:"Notebook",ai:"AI Practice",adaptive:"Adaptive DPP",ranker:"Ranker Test","rankers-test-series":"Ranker Test","rank-booster":"Rank Booster"}[String(h.source).toLowerCase()] || (String(h.source||"Practice").charAt(0).toUpperCase()+String(h.source||"Practice").slice(1));
-    $("rfBrand").innerHTML = 'RankForge <span>'+label+' CBT</span>';
-    $("rfSetupTitle").textContent = label+" Test";
-    document.title = "RankForge "+label+" CBT";
-    $("status").className = "status ok";
-    $("status").textContent = label+" ready: "+list.length+" questions loaded (all of them, no 90-question cap).";
-    $("startButton").disabled = false;
-    return;
-  }
 
-  if(source==="pdf") {
+    nextButton.onclick = () => {
+      const question = questions[currentIndex];
 
-    let pdf=[];
-
-    try {
-
-      const raw =
-        localStorage.getItem(
-          "pdfCbtQuestions"
+      if (selectedAnswer !== null) {
+        attempt = saveAnswer(
+          attempt,
+          question.id,
+          selectedAnswer
         );
-
-      if(raw) {
-        pdf =
-          normalizePDFForCBT(
-            JSON.parse(raw)
-          );
       }
 
-    } catch(error) {
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+        return;
+      }
 
-      console.error(
-        "[RankForge V318] PDF pool error",
-        error
-      );
+      const submission = submitAttempt({
+        attempt,
+        questions
+      });
 
-    }
+      result.textContent =
+        `Score: ${submission.score.score}\n` +
+        `Correct: ${submission.score.correct}\n` +
+        `Incorrect: ${submission.score.incorrect}\n` +
+        `Skipped: ${submission.score.skipped}\n` +
+        `Mistakes created: ${submission.mistakes.length}`;
 
-    if(!pdf.length) {
+      nextButton.disabled = true;
+    };
 
-      $("status").className =
-        "status err";
+    renderQuestion();
+  </script>
 
-      $("status").textContent =
-        "PDF CBT has no usable imported questions. Go back and import the PDF again.";
-
-      $("startButton").disabled=true;
-
-      return;
-
-    }
-
-    bank=pdf;
-
-    // PDF imports are variable length: start with the complete imported set.
-    $("questionCount").value = "all";
-    populateTests();
-    (function(){
-      const H=window.__RF_HANDOFF||{};
-      const label=String(H.title||localStorage.getItem("CBT_ACTIVE_PDF_FILENAME")||"Imported test");
-      try{
-        $("testSelect").innerHTML='<option value="1">'+label.replace(/[<>&]/g,"")+' \u00b7 '+pdf.length+' questions</option>';
-        const h1=document.querySelector("h1"); if(h1) h1.textContent=label.replace(/[<>&]/g,"");
-        $("startButton").textContent="Start test";
-      }catch(_){}
-    })();
-    $("status").className =
-      "status ok";
-    $("status").textContent =
-      "Ready: "+
-      pdf.length+
-      " questions loaded. Choose the count and press Start.";
-
-    /*
-     * Explicitly mark source.
-     */
-    try {
-      sessionStorage.setItem(
-        "CBT_ACTIVE_SOURCE",
-        "PDF"
-      );
-    } catch(_) {}
-
-    $("startButton").disabled=false;
-
-    /*
-     * Preserve existing retry/autostart behavior.
-     */
-    autoLaunchBiologyRetry();
-
-    return;
-  }
-
-  /*
-   * ======================================================
-   * BIOLOGY MODE
-   * ======================================================
-   *
-   * Canonical source remains authoritative.
-   */
-  try {
-
-    const data =
-      await loadJSONWithRetry(
-        BANK,
-        3
-      );
-
-    if(!Array.isArray(data)) {
-      throw new Error(
-        "Biology bank is not an array"
-      );
-    }
-
-    if(!window.RankForgeBiology7196 && data.length!==2699) {
-      throw new Error(
-        "Expected 2699 questions, got "+
-        data.length
-      );
-    }
-
-    bank =
-      data
-        .map(normalizeQuestion)
-        .filter(Boolean);
-
-    if(!window.RankForgeBiology7196 && bank.length!==2699) {
-      throw new Error(
-        "Only "+
-        bank.length+
-        " valid questions after normalization"
-      );
-    }
-
-    populateTests();
-
-    $("status").className =
-      "status ok";
-
-    $("status").textContent =
-      "Legacy Biology source available; 7196 canonical source selected.";
-
-    $("startButton").disabled=false;
-
-    try {
-      sessionStorage.setItem(
-        "CBT_ACTIVE_SOURCE",
-        "BIOLOGY"
-      );
-    } catch(_) {}
-
-    autoLaunchBiologyRetry();
-
-  } catch(error) {
-
-    console.error(
-      "[RankForge V318 Biology CBT]",
-      error
-    );
-
-    $("status").className =
-      "status err";
-
-    $("status").textContent =
-      "Biology bank load failed after 3 attempts: "+
-      (error.message || error);
-
-    $("startButton").disabled=true;
-
-  }
-}
-
-
-/* RANKFORGE V319 PDF AUTHORITY BRIDGE */
-(function enforcePDFAuthorityBeforeCBTBoot(){
-  try {
-    const params = new URLSearchParams(location.search || "");
-    const pdfMode =
-      params.get("source") === "pdf" ||
-      params.get("rf-final") === "1";
-
-    if (!pdfMode) return;
-
-    const raw = localStorage.getItem("pdfCbtQuestions");
-
-    if (!raw) {
-      console.warn("[RankForge] PDF mode requested but pdfCbtQuestions is absent");
-      return;
-    }
-
-    let parsed;
-
-    try {
-      parsed = JSON.parse(raw);
-    } catch (e) {
-      console.error("[RankForge] Invalid pdfCbtQuestions JSON", e);
-      return;
-    }
-
-    const questions =
-      Array.isArray(parsed) ? parsed :
-      Array.isArray(parsed?.questions) ? parsed.questions :
-      Array.isArray(parsed?.pool) ? parsed.pool :
-      [];
-
-    if (!questions.length) {
-      console.warn("[RankForge] PDF authority bridge found no questions");
-      return;
-    }
-
-    /*
-     * PDF mode is an explicit source request.
-     * Make the PDF question pool authoritative before the normal
-     * CBT source boot can fall back to Biology / RankForge state.
-     */
-    localStorage.setItem(
-      "CBT_ACTIVE_QUESTIONS",
-      JSON.stringify(questions)
-    );
-
-    localStorage.setItem(
-      "CBT_ACTIVE_SOURCE",
-      "PDF"
-    );
-
-    localStorage.setItem(
-      "CBT_ACTIVE_TEST_SOURCE",
-      "PDF"
-    );
-
-    localStorage.setItem(
-      "CBT_ACTIVE_PDF_FILENAME",
-      localStorage.getItem("PDF_ACTIVE_FILENAME") || ""
-    );
-
-    /*
-     * Remove only the competing active test object in PDF mode.
-     * Canonical Biology banks are untouched.
-     */
-    localStorage.removeItem("CBT_ACTIVE_TEST");
-    localStorage.removeItem("CBT_ACTIVE_TEST_ID");
-
-    console.info(
-      "[RankForge] PDF authority locked:",
-      questions.length,
-      "questions"
-    );
-
-  } catch (e) {
-    console.error("[RankForge] PDF authority bridge failed", e);
-  }
-})();
-
-bootCBTSource();
-
-
-
-})();
-</script>
-
-
-
-
-
-<script>
-document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("#pdfButton");if(!b)return;var t=document.title;document.title="RankForge CBT result";window.print();document.title=t;});
-</script>
 </body>
 </html>

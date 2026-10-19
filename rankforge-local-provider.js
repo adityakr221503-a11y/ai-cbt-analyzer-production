@@ -2,25 +2,13 @@
 (function () {
   "use strict";
 
-  const BASE = "http://127.0.0.1:8787";
-  const ENDPOINT = BASE + "/api/ai/generate";
-  /* Local AI is opt-in: it only runs when this page itself runs on this device, or you switched it on. */
-  function localEnabled() {
-    try {
-      var h = location.hostname;
-      if (window.Capacitor) return localStorage.getItem("rankforgeLocalAi") === "on";
-      if (h === "localhost" || h === "127.0.0.1") return true;
-      return localStorage.getItem("rankforgeLocalAi") === "on";
-    } catch (e) { return false; }
-  }
-  const OFF_MESSAGE = "Local AI is off. It only works when the local AI server runs on this same device. Use the AI server in Owner Hub or the offline generator instead.";
+  const ENDPOINT = "http://127.0.0.1:8787/generate";
 
   window.RankForgeLocalAI = {
     endpoint: ENDPOINT,
 
     async generateQuestions(options) {
       options = options || {};
-      if (!localEnabled()) { const off = new Error(OFF_MESSAGE); off.rankForgeProviderError = true; off.code = "LOCAL_AI_OFF"; throw off; }
 
       function toPromptString(value) {
         if (typeof value === "string") return value;
@@ -74,12 +62,15 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ prompt, count, focus: prompt.slice(0, 200), subject: options.subject, difficulty: options.difficulty })
+        body: JSON.stringify({
+          prompt,
+          count
+        })
       });
 
       const data = await r.json();
 
-      if (!r.ok || data.ok === false || !Array.isArray(data.questions)) {
+      if (!r.ok || !data.ok) {
         const err = new Error(
           data.error || "Local RankForge AI proxy failed."
         );
@@ -103,15 +94,13 @@
     },
 
     health() {
-      if (!localEnabled()) return Promise.resolve({ ok: false, off: true });
-      return fetch(BASE + "/health")
+      return fetch("http://127.0.0.1:8787/health")
         .then(r => r.json());
     }
     ,
     async getStatus() {
-      if (!localEnabled()) return { connected: false, provider: null, model: null, mode: "OFFLINE" };
       try {
-        const r = await fetch(BASE + "/health", {
+        const r = await fetch("http://127.0.0.1:8787/health", {
           cache: "no-store"
         });
         const h = await r.json();
@@ -139,7 +128,7 @@
    * registration API, use it without replacing the engine.
    */
   try {
-    if (window.RankForgeAI && localEnabled()) {
+    if (window.RankForgeAI) {
       window.RankForgeAI.localProvider = window.RankForgeLocalAI;
 
       if (typeof window.RankForgeAI.registerProvider === "function") {

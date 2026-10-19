@@ -2,188 +2,161 @@
  * CBT Analyzer Pro
  * Production Core — Question Model
  *
- * v9.1.1
+ * v10.0.0 — Rank Booster / TOPPER
  */
 
 export function createQuestion({
+
+  // ==========================================
+  // IDENTITY
+  // ==========================================
+
   id,
+
   text,
+
   options = [],
-  correctAnswer,
+
+  correctAnswer = null,
+
+
+  // ==========================================
+  // ACADEMIC METADATA
+  // ==========================================
+
   subject = "",
+
   chapter = "",
+
   topic = "",
+
   concept = "",
+
+
+  // ==========================================
+  // DIFFICULTY
+  // ==========================================
+
   difficulty = "medium",
+
+
+  // ==========================================
+  // MARKING
+  // ==========================================
+
   marks = 4,
+
   negativeMarks = 1,
+
+
+  // ==========================================
+  // EXPLANATION
+  // ==========================================
+
   explanation = "",
-  source = "",
+
+
+  // ==========================================
+  // SOURCE
+  // ==========================================
+
+  source = "unknown",
+
+
+  // ==========================================
+  // RANK BOOSTER INTELLIGENCE
+  // ==========================================
+
+  skillTested = "",
+
+  masterySkill = "",
+
+  questionType = "standard",
+
+  trapType = "",
+
+
+  // ==========================================
+  // QUESTION QUALITY
+  // ==========================================
+
+  learningObjective = "",
+
+  examinerIntent = "",
+
+  commonTrap = "",
+
+  teachingPoint = "",
+
+
+  // ==========================================
+  // VARIATION / ADAPTIVE SYSTEM
+  // ==========================================
+
+  variationType = "original",
+
+  variationOf = null,
+
+  adaptive = false,
+
+  targetMistakeId = null,
+
+
+  // ==========================================
+  // TEST-SERIES QUALITY
+  // ==========================================
+
+  qualityTier = "standard",
+
+  uniquenessKey = "",
+
 } = {}) {
 
-  /* ---------------------------------------------
-     BASIC VALIDATION
-  --------------------------------------------- */
+
+  // ==========================================
+  // VALIDATION
+  // ==========================================
 
   if (!id) {
+
     throw new Error(
       "Question requires a unique id."
     );
+
   }
+
 
   if (
     !text ||
     !String(text).trim()
   ) {
-    throw new Error(
-      "Question requires question text."
-    );
-  }
 
-  if (!Array.isArray(options)) {
     throw new Error(
-      "Question options must be an array."
+      "Question requires text."
     );
-  }
 
-  if (options.length < 2) {
-    throw new Error(
-      "Question requires at least two options."
-    );
   }
 
 
-  /* ---------------------------------------------
-     NORMALIZE OPTIONS
-  --------------------------------------------- */
+  // ==========================================
+  // NORMALIZE OPTIONS
+  // ==========================================
 
   const normalizedOptions =
-    options.map(
-      option => String(option)
-    );
+    Array.isArray(options)
+      ? [...options]
+      : [];
 
 
-  /* ---------------------------------------------
-     VALIDATE CORRECT ANSWER
-  --------------------------------------------- */
-
-  if (
-    correctAnswer === undefined ||
-    correctAnswer === null
-  ) {
-    throw new Error(
-      "Question requires a correct answer."
-    );
-  }
-
-
-  const normalizedCorrectAnswer =
-    String(correctAnswer);
-
-
-  /*
-   * The correct answer can be stored as
-   * either the actual option text or an
-   * option index such as 0, 1, 2, 3.
-   */
-
-  let finalCorrectAnswer =
-    normalizedCorrectAnswer;
-
-
-  /*
-   * If correctAnswer is a number-like
-   * index, convert it to option text.
-   */
-
-  if (
-    /^\d+$/.test(
-      normalizedCorrectAnswer
-    )
-  ) {
-
-    const index =
-      Number(
-        normalizedCorrectAnswer
-      );
-
-
-    if (
-      index >= 0 &&
-      index < normalizedOptions.length
-    ) {
-
-      finalCorrectAnswer =
-        normalizedOptions[index];
-
-    }
-
-  }
-
-
-  /*
-   * Make sure the final answer exists
-   * among the options.
-   */
-
-  if (
-    !normalizedOptions.includes(
-      finalCorrectAnswer
-    )
-  ) {
-
-    throw new Error(
-      "Correct answer must match one of the question options."
-    );
-
-  }
-
-
-  /* ---------------------------------------------
-     NORMALIZE MARKS
-  --------------------------------------------- */
-
-  const normalizedMarks =
-    Number(marks);
-
-
-  const normalizedNegativeMarks =
-    Number(negativeMarks);
-
-
-  if (
-    !Number.isFinite(
-      normalizedMarks
-    ) ||
-    normalizedMarks < 0
-  ) {
-
-    throw new Error(
-      "Question marks must be a valid positive number."
-    );
-
-  }
-
-
-  if (
-    !Number.isFinite(
-      normalizedNegativeMarks
-    ) ||
-    normalizedNegativeMarks < 0
-  ) {
-
-    throw new Error(
-      "Question negative marks must be a valid number."
-    );
-
-  }
-
-
-  /* ---------------------------------------------
-     RETURN IMMUTABLE QUESTION
-  --------------------------------------------- */
+  // ==========================================
+  // RETURN IMMUTABLE QUESTION
+  // ==========================================
 
   return Object.freeze({
+
+    // ------------------------------------------
+    // Identity
+    // ------------------------------------------
 
     id:
       String(id),
@@ -192,12 +165,14 @@ export function createQuestion({
       String(text),
 
     options:
-      Object.freeze(
-        normalizedOptions
-      ),
+      normalizedOptions,
 
-    correctAnswer:
-      finalCorrectAnswer,
+    correctAnswer,
+
+
+    // ------------------------------------------
+    // Academic metadata
+    // ------------------------------------------
 
     subject:
       String(subject),
@@ -211,20 +186,106 @@ export function createQuestion({
     concept:
       String(concept),
 
+
+    // ------------------------------------------
+    // Difficulty
+    // ------------------------------------------
+
     difficulty:
       String(difficulty),
 
+
+    // ------------------------------------------
+    // Marking
+    // ------------------------------------------
+
     marks:
-      normalizedMarks,
+      Number(marks),
 
     negativeMarks:
-      normalizedNegativeMarks,
+      Number(negativeMarks),
+
+
+    // ------------------------------------------
+    // Explanation
+    // ------------------------------------------
 
     explanation:
       String(explanation),
 
+
+    // ------------------------------------------
+    // Source
+    // ------------------------------------------
+
     source:
       String(source),
+
+
+    // ==========================================
+    // RANK BOOSTER INTELLIGENCE
+    // ==========================================
+
+    skillTested:
+      String(skillTested),
+
+    masterySkill:
+      String(masterySkill),
+
+    questionType:
+      String(questionType),
+
+    trapType:
+      String(trapType),
+
+
+    // ==========================================
+    // TEACHING / EXAMINER INTELLIGENCE
+    // ==========================================
+
+    learningObjective:
+      String(learningObjective),
+
+    examinerIntent:
+      String(examinerIntent),
+
+    commonTrap:
+      String(commonTrap),
+
+    teachingPoint:
+      String(teachingPoint),
+
+
+    // ==========================================
+    // ADAPTIVE / VARIATION
+    // ==========================================
+
+    variationType:
+      String(variationType),
+
+    variationOf:
+      variationOf === null
+        ? null
+        : String(variationOf),
+
+    adaptive:
+      Boolean(adaptive),
+
+    targetMistakeId:
+      targetMistakeId === null
+        ? null
+        : String(targetMistakeId),
+
+
+    // ==========================================
+    // PREMIUM TEST QUALITY
+    // ==========================================
+
+    qualityTier:
+      String(qualityTier),
+
+    uniquenessKey:
+      String(uniquenessKey),
 
   });
 

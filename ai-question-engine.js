@@ -446,6 +446,6 @@
     createTest
   };
 
-  global.RankForgeAI = Object.assign(global.RankForgeAI || {}, API);
+  global.RankForgeAI = API;
 
 })(window);
