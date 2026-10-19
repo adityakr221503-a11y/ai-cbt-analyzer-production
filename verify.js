@@ -47,6 +47,51 @@ check("ES-module graph in src/ resolves",()=>{const e=[];
     for(const m of t.matchAll(/(?:from|import)\s*\(?\s*["'](\.[^"']+)["']/g)){
       if(!fs.existsSync(path.normalize(path.join(path.dirname(f),m[1]))))e.push(f+" -> "+m[1])}}return e});
 
+check("PDF handoff selects current imported questions over stale 180-question bank",()=>{
+  const e=[],fix=require(path.join(root,"rf-fixpack-v1.js"));
+  const current=[{id:"CURRENT-PDF-1",question:"Question from the newly selected PDF",options:["A","B"],correctIndex:0}];
+  const stale=Array.from({length:180},(_,i)=>({id:"STALE-"+i,question:"Old topper question "+i,options:["A","B"],correctIndex:0}));
+  const session={CBT_ACTIVE_SOURCE:"PDF",CBT_ACTIVE_QUESTIONS:current,CBT_ACTIVE_TEST:{id:"fresh-pdf",source:"PDF",sourceType:"PDF",questions:current}};
+  const local={pdfCbtQuestions:current,CBT_ACTIVE_QUESTIONS:stale,TOPPER_TEST_180:{questions:stale}};
+  const chosen=fix.chooseSource({search:"?source=pdf",session:k=>session[k]??null,local:k=>local[k]??null,sessionRaw:k=>k==="CBT_ACTIVE_SOURCE"?"PDF":null,now:Date.now()});
+  if(chosen.mode!=="handoff")e.push("mode="+chosen.mode);
+  if(chosen.questions.length!==1)e.push("selected "+chosen.questions.length+" questions instead of 1");
+  if(chosen.questions[0]?.id!=="CURRENT-PDF-1")e.push("selected stale question "+(chosen.questions[0]?.id||"<none>"));
+  return e;
+});
+
+check("CBT scoring and answer persistence use the actual saveAttempt implementation",()=>{
+  const e=[],html=fs.readFileSync("cbt.html","utf8");
+  const start=html.indexOf("function saveAttempt(){");
+  const end=html.indexOf("/* ---------- submit ---------- */",start);
+  if(start<0||end<0)return ["Could not isolate saveAttempt() from cbt.html"];
+  const source=html.slice(start,end)+"\nsaveAttempt();";
+  const data={"CBT_ACTIVE_PDF_FILENAME":"fixture.pdf"};
+  const storage={getItem:k=>Object.prototype.hasOwnProperty.call(data,k)?data[k]:null,setItem:(k,v)=>{data[k]=String(v)},removeItem:k=>{delete data[k]}};
+  const active=[
+    {id:"q1",question:"correct",options:["A","B"],correctIndex:0},
+    {id:"q2",question:"incorrect",options:["A","B"],correctIndex:0},
+    {id:"q3",question:"unanswered",options:["A","B"],correctIndex:1},
+    {id:"q4",question:"missing answer key",options:["A","B"],correctIndex:-1}
+  ];
+  const ctx={active,answers:[0,1,null,0],localStorage:storage,location:{search:"?source=pdf"},window:{},URLSearchParams,Date,Number,Array,String,JSON,Math};
+  try{require("vm").runInNewContext(source,ctx,{timeout:2000});}catch(err){return ["saveAttempt threw: "+err.message]}
+  let history=[];try{history=JSON.parse(data.cbtHistory||"[]")}catch(_){return ["cbtHistory is invalid JSON"]}
+  const a=history[0];
+  if(!a)e.push("no cbtHistory record saved");
+  else{
+    if(a.correct!==1)e.push("correct count="+a.correct+", expected 1");
+    if(a.incorrect!==1)e.push("incorrect count="+a.incorrect+", expected 1");
+    if(a.unanswered!==1)e.push("unanswered count="+a.unanswered+", expected 1");
+    if(a.unverified!==1)e.push("unverified count="+a.unverified+", expected 1");
+    if(JSON.stringify(a.answers)!==JSON.stringify([0,1,null,0]))e.push("answer indices were not persisted correctly");
+    if(a.sourceType!=="PDF")e.push("sourceType="+a.sourceType+", expected PDF");
+  }
+  let duplicate=[];try{duplicate=JSON.parse(data.rankBoosterAttemptHistory||"[]")}catch(_){}
+  if(duplicate.length!==1)e.push("rankBoosterAttemptHistory records="+duplicate.length+", expected 1");
+  return e;
+});
+
 (async()=>{
   /* core learning loop, run for real with an in-memory localStorage */
   const store={};global.localStorage={getItem:k=>k in store?store[k]:null,setItem:(k,v)=>{store[k]=String(v)},removeItem:k=>{delete store[k]},clear(){for(const k in store)delete store[k]},key:i=>Object.keys(store)[i],get length(){return Object.keys(store).length}};
