@@ -1,23 +1,49 @@
-RANKFORGE LIVE UPDATE - where each file goes
+RANKFORGE FINAL PACKAGE - do these steps once
 =============================================
-Use ONLY the files in this folder. Ignore any older rankforge-android.yml you downloaded before.
+On a phone, open github.com in Chrome and choose "Desktop site".
+File names must be EXACTLY as in this folder (no "(1)" added by the phone).
 
-A) Main page of your repo (where index.html is listed)
-   GitHub > Add file > Upload files > choose these 3 files > Commit changes
-     capacitor.config.json
-     rf-nav-v1.js
-     version.json
+STEP 1 - Upload 5 files
+  A) Main page of the repo (where index.html is listed) > Add file > Upload files:
+       capacitor.config.json
+       rf-nav-v1.js
+       version.json
+  B) Open .github > workflows > Add file > Upload files:
+       rankforge-android.yml
+       rankforge-check.yml
+  Commit changes each time. Upload, do not paste into the editor.
 
-B) The .github/workflows folder
-   Open the repo > .github > workflows > Add file > Upload files > choose these 2 files > Commit changes
-     rankforge-android.yml   (replaces the old one)
-     rankforge-check.yml     (new)
-   Upload the files. Do not paste them into the editor.
+STEP 2 - Add an empty file named .nojekyll
+  Main page > Add file > Create new file > type  .nojekyll  as the file name > Commit changes.
+  (This stops GitHub from reshaping your files when it publishes the site.)
 
-C) Build the app ONE more time (the last time)
-   Repo > Actions > RankForge Android APK > wait for the green tick > download RankForge-v1.0.0-debug
-   > unzip > uninstall the old RankForge app once > install app-debug.apk
-   After this the app shows your live website, so you never download an APK for normal changes again.
+STEP 3 - Delete leftovers from the main page, if you see them
+  rf-apply.sh and delete.txt  (open the file > trash icon > Commit changes).
+  Never run rf-apply.sh. It puts old files back and undoes the fixes.
+
+STEP 4 - Check GitHub Pages
+  Settings > Pages > Build and deployment:
+    Source = Deploy from a branch, Branch = main, Folder = / (root).
+  Change it and Save only if it says something else.
+
+STEP 5 - Read the result in the Actions tab
+  "RankForge Check" has two parts:
+    check = is the app healthy (home page, bank, scripts, links)
+    live  = did your live website really receive this push (it waits up to 12 minutes)
+  Two green ticks mean your change is live. A red part shows a red message saying exactly what to fix.
+  If "live" is red, copy that red message and send it to me.
+
+STEP 6 - Only if the installed app still shows the old screen after Step 5 is green
+  Actions > RankForge Android APK > wait for the green tick > download RankForge-v1.0.0-debug
+  > unzip > uninstall the old RankForge app once > install app-debug.apk.
+  This APK opens your live website, so you never need another one for normal changes.
+
+TO TEST THE WEBSITE: open it in a Chrome Incognito tab. It never shows an old saved copy.
+
+EVERY TIME YOU CHANGE SOMETHING AFTER THIS
+  Edit on GitHub, or in Termux run:  rfpush "what I changed"
+  Wait for the two green ticks, then reopen the app. The bottom of the home screen shows
+  "Updated <date> - your note". No APK download.
 
 
 TERMUX: one-time setup

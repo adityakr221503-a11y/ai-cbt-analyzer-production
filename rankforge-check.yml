@@ -94,8 +94,58 @@ jobs:
             esac
           done
 
+          [ -f .nojekyll ] || echo "::warning::.nojekyll is missing. Add an empty file named .nojekyll to the main page so GitHub Pages publishes your files exactly as they are."
+
           if [ "$fail" -ne 0 ]; then
             echo "Some checks failed. Read the red messages above."
             exit 1
           fi
           echo "All RankForge checks passed."
+
+  live:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      LIVE_BASE: https://adityakr221503-a11y.github.io/ai-cbt-analyzer-production
+      MAX_WAIT: "720"
+      INTERVAL: "20"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check the live site received this push
+        run: |
+          set +e
+          files="version.json"
+          changed=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD 2>/dev/null)
+          for f in $changed; do
+            case "$f" in
+              .github/*|.cloudflare-dist/*|*.md|*.sh|*.yml|*.txt) continue ;;
+              *.html|*.js|*.css|*.json)
+                size=$(wc -c < "$f" 2>/dev/null || echo 0)
+                [ "$size" -le 400000 ] && files="$files $f"
+                ;;
+            esac
+          done
+          files=$(printf '%s\n' $files | sort -u | head -12)
+          echo "Waiting for the live site to show:" $files
+          start=$(date +%s)
+          while true; do
+            behind=""
+            for f in $files; do
+              want=$(sha256sum "$f" 2>/dev/null | cut -d' ' -f1)
+              got=$(curl -fsS --max-time 30 -H 'Cache-Control: no-cache' "$LIVE_BASE/$f?ts=$(date +%s%N)" 2>/dev/null | sha256sum | cut -d' ' -f1)
+              [ "$want" = "$got" ] || behind="$behind $f"
+            done
+            if [ -z "$behind" ]; then
+              echo "The live site is up to date."
+              exit 0
+            fi
+            now=$(date +%s)
+            if [ $((now - start)) -ge "$MAX_WAIT" ]; then break; fi
+            sleep "$INTERVAL"
+          done
+          echo "::error::The live site did not update within $((MAX_WAIT / 60)) minutes. Still old:$behind. GitHub Pages did not publish your push. Open Settings > Pages, and open the 'pages build and deployment' run in Actions to see why."
+          exit 1
