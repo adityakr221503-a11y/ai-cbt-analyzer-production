@@ -192,7 +192,7 @@
   }
 
   function subjectOf(q) {
-    return text(
+    const direct = text(
       q && (
         q.subject ||
         q.section ||
@@ -200,26 +200,32 @@
         ""
       )
     );
+    if (direct) return direct;
+    return (typeof window !== "undefined" && window.RankForgeFix && q) ? text(window.RankForgeFix.inferTopic(q).subject) : "";
   }
 
   function chapterOf(q) {
-    return text(
+    const direct = text(
       q && (
         q.chapter ||
         q.chapterName ||
         ""
       )
     );
+    if (direct) return direct;
+    return (typeof window !== "undefined" && window.RankForgeFix && q) ? text(window.RankForgeFix.inferTopic(q).topic) : "";
   }
 
   function topicOf(q) {
-    return text(
+    const direct = text(
       q && (
         q.topic ||
         q.topicName ||
         ""
       )
     );
+    if (direct) return direct;
+    return (typeof window !== "undefined" && window.RankForgeFix && q) ? text(window.RankForgeFix.inferTopic(q).topic) : "";
   }
 
   function conceptOf(q) {

@@ -1658,6 +1658,8 @@
 <script src="./pdf-cbt-production-engine-v8.js"></script>
 
 <script src="./rankforge-v318-stability-v1.js"></script>
+<link rel="stylesheet" href="./rf-theme.css">
+<script src="./rf-shell.js"></script>
 </head>
 
 
@@ -2351,7 +2353,11 @@ function getPDFQuestionPool() {
 
 
     return Array.isArray(parsed)
-      ? parsed
+      ? parsed.map(function(q){
+          /* many engines store the stem as "question"; the page code expects "text" */
+          if (q && typeof q === "object" && typeof q.text !== "string" && q.question != null) q.text = String(q.question);
+          return q;
+        })
       : [];
 
   }
@@ -3492,8 +3498,7 @@ function getQuestionsForCBT() {
 
       return (
         question &&
-        typeof question.text === "string" &&
-        question.text.trim().length > 0 &&
+        typeof (question.text || question.question) === "string" && String(question.text || question.question).trim().length > 0 &&
         Array.isArray(question.options) &&
         question.options.length >= 2
       );
@@ -4069,8 +4074,8 @@ function getCurrentPDFPool() {
 
       return (
         question &&
-        typeof question.text === "string" &&
-        question.text.trim().length > 0 &&
+        typeof (question.text || question.question) === "string" &&
+        String(question.text || question.question).trim().length > 0 &&
         Array.isArray(question.options) &&
         question.options.length >= 2
       );
@@ -4557,7 +4562,7 @@ function getCurrentPDFPool() {
 
     return (
       question &&
-      typeof question.text === "string" &&
+      typeof (question.text || question.question) === "string" &&
       question.text.trim() !== "" &&
       Array.isArray(question.options) &&
       question.options.length >= 2
@@ -5917,6 +5922,7 @@ alert("PDF conversion failed:\n\n"+(err.message||err));
 })();
 </script>
 
-<script src="./rf-nav-v1.js"></script>
+<script>/* keep the Test 180 counter live after an import (it only refreshed on page load) */
+setInterval(function(){try{if(typeof updateTest180Status==="function")updateTest180Status();}catch(e){}},2000);</script>
 </body>
 </html>

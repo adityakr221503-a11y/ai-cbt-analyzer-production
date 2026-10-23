@@ -22,8 +22,8 @@
       t.forEach(function (q, i) { if (ok(q)) { var s = /chem/i.test(q.subject) ? "Chemistry" : /phys/i.test(q.subject) ? "Physics" : "Biology"; out.push(norm(q, s, i, "Test 180")); } });
     } catch (e) {}
     try {
-      var b = list(await (await fetch("biology-7196-bank-readonly.json")).json()), picked = 0;
-      for (var i = 0; i < b.length && picked < 150; i += 46) { if (ok(b[i])) { out.push(norm(b[i], "Biology", i, "Biology bank")); picked++; } }
+      var b = list(await (await fetch("rank-booster/biology-test-series-2699.json")).json()), picked = 0;
+      for (var i = 0; i < b.length && picked < 150; i += 17) { if (ok(b[i])) { out.push(norm(b[i], "Biology", i, "Biology bank")); picked++; } }
     } catch (e) {}
     if (!out.length) return false;
     try { localStorage.setItem(KEY, JSON.stringify(out)); localStorage.setItem(FLAG, "1"); } catch (e) { return false; }
@@ -31,9 +31,14 @@
     return true;
   }
   window.RFPoolSeed = { seed: seed };
+  /* Never yank the page away from someone who is already using it. */
+  var touched = false;
+  ["pointerdown", "keydown", "touchstart"].forEach(function (ev) { window.addEventListener(ev, function () { touched = true; }, { once: true, passive: true }); });
   function go() {
     seed().then(function (fresh) {
-      if (fresh && !sessionStorage.getItem("rfPoolSeedReloaded")) { sessionStorage.setItem("rfPoolSeedReloaded", "1"); location.reload(); }
+      if (!fresh) return;
+      try { window.dispatchEvent(new Event("rf-pool-seeded")); } catch (e) {}
+      if (!touched && !sessionStorage.getItem("rfPoolSeedReloaded")) { sessionStorage.setItem("rfPoolSeedReloaded", "1"); location.reload(); }
     });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();

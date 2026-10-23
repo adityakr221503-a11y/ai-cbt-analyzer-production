@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RankForge Bookmarks</title>
+<script src="./rf-fixpack-v1.js"></script>
+<style>
+:root{--ink:#111827;--mute:#6b7280;--line:#e5e7eb;--a:#4f46e5}
+*{box-sizing:border-box}body{margin:0;background:#f3f4fb;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:30px}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px 16px}header h1{margin:0;font-size:19px}
+main{max-width:760px;margin:0 auto;padding:14px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+button,a.btn{font:inherit;display:block;width:100%;text-align:center;text-decoration:none;padding:12px;border-radius:12px;border:0;background:var(--a);color:#fff;font-weight:800;margin-top:10px}
+button.sec{background:#e5e7eb;color:var(--ink)}.opt{padding:6px 9px;border-radius:9px;margin:4px 0;background:#f8fafc}.opt.r{background:#dcfce7;font-weight:700}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;background:#eef0ff;color:#4338ca;font-size:12px;font-weight:700}
+.rf-list{padding-left:1.4em}small{color:var(--mute)}
+</style>
+<link rel="stylesheet" href="./rf-theme.css">
+<script src="./rf-shell.js"></script>
+</head>
+<body>
+<header><h1>🔖 My Bookmarks</h1><small>Questions you saved during tests</small></header>
+<main>
+  <div class="card" id="top"></div>
+  <div id="list"></div>
+  <a class="btn" href="./index.html" style="background:#e5e7eb;color:#111827">← Back to RankForge</a>
+</main>
+<script src="./rankforge-bookmarks-report-v1.js"></script>
+<script>
+(function(){
+var B=window.RankForgeBookmarks;
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function draw(){
+  var l=B.load();
+  document.getElementById("top").innerHTML = l.length
+    ? '<b>'+l.length+' bookmarked question'+(l.length>1?'s':'')+'</b><button id="go">▶ Practice bookmarked questions</button>'
+    : 'No bookmarks yet. Tap “🔖 Bookmark” on any question during a test.';
+  document.getElementById("list").innerHTML=l.map(function(b,i){
+    return '<div class="card"><span class="pill">'+esc(b.topic||"Unclassified")+'</span> <small>'+esc(b.subject||"")+'</small>'+
+      '<div style="margin-top:8px">'+window.RankForgeFix.richHTML(b.question)+'</div>'+
+      (b.options||[]).map(function(o,j){return '<div class="opt'+(j===b.correctIndex?' r':'')+'">'+String.fromCharCode(65+j)+'. '+esc(o)+'</div>';}).join("")+
+      (b.explanation?'<small>'+esc(b.explanation)+'</small>':'')+
+      '<button class="sec" data-rm="'+i+'">Remove bookmark</button></div>';
+  }).join("");
+  var go=document.getElementById("go"); if(go) go.onclick=function(){B.practice();};
+}
+document.getElementById("list").onclick=function(e){var i=e.target.getAttribute&&e.target.getAttribute("data-rm"); if(i==null) return; var l=B.load(); l.splice(Number(i),1); B.save(l); draw();};
+draw();
+})();
+</script>
+</body>
+</html>

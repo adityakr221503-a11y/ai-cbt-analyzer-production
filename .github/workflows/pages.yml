@@ -1,39 +1,23 @@
-name: Cleanup stray files
-on: workflow_dispatch
+name: RankForge checks
+
+# Pages is served from the main branch, so this workflow never deploys.
+# It only runs the repo health check so a broken push is visible straight away.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
 permissions:
-  contents: write
+  contents: read
+
 jobs:
-  clean:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Remove stray root copies
-        run: |
-          rm -f ARCHITECTURE.md BIOLOGY_ACTIVE_BANK.json BUILD_STATUS.txt MODULE_PLAN.md \
-            SECURITY_MODEL.md ai-new-question-module-v1.js ai-question-engine.js ai-server.js \
-            app.js apply-owner-only-practice.sh bank.sha256 biology.js \
-            build.sh cbt-active-test-router.js cbt-authoritative-loader.js cbt-live-source-panel.js \
-            cbt-question-source-lock.js cbt-source-isolation-v1.js cbt-unified-question-loader.js delete.txt \
-            final-validation-report.json import-test180.js lecture-ai.js lecture-api-contract.js \
-            lecture-data.js lecture-module.css lecture-module.js lecture-player-security.js \
-            lecture-practice.js lecture-result.js lectures.html live-test-flow-bridge.js \
-            nichod-app-ui.js nichod-authoring-engine.js nichod-authoring-ui.js nichod-cbt-metadata-bridge.js \
-            nichod-e2e-harness.js nichod-final-validation.js nichod-generation-bridge.js nichod-ingest.js \
-            nichod-live-flow-monitor.js nichod-posttest-bridge.js nichod-ranker-feed.js nichod-review-ui.js \
-            nichod-runtime-test.js nichod-system-health.js nichod-unified-orchestrator.js nichod-unseen-generator.js \
-            nichod-verified-feed.js pdf-cbt-auto-recovery.js pdf-cbt-generic-final.js pdf-cbt-live-import-bridge.js \
-            pdf-cbt-runtime-guard.js pdf-cbt-runtime-report.json pdf-cbt-runtime-smoke.js pdf-cbt-session-verifier.js \
-            pdf-cbt-universal-parser.js pdf-nichod-bridge.js pdf-test-session-manager.js pdf.min.js \
-            pdf.worker.min.js pyq-pipeline.js question-bank.js rankforge-ai-context.js \
-            rankforge-ai-handoff.js rankforge-local-provider.js rankforge-originality-engine.js rankforge-owner-access.js \
-            rankforge-practice-source-policy.js rankforge-student-source-guard.js real-flow-test-suite.js real-flow-validator.js \
-            restore.txt rf-apply.sh run.sh runtime-health-report.json \
-            schema.js schema.json security-model.js seed-test180.js \
-            stream-guard.js study-vault.css study-vault.js sync-dist.sh \
-            test-creation-auto-hook.js test-creation-bridge.js unified-question-bank.js unified-test-library-ui.js \
-            unified-test-library.js verify.js
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add -A
-          git commit -m "Remove stray duplicate files" || echo "Nothing to remove"
-          git push
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verify RankForge
+        run: node tools/verify.js

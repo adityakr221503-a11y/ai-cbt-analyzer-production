@@ -1,0 +1,21 @@
+# Cloudflare serves the repo root directly; keep non-web files out of the upload.
+.git
+.github
+.gitignore
+.assetsignore
+node_modules
+android
+tools
+server
+rankforge-ai-worker
+rankforge-local-ai
+rankforge-lecture-security/server
+rankforge-lecture-module/server
+wrangler.jsonc
+capacitor.config.json
+package.json
+package-lock.json
+*.md
+*.sh
+*.py
+*.txt

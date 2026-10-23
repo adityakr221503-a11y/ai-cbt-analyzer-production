@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RankForge Subject Practice</title>
+<script src="./rf-fixpack-v1.js"></script>
+<style>
+*{box-sizing:border-box}
+main{max-width:760px;margin:0 auto;padding:0 14px 24px}
+.hero{padding:16px;margin:6px 0 12px;border-radius:20px;border:1px solid var(--rf-line);background:linear-gradient(135deg,rgba(124,92,255,.26),rgba(34,211,238,.10))}
+.hero b{display:block;font-size:20px}.hero span{color:var(--rf-mu);font-size:14px}
+.subj{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.subj button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border-radius:18px;border:1.5px solid var(--rf-line);background:var(--rf-surface-solid);color:var(--rf-tx);
+  font:inherit;text-align:left;cursor:pointer;min-height:92px}
+.subj button .e{font-size:26px}.subj button b{font-size:16px}.subj button small{color:var(--rf-mu);font-size:12.5px}
+.subj button.on{border-color:var(--rf-ac);background:linear-gradient(135deg,rgba(124,92,255,.28),rgba(34,211,238,.08));box-shadow:0 0 0 3px rgba(124,92,255,.22)}
+.card{background:var(--rf-surface-solid);border:1px solid var(--rf-line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:var(--rf-shadow)}
+label{display:block;font-weight:800;font-size:12.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--rf-mu);margin:12px 0 7px}
+select,input{width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{padding:9px 13px;border-radius:99px;border:1px solid var(--rf-line);background:var(--rf-field);color:var(--rf-tx);font:inherit;font-size:13.5px;cursor:pointer}
+.chips button.on{background:var(--rf-ac);color:#fff;border-color:transparent}
+button.go{width:100%;margin-top:14px;padding:15px;border-radius:16px;border:0;background:linear-gradient(135deg,var(--rf-ac),#5a3df0);color:#fff;font:inherit;font-weight:800;font-size:16.5px;cursor:pointer;box-shadow:0 10px 24px rgba(100,70,240,.35)}
+button.go:disabled{opacity:.45}
+button.alt{width:100%;margin-top:10px;padding:13px;border-radius:14px;border:1px solid var(--rf-line);background:var(--rf-surface-2);color:var(--rf-tx);font:inherit;font-weight:700;cursor:pointer}
+.msg{padding:11px 13px;border-radius:14px;margin-top:10px;font-size:14px;border:1px solid var(--rf-line);background:var(--rf-field)}
+.msg.ok{border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.12);color:var(--rf-ok)}
+.msg.err{border-color:rgba(251,113,133,.45);background:rgba(251,113,133,.12);color:var(--rf-bad)}
+.note{color:var(--rf-mu);font-size:13.5px;line-height:1.55}
+.count{font-size:34px;font-weight:900;letter-spacing:-.02em}
+</style>
+<link rel="stylesheet" href="./rf-theme.css">
+<script src="./rf-shell.js"></script>
+</head>
+<body>
+<main data-rf-noskin>
+  <div class="hero"><b>Subject Practice</b><span>Pick a subject, choose how many, and start. Your mistakes feed straight into Adaptive DPP and analysis.</span></div>
+
+  <div class="subj" id="subj">
+    <button data-s="Biology" class="on"><span class="e">🧬</span><b>Biology</b><small id="n-Biology">loading…</small></button>
+    <button data-s="Physics"><span class="e">⚛️</span><b>Physics</b><small id="n-Physics">loading…</small></button>
+    <button data-s="Chemistry"><span class="e">🧪</span><b>Chemistry</b><small id="n-Chemistry">loading…</small></button>
+    <button data-s="Mixed"><span class="e">🎯</span><b>Mixed PCB</b><small id="n-Mixed">loading…</small></button>
+  </div>
+
+  <div class="card">
+    <div class="note">Questions ready for this subject</div>
+    <div class="count" id="avail">…</div>
+    <label>Chapter / topic</label>
+    <div class="chips" id="chaps"></div>
+    <label for="cnt">How many questions</label>
+    <select id="cnt"><option>10</option><option selected>20</option><option>30</option><option>45</option><option value="all">All available</option></select>
+    <label for="ord">Order</label>
+    <select id="ord"><option value="random">Random mix</option><option value="seq">In order</option></select>
+    <button class="go" id="start" disabled>▶ Start practice</button>
+    <button class="alt" id="more">✨ Generate more with free AI</button>
+    <div id="msg" class="msg" style="display:none"></div>
+  </div>
+
+  <div class="card note">
+    <b>Where do these questions come from?</b><br>
+    Biology uses your verified 7,196-question bank. Physics and Chemistry use the verified questions from your Test 180 plus anything you import from a PDF or generate with AI. Questions whose formulas could not be read from a PDF are left out of practice.
+  </div>
+</main>
+<script>
+(function(){
+"use strict";
+var F=window.RankForgeFix, $=function(i){return document.getElementById(i);};
+var SUBJ=["Biology","Physics","Chemistry"], pool={Biology:[],Physics:[],Chemistry:[]}, cur="Biology", chap="All";
+function say(t,k){var m=$("msg");m.style.display="block";m.className="msg"+(k?" "+k:"");m.textContent=t;}
+function jsonLS(k){try{var v=JSON.parse(localStorage.getItem(k)||"[]");return Array.isArray(v)?v:(v&&v.questions)||[];}catch(e){return [];}}
+function keyOf(q){return String(q.question||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim().slice(0,200);}
+
+function addAll(list){
+  var norm=F.normalizeList(list||[]).filter(function(q){return q.correctIndex>=0 && !q.rfDamaged;});
+  F.enrichQuestions(norm);
+  norm.forEach(function(q){
+    var s=SUBJ.indexOf(q.subject)>=0?q.subject:(F.inferTopic(q).subject);
+    if(SUBJ.indexOf(s)<0) return;
+    q.subject=s; pool[s].push(q);
+  });
+}
+function dedupe(){
+  SUBJ.forEach(function(s){var seen={},out=[];pool[s].forEach(function(q){var k=keyOf(q);if(k&&!seen[k]){seen[k]=1;out.push(q);}});pool[s]=out;});
+}
+function counts(){
+  SUBJ.forEach(function(s){$("n-"+s).textContent=pool[s].length+" questions";});
+  $("n-Mixed").textContent=(pool.Biology.length+pool.Physics.length+pool.Chemistry.length)+" questions";
+}
+function current(){
+  return cur==="Mixed" ? pool.Biology.concat(pool.Physics,pool.Chemistry) : pool[cur];
+}
+function drawChaps(){
+  var list=current(), by={};
+  list.forEach(function(q){var t=q.topic||q.chapter||"Mixed / Unclassified"; by[t]=(by[t]||0)+1;});
+  var names=Object.keys(by).sort(function(a,b){return by[b]-by[a];}).slice(0,14);
+  var html='<button data-c="All" class="'+(chap==="All"?"on":"")+'">All ('+list.length+')</button>'+names.map(function(n){return '<button data-c="'+n.replace(/"/g,"&quot;")+'" class="'+(chap===n?"on":"")+'">'+n.replace(/</g,"&lt;")+' ('+by[n]+')</button>';}).join("");
+  $("chaps").innerHTML=html;
+}
+function filtered(){
+  var l=current(); if(chap!=="All") l=l.filter(function(q){return (q.topic||q.chapter||"Mixed / Unclassified")===chap;});
+  return l;
+}
+function refresh(){
+  var n=filtered().length; $("avail").textContent=n; $("start").disabled=n<1;
+  $("start").textContent=n? "▶ Start "+(cur==="Mixed"?"Mixed PCB":cur)+" practice":"No questions yet";
+  if(!n) say("Nothing here yet. Tap “Generate more with free AI”, or import a PDF in PDF → CBT.","");
+  else $("msg").style.display="none";
+}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+$("subj").onclick=function(e){var b=e.target.closest("button[data-s]"); if(!b) return; cur=b.dataset.s; chap="All";
+  document.querySelectorAll("#subj button").forEach(function(x){x.classList.toggle("on",x===b);}); drawChaps(); refresh();};
+$("chaps").onclick=function(e){var b=e.target.closest("button[data-c]"); if(!b) return; chap=b.dataset.c; drawChaps(); refresh();};
+
+$("start").onclick=function(){
+  var l=filtered(); if(!l.length) return;
+  var n=$("cnt").value==="all"?l.length:Math.min(+$("cnt").value,l.length);
+  l=$("ord").value==="random"?shuffle(l).slice(0,n):l.slice(0,n);
+  var title=(cur==="Mixed"?"Mixed PCB":cur)+" Practice"+(chap!=="All"?" · "+chap:"");
+  l=l.map(function(q,i){return Object.assign({},q,{testNumber:1,questionNumber:i+1});});
+  F.handoff({title:title,source:"rankforge-subject",questions:l},"rankforge-subject");
+};
+
+$("more").onclick=async function(){
+  if(F.aiMode()==="none"){ say(F.endpointProblem(),"err"); return; }
+  var s=cur==="Mixed"?"Mixed NEET":cur; this.disabled=true; say("Asking the free AI… this can take a few seconds.");
+  try{
+    var r=await F.generateQuestions({count:10,subject:s,topic:chap==="All"?"":chap,chapter:chap==="All"?"":chap,difficulty:"NEET level"});
+    if(!r.questions.length) throw new Error("The AI returned no usable questions. Try again.");
+    var cur2=jsonLS("importedQuestions"), have={}; cur2.forEach(function(q){have[keyOf(q)]=1;});
+    var add=r.questions.filter(function(q){return !have[keyOf(q)];});
+    add.forEach(function(q){q.source="AI";q.sourceType="AI";}); cur2=cur2.concat(add);
+    try{localStorage.setItem("importedQuestions",JSON.stringify(cur2));}catch(e){throw new Error("Phone storage is full. Clear the PDF pool in Owner Hub.");}
+    addAll(add); dedupe(); counts(); drawChaps(); refresh();
+    say("Added "+add.length+" new "+s+" questions. "+(r.note||""),"ok");
+  }catch(e){say(e.message,"err");}
+  this.disabled=false;
+};
+
+(async function load(){
+  /* local pools: PDF imports, imported / AI questions, ranker bank */
+  ["pdfCbtQuestions","importedQuestions","rankerQuestionBank","questionBank"].forEach(function(k){addAll(jsonLS(k));});
+  try{ var t=await (await fetch("./test180-questions.json")).json(); addAll(Array.isArray(t)?t:(t.questions||[])); }catch(e){}
+  dedupe(); counts(); drawChaps(); refresh();
+  try{ var b=await (await fetch("./biology-7196-bank-readonly.json")).json(); b=Array.isArray(b)?b:(b.questions||[]); b.forEach(function(q){q.subject="Biology";}); addAll(b); dedupe(); counts(); drawChaps(); refresh(); }
+  catch(e){ say("Could not load the Biology bank. Check your connection.","err"); }
+})();
+})();
+</script>
+</body>
+</html>

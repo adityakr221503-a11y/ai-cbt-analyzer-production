@@ -88,7 +88,7 @@
     if (idx >= 0) return idx;
 
     const letter = String(c ?? "").toUpperCase().match(/^[A-D]$/);
-    if (letter) return letter.charCodeAt(0) - 65;
+    if (letter) return letter[0].charCodeAt(0) - 65;
 
     const number = Number(c);
     if (Number.isFinite(number)) {
@@ -228,6 +228,7 @@
   }
 
   function validate(q) {
+    if (q && !q.text) q = normalize(q, 0);
     return !!(
       q &&
       clean(q.text).length >= 10 &&
@@ -446,6 +447,6 @@
     createTest
   };
 
-  global.RankForgeAI = API;
+  global.RankForgeAI = Object.assign(global.RankForgeAI || {}, API);
 
 })(window);

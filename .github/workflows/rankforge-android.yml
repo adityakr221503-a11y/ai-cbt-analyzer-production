@@ -1,5 +1,7 @@
 name: RankForge Android APK
 
+# The app now loads the LIVE site (GitHub Pages), so normal feature changes do NOT need a new APK.
+# Rebuild only when native things change, or press "Run workflow" by hand.
 on:
   workflow_dispatch:
   push:
@@ -10,7 +12,14 @@ on:
       - ".github/workflows/rankforge-android.yml"
       - "capacitor.config.json"
       - "package.json"
-      - ".rankforge-web/**"
+      - "tools/android-debug.keystore"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rankforge-android
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -99,7 +108,7 @@ jobs:
 
           test -s "$RUNTIME"
 
-          python - "$RUNTIME" <<'PYTHON'
+          python3 - "$RUNTIME" <<'PYTHON'
           import json
           import sys
 
@@ -157,24 +166,47 @@ jobs:
         run: |
           set -euo pipefail
 
+          # webDir is the offline fallback / safety copy. The installed app loads the live
+          # site from capacitor.config.json (server.url), so copy the WHOLE web tree,
+          # including subfolders (rank-booster, vendor, nichod, owner-imports ...).
           rm -rf ".rankforge-web"
           mkdir -p ".rankforge-web"
 
-          find . -maxdepth 1 \
-            -type f \
-            \( -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.json" \) \
-            -exec cp -f {} ".rankforge-web/" \;
-
-          [ -d "data" ] && cp -R data ".rankforge-web/" || true
+          rsync -a ./ .rankforge-web/ \
+            --exclude='.git*' --exclude='.github' --exclude='.rankforge-web' \
+            --exclude='node_modules' --exclude='android' --exclude='.cloudflare-dist' \
+            --exclude='tools' --exclude='server' --exclude='rankforge-ai-worker' \
+            --exclude='rankforge-local-ai' --exclude='rankforge-lecture-security/server' \
+            --exclude='*.md' --exclude='*.sh' --exclude='*.py' --exclude='*.txt' \
+            --exclude='package*.json' --exclude='wrangler.jsonc' --exclude='capacitor.config.json'
 
           test -f ".rankforge-web/index.html"
+          test -f ".rankforge-web/offline.html"
           test -f ".rankforge-web/biology-7196-cbt.html"
           test -f ".rankforge-web/biology-7196-bank-readonly.json"
-          test -f ".rankforge-web/biology-rankforge-bridge.js"
-          test -f ".rankforge-web/biology-rankforge-final-hook.js"
+          test -f ".rankforge-web/vendor/pdf.min.js"
+          test -f ".rankforge-web/rank-booster/ai-question-engine.js"
 
-          echo "[PASS] RankForge web assets prepared"
-          echo "[PASS] Biology CBT + 7,196 runtime asset bundled"
+          echo "[PASS] RankForge web assets prepared (full tree)"
+
+      - name: Set app version and stable signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # 1) every build gets a higher versionCode so Android installs it as an UPDATE
+          GRADLE=android/app/build.gradle
+          test -f "$GRADLE"
+          sed -i -E "s/versionCode[ =]+[0-9]+/versionCode ${GITHUB_RUN_NUMBER}/" "$GRADLE"
+          sed -i -E "s/versionName[ =]+\"[^\"]*\"/versionName \"1.0.${GITHUB_RUN_NUMBER}\"/" "$GRADLE"
+          grep -nE "versionCode|versionName" "$GRADLE" || true
+          grep -qE "versionCode[ =]+${GITHUB_RUN_NUMBER}" "$GRADLE"
+
+          # 2) the SAME signing key on every build, otherwise Android refuses to update the app
+          test -f tools/android-debug.keystore
+          mkdir -p "$HOME/.android"
+          cp tools/android-debug.keystore "$HOME/.android/debug.keystore"
+          echo "[PASS] version ${GITHUB_RUN_NUMBER} + stable signing key"
 
       - name: Capacitor sync
         shell: bash
@@ -236,19 +268,6 @@ jobs:
 
           echo "[PASS] Android Gradle configuration"
 
-      - name: Use a fixed debug signing key
-        continue-on-error: true
-        run: |
-          set -e
-          # Every build is signed with the same key, so a new APK installs over the old one and keeps your data.
-          for dir in "$HOME/.android" "${ANDROID_USER_HOME:-}" "${ANDROID_SDK_HOME:+$ANDROID_SDK_HOME/.android}"; do
-            [ -n "$dir" ] || continue
-            mkdir -p "$dir"
-            echo "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" | base64 -d > "$dir/debug.keystore"
-          done
-          keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android > "${RUNNER_TEMP:-/tmp}/rf-keystore.txt"
-          grep -q androiddebugkey "${RUNNER_TEMP:-/tmp}/rf-keystore.txt"
-
       - name: Build RankForge Debug APK
         shell: bash
         run: |
@@ -282,3 +301,20 @@ jobs:
           name: RankForge-v1.0.0-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Publish APK to GitHub Releases (stable download link)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          cp android/app/build/outputs/apk/debug/app-debug.apk RankForge.apk
+
+          gh release delete apk-latest --yes --cleanup-tag || true
+          gh release create apk-latest RankForge.apk \
+            --title "RankForge APK (build ${GITHUB_RUN_NUMBER})" \
+            --notes "Install once. The app loads the live site, so new features arrive without a new APK. Build ${GITHUB_RUN_NUMBER}." \
+            --latest=false
+
+          echo "Download: https://github.com/${GITHUB_REPOSITORY}/releases/download/apk-latest/RankForge.apk"

@@ -232,7 +232,7 @@
 
   async function aiQuestions(chunks, title, opts) {
     var fix = opts.fix;
-    if (!fix || !fix.getEndpoint()) throw new Error("NO_ENDPOINT");
+    if (!fix || !(fix.aiMode ? fix.aiMode() !== "none" : fix.getEndpoint())) throw new Error("NO_ENDPOINT");
     var ctx = (opts.focusHits && opts.focusHits.length ? opts.focusHits.map(function (h) { return h.chunk; }) : chunks).slice(0, 14)
       .map(function (c, i) { return "[" + (i + 1) + "] " + c.text; }).join("\n\n");
     var res = await fix.generateQuestions({
@@ -251,7 +251,7 @@
     opts = opts || {};
     var count = Math.max(1, Math.min(opts.count || 10, 30));
     if (!chunks.length) return { questions: [], mode: "none", note: "Add a source first." };
-    if (opts.fix && opts.fix.getEndpoint() && !opts.offlineOnly) {
+    if (opts.fix && (opts.fix.aiMode ? opts.fix.aiMode() !== "none" : opts.fix.getEndpoint()) && !opts.offlineOnly) {
       try {
         var r = await aiQuestions(chunks, title, { count: count, subject: opts.subject, difficulty: opts.difficulty, focus: opts.focus, focusHits: opts.focusHits, fix: opts.fix });
         if (r.questions.length) return { questions: r.questions, mode: "ai-grounded", note: r.dropped ? r.dropped + " AI question(s) rejected: not supported by your sources." : "" };

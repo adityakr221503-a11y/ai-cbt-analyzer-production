@@ -46,6 +46,8 @@
         question: q.question,
         options: q.options,
         answer: q.correctAnswer || "",
+        correctAnswer: q.correctAnswer || "",
+        correctIndex: Number.isInteger(q.correctIndex) ? q.correctIndex : undefined,
         explanation: q.solution || "",
         difficulty: "NEET",
         questionType: "MCQ",

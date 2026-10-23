@@ -1064,20 +1064,7 @@ console.info(
     ),answerIndex);
   }
 
-    /* Questions often continue onto the next page. Read the whole PDF as one stream so they are not cut in half. */
-  function rfMergePages(pages){
-    const list=Array.isArray(pages)?pages:[];
-    if(!list.length) return [];
-    const rows=[];
-    list.forEach(function(pg){
-      (Array.isArray(pg.rows)?pg.rows:[]).forEach(function(r){
-        rows.push(Object.assign({},r,{_page:pg.page,_img:pg.hasImages}));
-      });
-    });
-    return [{page:list[0].page,hasImages:list[0].hasImages,rows:rows}];
-  }
-
-function parsePages(pages){
+  function parsePages(pages){
     const all=[];
     const diagnostics={
       pages:Array.isArray(pages)?pages.length:0,
@@ -1087,10 +1074,21 @@ function parsePages(pages){
       rejected:0
     };
 
-    for(const pg of rfMergePages(pages)){
-      const rows=Array.isArray(pg.rows)?pg.rows:[];
-      if(!rows.length) continue;
+    /*
+     * FIX: read ALL pages as ONE continuous row stream.
+     * Before, every page was parsed alone, so a question whose stem is at the bottom of a page
+     * and whose options are on the next page was silently dropped.
+     */
+    const stream=[];
+    for(const pg of (pages||[])){
+      const prs=Array.isArray(pg.rows)?pg.rows:[];
+      prs.forEach(function(r){ stream.push({r:r,page:pg.page,hasImages:!!pg.hasImages}); });
+    }
+    const rows=stream.map(function(x){ return x.r; });
+    /* where the answer key / solutions start, a question block must stop */
+    const keyStopRx=/^\s*(answer\s*keys?\b|answers?\s*[:\-]|solutions?\b|key\s*[:\-]|(?:\d{1,3}\s*[-–.:)]\s*[A-Da-d1-4]\b\s*){3,})/i;
 
+    if(rows.length){
       const candidates=[];
 
       for(let i=0;i<rows.length;i++){
@@ -1114,15 +1112,22 @@ function parsePages(pages){
       for(let i=0;i<candidates.length;i++){
         const a=candidates[i];
         const b=candidates[i+1];
+        const endIdx=b ? b.index : rows.length;
 
-        let block=rows
-          .slice(a.index,b ? b.index : rows.length)
-          .map(r=>rfCleanLine(r.text))
-          .filter(Boolean);
+        let block=[];
+        for(let k=a.index;k<endIdx;k++){
+          const t=rfCleanLine((rows[k]||{}).text);
+          if(!t) continue;
+          if(k>a.index && keyStopRx.test(t)) break;
+          block.push(t);
+        }
 
         if(!block.length) continue;
 
         block[0]=a.first;
+
+        const startPage=stream[a.index].page;
+        const anyImages=stream.slice(a.index,endIdx).some(function(x){ return x.hasImages; });
 
         /*
          * First try A-D.
@@ -1130,8 +1135,8 @@ function parsePages(pages){
         let q=parseGroup(
           block,
           a.number,
-          (rows[a.index]&&rows[a.index]._page)||pg.page,
-          (rows[a.index]&&rows[a.index]._img)||pg.hasImages
+          startPage,
+          anyImages
         );
 
         /*
@@ -1141,8 +1146,8 @@ function parsePages(pages){
           q=parseNumericGroup(
             block,
             a.number,
-            (rows[a.index]&&rows[a.index]._page)||pg.page,
-            (rows[a.index]&&rows[a.index]._img)||pg.hasImages
+            startPage,
+            anyImages
           );
         }
 

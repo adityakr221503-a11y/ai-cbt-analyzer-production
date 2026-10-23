@@ -144,7 +144,7 @@ jobs:
           npx wrangler deploy \
             rankforge-ai-worker/src/index.js \
             --config rankforge-ai-worker/wrangler.jsonc \
-            
+            --account-id "$CLOUDFLARE_ACCOUNT_ID"
 
           echo "✅ Wrangler deployment command completed"
 

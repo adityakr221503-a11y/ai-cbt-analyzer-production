@@ -6,7 +6,7 @@
 <script src="./rf-fixpack-v1.js"></script>
 <script src="./rankforge-core-v1.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ranker Pro — AI Test Generator</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#0f172a}header{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 20px}.wrap{max-width:1000px;margin:auto}.brand{font-size:21px;font-weight:800}.brand span{color:#2563eb}.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin:18px 0;box-shadow:0 4px 14px rgba(15,23,42,.05)}h1{margin:8px 0;font-size:28px}.muted{color:#64748b}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.field label{display:block;font-weight:700;margin-bottom:7px}.field select,.field input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px;background:#fff}.btn{border:0;border-radius:11px;padding:13px 17px;font-weight:800;cursor:pointer}.primary{background:#2563eb;color:#fff}.secondary{background:#e2e8f0;color:#0f172a}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{padding:14px;background:#f8fafc;border-radius:12px}.stat b{display:block;font-size:22px}.status{padding:12px;border-radius:10px;background:#eff6ff;color:#1e40af}.warning{background:#fff7ed;color:#9a3412}.success{background:#f0fdf4;color:#166534}ul{padding-left:20px}.actions{display:flex;gap:10px;flex-wrap:wrap}@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}h1{font-size:24px}}
@@ -14,6 +14,8 @@
 <script src="./rank-booster/ai-question-engine.js"></script>
 <script src="./rank-booster/unified-question-bank.js"></script>
 <script src="./rank-booster/rankforge-originality-engine.js"></script>
+<link rel="stylesheet" href="./rf-theme.css">
+<script src="./rf-shell.js"></script>
 </head>
 <body>
 <header><div class="wrap"><div class="brand">🏆 Ranker <span>Pro</span></div></div></header>
@@ -82,37 +84,16 @@ async function generate(){
     updateStatus('Core + AI bank me '+generated.length+'/'+count+' questions mile. Secure AI se '+need+' new questions generate ho rahe hain...');
 
     try{
-      const endpoint = window.RankForgeFix ? window.RankForgeFix.getEndpoint() :
-        (window.RANKFORGE_AI_ENDPOINT || localStorage.getItem('rankforgeAiEndpoint') || '');
-      if(!endpoint){
-        throw new Error(window.RankForgeFix ? window.RankForgeFix.endpointProblem() : 'AI endpoint not configured');
+      if(!window.RankForgeFix || window.RankForgeFix.aiMode()==='none'){
+        throw new Error(window.RankForgeFix ? window.RankForgeFix.endpointProblem() : 'AI is not configured');
       }
-
-      const payload = {
+      const genRes = await window.RankForgeFix.generateQuestions({
         count: Math.min(need, 20),
         subject: subject,
         difficulty: difficulty,
-        type: 'MCQ',
-        focus: 'NEET rank-booster; NCERT-first; concept + application + examiner-trap; original questions only',
-        sourceBasis: 'Approved curriculum/reference calibration only. Do not copy source wording or questions.'
-      };
-
-      const response = await fetch(endpoint,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
+        focus: 'NEET rank-booster; NCERT-first; concept + application + examiner-trap; original questions only'
       });
-
-      if(!response.ok){
-        throw new Error('AI endpoint HTTP '+response.status);
-      }
-
-      const data = await response.json();
-      const aiRaw =
-        Array.isArray(data) ? data :
-        Array.isArray(data.questions) ? data.questions :
-        Array.isArray(data.candidates) ? data.candidates :
-        [];
+      const aiRaw = genRes.questions || [];
 
       const normaliseAI = q => {
         if(!q || typeof q !== 'object') return null;
@@ -329,5 +310,4 @@ try{
 })();
 </script>
 
-<script src="./rf-nav-v1.js"></script>
 </body></html>

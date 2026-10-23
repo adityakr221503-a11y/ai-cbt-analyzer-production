@@ -1,9 +1,0 @@
-{
-  "appId": "com.adityakumar.cbtanalyzer",
-  "appName": "CBT Analyzer",
-  "webDir": ".",
-  "bundledWebRuntime": false,
-  "server": {
-    "androidScheme": "https"
-  }
-}

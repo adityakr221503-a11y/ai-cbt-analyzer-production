@@ -28,7 +28,12 @@ button.sec{background:#e5e7eb;color:var(--ink)}button.danger{background:#fff;col
 .gate{background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:12px;border-radius:14px;margin-bottom:14px}
 .msg{margin-top:10px;padding:10px 12px;border-radius:12px;background:#ecfdf5;color:#065f46;font-size:14px;display:none}
 .msg.err{background:#fef2f2;color:#991b1b}
+.note{color:var(--rf-mu);font-size:14px;line-height:1.55;margin:4px 0 8px}
+h3.sub{margin:18px 0 4px;font-size:16px}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;background:rgba(124,92,255,.18);color:var(--rf-ac2);font-size:11.5px;font-weight:800;vertical-align:middle;margin-left:4px}
 </style>
+<link rel="stylesheet" href="./rf-theme.css">
+<script src="./rf-shell.js"></script>
 </head>
 <body>
 <header><h1>🛠 RankForge Owner Hub</h1><small>Upload, connect, diagnose — in one place</small></header>
@@ -42,8 +47,22 @@ button.sec{background:#e5e7eb;color:var(--ink)}button.danger{background:#fff;col
   </div>
 
   <div class="card">
-    <h2>AI Server (one setting for every AI feature)</h2>
-    <p style="color:#6b7280;font-size:13px;line-height:1.5;margin:0">AI Question Lab, AI Test Generator, AI Question Studio and Notebook Studio all use this one URL. Paste your deployed Cloudflare Worker address. It uses free Cloudflare Workers AI — no OpenAI key, no token bill. When the free daily limit is used up, Notebook Studio switches to its offline generator automatically.</p>
+    <h2>🤖 Free AI</h2>
+    <p class="note">One setting powers AI Practice, the AI Test Generator, AI Question Lab and Nexus. Pick <b>either</b> option. Nothing here costs money.</p>
+    <div id="aiNow" class="msg" style="display:block"></div>
+
+    <h3 class="sub">Option 1 · Google Gemini key <span class="pill">fastest · no server</span></h3>
+    <p class="note">Get a free key at <b>aistudio.google.com</b> → “Get API key”, then paste it here. It is stored only on this phone, so use it for your own question generation.</p>
+    <label for="gk">Gemini API key</label>
+    <input id="gk" type="password" placeholder="AIza…" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <label for="gm">Model</label>
+    <input id="gm" placeholder="gemini-2.5-flash">
+    <div class="row"><button id="gSave">Save</button><button id="gTest" class="sec">Save &amp; test</button></div>
+    <button id="gClear" class="sec">Remove key from this phone</button>
+    <div id="gMsg" class="msg"></div>
+
+    <h3 class="sub">Option 2 · Cloudflare Worker <span class="pill">works for all students</span></h3>
+    <p class="note">Deploy <b>rankforge-ai-worker</b> once (free Workers AI, no key) and paste its address.</p>
     <label for="ep">Worker URL</label>
     <input id="ep" placeholder="https://rankforge-ai.YOURNAME.workers.dev/api/ai/generate" inputmode="url" autocapitalize="off">
     <div class="row"><button id="epSave">Save</button><button id="epTest" class="sec">Save &amp; test</button></div>
@@ -73,6 +92,7 @@ button.sec{background:#e5e7eb;color:var(--ink)}button.danger{background:#fff;col
       <a href="ranker-command-center.html">🎯 Command Center</a>
       <a href="mistake.html">🧠 Mistakes &amp; DPP</a>
       <a href="cbt.html?source=biology">🧬 Biology CBT</a>
+      <a href="bookmarks.html">🔖 Bookmarks</a>
       <a href="rankforge-system-check.html">✅ System check</a>
     </div>
   </div>
@@ -84,7 +104,7 @@ button.sec{background:#e5e7eb;color:var(--ink)}button.danger{background:#fff;col
 var Fix = window.RankForgeFix, report = [];
 var $ = function(i){return document.getElementById(i);};
 function J(k,s){ try{return JSON.parse((s?sessionStorage:localStorage).getItem(k));}catch(_){return null;} }
-function arr(v){ return Array.isArray(v)?v:(v&&Array.isArray(v.questions)?v.questions:[]); }
+function arr(v){ if(Array.isArray(v)) return v; if(v&&Array.isArray(v.questions)) return v.questions; if(v&&typeof v==="object") return Object.keys(v).map(function(k){return v[k];}).filter(function(x){return x&&typeof x==="object";}); return []; }
 function show(id,msg,err){ var e=$(id); e.style.display="block"; e.className="msg"+(err?" err":""); e.textContent=msg; }
 
 async function doctor(){
@@ -110,14 +130,15 @@ async function doctor(){
   var age = ts?Math.round((Date.now()-ts)/1000)+"s ago":"none";
   add("ok","Test hand-off state","Active source: "+(tag||"none")+" · questions: "+sa.length+" · last hand-off: "+age+(sessionStorage.getItem("RF_HANDOFF_CONSUMED")?" (already opened)":""));
 
-  var ep = Fix?Fix.getEndpoint():"";
-  if(!ep) add("fail","AI server","Not connected. "+(Fix?Fix.endpointProblem():""));
+  var mode = Fix?Fix.aiMode():"none", ep = Fix?Fix.getEndpoint():"";
+  if(mode==="none") add("fail","Free AI","Not connected. "+(Fix?Fix.endpointProblem():""));
+  else if(mode==="gemini") add("ok","Free AI","Using your Gemini key ("+Fix.getGeminiModel()+"). Press “Save & test” to confirm it works.");
   else {
-    try{ var t0=Date.now(); var rr=await fetch(ep,{method:"GET"}); add(rr.status<500?"ok":"warn","AI server","Reachable ("+rr.status+", "+(Date.now()-t0)+" ms): "+ep+(rr.status===405?" — responds (POST required is normal).":"")); }
-    catch(e){ add("fail","AI server","Cannot reach "+ep+". Wrong URL, Worker not deployed, or blocked by CORS (the Worker's ALLOWED_ORIGIN must equal this site's address)."); }
+    try{ var t0=Date.now(); var rr=await fetch(ep,{method:"GET"}); add(rr.status<500?"ok":"warn","Free AI","Worker reachable ("+rr.status+", "+(Date.now()-t0)+" ms)."+(rr.status===405?" POST required is normal.":"")); }
+    catch(e){ add("fail","Free AI","Cannot reach the Worker at "+ep+". Wrong URL, not deployed, or blocked by CORS (ALLOWED_ORIGIN must equal this site)."); }
   }
 
-  var m = arr(J("rankforgeMistakesV1")), unk = m.filter(function(x){var t=String((x&&(x.topic||x.chapter))||"").trim();return !t||/^unknown$/i.test(t);}).length;
+  var m = arr(J("rankforgeMistakesV1")), unk = m.filter(function(x){var t=String((x&&(x.topic||x.chapter))||"").trim();return !t||/^unknown$/i.test(t)||/^biology test \d+$/i.test(t);}).length;
   add(unk?"warn":"ok","Mistake topics", m.length+" mistakes saved, "+unk+" without a topic."+(unk?" Use “Repair Unknown topics”.":""));
 
   var nb=0; try{ nb=(J("rfNotebooksV1")||[]).reduce(function(a,b){return a+b.sources.length;},0); }catch(_){}
@@ -133,8 +154,22 @@ async function doctor(){
 $("rerun").onclick=doctor;
 $("copyRep").onclick=function(){ var t="RankForge Doctor "+new Date().toISOString()+"\n"+report.map(function(r){return "["+r.level.toUpperCase()+"] "+r.name+": "+r.detail;}).join("\n"); (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){show("fixMsg","Report copied.");},function(){show("fixMsg",t);}); };
 
+function aiNow(){ var m=Fix.aiMode(); var e=$("aiNow"); e.className="msg"+(m==="none"?" err":""); e.style.display="block"; e.textContent = m==="none"?"No AI connected yet. Offline question generation still works in Nexus.":(m==="gemini"?"Active: Gemini key on this phone.":"Active: Cloudflare Worker."); }
+$("gk").value = Fix.getGeminiKey(); $("gm").value = Fix.getGeminiModel();
+function saveG(){ var k=$("gk").value.trim(); Fix.setGemini(k,$("gm").value.trim()||"gemini-2.5-flash"); show("gMsg",k?"Saved on this phone.":"Key removed."); aiNow(); return !!k; }
+$("gSave").onclick=function(){ saveG(); doctor(); };
+$("gClear").onclick=function(){ $("gk").value=""; saveG(); doctor(); };
+$("gTest").onclick=async function(){
+  if(!saveG()) return; show("gMsg","Asking Gemini for 1 test question…");
+  try{ var saved=Fix.getEndpoint(); if(saved){ show("gMsg","A Worker URL is also saved and takes priority. Clear it to test Gemini.",true); return; }
+    var r=await Fix.generateQuestions({count:1,subject:"Biology",difficulty:"NEET mix",topic:"Cell: The Unit of Life"});
+    show("gMsg",r.questions.length?"Gemini works. It returned a valid question.":"Gemini answered but returned no valid question. Try again.",!r.questions.length); }
+  catch(e){ show("gMsg",e.message,true); }
+  doctor();
+};
+aiNow();
 $("ep").value = Fix?Fix.getEndpoint():"";
-function saveEp(){ var v=$("ep").value.trim(); if(v&&!/^https?:\/\//i.test(v)){ show("epMsg","The URL must start with https://",true); return false; } Fix.setEndpoint(v); show("epMsg",v?"Saved. All AI features now use this server.":"Cleared."); return !!v; }
+function saveEp(){ var v=$("ep").value.trim(); if(v&&!/^https?:\/\//i.test(v)){ show("epMsg","The URL must start with https://",true); return false; } Fix.setEndpoint(v); show("epMsg",v?"Saved. All AI features now use this server.":"Cleared."); aiNow(); return !!v; }
 $("epSave").onclick=function(){ saveEp(); doctor(); };
 $("epTest").onclick=async function(){
   if(!saveEp()) return; show("epMsg","Asking the server for 1 test question…");
@@ -144,9 +179,9 @@ $("epTest").onclick=async function(){
 };
 
 $("fixTopics").onclick=function(){
-  var m=arr(J("rankforgeMistakesV1")), n=0;
-  m.forEach(function(x){ if(!x) return; var t=String(x.topic||x.chapter||"").trim(); if(!t||/^unknown$/i.test(t)){ var i=Fix.inferTopic(x); x.topic=i.topic; x.chapter=x.chapter&&!/^unknown$/i.test(x.chapter)?x.chapter:i.topic; if(!x.subject||/^unknown$/i.test(x.subject)) x.subject=i.subject; n++; } });
-  try{ localStorage.setItem("rankforgeMistakesV1",JSON.stringify(m)); show("fixMsg","Repaired "+n+" mistake(s). Adaptive DPP will now group them by real topic."); }catch(e){ show("fixMsg","Could not save: "+e.message,true); }
+  var raw=J("rankforgeMistakesV1"), m=arr(raw), n=0;
+  m.forEach(function(x){ if(!x) return; var t=String(x.topic||x.chapter||"").trim(); if(!t||/^unknown$/i.test(t)||/^biology test \d+$/i.test(t)){ var i=Fix.inferTopic(x); x.topic=i.topic; x.chapter=i.topic; if(!x.subject||/^unknown$/i.test(x.subject)) x.subject=i.subject; n++; } });
+  try{ localStorage.setItem("rankforgeMistakesV1",JSON.stringify(raw)); show("fixMsg","Repaired "+n+" mistake(s). Adaptive DPP will now group them by real topic."); }catch(e){ show("fixMsg","Could not save: "+e.message,true); }
   doctor();
 };
 $("clearHand").onclick=function(){ ["RF_HANDOFF_TS","RF_HANDOFF_CONSUMED","CBT_ACTIVE_QUESTIONS","CBT_ACTIVE_SOURCE","CBT_ACTIVE_TEST","CBT_ACTIVE_TEST_ID","CBT_ACTIVE_TEST_SOURCE"].forEach(function(k){try{sessionStorage.removeItem(k);}catch(_){}}); show("fixMsg","Cleared. The next test you start opens the right questions."); doctor(); };
@@ -156,6 +191,5 @@ $("hardRefresh").onclick=async function(){ try{ if(navigator.serviceWorker){ (aw
 doctor();
 })();
 </script>
-<script src="./rf-nav-v1.js"></script>
 </body>
 </html>

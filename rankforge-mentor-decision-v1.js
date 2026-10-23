@@ -452,12 +452,11 @@ cursor:pointer;
           window.RankForgeAdaptiveDPPV1 &&
           typeof window.RankForgeAdaptiveDPPV1.start==="function"
         ){
-          const r=window.RankForgeAdaptiveDPPV1.start(x.size,x.difficulty,x.topic);
-          if(r&&r.ok&&r.dpp&&r.dpp.questions&&r.dpp.questions.length&&window.RankForgeFix&&window.RankForgeFix.handoff){
-            window.RankForgeFix.handoff({title:"Recommended Practice",source:"rankforge-dpp",questions:r.dpp.questions},"rankforge-dpp");
-          }else{
-            alert((r&&r.message)||"No practice questions are available yet. Take a test first so RankForge can find your weak topics.");
-          }
+          (window.RankForgeAdaptiveDPPV1.launch || window.RankForgeAdaptiveDPPV1.start)(
+            x.size,
+            x.difficulty,
+            x.topic
+          );
           return;
         }
 

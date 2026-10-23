@@ -6,50 +6,65 @@
 <title>RankForge Notebook Studio</title>
 <script src="./rf-fixpack-v1.js"></script>
 <style>
-:root{--ink:#111827;--mute:#6b7280;--line:#e5e7eb;--bg:#f3f4fb;--card:#fff;--a:#4f46e5;--ok:#047857;--bad:#b91c1c}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:84px}
-header{background:#fff;border-bottom:1px solid var(--line);padding:14px 16px;position:sticky;top:0;z-index:5}
-header h1{margin:0;font-size:19px}header h1 span{color:var(--a)}
-header small{color:var(--mute)}
-main{max-width:760px;margin:0 auto;padding:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
-h2{margin:0 0 10px;font-size:17px}
-label{display:block;font-weight:700;font-size:13px;margin:10px 0 5px}
-input,select,textarea,button{font:inherit;width:100%;padding:12px;border-radius:12px;border:1px solid #d1d5db;background:#fff;color:var(--ink)}
-textarea{min-height:130px;resize:vertical}
-button{border:0;background:var(--a);color:#fff;font-weight:800;margin-top:10px;cursor:pointer}
-button.sec{background:#e5e7eb;color:var(--ink)}button.ok{background:var(--ok)}button.warn{background:#fff;color:var(--bad);border:1px solid #fecaca}
+input,select,textarea{width:100%}
+main{max-width:760px;margin:0 auto;padding:0 14px 20px}
+.hero{display:flex;gap:12px;align-items:center;padding:14px 16px;margin:6px 0 12px;border-radius:20px;border:1px solid var(--rf-line);
+  background:linear-gradient(135deg,rgba(124,92,255,.26),rgba(34,211,238,.10))}
+.hero .ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:24px;background:var(--rf-surface-solid);border:1px solid var(--rf-line);flex:none}
+.hero b{display:block;font-size:17px}.hero span{display:block;font-size:13px;color:var(--rf-mu)}
+.chip{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:800;background:rgba(52,211,153,.16);color:var(--rf-ok)}
+.chip.off{background:rgba(251,191,36,.16);color:var(--rf-warn)}
+.card{background:var(--rf-surface-solid);border:1px solid var(--rf-line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:var(--rf-shadow)}
+h2{margin:0 0 10px;font-size:18px}
+label{display:block;font-weight:800;font-size:12.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--rf-mu);margin:12px 0 6px}
+button{font:inherit;width:100%;padding:13px;border-radius:14px;border:0;background:linear-gradient(135deg,var(--rf-ac),#5a3df0);color:#fff;font-weight:800;margin-top:10px;cursor:pointer;min-height:46px}
+button.sec{background:var(--rf-surface-2);color:var(--rf-tx);border:1px solid var(--rf-line)}
+button.ok{background:linear-gradient(135deg,#10b981,#059669)}
+button.warn{background:rgba(251,113,133,.14);color:var(--rf-bad);border:1px solid rgba(251,113,133,.45)}
 button:disabled{opacity:.5}
 .row{display:flex;gap:8px}.row>*{flex:1}
-.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:#eef0ff;color:#4338ca;font-size:12px;font-weight:700;margin:2px 4px 2px 0}
-.src{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px}
-.src b{display:block}.src small{color:var(--mute)}.src button{width:auto;margin:0;padding:8px 12px}
-.msg{padding:10px 12px;border-radius:14px;margin:8px 0;line-height:1.5}
-.me{background:#eef0ff;margin-left:28px}.bot{background:#f8fafc;border:1px solid var(--line);margin-right:12px}
-.cite{font-size:12px;color:var(--mute);border-left:3px solid #c7d2fe;padding-left:8px;margin-top:6px}
-.status{padding:10px 12px;border-radius:12px;background:#ecfdf5;color:#065f46;margin:10px 0;font-size:14px}
-.status.err{background:#fef2f2;color:#991b1b}.status.warn{background:#fffbeb;color:#92400e}
-.q{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
-.q .opt{padding:7px 10px;border-radius:10px;margin:5px 0;background:#f8fafc}
-.q .opt.right{background:#dcfce7;font-weight:700}
-.q small{color:var(--mute);display:block;margin-top:6px}
-nav.tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0)}
-nav.tabs button{margin:0;border-radius:0;background:#fff;color:var(--mute);padding:14px 4px;font-size:13px;border:0}
-nav.tabs button.on{color:var(--a);border-top:3px solid var(--a)}
+.pill{display:inline-block;padding:4px 11px;border-radius:99px;background:rgba(124,92,255,.18);color:var(--rf-tx);font-size:12.5px;font-weight:700;margin:3px 4px 3px 0}
+.src{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--rf-line);border-radius:14px;padding:11px 12px;margin-top:9px;background:var(--rf-field)}
+.src b{display:block}.src small{color:var(--rf-mu)}.src button{width:auto;margin:0;padding:8px 12px;min-height:36px;font-size:13px}
+.msg{padding:12px 14px;border-radius:16px;margin:10px 0;line-height:1.6;font-size:15.5px}
+.me{background:linear-gradient(135deg,rgba(124,92,255,.30),rgba(124,92,255,.16));margin-left:36px;border-bottom-right-radius:6px}
+.bot{background:var(--rf-field);border:1px solid var(--rf-line);margin-right:14px;border-bottom-left-radius:6px}
+.cite{font-size:12.5px;color:var(--rf-mu);border-left:3px solid var(--rf-ac);padding-left:9px;margin-top:8px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chips button{width:auto;flex:none;margin:0;padding:9px 14px;font-size:13.5px;min-height:38px;border-radius:99px;background:var(--rf-surface-2);color:var(--rf-tx);border:1px solid var(--rf-line)}
+.status{padding:11px 13px;border-radius:14px;margin:10px 0;font-size:14px;border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.12);color:var(--rf-ok)}
+.status.err{border-color:rgba(251,113,133,.45);background:rgba(251,113,133,.12);color:var(--rf-bad)}
+.status.warn{border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.12);color:var(--rf-warn)}
+.q{border:1px solid var(--rf-line);border-radius:18px;padding:14px;margin-top:10px;font-size:16px;line-height:1.6}
+.q .opt{padding:10px 12px;border-radius:12px;margin:7px 0;background:var(--rf-field);border:1px solid var(--rf-line)}
+.q .opt.right{background:rgba(52,211,153,.16);border-color:rgba(52,211,153,.5);font-weight:700}
+.q small{color:var(--rf-mu);display:block;margin-top:8px}
+nav.tabs{position:sticky;top:calc(var(--rf-top) + env(safe-area-inset-top,0px) + 2px);z-index:50;display:flex;gap:6px;overflow-x:auto;padding:8px 2px 10px;margin:0 0 6px;
+  background:linear-gradient(var(--rf-bg) 70%,transparent);scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{width:auto;flex:none;margin:0;padding:10px 16px;min-height:42px;border-radius:99px;background:var(--rf-surface-solid);color:var(--rf-mu);border:1px solid var(--rf-line);font-size:14px;white-space:nowrap}
+nav.tabs button.on{background:linear-gradient(135deg,var(--rf-ac),#5a3df0);color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(100,70,240,.3)}
 section.tab{display:none}section.tab.on{display:block}
-ul.plain{padding-left:18px;line-height:1.55}
-.covgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(20px,1fr));gap:5px;margin:10px 0}.covgrid i{aspect-ratio:1;border-radius:5px;background:#22d3ee}.covgrid i.z{background:none;border:1.5px dashed #fb7185}.pr{cursor:pointer;border:1px solid #c7d2fe;background:#eef2ff;color:#1e1b4b;margin:3px;padding:7px 11px;border-radius:999px;font:inherit}
+ul.plain{padding-left:20px;line-height:1.65}
+.covgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(22px,1fr));gap:5px;margin:10px 0}.covgrid i{aspect-ratio:1;border-radius:6px;background:var(--rf-ac2)}.covgrid i.z{background:none;border:1px dashed var(--rf-line)}
 </style>
-<link rel="stylesheet" href="./rankforge-ui-security-v1.css">
+<link rel="stylesheet" href="./rf-theme.css">
+<script src="./rf-shell.js"></script>
 </head>
 <body>
-<header>
-  <h1>📓 RankForge <span>Notebook Studio</span></h1>
-  <small>Answers and questions come only from <b>your</b> sources, with citations.</small>
-</header>
 
-<main>
+
+<main data-rf-noskin>
+  <div class="hero"><div class="ic">📓</div><div><b>Nexus</b><span>Your private study notebook. Answers and quizzes come only from your own sources, with citations.</span><span id="aiChip" class="chip off">Checking AI…</span></div></div>
+  <nav class="tabs">
+  <button class="on" data-tab="sources">Sources</button>
+  <button data-tab="chat">Chat</button>
+  <button data-tab="guide">Guide</button>
+  <button data-tab="q">Questions</button>
+  <button data-tab="predict">Predict</button>
+</nav>
+
   <div class="card">
     <label for="nbSelect">Notebook</label>
     <select id="nbSelect"></select>
@@ -80,6 +95,7 @@ ul.plain{padding-left:18px;line-height:1.55}
   <section class="tab" id="tab-chat">
     <div class="card">
       <h2>Ask your notebook</h2>
+      <div class="chips" id="chatChips"><button class="sec" data-p="Summarise my sources in 5 points">Summarise</button><button class="sec" data-p="What are the key terms and their meanings?">Key terms</button><button class="sec" data-p="What are the most likely exam questions from these sources?">Likely questions</button><button class="sec" data-p="Explain the hardest concept in simple words">Explain simply</button></div>
       <div id="chatLog"></div>
       <textarea id="chatQ" style="min-height:70px" placeholder="Ask something that your sources answer…"></textarea>
       <button id="chatSend">Ask</button>
@@ -125,13 +141,7 @@ ul.plain{padding-left:18px;line-height:1.55}
   </section>
 </main>
 
-<nav class="tabs">
-  <button class="on" data-tab="sources">Sources</button>
-  <button data-tab="chat">Chat</button>
-  <button data-tab="guide">Guide</button>
-  <button data-tab="q">Questions</button>
-  <button data-tab="predict">Predict</button>
-</nav>
+
 
 <script src="./rankforge-notebook-v1.js"></script>
 <script src="./rankforge-forge-v1.js"></script>
@@ -224,16 +234,32 @@ $("srcFile").onchange=async function(){
 };
 
 /* chat */
-$("chatSend").onclick=function(){
-  var q=$("chatQ").value.trim(); if(!q) return;
-  var ch=NB.chunksOf(cur);
-  $("chatLog").insertAdjacentHTML("beforeend",'<div class="msg me">'+esc(q)+"</div>");
-  if(!ch.length){ $("chatLog").insertAdjacentHTML("beforeend",'<div class="msg bot">Add a source first (Sources tab).</div>'); return; }
-  var r=NB.answer(NB.buildIndex(ch),q);
-  var cites=r.citations.map(function(c){return '<div class="cite">['+c.n+'] '+esc(c.sourceTitle)+': '+esc(c.text)+'…</div>';}).join("");
-  $("chatLog").insertAdjacentHTML("beforeend",'<div class="msg bot">'+esc(r.text)+cites+"</div>");
-  $("chatQ").value="";
-};
+function aiChip(){
+  var m=Fix?Fix.aiMode():"none", c=$("aiChip"); if(!c) return;
+  c.className="chip"+(m==="none"?" off":"");
+  c.textContent = m==="gemini" ? "● Free AI on (Gemini)" : m==="worker" ? "● Free AI on (Worker)" : "○ Offline mode · connect free AI in Owner Hub";
+}
+async function ask(q){
+  var ch=NB.chunksOf(cur), log=$("chatLog");
+  log.insertAdjacentHTML("beforeend",'<div class="msg me">'+esc(q)+"</div>");
+  if(!ch.length){ log.insertAdjacentHTML("beforeend",'<div class="msg bot">Add a source first (Sources tab).</div>'); return; }
+  var idx=NB.buildIndex(ch), r=NB.answer(idx,q), hits=NB.search(idx,q,6);
+  var cites=function(list){return list.map(function(c){return '<div class="cite">['+c.n+'] '+esc(c.sourceTitle)+': '+esc(c.text)+'…</div>';}).join("");};
+  if(Fix && Fix.aiMode()==="gemini" && hits.length){
+    var holder=document.createElement("div"); holder.className="msg bot"; holder.textContent="Thinking…"; log.appendChild(holder);
+    try{
+      var ctx=hits.map(function(h,i){return "["+(i+1)+"] ("+h.chunk.sourceTitle+") "+h.chunk.text;}).join("\n\n");
+      var prompt="You are a careful study assistant. Answer the QUESTION using ONLY the SOURCES below. Cite the sources you use like [1] or [2]. If the sources do not contain the answer, say so plainly. Keep it clear and student-friendly.\n\nSOURCES:\n"+ctx+"\n\nQUESTION: "+q;
+      var ans=await Fix.geminiAsk(prompt,{temperature:0.2});
+      holder.innerHTML=esc(ans).replace(/\n/g,"<br>")+hits.map(function(h,i){return '<div class="cite">['+(i+1)+'] '+esc(h.chunk.sourceTitle)+': '+esc(h.chunk.text.slice(0,200))+'…</div>';}).join("");
+      return;
+    }catch(e){ holder.innerHTML=esc(r.text)+cites(r.citations)+'<div class="cite">AI unavailable ('+esc(e.message)+'). Showing the extractive answer.</div>'; return; }
+  }
+  log.insertAdjacentHTML("beforeend",'<div class="msg bot">'+esc(r.text)+cites(r.citations)+"</div>");
+}
+$("chatSend").onclick=function(){ var q=$("chatQ").value.trim(); if(!q) return; $("chatQ").value=""; ask(q); };
+$("chatChips").onclick=function(e){ var p=e.target.getAttribute&&e.target.getAttribute("data-p"); if(p) ask(p); };
+aiChip();
 
 /* questions */
 function renderQs(){
@@ -276,6 +302,5 @@ refresh();
 })();
 </script>
 <script src="./rankforge-study-upgrade-v1.js"></script>
-<script src="./rf-nav-v1.js"></script>
 </body>
 </html>

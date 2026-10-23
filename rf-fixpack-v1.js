@@ -49,12 +49,16 @@
     var opts = q.options != null ? q.options : q.choices != null ? q.choices : q.answers;
     if (opts && !Array.isArray(opts) && typeof opts === "object") opts = Object.keys(opts).map(function (k) { return opts[k]; });
     if (!Array.isArray(opts)) opts = [];
-    opts = opts.map(function (x) {
+    var slots = opts.map(function (x) {
       if (x && typeof x === "object") return toText(x.text != null ? x.text : x.value != null ? x.value : x.label != null ? x.label : x.option);
       return toText(x);
-    }).map(function (s) { return s.trim(); }).filter(Boolean);
-
-    if (!text || opts.length < 2) return null;
+    }).map(function (s) { return s.trim(); });
+    /* KEEP positions: dropping blanks shifted the answer key and lost questions.
+       Blank options (formula/figure the PDF reader could not extract) get a placeholder. */
+    var blanks = slots.filter(function (s) { return !s; }).length;
+    var present = slots.length - blanks;
+    if (!text || slots.length < 2) return null;   /* keep image-only questions: dropping them lost questions from a 180 paper */
+    opts = slots.map(function (s, i) { return s || "(option " + String.fromCharCode(65 + i) + " not extracted — see original paper)"; });
 
     var ci = -1;
     /* 0-based fields */
@@ -87,6 +91,7 @@
     out.question = text;
     out.options = opts;
     out.correctIndex = ci;
+    out.rfDamaged = blanks > 0 || present < 1 || /(?:^|\n)\s*(?:\d+\s+){2,}\d+\s*(?:\n|$)/.test(text) ? true : !!q.rfDamaged;
     return out;
   }
 
@@ -126,16 +131,16 @@
     if (src === "biology") return { mode: "biology", reason: "explicit-biology" };
 
     var cands = [];
-    function add(label, raw, tag) {
+    function add(label, raw, tag, title) {
       var list = normalizeList(arrayFrom(raw));
-      if (list.length) cands.push({ label: label, list: list, tag: tag || "" });
+      if (list.length) cands.push({ label: label, list: list, tag: tag || "", title: title || "" });
     }
 
     var sTag = toText(env.sessionRaw && env.sessionRaw("CBT_ACTIVE_SOURCE")).replace(/^"|"$/g, "");
     var activeTest = env.session("CBT_ACTIVE_TEST") || env.local("CBT_ACTIVE_TEST");
 
     add("session.CBT_ACTIVE_QUESTIONS", env.session("CBT_ACTIVE_QUESTIONS"), sTag);
-    add("CBT_ACTIVE_TEST", activeTest && activeTest.questions, activeTest && (activeTest.sourceType || activeTest.source));
+    add("CBT_ACTIVE_TEST", activeTest && activeTest.questions, activeTest && (activeTest.sourceType || activeTest.source), activeTest && activeTest.title);
 
     var explicitHandoff = src && src !== "biology";
     var stamp = Number(env.sessionRaw && env.sessionRaw("RF_HANDOFF_TS")) || 0;
@@ -145,46 +150,45 @@
     if (src === "pdf" || params.get("rf-final") === "1" || params.get("pdfcbt") === "1") {
       add("local.pdfCbtQuestions", env.local("pdfCbtQuestions"), "PDF");
       add("local.CBT_ACTIVE_QUESTIONS", env.local("CBT_ACTIVE_QUESTIONS"), "PDF");
-
-      /*
-       * PDF handoff must preserve the just-imported test. Never choose by
-       * question count: a stale TOPPER_TEST_180 or old pool can be larger
-       * than the file the user selected. Prefer the current session payload,
-       * then its active-test wrapper, then the persisted PDF pool. Deliberately
-       * do not treat TOPPER_TEST_180 as a PDF fallback.
-       */
-      var pick = cands.find(function (c) {
-        return c.label === "session.CBT_ACTIVE_QUESTIONS" && /pdf/i.test(c.tag);
-      });
-      if (!pick) pick = cands.find(function (c) {
-        return c.label === "CBT_ACTIVE_TEST" && /pdf/i.test(c.tag);
-      });
-      if (!pick) pick = cands.find(function (c) {
-        return c.label === "local.pdfCbtQuestions";
-      });
-      if (!pick) pick = cands.find(function (c) {
-        return c.label === "local.CBT_ACTIVE_QUESTIONS" && /pdf/i.test(c.tag);
-      });
-      if (pick) return done(pick, "pdf");
+      add("local.TOPPER_TEST_180", env.local("TOPPER_TEST_180"), "PDF");
+      /* a PDF import can legitimately be 180+: always take the biggest complete set */
+      cands.sort(function (a, b) { return b.list.length - a.list.length; });
+      if (cands.length) return done(cands[0], "pdf");
       return { mode: "handoff", source: "pdf", questions: [], reason: "pdf-empty" };
     }
 
     if (explicitHandoff) {
-      var pick = cands.filter(function (c) { return !BIOLOGY_TAGS.test(c.tag); })[0] || cands[0];
+      /* the Ranker / Rank-Booster launchers keep their questions here */
+      /* only the Ranker / Rank-Booster launchers use this key; anything else must not inherit a stale Test180 */
+      var rb = /^(rankers?-test-series|rank-booster|ranker)$/i.test(src) ? normalizeList(arrayFrom(env.local("rbSelectedQuestions"))) : [];
+      var pool = [];
+      if (rb.length) pool.push({ label: "local.rbSelectedQuestions", list: rb, tag: "RANKER" });
+      cands.forEach(function (c) { pool.push(c); });
+      /* never fall back to a stale Biology set: that was the "opens Biology" bug */
+      var pick = pool.filter(function (c) { return !BIOLOGY_TAGS.test(c.tag); })[0];
       if (pick) return done(pick, src);
       return { mode: "handoff", source: src, questions: [], reason: "handoff-empty" };
     }
 
     /* no ?source= : only honour a fresh, un-consumed hand-off that is not Biology */
     if (fresh && !consumed) {
+      var hk = env.sessionRaw && env.sessionRaw("RF_HANDOFF_KEY");
+      var hs = env.sessionRaw && env.sessionRaw("RF_HANDOFF_STORE");
+      var hv = hk ? (hs === "session" ? env.session(hk) : env.local(hk)) : null;
+      var hl = normalizeList(arrayFrom(hv));
+      if (hl.length) {
+        return { mode: "handoff", source: shortSource(hv), title: (hv && hv.title) || "", questions: hl, reason: "hook:" + hk };
+      }
       var p2 = cands.filter(function (c) { return !BIOLOGY_TAGS.test(c.tag); })[0];
       if (p2) return done(p2, (p2.tag || "handoff").toLowerCase());
     }
     return { mode: "biology", reason: "default" };
 
     function done(c, source) {
-      var t = activeTest && activeTest.title;
-      return { mode: "handoff", source: source, title: t || "", questions: c.list, reason: c.label };
+      /* take the title from the active test only when this set really is that test (never a stale one) */
+      var same = activeTest && Array.isArray(activeTest.questions) && activeTest.questions.length === c.list.length;
+      var t = c.title || (same && /session\.CBT_ACTIVE_QUESTIONS/.test(c.label) ? toText(activeTest.title) : "");
+      return { mode: "handoff", source: source, title: t, questions: c.list, reason: c.label };
     }
   }
 
@@ -195,6 +199,14 @@
       local: function (k) { return getJSON("localStorage", k); },
       sessionRaw: function (k) { return getRaw("sessionStorage", k); }
     };
+  }
+
+  function shortSource(v) {
+    var t = toText(v && (v.mode || v.source || v.sourceType)).toLowerCase();
+    if (/dpp/.test(t)) return "adaptive-dpp";
+    if (/practice/.test(t)) return "ai-practice";
+    if (/engine|v2|ai/.test(t)) return "ai";
+    return t.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "handoff";
   }
 
   /* duration: NEET 180 -> 200 min, 90 -> 30 min (existing), else ~1.1 min/q */
@@ -364,11 +376,73 @@
     return url;
   }
 
+  /* ---- free AI: a Cloudflare Worker URL (works for everyone) OR a free Google Gemini key (no server, this device only) ---- */
+  var GKEY = "rfGeminiKey", GMODEL = "rfGeminiModel", DEFAULT_GEMINI = "gemini-2.5-flash";
+  function getGeminiKey() { return toText((root && root.RF_GEMINI_KEY) || getRaw("localStorage", GKEY)).trim(); }
+  function getGeminiModel() { return toText(getRaw("localStorage", GMODEL)).trim() || DEFAULT_GEMINI; }
+  function setGemini(key, model) {
+    setRaw("localStorage", GKEY, toText(key).trim());
+    if (model != null) setRaw("localStorage", GMODEL, toText(model).trim());
+    return getGeminiKey();
+  }
+  /* "worker" | "gemini" | "none" */
+  function aiMode() { return getEndpoint() ? "worker" : (getGeminiKey() ? "gemini" : "none"); }
+
   function endpointProblem() {
-    var ep = getEndpoint();
-    if (ep) return "";
-    return "No AI server is connected. Open Owner Hub → AI Server and paste your Cloudflare Worker URL " +
-      "(example: https://rankforge-ai.<your-name>.workers.dev/api/ai/generate).";
+    if (aiMode() !== "none") return "";
+    return "No free AI is connected yet. Open Owner Hub → AI and either paste a free Google Gemini key (fastest, no server) " +
+      "or your Cloudflare Worker URL.";
+  }
+
+  function parseJSONLoose(text) {
+    if (text && typeof text === "object") return text;
+    var t = toText(text).trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+    try { return JSON.parse(t); } catch (_) {}
+    var a = t.indexOf("{"), b = t.lastIndexOf("}"), c = t.indexOf("["), d = t.lastIndexOf("]");
+    var tries = [];
+    if (a >= 0 && b > a) tries.push(t.slice(a, b + 1));
+    if (c >= 0 && d > c) tries.push(t.slice(c, d + 1));
+    for (var i = 0; i < tries.length; i++) { try { return JSON.parse(tries[i]); } catch (_) {} }
+    throw new Error("The AI did not return valid JSON.");
+  }
+
+  /* one call to Gemini; returns the text of the answer */
+  async function geminiAsk(prompt, opts) {
+    opts = opts || {};
+    var key = getGeminiKey();
+    if (!key) throw new Error("No Gemini key saved. Add it in Owner Hub → AI.");
+    var model = getGeminiModel();
+    var gen = { temperature: opts.temperature != null ? opts.temperature : 0.4 };
+    if (opts.json) gen.responseMimeType = "application/json";
+    var res;
+    try {
+      res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent", {
+        method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: gen })
+      });
+    } catch (e) { throw new Error("Cannot reach Google AI. Check your internet connection."); }
+    var data = null; try { data = await res.json(); } catch (_) {}
+    if (!res.ok) {
+      var msg = (data && data.error && data.error.message) || ("HTTP " + res.status);
+      if (res.status === 429) throw new Error("The free Gemini limit for now is used up. Try again later, or use the offline generator.");
+      if (res.status === 400 || res.status === 403) throw new Error("Gemini rejected the key or request: " + msg);
+      throw new Error("Gemini error: " + msg);
+    }
+    var parts = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
+    var text = parts ? parts.map(function (p) { return p.text || ""; }).join("") : "";
+    if (!text) throw new Error("Gemini returned no answer" + (data && data.promptFeedback && data.promptFeedback.blockReason ? " (blocked: " + data.promptFeedback.blockReason + ")" : "") + ".");
+    return text;
+  }
+
+  function questionPrompt(p, n) {
+    var grounded = !!p.context;
+    return "You are an expert NTA NEET / JEE question setter writing for Indian students.\n" +
+      "Create " + n + " ORIGINAL multiple-choice questions.\n" +
+      "Subject: " + (p.subject || "Mixed") + "\nChapter / topic: " + (p.chapter || p.topic || "Mixed") + "\nDifficulty: " + (p.difficulty || "NEET level") + "\n" +
+      "Rules:\n- exactly 4 options, exactly one correct answer, plausible distractors\n- never use 'all of the above' or 'none of the above'\n- facts must agree with NCERT\n" +
+      "- give a clear explanation of at least 25 characters\n" +
+      (grounded ? "- SOURCE-GROUNDED: use ONLY facts found in SOURCE below. Each question must include sourceQuote (at most 25 words copied exactly from SOURCE).\n\nSOURCE:\n\"\"\"\n" + p.context + "\n\"\"\"\n" : "") +
+      "\nReturn ONLY JSON: {\"questions\":[{\"question\":\"\",\"options\":[\"\",\"\",\"\",\"\"],\"correctIndex\":0,\"explanation\":\"\",\"subject\":\"\",\"chapter\":\"\",\"topic\":\"\",\"difficulty\":\"\"" + (grounded ? ",\"sourceQuote\":\"\"" : "") + "}]}";
   }
 
   function validateAIQuestion(q) {
@@ -382,8 +456,8 @@
 
   async function generateQuestions(cfg) {
     cfg = cfg || {};
-    var ep = getEndpoint();
-    if (!ep) throw new Error(endpointProblem());
+    var mode = aiMode();
+    if (mode === "none") throw new Error(endpointProblem());
 
     var count = Math.max(1, Math.min(Number(cfg.count) || 10, 30));
     var payload = {
@@ -395,32 +469,41 @@
       focus: cfg.focus || cfg.topic || "",
       context: cfg.context || ""
     };
+    var ep = getEndpoint();
 
-    /* The free Workers AI model returns a few questions per call: ask in batches, de-duplicate */
-    var good = [], seen = {}, rejected = 0, lastErr = null, calls = 0;
+    /* The free models return a few questions per call: ask in batches, de-duplicate */
+    var good = [], seen = {}, rejected = 0, lastErr = null, calls = 0, step = mode === "gemini" ? 8 : 6;
     while (good.length < count && calls < 6) {
       calls++;
-      var batch = Object.assign({}, payload, { count: Math.min(count - good.length, 6) });
-      var ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
-      var timer = ctl ? setTimeout(function () { ctl.abort(); }, 90000) : null;
-      var res, data = null;
-      try {
-        res = await fetch(ep, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(batch), signal: ctl ? ctl.signal : undefined });
-      } catch (e) {
+      var batch = Object.assign({}, payload, { count: Math.min(count - good.length, step) });
+      var raw = [];
+      if (mode === "gemini") {
+        try {
+          var txt = await geminiAsk(questionPrompt(batch, batch.count), { json: true });
+          var parsed = parseJSONLoose(txt);
+          raw = Array.isArray(parsed) ? parsed : (parsed && (parsed.questions || parsed.candidates)) || [];
+        } catch (e) { if (good.length) { lastErr = e; break; } throw e; }
+      } else {
+        var ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+        var timer = ctl ? setTimeout(function () { ctl.abort(); }, 90000) : null;
+        var res, data = null;
+        try {
+          res = await fetch(ep, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(batch), signal: ctl ? ctl.signal : undefined });
+        } catch (e) {
+          if (timer) clearTimeout(timer);
+          if (good.length) { lastErr = e; break; }
+          throw new Error("Cannot reach AI server (" + ep + "). Check the URL and that the Worker is deployed. " + (e && e.message ? e.message : ""));
+        }
         if (timer) clearTimeout(timer);
-        if (good.length) { lastErr = e; break; }
-        throw new Error("Cannot reach AI server (" + ep + "). Check the URL and that the Worker is deployed. " + (e && e.message ? e.message : ""));
+        try { data = await res.json(); } catch (_) {}
+        if (!res.ok || (data && data.ok === false)) {
+          var limit = (data && data.code === "AI_LIMIT_REACHED") || res.status === 429;
+          var msg = limit ? "The free AI limit for today is used up. Try again tomorrow, or use the offline generator." : ((data && data.error) || ("AI server returned HTTP " + res.status));
+          if (good.length) { lastErr = new Error(msg); break; }
+          throw new Error(msg);
+        }
+        raw = Array.isArray(data) ? data : (data && (data.questions || data.candidates)) || [];
       }
-      if (timer) clearTimeout(timer);
-      try { data = await res.json(); } catch (_) { /* handled below */ }
-      if (!res.ok || (data && data.ok === false)) {
-        var limit = (data && data.code === "AI_LIMIT_REACHED") || res.status === 429;
-        var msg = limit ? "The free AI limit for today is used up. Try again tomorrow, or use the offline generator."
-          : ((data && data.error) || ("AI server returned HTTP " + res.status));
-        if (good.length) { lastErr = new Error(msg); break; }
-        throw new Error(msg);
-      }
-      var raw = Array.isArray(data) ? data : (data && (data.questions || data.candidates)) || [];
       if (!raw.length) break;
       raw.map(validateAIQuestion).forEach(function (q) {
         if (!q) { rejected++; return; }
@@ -437,7 +520,7 @@
       q.chapter = q.chapter || payload.chapter || undefined;
       q.topic = q.topic || payload.topic || q.chapter || undefined;
     });
-    return { ok: true, questions: good, rejected: rejected, note: lastErr ? String(lastErr.message || lastErr) : "" };
+    return { ok: true, questions: good, rejected: rejected, mode: mode, note: lastErr ? String(lastErr.message || lastErr) : "" };
   }
 
   /* ------------------------------------------------------------------ */
@@ -449,32 +532,38 @@
     ["Biology", "Plant Kingdom", "algae bryophyte pteridophyte gymnosperm angiosperm alternation of generation"],
     ["Biology", "Animal Kingdom", "porifera coelenterata annelida arthropoda mollusca echinodermata chordata notochord"],
     ["Biology", "Morphology of Flowering Plants", "inflorescence root stem leaf phyllotaxy aestivation placentation"],
-    ["Biology", "Anatomy of Flowering Plants", "meristem xylem phloem cambium epidermis vascular bundle"],
+    ["Biology", "Anatomy of Flowering Plants", "meristem xylem phloem cambium epidermis vascular bundle parenchyma sclerenchyma collenchyma tissue secondary growth"],
     ["Biology", "Cell: The Unit of Life", "organelle mitochondria ribosome golgi nucleus endoplasmic reticulum plasma membrane cell wall"],
     ["Biology", "Cell Cycle and Division", "mitosis meiosis prophase metaphase anaphase telophase interphase crossing over"],
     ["Biology", "Biomolecules", "enzyme protein carbohydrate lipid nucleic acid amino acid cofactor substrate"],
-    ["Biology", "Photosynthesis", "chlorophyll calvin cycle light reaction c3 c4 photophosphorylation rubisco"],
+    ["Biology", "Photosynthesis", "chlorophyll calvin cycle light reaction c3 c4 photophosphorylation rubisco photosynthesis thylakoid stroma pigment photosystem"],
     ["Biology", "Respiration in Plants", "glycolysis krebs oxidative phosphorylation fermentation respiratory quotient atp"],
     ["Biology", "Plant Growth and Development", "auxin gibberellin cytokinin abscisic ethylene photoperiodism vernalisation"],
     ["Biology", "Breathing and Exchange of Gases", "alveoli lung haemoglobin spirometry tidal volume respiratory"],
-    ["Biology", "Body Fluids and Circulation", "blood plasma heart ecg cardiac cycle lymph platelet"],
+    ["Biology", "Body Fluids and Circulation", "blood plasma heart ecg cardiac cycle lymph platelet circulation artery vein atrium ventricle erythrocyte leucocyte coagulation"],
     ["Biology", "Excretory Products", "nephron kidney urine glomerular filtration loop of henle dialysis"],
-    ["Biology", "Locomotion and Movement", "muscle sarcomere actin myosin skeleton joint bone"],
-    ["Biology", "Neural Control", "neuron synapse axon reflex brain neurotransmitter action potential"],
+    ["Biology", "Locomotion and Movement", "muscle sarcomere actin myosin skeleton joint bone locomotion vertebra skull ribs pectoral pelvic"],
+    ["Biology", "Neural Control", "neuron synapse axon reflex brain neurotransmitter action potential cerebrum cerebellum medulla hypothalamus eye ear retina cochlea"],
     ["Biology", "Chemical Coordination", "hormone pituitary thyroid insulin adrenal endocrine glucagon"],
     ["Biology", "Reproduction in Organisms", "asexual vegetative budding fission reproduction organisms"],
     ["Biology", "Sexual Reproduction in Flowering Plants", "pollination fertilisation embryo sac endosperm double fertilization pollen"],
-    ["Biology", "Human Reproduction", "gametogenesis spermatogenesis oogenesis menstrual placenta ovary testis"],
+    ["Biology", "Human Reproduction", "gametogenesis spermatogenesis oogenesis menstrual placenta ovary testis uterus embryo fertilisation implantation lactation female male reproductive"],
     ["Biology", "Reproductive Health", "contraceptive amniocentesis sti infertility ivf art"],
     ["Biology", "Principles of Inheritance and Variation", "mendel allele dominant recessive linkage pedigree chromosomal disorder genotype phenotype"],
     ["Biology", "Molecular Basis of Inheritance", "dna replication transcription translation genetic code lac operon rna polymerase"],
-    ["Biology", "Evolution", "darwin natural selection hardy weinberg fossil speciation homologous analogous"],
+    ["Biology", "Evolution", "darwin natural selection hardy weinberg fossil speciation homologous analogous evolution adaptive radiation lamarck miller origin"],
     ["Biology", "Human Health and Disease", "immunity antibody vaccine cancer aids pathogen malaria typhoid"],
     ["Biology", "Microbes in Human Welfare", "biogas sewage fermentation biofertilizer antibiotic yeast lactobacillus"],
     ["Biology", "Biotechnology", "recombinant dna pcr restriction enzyme vector transgenic gene therapy bt cotton"],
     ["Biology", "Organisms and Populations", "population adaptation niche interaction predation mutualism commensalism"],
     ["Biology", "Ecosystem", "trophic level food chain ecological pyramid productivity decomposition nutrient cycling"],
     ["Biology", "Biodiversity and Conservation", "hotspot extinction conservation endemic in situ ex situ iucn"],
+    ["Biology", "Digestion and Absorption", "digestive digestion stomach intestine bile saliva pancreas liver villi enzyme gastric peristalsis absorption duodenum"],
+    ["Biology", "Structural Organisation in Animals", "cockroach earthworm frog epithelial connective tissue tissues cartilage adipose areolar malpighian"],
+    ["Biology", "Mineral Nutrition", "mineral nutrient deficiency nitrogen fixation nodule macronutrient micronutrient essential element chlorosis"],
+    ["Biology", "Transport in Plants", "transpiration stomata osmosis diffusion water potential translocation guttation imbibition plasmolysis"],
+    ["Biology", "Strategies for Enhancement in Food Production", "cattle breeding apiculture poultry tissue culture somatic hybridisation single cell protein biofortification"],
+    ["Biology", "The Living World", "herbarium museum botanical zoological taxonomic specimens keys catalogue suffix scientific names"],
     ["Physics", "Kinematics", "velocity acceleration projectile displacement uniform motion relative velocity"],
     ["Physics", "Laws of Motion", "newton friction inertia momentum tension pulley"],
     ["Physics", "Work, Energy and Power", "kinetic energy potential energy work done power conservative"],
@@ -498,52 +587,53 @@
     ["Chemistry", "p-Block and d-Block", "halogen noble gas transition lanthanoid oxoacid"]
   ];
 
+  function escRe(w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+  /* short tokens (dna, rna, atp...) match as whole words; longer ones as word-prefix (photosynth -> photosynthesis) */
   var TOPIC_INDEX = TOPICS.map(function (t) {
-    return { subject: t[0], topic: t[1], words: t[2].split(/\s+/) };
+    var rx = t[2].split(/\s+/).map(function (w) {
+      return { w: w, re: new RegExp("\\b" + escRe(w) + (w.length >= 5 ? "" : "\\b"), "i"), weight: w.length > 6 ? 2 : 1 };
+    });
+    return { subject: t[0], topic: t[1], words: rx };
   });
+  var KNOWN_SUBJECTS = { biology: "Biology", physics: "Physics", chemistry: "Chemistry" };
+  var GENERIC_TOPIC = /^(unknown|mixed|general|pdf|biology|physics|chemistry|biology test \d+|test \d+|mixed \/ unclassified)$/i;
+
+  function isRealTopic(t) { t = toText(t).trim(); return !!t && !GENERIC_TOPIC.test(t); }
 
   function textOf(q) {
-    return (toText(q.question || q.text || "") + " " + (Array.isArray(q.options) ? q.options.map(function (o) { return o && o.text != null ? o.text : o; }).join(" ") : "") + " " + toText(q.explanation)).toLowerCase();
+    return toText(q.question || q.text || q.questionText || "") + " " +
+      (Array.isArray(q.options) ? q.options.map(function (o) { return o && o.text != null ? o.text : o; }).join(" ") : "") + " " + toText(q.explanation);
   }
 
   function inferTopic(q) {
     q = q || {};
-    var have = {
-      subject: toText(q.subject || q.section).trim(),
-      topic: toText(q.topic || q.chapter || q.unit || q.subtopic || q.concept || q.chapterName).trim()
-    };
-    if (have.topic && !/^unknown$/i.test(have.topic) && have.subject && !/^unknown$/i.test(have.subject)) {
-      return { subject: have.subject, topic: have.topic, inferred: false };
-    }
-    var hay = " " + textOf(q) + " ";
+    var subj = toText(q.subject || q.section).trim();
+    var subjKey = KNOWN_SUBJECTS[subj.toLowerCase()] || "";
+    var topic = toText(q.topic || q.chapter || q.unit || q.subtopic || q.concept || q.chapterName).trim();
+    var haveSubject = subjKey || (subj && !/^unknown$|^general$/i.test(subj) ? subj : "");
+    if (isRealTopic(topic) && haveSubject) return { subject: haveSubject, topic: topic, inferred: false };
+
+    var hay = textOf(q);
     var best = null, bestScore = 0;
     TOPIC_INDEX.forEach(function (t) {
+      if (subjKey && t.subject !== subjKey) return;       /* stay inside the known subject */
       var score = 0;
-      t.words.forEach(function (w) { if (hay.indexOf(" " + w) >= 0 || hay.indexOf(w + " ") >= 0) score += w.length > 6 ? 2 : 1; });
+      t.words.forEach(function (x) { if (x.re.test(hay)) score += x.weight; });
       if (score > bestScore) { bestScore = score; best = t; }
     });
-    var hint = toText(q.pageTitle || q.title || q.bookTitle).trim();
-    if (best && bestScore >= 2) {
-      return {
-        subject: have.subject && !/^unknown$/i.test(have.subject) ? have.subject : best.subject,
-        topic: have.topic && !/^unknown$/i.test(have.topic) ? have.topic : best.topic,
-        inferred: true
-      };
-    }
-    return {
-      subject: have.subject && !/^unknown$/i.test(have.subject) ? have.subject : "General",
-      topic: have.topic && !/^unknown$/i.test(have.topic) ? have.topic : (hint || "Mixed / Unclassified"),
-      inferred: true
-    };
+    var hint = toText(q.pageTitle || q.bookTitle).trim();
+    var outSubject = haveSubject || (best && bestScore >= 2 ? best.subject : "General");
+    var outTopic = isRealTopic(topic) ? topic : (best && bestScore >= 2 ? best.topic : (isRealTopic(hint) ? hint : "Mixed / Unclassified"));
+    return { subject: outSubject, topic: outTopic, inferred: true };
   }
 
   function enrichQuestions(list) {
     return (list || []).map(function (q) {
       if (!q || typeof q !== "object") return q;
       var t = inferTopic(q);
-      if (!q.subject || /^unknown$/i.test(q.subject)) q.subject = t.subject;
-      if (!q.topic || /^unknown$/i.test(q.topic)) q.topic = t.topic;
-      if (!q.chapter || /^unknown$/i.test(q.chapter)) q.chapter = q.topic;
+      if (!q.subject || /^unknown$|^general$/i.test(q.subject)) q.subject = t.subject;
+      if (!isRealTopic(q.topic)) q.topic = t.topic;
+      if (!isRealTopic(q.chapter)) q.chapter = q.topic;
       return q;
     });
   }
@@ -592,6 +682,50 @@
     }, true);
   }
 
+  /* Every launcher (DPP, V2 bridge, adaptive, practice, unified ranker...) stores its test under an
+     "active" key and then opens plain cbt.html. Stamp that moment so cbt.html knows it was a hand-off. */
+  var ACTIVE_KEY_RX = /^(CBT_ACTIVE_TEST|CBT_ACTIVE_QUESTIONS|rankforge[A-Za-z]*Active[A-Za-z0-9]*|rankforgeActiveEngineTestV2)$/;
+  function hookActiveWrites() {
+    if (!isBrowser || /\/cbt\.html$/i.test(location.pathname) || window.__rfHooked) return;
+    window.__rfHooked = true;
+    var orig = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (k, v) {
+      orig.call(this, k, v);
+      try {
+        if (!ACTIVE_KEY_RX.test(k)) return;
+        var data = JSON.parse(v);
+        var list = Array.isArray(data) ? data : (data && data.questions);
+        var tag = toText(data && (data.sourceType || data.source || data.mode));
+        if (!Array.isArray(list) || !list.length || BIOLOGY_TAGS.test(tag.trim())) return;
+        orig.call(sessionStorage, "RF_HANDOFF_TS", String(Date.now()));
+        orig.call(sessionStorage, "RF_HANDOFF_KEY", k);
+        orig.call(sessionStorage, "RF_HANDOFF_STORE", this === window.localStorage ? "local" : "session");
+        sessionStorage.removeItem("RF_HANDOFF_CONSUMED");
+      } catch (_) { /* never break the app */ }
+    };
+  }
+
+  /* lazy Biology pool (1.6 MB) so DPP / adaptive tools work without a manual import */
+  var biologyPoolPromise = null;
+  function loadBiologyPool() {
+    if (!isBrowser) return Promise.resolve([]);
+    if (window.__RF_BIO_POOL) return Promise.resolve(window.__RF_BIO_POOL);
+    if (!biologyPoolPromise) {
+      biologyPoolPromise = fetch("./rank-booster/biology-test-series-2699.json", { cache: "force-cache" })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var raw = Array.isArray(d) ? d : (d && (d.questions || d.tests && [].concat.apply([], d.tests.map(function (t) { return t.questions || []; })))) || [];
+          var list = normalizeList(raw).filter(function (q) { return q.correctIndex >= 0; });
+          list.forEach(function (q) { if (!q.subject) q.subject = "Biology"; });
+          enrichQuestions(list);
+          window.__RF_BIO_POOL = list;
+          return list;
+        })
+        .catch(function () { biologyPoolPromise = null; return []; });
+    }
+    return biologyPoolPromise;
+  }
+
   function installProvider() {
     if (!isBrowser) return;
     var api = window.RankForgeAI = window.RankForgeAI || {};
@@ -621,6 +755,8 @@
       var json = JSON.stringify(t);
       localStorage.setItem("CBT_ACTIVE_TEST", json);
       sessionStorage.setItem("CBT_ACTIVE_TEST", json);
+      /* keep the three keys in step, otherwise a stale list from an earlier test is picked up under the new name */
+      sessionStorage.setItem("CBT_ACTIVE_QUESTIONS", JSON.stringify(Array.isArray(t.questions) ? t.questions : []));
       sessionStorage.setItem("CBT_ACTIVE_SOURCE", source.toUpperCase());
       sessionStorage.setItem("RF_HANDOFF_TS", String(Date.now()));
       sessionStorage.removeItem("RF_HANDOFF_CONSUMED");
@@ -630,7 +766,6 @@
 
   var API = {
     version: VERSION,
-    handoff: handoff,
     normalizeAny: normalizeAny,
     normalizeList: normalizeList,
     chooseSource: chooseSource,
@@ -642,10 +777,13 @@
     getEndpoint: getEndpoint,
     setEndpoint: setEndpoint,
     endpointProblem: endpointProblem,
+    aiMode: aiMode, setGemini: setGemini, getGeminiKey: getGeminiKey, getGeminiModel: getGeminiModel, geminiAsk: geminiAsk, parseJSONLoose: parseJSONLoose,
     generateQuestions: generateQuestions,
     inferTopic: inferTopic,
     enrichQuestions: enrichQuestions,
-    injectCSS: injectCSS
+    injectCSS: injectCSS,
+    loadBiologyPool: loadBiologyPool,
+    handoff: handoff
   };
 
   if (isBrowser) {
@@ -655,6 +793,7 @@
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", hideDebugPanels);
     } else { hideDebugPanels(); }
+    hookActiveWrites();
     stampHandoffOnLeave();
   }
   if (typeof module !== "undefined" && module.exports) module.exports = API;

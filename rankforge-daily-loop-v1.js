@@ -146,7 +146,7 @@ function start(){
       window.RankForgeAdaptiveDPPV1 &&
       typeof window.RankForgeAdaptiveDPPV1.start==="function"
     ){
-      window.RankForgeAdaptiveDPPV1.start(
+      (window.RankForgeAdaptiveDPPV1.launch || window.RankForgeAdaptiveDPPV1.start)(
         state.action.size,
         state.action.difficulty,
         state.action.topic
@@ -530,10 +530,9 @@ cursor:pointer;
 
   target.insertBefore(panel,target.firstChild);
 
-  const start=document.getElementById("rdlStart");
-
-  if(start){
-    start.addEventListener("click",start);
+  const startBtn=document.getElementById("rdlStart");
+  if(startBtn){
+    startBtn.addEventListener("click",function(){ start(); });
   }
 
   const refreshButton=document.getElementById("rdlRefresh");

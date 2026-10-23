@@ -1,196 +1,376 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="../rankforge-core-v1.js"></script>
-
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080d19">
-<title>Study Vault — RankForge AI</title>
-<link rel="stylesheet" href="./study-vault.css">
+<title>RankForge AI — Learn · Practise · Test · Master</title>
+<meta name="description" content="RankForge AI: NEET preparation with NCERT-first learning, CBT tests, mistake mastery and analytics.">
+<meta name="theme-color" content="#0b0a1f">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./rankforge-icon-192.png?v=4">
+<link rel="apple-touch-icon" href="./rankforge-icon-192.png?v=4">
+<script src="./rf-fixpack-v1.js"></script>
+<script src="./rankforge-core-v1.js"></script>
+<script src="./owner-imports/rankforge-owner-access.js"></script>
+<script src="./owner-imports/rankforge-student-source-guard.js"></script>
+<script src="./owner-imports/rankforge-practice-source-policy.js"></script>
+<style>
+:root{
+  --bg:#0b0a1f;--bg2:#12102e;--card:rgba(255,255,255,.055);--line:rgba(255,255,255,.11);
+  --tx:#f4f3ff;--mu:#a9a6c9;--ac:#7c5cff;--ac2:#22d3ee;--ok:#34d399;--bad:#fb7185;--warn:#fbbf24;
+  --r:20px;--nav:68px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--tx);font:15px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:radial-gradient(900px 500px at 85% -10%,rgba(124,92,255,.28),transparent 60%),radial-gradient(700px 420px at -10% 10%,rgba(34,211,238,.14),transparent 60%),var(--bg);
+  padding:env(safe-area-inset-top) 0 0}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--ac2);outline-offset:2px}
+.app{max-width:760px;margin:0 auto;padding:14px 14px calc(var(--nav) + 28px + env(safe-area-inset-bottom))}
+.page{display:none;animation:in .25s ease}.page.active{display:block}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;font-weight:800;box-shadow:0 6px 22px rgba(124,92,255,.45)}
+.brand h1{margin:0;font-size:18px;letter-spacing:.2px}
+.brand p{margin:0;font-size:9.5px;letter-spacing:1.3px;color:var(--mu);white-space:nowrap}
+.chips{display:flex;align-items:center;gap:8px}
+.exam{white-space:nowrap;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:12.5px;font-weight:600}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#5b3df5,#9b6bff);font-weight:700;font-size:13px;border:2px solid rgba(255,255,255,.2)}
+
+.glass{background:var(--card);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.hero{padding:18px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,rgba(124,92,255,.28),rgba(34,211,238,.08));border:1px solid rgba(124,92,255,.45);border-radius:24px;box-shadow:0 14px 40px rgba(60,30,160,.35)}
+.hero small{color:var(--mu);font-size:12px}
+.hero h2{margin:2px 0 4px;font-size:25px;line-height:1.15;word-break:break-word}
+.hero p{margin:0 0 12px;color:var(--mu);font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;background:linear-gradient(135deg,var(--ac),#5a3df0);font-weight:600;font-size:13.5px;box-shadow:0 6px 18px rgba(124,92,255,.5)}
+.ring{width:112px;height:112px;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .tr{stroke:rgba(255,255,255,.12)}.ring .pg{stroke:url(#g);stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.ring b{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-size:24px;line-height:1.05}
+.ring b span{font-size:10.5px;color:var(--mu);font-weight:500}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+.stat{padding:13px 14px}
+.stat small{color:var(--mu);font-size:12px;display:block}
+.stat b{font-size:22px;display:block;margin-top:2px}
+.bar{height:6px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:9px;transition:width .6s ease}
+
+h3.sec{margin:20px 2px 10px;font-size:16px}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{position:relative;padding:15px 14px;border-radius:18px;min-height:112px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;border:1px solid var(--line);transition:transform .15s}
+.tile:active{transform:scale(.97)}
+.tile .ic{font-size:26px;margin-bottom:auto;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4))}
+.tile strong{font-size:14.5px}.tile span{font-size:11.5px;color:rgba(255,255,255,.72)}
+.c-blue{background:linear-gradient(145deg,#1d4ed8,#0b2a6b)}.c-green{background:linear-gradient(145deg,#059669,#064e3b)}
+.c-purple{background:linear-gradient(145deg,#7c3aed,#3b1a7a)}.c-amber{background:linear-gradient(145deg,#d97706,#6b3a05)}
+.c-pink{background:linear-gradient(145deg,#db2777,#6b1240)}.c-teal{background:linear-gradient(145deg,#0d9488,#0b3f45)}
+.c-lime{background:linear-gradient(145deg,#16a34a,#14532d)}.c-indigo{background:linear-gradient(145deg,#6d28d9,#2a1668)}
+
+.list{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:13px;padding:14px;border-radius:18px}
+.row .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;flex:none}
+.row div{min-width:0;flex:1}.row strong{display:block;font-size:15px}.row div span{font-size:12.5px;color:var(--mu)}
+.row::after{content:"›";color:var(--mu);font-size:22px}
+.tabhead{padding:6px 2px 14px}.tabhead small{color:var(--ac2);letter-spacing:1.6px;font-size:11px;font-weight:700}
+.tabhead h2{margin:2px 0;font-size:26px}.tabhead p{margin:0;color:var(--mu);font-size:13.5px}
+
+.two{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:560px){.two{grid-template-columns:1fr 1fr}.grid{grid-template-columns:repeat(4,1fr)}.stats{grid-template-columns:repeat(4,1fr)}}
+.card{padding:15px}.card h4{margin:0 0 4px;font-size:15px}.card p{margin:0 0 12px;color:var(--mu);font-size:13px}
+.btn{display:block;width:100%;text-align:center;padding:12px;border-radius:14px;background:linear-gradient(135deg,var(--ac),#5a3df0);font-weight:600}
+.btn.ghost{background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.act{display:flex;gap:11px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.act:first-child{border-top:0}.act i{width:34px;height:34px;border-radius:10px;background:rgba(124,92,255,.25);display:grid;place-items:center;font-style:normal;flex:none}
+.act div{flex:1;min-width:0}.act b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.act small{color:var(--mu);font-size:11.5px}
+.empty{color:var(--mu);font-size:13px;padding:6px 0}
+.quote{text-align:center;padding:18px;border-color:rgba(251,191,36,.35);background:linear-gradient(160deg,rgba(251,191,36,.12),rgba(255,255,255,.03))}
+.quote b{display:block;font-size:19px;color:var(--warn)}.quote span{color:var(--mu);font-size:13px}
+.foot{text-align:center;color:var(--mu);font-size:11.5px;margin:22px 0 4px}
+.foot a{color:var(--ac2)}
+
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(560px,calc(100% - 20px));height:var(--nav);
+  display:grid;grid-template-columns:repeat(6,1fr);padding:6px;border-radius:24px;background:rgba(18,16,46,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);box-shadow:0 12px 34px rgba(0,0,0,.5);z-index:20}
+.nav button,.nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:18px;color:var(--mu);font-size:10.5px;font-weight:600;padding:0 1px;white-space:nowrap}
+.nav a{min-width:0}
+.nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:#fff;background:linear-gradient(135deg,rgba(124,92,255,.5),rgba(34,211,238,.18))}
+
+.sheet{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(3,2,15,.65);z-index:40}
+.sheet.open{display:flex}
+.sheet>div{width:min(560px,100%);background:var(--bg2);border:1px solid var(--line);border-radius:24px 24px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom))}
+.sheet h4{margin:0 0 4px;font-size:18px}.sheet p{margin:0 0 16px;color:var(--mu);font-size:13px}
+.step{display:flex;align-items:center;justify-content:center;gap:22px;margin-bottom:16px}
+.step button{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.1);font-size:24px}
+.step output{font-size:34px;font-weight:800;min-width:90px;text-align:center}
+input.txt{width:100%;padding:13px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--tx);font:inherit;margin-bottom:14px}
+</style>
+<link rel="stylesheet" href="./rf-theme.css">
+<script src="./rf-shell.js"></script>
 </head>
 <body>
-
 <main class="app">
 
 <header class="top">
-  <div>
-    <a href="../index.html" class="back">← RankForge</a>
-    <h1>📚 Study Vault</h1>
-    <p>Your personal NEET knowledge base</p>
+  <div class="brand">
+    <div class="logo" aria-hidden="true">RF</div>
+    <div><h1>RankForge AI</h1><p>LEARN · PRACTISE · RISE</p></div>
   </div>
-  <button id="quickSave" class="primary">＋ Quick Save</button>
+  <div class="chips">
+    <span class="exam">🎯 NEET 2026</span>
+    <button class="avatar" id="avatar" aria-label="Edit your name">S</button>
+  </div>
 </header>
 
-<section class="vaultNavigation" id="vaultNavigationHint">
-<div>
-<strong>🧭 Direct Navigation</strong>
-<small>Subject → Class → Chapter → Material. Your current chapter stays selected after refresh.</small>
-</div>
-</section>
-
-<section class="search">
-  <input id="search" placeholder="Search questions, notes, formulas, traps...">
-  <button id="clearSearch">×</button>
-</section>
-
-<section class="stats" id="stats"></section>
-
-<section class="quickGrid">
-  <button data-filter="pinned">📌<b>Top Picks</b><small>Pinned material</small></button>
-<button data-filter="gallery">🖼️<b>Gallery</b><small>Saved screenshots</small></button>
-<button data-filter="important">⭐<b>Important</b><small>Top material</small></button>
-  <button data-filter="revision">🔄<b>Revision</b><small>Due today</small></button>
-  <button data-filter="inbox">📥<b>Quick Inbox</b><small>Unsorted</small></button>
-  <button data-filter="archive">🗃️<b>Archive</b><small>Stored safely</small></button>
-</section>
-
-<section>
-<h2>Subjects</h2>
-<div class="subjects">
-<button data-subject="Physics">⚡<b>Physics</b><small>Chapters & materials</small></button>
-<button data-subject="Chemistry">🧪<b>Chemistry</b><small>Chapters & materials</small></button>
-<button data-subject="Biology">🧬<b>Biology</b><small>Chapters & materials</small></button>
-</div>
-</section>
-
-<section class="panel">
-<div class="panelHead">
-<h2>📊 Study Vault Dashboard</h2>
-<span class="meta">Live local summary</span>
-</div>
-<div id="vaultDashboard" class="vaultDashboard">
-<div class="vaultDashItem"><b>0</b><small>Due Revision</small></div>
-<div class="vaultDashItem"><b>0</b><small>Pinned</small></div>
-<div class="vaultDashItem"><b>0</b><small>Images</small></div>
-<div class="vaultDashItem"><b>0</b><small>Linked</small></div>
-</div>
-</section>
-
-<section class="panel chapterBrowser" id="chapterBrowser">
-<div class="panelHead">
-  <div>
-    <h2 id="chapterBrowserTitle">📚 NCERT Chapter Library</h2>
-    <div class="meta">Subject → Class → Chapter → saved study material</div>
+<section id="home" class="page active" aria-label="Home">
+  <div class="hero">
+    <div>
+      <small id="greet">Good day,</small>
+      <h2 id="uname">Student!</h2>
+      <p>Your Rank. Our Mission.</p>
+      <a class="pill" href="rankers-test-series.html">👑 Start today's test</a>
+    </div>
+    <div class="ring" role="img" aria-label="Overall accuracy">
+      <svg viewBox="0 0 120 120"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#7c5cff"/></linearGradient></defs>
+        <circle class="tr" cx="60" cy="60" r="52" fill="none" stroke-width="10"/>
+        <circle class="pg" id="ringPg" cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg>
+      <b><i id="ringTx" style="font-style:normal">0%</i><span>Overall<br>Accuracy</span></b>
+    </div>
   </div>
-  <button id="chapterBack" class="secondary" hidden>← Back</button>
-</div>
-<div id="chapterBrowserContent"></div>
+
+  <div class="stats">
+    <div class="glass stat"><small>🏆 Daily Target</small><b><i id="dtDone" style="font-style:normal">0</i> / <i id="dtGoal" style="font-style:normal">30</i></b><div class="bar"><i id="dtBar"></i></div></div>
+    <div class="glass stat"><small>✅ Tests Taken</small><b id="sTests">0</b></div>
+    <div class="glass stat"><small>⚡ Last Score</small><b id="sLast">—</b></div>
+    <div class="glass stat"><small>❌ Mistakes</small><b id="sMist">0</b></div>
+  </div>
+
+  <h3 class="sec">🔥 Quick Access</h3>
+  <div class="grid" id="quick"></div>
+
+  <div class="two" style="margin-top:14px">
+    <div class="glass card">
+      <h4>🧠 Mistake Book</h4><p id="mistTxt">Learn from your mistakes and turn them into marks.</p>
+      <a class="btn" href="mistake.html">View Mistakes →</a>
+    </div>
+    <div class="glass card">
+      <h4>📅 Study Planner · Today</h4><p id="planTxt">Set a daily question target to stay on track.</p>
+      <button class="btn" id="setTarget">Set Daily Target</button>
+    </div>
+  </div>
+
+  <div class="glass card" style="margin-top:10px">
+    <h4>🕘 Recent Activity</h4>
+    <div id="recent"></div>
+    <a class="btn ghost" href="history.html" style="margin-top:10px">View All</a>
+  </div>
+
+  <div class="glass quote" style="margin-top:10px"><b>Dream Big · Study Smart</b><span>"Discipline today, dream tomorrow."</span></div>
+
+  <h3 class="sec">🛠 Tools &amp; Security</h3>
+  <div class="list" id="tools">
+    <a class="glass row" href="nichod-hub.html"><span class="ic c-purple">🧠</span><div><strong>NICHOD Hub</strong><span>Pattern, concept, mistake and mastery intelligence</span></div></a>
+    <a class="glass row" href="study-vault/"><span class="ic c-blue">📚</span><div><strong>Study Vault</strong><span>Notes, screenshots, PDFs and important questions</span></div></a>
+    <a class="glass row" href="rankforge-system-check.html"><span class="ic c-green">✅</span><div><strong>System Check</strong><span>One-tap health check of data, banks and pages</span></div></a>
+    <a class="glass row" href="privacy.html"><span class="ic c-teal">🛡️</span><div><strong>Privacy</strong><span>Your study data stays under your control</span></div></a>
+    <a class="glass row" href="security.html"><span class="ic c-green">🔐</span><div><strong>Security</strong><span>How local data and protected modules are handled</span></div></a>
+    <a class="glass row" data-owner-only href="rankforge-owner-ai.html"><span class="ic c-pink">🧰</span><div><strong>Owner AI Guardian</strong><span>Diagnostics, verified repair and evidence</span></div></a>
+    <a class="glass row" data-owner-access-entry href="owner-access.html"><span class="ic c-indigo">🔑</span><div><strong>Owner Access</strong><span>Private module management</span></div></a>
+    <a class="glass row" data-owner-only href="owner-source.html"><span class="ic c-amber">🗂️</span><div><strong>Private Source Hub</strong><span>Owner-only module ingestion</span></div></a>
+  </div>
+  <p class="foot">RankForge AI · Student-first · Local/offline-first · <a href="privacy.html">Privacy</a></p>
 </section>
 
-<section class="panel">
-<div class="panelHead">
-<h2 id="listTitle">Recently Added</h2>
-<div>
-<button id="backup">💾 Backup</button>
-<label class="restore">Restore<input id="restore" type="file" accept=".json"></label>
-</div>
-</div>
-<div id="materials"></div>
-</section>
-
-<section class="panel">
-<div class="panelHead">
-<h2>🖼️ Screenshot Gallery</h2>
-<span class="meta">Saved image materials</span>
-</div>
-<div id="vaultGallery" class="vaultGallery"></div>
-</section>
-
-<section class="panel">
-<h2>🧩 Collections</h2>
-<div id="collections" class="collections"></div>
-<button id="newCollection" class="secondary">＋ New Collection</button>
-</section>
-
+<section id="learn" class="page" aria-label="Learn"></section>
+<section id="practice" class="page" aria-label="Practice"></section>
+<section id="tests" class="page" aria-label="Tests"></section>
+<section id="progress" class="page" aria-label="Progress"></section>
 </main>
 
-<dialog id="dialog">
-<form id="materialForm">
-<div class="dialogTop">
-<h2>Save Material</h2>
-<button type="button" id="closeDialog">×</button>
+<nav class="nav" aria-label="Main">
+  <button data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+  <button data-tab="learn"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h6v18H5a2 2 0 0 1-2-2zM21 5a2 2 0 0 0-2-2h-6v18h6a2 2 0 0 0 2-2z"/></svg>Learn</button>
+  <button data-tab="practice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>Practice</button>
+  <button data-tab="tests"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11h6M9 15h6"/></svg>Tests</button>
+  <button data-tab="progress"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Progress</button>
+  <a href="notebook-studio.html" aria-label="RankForge Nexus"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>Nexus</a>
+</nav>
+
+<div class="sheet" id="targetSheet" role="dialog" aria-modal="true" aria-labelledby="tTitle">
+  <div>
+    <h4 id="tTitle">Daily question target</h4><p>How many questions will you solve each day?</p>
+    <div class="step"><button id="tMinus" aria-label="Decrease">−</button><output id="tVal">30</output><button id="tPlus" aria-label="Increase">+</button></div>
+    <button class="btn" id="tSave">Save target</button>
+    <button class="btn ghost" id="tCancel" style="margin-top:8px">Cancel</button>
+  </div>
+</div>
+<div class="sheet" id="nameSheet" role="dialog" aria-modal="true" aria-labelledby="nTitle">
+  <div>
+    <h4 id="nTitle">Your name</h4><p>Shown in your greeting. Stored only on this device.</p>
+    <input class="txt" id="nIn" maxlength="30" autocomplete="given-name" placeholder="Enter your name">
+    <button class="btn" id="nSave">Save</button>
+    <button class="btn ghost" id="nCancel" style="margin-top:8px">Cancel</button>
+  </div>
 </div>
 
-<label>Title
-<input id="title" required placeholder="e.g. Projectile motion trap">
-</label>
+<script src="./rankforge-canonical-v1.js"></script>
+<script src="./rankforge-v318-stability-v1.js"></script>
+<script src="./rankforge-universal-source-fabric-v1.js"></script>
+<script>
+(function(){
+"use strict";
 
-<div class="two">
-<label>Subject
-<select id="subject">
-<option value="Inbox">📥 Inbox</option>
-<option>Physics</option>
-<option>Chemistry</option>
-<option>Biology</option>
-</select>
-</label>
+/* single source of truth for every destination */
+var NAV = {
+  learn:{k:"LEARN",t:"Build the base.",d:"NCERT-first learning and smart revision.",items:[
+    ["📚","Smart Revision","Focused revision workflow","ranker-revision/index.html","c-blue"],
+    ["🧠","Rank Booster Bank","High-value NEET practice questions","question-bank.html","c-green"],
+    ["🎓","AI Lectures","NCERT-first lectures, AI explanation and practice","rankforge-lecture-module/pages/lectures.html","c-purple"],
+    ["🧬","Biology 360°","Every concept connected, with active recall","biology360/index.html","c-teal"],
+    ["🗂️","Study Vault","Notes, screenshots and PDFs in one place","study-vault/","c-indigo"]]},
+  practice:{k:"PRACTICE",t:"Build concepts. Improve accuracy.",d:"Targeted practice that fixes what you get wrong.",items:[
+    ["🎯","Subject Practice","Biology · Physics · Chemistry · Mixed PCB","subject-practice.html","c-purple"],
+    ["🔥","Stable CBT Practice","7,196 verified Biology questions","rankforge-stable-practice.html","c-amber"],
+    ["🧬","Biology Universe","Protected NCERT-first Biology practice","biology-7196-cbt.html","c-green"],
+    ["🎯","Adaptive DPP","Performance-based deliberate practice","ranker-command-center.html","c-purple"],
+    ["✨","AI Practice","AI-generated questions with explanations","ai-question-lab.html","c-pink"],
+    ["🧪","AI Test Generator","Build a test from your weak topics","ai-test-generator.html","c-blue"],
+    ["🔁","Retry Mistakes","Re-attempt questions you got wrong","retry.html","c-teal"],
+    ["🏷️","Tag Based Questions","Drill by question type: statement, matching, A-R and more","tag-practice.html","c-pink"]]},
+  tests:{k:"TESTS",t:"Attempt. Analyse. Improve.",d:"Real exam-style CBT with full analysis.",items:[
+    ["🏆","Ranker Test Series","Pre-test → CBT → post-test analysis","rankers-test-series.html","c-amber"],
+    ["⏱️","CBT","Computer-based testing","cbt.html","c-blue"],
+    ["📄","PDF → CBT","Turn your own PDF into a timed test","pdf-to-cbt.html","c-pink"],
+    ["🔍","Test Analysis","Question-by-question review of a test","orbit-test-analysis.html","c-purple"]]},
+  progress:{k:"PROGRESS",t:"See how far you've come.",d:"Accuracy, speed, weak areas and mastery.",items:[
+    ["🕘","Test History","Review previous attempts","history.html","c-blue"],
+    ["📈","Performance","Accuracy, speed and gaps","analysis.html","c-green"],
+    ["🔧","Mastery","Mistakes, retries and mastered concepts","mistake.html","c-purple"],
+    ["✅","Mastered","Concepts you have locked in","mastered.html","c-teal"]]}
+};
+var QUICK = [
+  ["📖","Learn","NCERT First Study","ranker-revision/index.html","c-blue"],
+  ["🧠","Question Bank","Topic-wise Practice","question-bank.html","c-green"],
+  ["✨","AI Practice","Generate & Solve","ai-question-lab.html","c-purple"],
+  ["📋","CBT","Start Test Now","cbt.html","c-amber"],
+  ["📄","PDF → CBT","Import & Attempt","pdf-to-cbt.html","c-pink"],
+  ["🚀","720 Approach","Score Gap Strategy","ranker-command-center.html#720","c-teal"],
+  ["🎯","Ranker Series","Full-Length Tests","rankers-test-series.html","c-lime"],
+  ["📊","Analysis","Track & Improve","analysis.html","c-indigo"]
+];
 
-<label>Type
-<select id="type">
-<option value="question">⭐ Important Question</option>
-<option value="screenshot">📸 Screenshot / Photo</option>
-<option value="ncert">📖 NCERT Point</option>
-<option value="pdf">📄 PDF / Document</option>
-<option value="note">📝 Note</option>
-<option value="trap">⚠️ Trap / Exception</option>
-<option value="formula">📐 Formula / Shortcut</option>
-<option value="mistake">❌ Mistake</option>
-<option value="reference">🔗 Reference</option>
-</select>
-</label>
-</div>
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function tile(x){return '<a class="tile '+x[4]+'" href="'+x[3]+'"><span class="ic">'+x[0]+'</span><strong>'+esc(x[1])+'</strong><span>'+esc(x[2])+'</span></a>'}
+function row(x){return '<a class="glass row" href="'+x[3]+'"><span class="ic '+x[4]+'">'+x[0]+'</span><div><strong>'+esc(x[1])+'</strong><span>'+esc(x[2])+'</span></div></a>'}
 
-<label>Chapter
-<select id="chapter"></select>
-</label>
+document.getElementById("quick").innerHTML = QUICK.map(tile).join("");
+Object.keys(NAV).forEach(function(id){
+  var n=NAV[id];
+  document.getElementById(id).innerHTML =
+    '<div class="tabhead"><small>'+n.k+'</small><h2>'+esc(n.t)+'</h2><p>'+esc(n.d)+'</p></div><div class="list">'+n.items.map(row).join("")+'</div>';
+});
 
-<label>Topic
-<input id="topic" placeholder="e.g. Projectile Motion">
-</label>
+/* safe storage helpers */
+function read(key,fb){try{var v=JSON.parse(localStorage.getItem(key));return v==null?fb:v}catch(e){return fb}}
+function write(key,val){try{localStorage.setItem(key,JSON.stringify(val));return true}catch(e){return false}}
+function list(key){var v=read(key,[]);return Array.isArray(v)?v:[]}
+var PREMIUM_KEY="rankforgePremiumStateV1", NAME_KEY="rankforgeProfileNameV1";
 
-<label>Tags
-<input id="tags" placeholder="kinematics, formula, trap">
-</label>
+/* real data */
+function ts(a){var d=a&&(a.submittedAt||a.date);var t=d?new Date(d).getTime():NaN;return isNaN(t)?0:t}
+function pct(a){var n=Number(a.questionCount)||0;return n?Math.round((Number(a.correct)||0)/n*100):0}
+function ago(t){if(!t)return"";var m=Math.round((Date.now()-t)/60000);if(m<1)return"just now";if(m<60)return m+" min ago";var h=Math.round(m/60);if(h<24)return h+" h ago";return Math.round(h/24)+" d ago"}
 
-<div class="two">
-<label>Priority
-<select id="priority">
-<option value="high">⭐ High</option>
-<option value="normal" selected>Normal</option>
-<option value="low">Low</option>
-</select>
-</label>
+function render(){
+  var hist=list("cbtHistory").filter(function(a){return a&&typeof a==="object"&&Number(a.questionCount)>0}).sort(function(a,b){return ts(a)-ts(b)});
+  var tests=hist.length, last=tests?pct(hist[tests-1]):null;
+  var qs=0,ok=0; hist.forEach(function(a){qs+=Number(a.questionCount)||0;ok+=Number(a.correct)||0});
+  var acc=qs?Math.round(ok/qs*100):0;
+  var mist=(window.RFData?RFData.active().length:list("rankforgeMistakesV1").filter(function(m){return m&&m.status!=="mastered"}).length);
+  var start=new Date();start.setHours(0,0,0,0);
+  var today=0; hist.forEach(function(a){if(ts(a)>=start.getTime())today+=Number(a.questionCount)||0});
+  var prem=read(PREMIUM_KEY,{}), goal=Math.max(1,Number(prem.dailyTarget)||30);
 
-<label>Revision
-<select id="revision">
-<option value="new">New</option>
-<option value="learning">Learning</option>
-<option value="revising">Revising</option>
-<option value="strong">Strong</option>
-</select>
-</label>
-</div>
+  document.getElementById("sTests").textContent=tests;
+  document.getElementById("sLast").textContent=last==null?"—":last+"%";
+  document.getElementById("sMist").textContent=mist;
+  document.getElementById("dtDone").textContent=today;
+  document.getElementById("dtGoal").textContent=goal;
+  document.getElementById("dtBar").style.width=Math.min(100,Math.round(today/goal*100))+"%";
+  document.getElementById("ringTx").textContent=acc+"%";
+  document.getElementById("ringPg").style.strokeDashoffset=(326.7*(1-acc/100)).toFixed(1);
+  document.getElementById("mistTxt").textContent=mist?("You have "+mist+" active mistake"+(mist>1?"s":"")+" to fix. Retry them to lock in marks."):"No active mistakes yet. Take a test and they will appear here.";
+  document.getElementById("planTxt").textContent=today>=goal?"Target reached today. Great discipline!":(goal-today)+" more question"+(goal-today>1?"s":"")+" to hit today's target of "+goal+".";
 
-<label>What to remember?
-<textarea id="body" rows="5"></textarea>
-</label>
+  var rec=hist.slice(-3).reverse();
+  document.getElementById("recent").innerHTML = rec.length
+    ? rec.map(function(a){return '<div class="act"><i>📝</i><div><b>'+esc(a.title||"Test")+'</b><small>'+pct(a)+'% · '+(Number(a.correct)||0)+'/'+(Number(a.questionCount)||0)+' correct</small></div><small>'+ago(ts(a))+'</small></div>'}).join("")
+    : '<div class="empty">No activity yet. Start your first test and your progress will show up here.</div>';
 
-<label>Why I saved this?
-<input id="why" placeholder="Repeated mistake / important NCERT line / trap...">
-</label>
+  var name=read(NAME_KEY,"");
+  var h=new Date().getHours(), g=h<5?"Good night,":h<12?"Good morning,":h<17?"Good afternoon,":"Good evening,";
+  document.getElementById("greet").textContent=g;
+  document.getElementById("uname").textContent=(name||"Student")+"!";
+  document.getElementById("avatar").textContent=(name||"S").trim().charAt(0).toUpperCase()||"S";
+}
 
-<label>Attachment
-<input id="attachment" type="file" accept="image/*,.pdf,.txt,.doc,.docx">
-</label>
+/* tabs (hash routed so Back works) */
+var pages=["home","learn","practice","tests","progress"];
+function show(id,push){
+  if(pages.indexOf(id)<0)id="home";
+  pages.forEach(function(p){document.getElementById(p).classList.toggle("active",p===id)});
+  document.querySelectorAll(".nav button").forEach(function(b){
+    if(b.dataset.tab===id)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");
+  });
+  if(push&&location.hash!=="#"+id)history.pushState(null,"","#"+id);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-tab]").forEach(function(b){b.addEventListener("click",function(){show(b.dataset.tab,true)})});
+window.addEventListener("popstate",function(){show(location.hash.slice(1),false)});
 
-<div class="actions">
-<button type="button" id="cancel">Cancel</button>
-<button class="primary">Save Material</button>
-</div>
-</form>
-</dialog>
+/* sheets */
+function sheet(id,open){document.getElementById(id).classList.toggle("open",open)}
+var tv=30,tval=document.getElementById("tVal");
+document.getElementById("setTarget").onclick=function(){tv=Math.max(1,Number(read(PREMIUM_KEY,{}).dailyTarget)||30);tval.textContent=tv;sheet("targetSheet",true)};
+document.getElementById("tMinus").onclick=function(){tv=Math.max(5,tv-5);tval.textContent=tv};
+document.getElementById("tPlus").onclick=function(){tv=Math.min(500,tv+5);tval.textContent=tv};
+document.getElementById("tCancel").onclick=function(){sheet("targetSheet",false)};
+document.getElementById("tSave").onclick=function(){var p=read(PREMIUM_KEY,{});p.dailyTarget=tv;write(PREMIUM_KEY,p);sheet("targetSheet",false);render()};
+document.getElementById("avatar").onclick=function(){document.getElementById("nIn").value=read(NAME_KEY,"");sheet("nameSheet",true);document.getElementById("nIn").focus()};
+document.getElementById("nCancel").onclick=function(){sheet("nameSheet",false)};
+document.getElementById("nSave").onclick=function(){write(NAME_KEY,document.getElementById("nIn").value.trim().slice(0,30));sheet("nameSheet",false);render()};
+document.querySelectorAll(".sheet").forEach(function(s){s.addEventListener("click",function(e){if(e.target===s)s.classList.remove("open")})});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")document.querySelectorAll(".sheet.open").forEach(function(s){s.classList.remove("open")})});
 
-<script src="./study-vault.js"></script>
+/* refresh live numbers whenever the student returns */
+document.addEventListener("visibilitychange",function(){if(!document.hidden)render()});
+window.addEventListener("pageshow",render);
+window.addEventListener("storage",render);
+
+render();
+show(location.hash.slice(1),false);
+
+/* offline / PWA update */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).then(function(reg){
+      reg.update().catch(function(){});
+      reg.addEventListener("updatefound",function(){
+        var w=reg.installing; if(!w)return;
+        w.addEventListener("statechange",function(){
+          if(w.state==="installed"&&navigator.serviceWorker.controller)w.postMessage("SKIP_WAITING");
+        });
+      });
+    }).catch(function(e){console.warn("[RankForge] Service worker unavailable:",e)});
+  });
+}
+})();
+</script>
 </body>
 </html>

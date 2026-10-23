@@ -87,8 +87,8 @@
     const result = [];
     const seen = new Set();
 
-    QUESTION_KEYS.forEach(function (key) {
-      const raw = read(key, null);
+    QUESTION_KEYS.concat(["__RF_BIO_POOL__"]).forEach(function (key) {
+      const raw = key === "__RF_BIO_POOL__" ? (window.__RF_BIO_POOL || null) : read(key, null);
 
       let list = [];
 
@@ -583,25 +583,34 @@
           const size =
             Number(button.getAttribute("data-rfd-size")) || 15;
 
-          const result = start(size);
           const status =
             document.getElementById("rfdStatus");
 
-          if (!result.ok) {
+          function go(result) {
+            if (!result.ok) {
+              status.textContent =
+                "⚠️ " + result.message;
+              return;
+            }
+
             status.textContent =
-              "⚠️ " + result.message;
-            return;
+              "✅ " +
+              result.dpp.questions.length +
+              " questions prepared. Opening CBT…";
+
+            setTimeout(function () {
+              if (window.RankForgeFix && window.RankForgeFix.handoff) window.RankForgeFix.handoff({ title: "Adaptive DPP", source: "rankforge-dpp", questions: result.dpp.questions }, "rankforge-dpp");
+              else location.href = "cbt.html";
+            }, 300);
           }
 
-          status.textContent =
-            "✅ " +
-            result.dpp.questions.length +
-            " questions prepared. Opening CBT…";
-
-          setTimeout(function () {
-            if (window.RankForgeFix && window.RankForgeFix.handoff) window.RankForgeFix.handoff({ title: "Adaptive DPP", source: "rankforge-dpp", questions: result.dpp.questions }, "rankforge-dpp");
-            else location.href = "cbt.html";
-          }, 300);
+          let result = start(size);
+          if (!result.ok && result.reason === "NO_QUESTIONS" && window.RankForgeFix) {
+            status.textContent = "Loading the Biology question bank…";
+            window.RankForgeFix.loadBiologyPool().then(function () { go(start(size)); });
+            return;
+          }
+          go(result);
         });
       });
   }
@@ -615,7 +624,29 @@
       .replace(/'/g, "&#039;");
   }
 
+  /* One launcher for every "Start ..." button: prepare -> (load Biology bank if the pool is empty) -> open CBT */
+  function launch(size) {
+    function go(result) {
+      if (result && result.ok) {
+        setTimeout(function () {
+          if (window.RankForgeFix && window.RankForgeFix.handoff && result.dpp) window.RankForgeFix.handoff({ title: "Adaptive DPP", source: "rankforge-dpp", questions: result.dpp.questions }, "rankforge-dpp");
+          else location.href = "cbt.html";
+        }, 150);
+        return result;
+      }
+      alert((result && result.message) || "No questions are available yet. Take a Biology test or import a PDF first.");
+      return result;
+    }
+    const first = start(size);
+    if (!first.ok && first.reason === "NO_QUESTIONS" && window.RankForgeFix) {
+      window.RankForgeFix.loadBiologyPool().then(function () { go(start(size)); });
+      return first;
+    }
+    return go(first);
+  }
+
   window.RankForgeAdaptiveDPPV1 = {
+    launch: launch,
     generate: generate,
     start: start,
     getWeakTopics: weakTopics,

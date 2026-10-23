@@ -244,8 +244,41 @@ function completeRetry(id,passed){
   write(KEY.retry,arr(read(KEY.retry,[])).filter(filter));
 }
 
+/* FIX: the history entries carry no question detail, so this store stayed empty.
+   Also ingest the canonical mistakes that cbt.html saves ("cbtMistakes" / "rankforgeMistakesV1"). */
+function ingestCanonical(){
+  let src=read("cbtMistakes",null);
+  if(!src) src=read("rankforgeMistakesV1",[]);
+  if(!Array.isArray(src)) src=Object.keys(src||{}).map(k=>src[k]);
+  const mistakes=arr(read(KEY.mistakes,[]));
+  const queue=arr(read(KEY.queue,[]));
+  const have=new Set(mistakes.map(x=>String(x.id)));
+  let added=0;
+  src.forEach((q,i)=>{
+    if(!q || typeof q!=="object" || !(q.question||q.text)) return;
+    const id=String(q.id||q.questionId||("Q-"+i));
+    if(have.has(id)) return;
+    const m=normalizeMistake(Object.assign({},q,{id:id,selectedAnswer:q.userAnswer}),i,{});
+    if(!m) return;
+    m.status=q.status==="mastered"?"mastered":"active";
+    mistakes.push(m); have.add(id); added++;
+    if(m.status==="active" && !queue.some(x=>String(x.id||x.questionId)===id))
+      queue.push(Object.assign({},q,{id:id,retryStatus:"pending"}));
+  });
+  if(added){
+    write(KEY.mistakes,mistakes.slice(-1000));
+    write(KEY.queue,queue.slice(-1000));
+  }
+  return added;
+}
+
+function syncAll(){
+  try{ ingestCanonical(); }catch(e){ console.warn("RankForge Learning Loop (canonical):",e); }
+  return syncHistory.apply(this,arguments);
+}
+
 window.RankForgeLearningLoop={
-  syncHistory,
+  syncHistory:syncAll,
   ingestAttempt,
   markMastery,
   completeRetry,
@@ -255,7 +288,7 @@ window.RankForgeLearningLoop={
 };
 
 try{
-  syncHistory();
+  syncAll();
 }catch(e){
   console.warn("RankForge Learning Loop:",e);
 }

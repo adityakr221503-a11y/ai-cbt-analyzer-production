@@ -143,6 +143,8 @@ function validateQuestion(q, index) {
       q.ncertPoint
     ),
 
+    sourceQuote: clean(q.sourceQuote).slice(0, 300),
+
     questionFamily: clean(
       q.questionFamily
     ) || "AI Rank Booster",
@@ -220,6 +222,49 @@ function rankforgeCors(request, env) {
   return headers;
 }
 
+/* ------------------------------------------------------------------
+   FREE AI: Cloudflare Workers AI (binding "AI") — no API key, no OpenAI bill.
+   If OPENAI_API_KEY is set it is still used (optional paid upgrade).
+------------------------------------------------------------------ */
+const DEFAULT_FREE_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+
+function parseJSONLoose(text) {
+  if (text && typeof text === "object") return text;
+  let t = String(text || "").trim();
+  t = t.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+  try { return JSON.parse(t); } catch (_) { /* try to carve out the JSON */ }
+  const a = t.indexOf("{"), b = t.lastIndexOf("}");
+  const c = t.indexOf("["), d = t.lastIndexOf("]");
+  const tries = [];
+  if (a >= 0 && b > a) tries.push(t.slice(a, b + 1));
+  if (c >= 0 && d > c) tries.push(t.slice(c, d + 1));
+  for (const x of tries) { try { return JSON.parse(x); } catch (_) {} }
+  throw new Error("invalid json");
+}
+
+async function aiFetch(env, url, init) {
+  if (env.OPENAI_API_KEY) return fetch(url, init);
+  if (!env.AI) {
+    return { ok: false, status: 503, text: async () => "No AI binding configured", json: async () => ({}) };
+  }
+  try {
+    const req = JSON.parse(init.body);
+    const out = await env.AI.run(env.AI_MODEL || DEFAULT_FREE_MODEL, {
+      messages: req.messages,
+      max_tokens: 3500,
+      temperature: 0.4
+    });
+    const content = typeof out === "string" ? out
+      : (out && (typeof out.response === "string" ? out.response : (out.response ? JSON.stringify(out.response) : "")))
+        || (out && out.result && out.result.response) || "";
+    return { ok: true, status: 200, text: async () => content, json: async () => ({ choices: [{ message: { content } }] }) };
+  } catch (e) {
+    const msg = String((e && e.message) || e);
+    const limit = /limit|quota|neuron|429|capacity/i.test(msg);
+    return { ok: false, status: limit ? 429 : 502, text: async () => msg, json: async () => ({}) };
+  }
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -245,9 +290,9 @@ export default {
         );
       }
 
-      if (!env.OPENAI_API_KEY) {
+      if (!env.OPENAI_API_KEY && !env.AI) {
         return response(
-          { ok: false, error: "AI provider secret is not configured" },
+          { ok: false, error: "No AI is configured: add the Workers AI binding (free) in wrangler.jsonc, or set OPENAI_API_KEY" },
           503,
           origin,
           allowed
@@ -379,8 +424,7 @@ Return JSON ONLY in exactly this shape:
 Keep every list focused and useful. Do not pad with generic statements.
 `;
 
-      const upstream = await fetch(
-        "https://api.openai.com/v1/chat/completions",
+      const upstream = await aiFetch(env, "https://api.openai.com/v1/chat/completions",
         {
           method: "POST",
           headers: {
@@ -416,6 +460,7 @@ Keep every list focused and useful. Do not pad with generic statements.
             ok: false,
             error: "AI provider request failed",
             providerStatus: upstream.status,
+          code: upstream.status === 429 ? "AI_LIMIT_REACHED" : undefined,
             detail: errorText.slice(0, 1000)
           },
           502,
@@ -429,7 +474,7 @@ Keep every list focused and useful. Do not pad with generic statements.
 
       let parsed;
       try {
-        parsed = JSON.parse(rawText);
+        parsed = parseJSONLoose(rawText);
       } catch {
         return response(
           { ok: false, error: "AI returned invalid JSON" },
@@ -496,9 +541,9 @@ Keep every list focused and useful. Do not pad with generic statements.
       );
     }
 
-    if (!env.OPENAI_API_KEY) {
+    if (!env.OPENAI_API_KEY && !env.AI) {
       return response(
-        { ok: false, error: "AI provider secret is not configured" },
+        { ok: false, error: "No AI is configured: add the Workers AI binding (free) in wrangler.jsonc, or set OPENAI_API_KEY" },
         503,
         origin,
         allowed
@@ -520,13 +565,15 @@ Keep every list focused and useful. Do not pad with generic statements.
 
     const count = Math.min(
       Math.max(Number(body.count) || 10, 1),
-      90
+      env.OPENAI_API_KEY ? 90 : 6
     );
 
     const subject = clean(body.subject) || "Mixed NEET";
     const difficulty = clean(body.difficulty) || "Rank Booster";
     const chapter = clean(body.chapter) || "Mixed";
-    const topic = clean(body.topic) || "Mixed";
+    const topic = clean(body.topic) || clean(body.focus) || "Mixed";
+    /* Notebook-style grounding: questions must come ONLY from the supplied source text */
+    const context = clean(body.context).slice(0, 24000);
 
     const userPrompt = `
 Create ${count} original questions.
@@ -545,10 +592,20 @@ Requirements:
 - NCERT anchor wherever applicable.
 - Avoid unsupported facts.
 - Avoid trivial textbook recall unless it tests a subtle examiner trap.
+${context ? `
+SOURCE-GROUNDED MODE (like NotebookLM):
+- Use ONLY the facts in the SOURCE below. Do not add outside facts.
+- Each question must include a short "sourceQuote" (<= 25 words, copied from SOURCE) that proves the answer.
+- If SOURCE does not support ${count} good questions, return fewer.
+
+SOURCE:
+"""
+${context}
+"""
+` : ""}
 `;
 
-    const upstream = await fetch(
-      "https://api.openai.com/v1/chat/completions",
+    const upstream = await aiFetch(env, "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -583,6 +640,7 @@ Requirements:
           ok: false,
           error: "AI provider request failed",
           providerStatus: upstream.status,
+          code: upstream.status === 429 ? "AI_LIMIT_REACHED" : undefined,
           detail: errorText.slice(0, 1000)
         },
         502,
@@ -599,7 +657,7 @@ Requirements:
     let parsed;
 
     try {
-      parsed = JSON.parse(rawText);
+      parsed = parseJSONLoose(rawText);
     } catch {
       return response(
         {
