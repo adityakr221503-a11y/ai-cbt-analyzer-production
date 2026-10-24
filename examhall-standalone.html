@@ -33,13 +33,23 @@ section[data-p]{display:none}section[data-p].on{display:block;animation:fi .25s}
 .tile{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.tl{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:left;color:var(--ink);font:600 15px Figtree,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.05)}.tl b{display:block;font-size:24px}.tl span{display:block;font-weight:400}
 button{transition:transform .08s,opacity .2s}button:active{transform:scale(.97)}html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+.xh{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:6px 0;position:sticky;top:env(safe-area-inset-top,0px);z-index:3}
+.xr{display:flex;gap:8px;align-items:center}.xt{text-align:center}.xt b{font-size:20px;display:block;font-variant-numeric:tabular-nums}
+.qcard{padding:0;overflow:hidden}.qh{display:flex;justify-content:space-between;gap:8px;padding:10px 14px;background:color-mix(in srgb,var(--acc) 10%,var(--card));border-bottom:1px solid var(--line)}
+.qt{padding:14px;font-size:18px;line-height:1.7;overflow-wrap:anywhere}.ops{padding:0 14px 8px}
+.op{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;font:inherit;font-size:17px;line-height:1.55;overflow-wrap:anywhere}
+.rd{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid var(--mut);margin-top:3px}.ol{flex:none;font-weight:700}
+.op.sel{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,var(--card))}.op.sel .rd{border-color:var(--acc);background:radial-gradient(var(--acc) 45%,transparent 50%)}.op.ok{border-color:var(--ok);border-width:3px}.op.no{border-color:var(--bad);border-width:3px}
+.xb{display:flex;flex-wrap:wrap;gap:8px;padding:8px 0;position:sticky;bottom:0;background:var(--bg);z-index:2}
+.pn2{display:none}.pn2.open{display:block}@media(min-width:800px){.pn2{display:block}}
+.lg{display:grid;gap:4px;margin-bottom:10px;font-size:13px}.lg i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;border:1px solid var(--line)}.s0{background:var(--card)}
 </style></head><body>
 <header><div class="logo">EH</div><div><h1>ExamHall</h1><div class="mut">Practise · Test · Analyse · Master</div></div></header><main></main><nav><button data-t="home" onclick="tab('home')"><b>🏠</b>Home</button><button data-t="create" onclick="tab('create')"><b>➕</b>Create</button><button data-t="library" onclick="tab('library')"><b>📚</b>Library</button><button data-t="practice" onclick="tab('practice')"><b>🔁</b>Practice</button><button data-t="stats" onclick="tab('stats')"><b>📊</b>Analysis</button><button data-t="more" onclick="tab('more')"><b>⚙️</b>More</button></nav>
 <div id="tz" class="card" hidden style="position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:9;margin:0"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),A='ABCDEF';
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),A='123456';
 let S={tests:[],hist:[]},E=null,T=null,AI=null,DL=null,RF='bad';
 try{S=JSON.parse(localStorage.getItem('eh1'))||S}catch(e){}
 const keep=()=>{try{localStorage.setItem('eh1',JSON.stringify(S))}catch(e){msg('Storage is full. Delete an old test.')}};
@@ -94,16 +104,18 @@ const upd=i=>{E.s[i]=E.mk[i]?(E.a[i]!=null?4:3):(E.a[i]!=null?2:1)};
 function tick(){E.tm[E.i]=(E.tm[E.i]||0)+(Date.now()-E.q0)/1000;E.q0=Date.now()}
 function start(t,mode,qs,go){qs=qs||t.qs;if(localStorage.getItem('ehs')=='1')qs=[...qs].sort(()=>Math.random()-.5);if(mode=='test'&&!go&&!t.tmp){P0={t,mode,qs};ins(t,qs);return}E={t,qs,mode,i:0,a:[],s:[],tm:[],mk:[],left:t.m*60,q0:Date.now()};upd(0);
  if(mode=='test'){ti();document.documentElement.requestFullscreen?.().catch(()=>{})}exam()}
-function exam(){document.body.classList.add('inx');sa();const{qs,i,a,s,mode}=E,q=qs[i],pr=mode=='practice'&&a[i]!=null;
- $('main').innerHTML=`<div class="row"><b style="flex:1">${esc(E.t.n)}</b>${mode=='test'?`<span class="card" style="margin:0;padding:6px 12px" id="tm">${fmt(E.left)}</span>`:'<span class="mut">Practice</span>'}<button class="b" onclick="submit()">${mode=='test'?'Submit':'Finish'}</button></div>
-${secs(E)}<div class="exam"><div><div class="card"><div class="mut">Question ${i+1} of ${qs.length} · ${esc(q.t)}</div><p style="font-size:18px;white-space:pre-wrap">${esc(q.q)}</p>
-${q.o.map((o,j)=>`<button class="opt ${a[i]===j?'sel':''} ${pr?(j===q.a?'ok':a[i]===j?'no':''):''}" onclick="pick(${j})"><b>${A[j]}.</b> ${esc(o)}</button>`).join('')}
-${pr?`<p><b>${a[i]===q.a?'Correct.':'Not quite. Answer: '+(A[q.a]??'?')+'.'}</b> ${esc(q.e)}</p><button class="b g" onclick="teach(${i})">Ask teacher</button>`:''}</div>
-<div class="row"><button class="b g" onclick="jump(E.i-1)">Previous</button><button class="b g" onclick="mark()">Mark for review</button><button class="b g" onclick="pick(null)">Clear</button><button class="b g" onclick="bm()">Bookmark</button><button class="b" onclick="jump(E.i+1)">Save &amp; next</button></div></div>
-<div class="card"><div class="grid">${qs.map((_,n)=>`<button class="pn s${s[n]||0} ${n===i?'cur':''}" onclick="jump(${n})">${n+1}</button>`).join('')}</div><p class="mut">Green answered · Red not answered · Purple marked for review</p></div></div>`}
-function pick(j){if(E.mode=='practice'&&E.a[E.i]!=null)return;E.a[E.i]=j;upd(E.i);exam()}
-function mark(){E.mk[E.i]=!E.mk[E.i];upd(E.i);exam()}
-function jump(n){tick();upd(E.i);E.i=Math.max(0,Math.min(E.qs.length-1,n));upd(E.i);exam();scrollTo(0,0)}
+const fq=t=>esc(t).replace(/\s*(Statement[\s-]*(?:IV|I{1,3}|[1-4])\b|Assertion\s*(?:\(A\))?|Reason\s*(?:\(R\))?|List[\s-]*(?:II|I|[12])\b|Column[\s-]*(?:II|I|[12])\b)/g,(m,x)=>'<br><b>'+x.trim()+'</b>').replace(/\s+(\((?:[a-e]|iv|v|i{1,3})\))\s/g,'<br>$1 ').replace(/^(<br>)+/,'').replace(/\n/g,'<br>');
+function exam(){document.body.classList.add('inx');sa();
+ $('main').innerHTML=`<div class="xh"><div><b>${esc(E.t.n)}</b><div class="mut">${E.mode=='test'?'Computer Based Test':'Practice mode'}</div></div><div class="xr">${E.mode=='test'?`<div class="xt"><span class="mut">Time left</span><b id="tm">${fmt(E.left)}</b></div>`:''}<button class="b g" onclick="$('#pn').classList.toggle('open')">Palette</button><button class="b" onclick="cfm()">${E.mode=='test'?'Submit':'Finish'}</button></div></div><div id="sec"></div><div class="exam"><div id="qc"></div><div id="pn" class="pn2 card"></div></div>`;draw()}
+function draw(){const{qs,i,a,s,mode}=E,q=qs[i],pr=mode=='practice'&&a[i]!=null,c=[0,0,0,0,0];qs.forEach((_,n)=>c[s[n]||0]++);
+ $('#sec').innerHTML=secs(E);
+ $('#qc').innerHTML=`<div class="card qcard"><div class="qh"><b>Question ${i+1} of ${qs.length}</b><span class="mut">${esc(q.s||'')} · +${E.t.p} / −${E.t.x}</span></div><div class="qt">${fq(q.q)}</div><div class="ops">${q.o.map((o,j)=>`<button class="op ${a[i]===j?'sel':''} ${pr?(j===q.a?'ok':a[i]===j?'no':''):''}" onclick="pick(${j})"><span class="rd"></span><span class="ol">(${A[j]})</span><span>${fq(o)}</span></button>`).join('')}</div>${pr?`<div class="qt"><b>${a[i]===q.a?'Correct.':'Not quite. Answer: ('+(A[q.a]??'?')+')'}</b><br>${fq(q.e||'')}<br><button class="b g" onclick="teach(${i})">Ask teacher</button></div>`:''}</div>
+<div class="xb"><button class="b g" onclick="jump(E.i-1)">Previous</button><button class="b g" onclick="mark()">${E.mk[i]?'Unmark review':'Mark for review &amp; next'}</button><button class="b g" onclick="pick(null)">Clear response</button><button class="b g" onclick="bm()">Bookmark</button><button class="b" onclick="jump(E.i+1)">Save &amp; next</button></div>`;
+ $('#pn').innerHTML=`<div class="lg"><span><i class="s2"></i>${c[2]} Answered</span><span><i class="s1"></i>${c[1]} Not answered</span><span><i class="s0"></i>${c[0]} Not visited</span><span><i class="s3"></i>${c[3]} Marked for review</span><span><i class="s4"></i>${c[4]} Answered and marked</span></div><div class="grid">${qs.map((_,n)=>`<button class="pn s${s[n]||0} ${n===i?'cur':''}" onclick="jump(${n})">${n+1}</button>`).join('')}</div>`}
+function cfm(){if(E.mode!='test')return submit();const an=E.a.filter(x=>x!=null).length,mk=E.mk.filter(Boolean).length;$('#qc').innerHTML=`<div class="card"><h2>Submit this test?</h2><p>${an} answered · ${E.qs.length-an} not answered · ${mk} marked for review</p><p class="mut">You cannot change answers after submitting.</p><div class="row"><button class="b" onclick="submit()">Yes, submit</button><button class="b g" onclick="draw()">Go back</button></div></div>`}
+function pick(j){if(E.mode=='practice'&&E.a[E.i]!=null)return;E.a[E.i]=j;upd(E.i);sa();draw()}
+function mark(){const m=E.mk[E.i]=!E.mk[E.i];upd(E.i);m?jump(E.i+1):draw()}
+function jump(n){tick();upd(E.i);E.i=Math.max(0,Math.min(E.qs.length-1,n));upd(E.i);draw();sa();const p=$('#pn');if(p)p.classList.remove('open');scrollTo(0,0)}
 const grade=e=>{let c=0,w=0,sk=0;const tp={},sj={};e.qs.forEach((q,i)=>{const a=e.a[i],t=tp[q.t]=tp[q.t]||[0,0],u=sj[q.s||'General']=sj[q.s||'General']||[0,0,0];t[1]++;t[2]=(t[2]||0)+(e.tm[i]||0);u[2]++;if(a==null)sk++;else if(a===q.a){c++;t[0]++;u[0]++}else{w++;u[1]++}});return{c,w,sk,tp,sj,sc:c*e.t.p-w*e.t.x,mx:e.qs.length*e.t.p,ac:c+w?Math.round(100*c/(c+w)):0}};
 function submit(){tick();clearInterval(E.iv);localStorage.removeItem('ehr');if(document.fullscreenElement)document.exitFullscreen();const r=grade(E);if(!E.t.tmp)S.hist.unshift({tid:E.t.id,n:E.t.n,mode:E.mode,a:E.a,tm:E.tm,qi:E.qs===E.t.qs?null:E.qs.map(q=>E.t.qs.indexOf(q)),sc:r.sc,mx:r.mx,ac:r.ac});S.hist=S.hist.slice(0,15);nb(E);dl(E);keep();res(E)}
 function openH(n){const h=S.hist[n],t=S.tests.find(x=>x.id==h.tid);if(!t)return msg('That test was deleted.');res({t,qs:h.qi?h.qi.map(x=>t.qs[x]):t.qs,mode:h.mode,a:h.a,tm:h.tm})}
