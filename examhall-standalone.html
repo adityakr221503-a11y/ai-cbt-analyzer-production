@@ -1,0 +1,143 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>ExamHall: PDF to CBT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9eff3;--card:#fff;--ink:#0e1b2b;--mut:#5b6b7b;--line:#d3dce4;--acc:#0b6e69;--aci:#fff;--ok:#1e8e4e;--bad:#c73e3a;--mk:#7a4fc4;--wn:#c98a0b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0c1620;--card:#14222f;--ink:#e6eef5;--mut:#8fa3b5;--line:#26394a;--acc:#3cc1b5;--aci:#06201e;--ok:#46c37b;--bad:#f0706b;--mk:#a98bea;--wn:#e3b04b}}
+:root[data-theme=dark]{--bg:#0c1620;--card:#14222f;--ink:#e6eef5;--mut:#8fa3b5;--line:#26394a;--acc:#3cc1b5;--aci:#06201e;--ok:#46c37b;--bad:#f0706b;--mk:#a98bea;--wn:#e3b04b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,sans-serif}
+header,main{max-width:1000px;margin:0 auto;padding:10px 12px}h1{font-size:22px;font-weight:800;margin:0}h2,h3{margin:.2em 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+button,input{font:inherit}input[type=number],input[type=password],input:not([type]){padding:7px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.b{background:var(--acc);color:var(--aci);border:0;border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer}.b.g{background:transparent;color:var(--acc);border:1px solid var(--line)}.b:disabled{opacity:.5}label.b{display:inline-block;position:relative}.fi{position:absolute;opacity:0;width:1px;height:1px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--wn)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}.mut{color:var(--mut);font-size:14px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin:6px 0;cursor:pointer}
+.opt.sel{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 14%,var(--card))}.opt.ok{border-color:var(--ok);border-width:3px}.opt.no{border-color:var(--bad);border-width:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}.pn{height:42px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:600}
+.s1{background:var(--bad);color:#fff}.s2{background:var(--ok);color:#fff}.s3{background:var(--mk);color:#fff}.s4{background:var(--mk);color:#fff;box-shadow:0 0 0 3px var(--ok)}.pn.cur{outline:3px solid var(--wn)}
+.exam{display:grid;gap:10px;grid-template-columns:1fr}@media(min-width:800px){.exam{grid-template-columns:1fr 290px}}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:8px}.bar i{display:block;height:100%;background:var(--acc)}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}.stat div{background:var(--bg);border-radius:10px;padding:10px}.stat b{font-size:22px;display:block}
+.board{background:#12372f;color:#eaf6ef;border-radius:12px;padding:16px;min-height:150px;white-space:pre-wrap;font-size:18px}
+.fig{width:84px;height:84px}.mouth{transform-origin:42px 58px}.talk .mouth{animation:t .25s infinite alternate}@keyframes t{to{transform:scaleY(.3)}}@media(prefers-reduced-motion:reduce){.talk .mouth{animation:none}}
+.ov{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:max(12px,env(safe-area-inset-top)) 12px 12px;z-index:5}
+</style></head><body>
+<header><h1>ExamHall</h1></header><main></main>
+<div id="tz" class="card" hidden style="position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:9;margin:0"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),A='ABCDEF';
+let S={tests:[],hist:[]},E=null,T=null,AI=null,DL=null,RF='bad';
+try{S=JSON.parse(localStorage.getItem('eh1'))||S}catch(e){}
+const keep=()=>{try{localStorage.setItem('eh1',JSON.stringify(S))}catch(e){msg('Storage is full. Delete an old test.')}};
+const msg=s=>{const t=$('#tz');t.textContent=s;t.hidden=false;clearTimeout(msg.t);msg.t=setTimeout(()=>t.hidden=true,4500)};
+const fmt=s=>Math.floor(s/60)+':'+String(Math.round(s)%60).padStart(2,'0'),pg=s=>{const p=$('#pg');if(p)p.textContent=s};
+const cp=e=>({not_granted:'Claude access was declined. Allow it when asked to use AI features.',rate_limited:'Usage limit or too many requests. Wait a little, then try again.',images_unavailable:'Reading page images is unavailable in this view.',invalid_json:'Claude’s answer could not be read. Try again.'}[e.code]||'Something went wrong: '+(e.message||e.code));
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+function home(){if(E)clearInterval(E.iv);E=null;$('main').innerHTML=`<div class="card"><h2>Turn a module or PDF into a CBT test</h2>
+<p class="mut">Upload PDFs or page photos. Every question and option is read and loaded into a real exam screen. Reading uses your Claude usage, and a big module takes a few minutes.</p>
+<div class="row"><label class="b">Choose PDF<input class="fi" type="file" multiple accept="application/pdf,.pdf"></label><label class="b g">Choose photos<input class="fi" type="file" multiple accept="image/*"></label><label class="b g">Take photo<input class="fi" type="file" accept="image/*" capture="environment"></label><label class="b g">Any file<input class="fi" type="file" multiple></label></div><div id="fn" class="mut"></div>
+<textarea id="pt" rows="4" placeholder="No file picker? Paste the questions here as text" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit"></textarea>
+<label class="row"><input id="sc" type="checkbox"> Scanner mode: read every page as an image (best for scanned or photographed pages)</label>
+<div class="row"><button class="b" id="go">Build test</button><button class="b g" id="stop" hidden>Stop</button></div><details style="margin:8px 0"><summary>AI settings (your own model)</summary><div class="row"><input id="cu" placeholder="Endpoint URL" style="flex:1;min-width:220px"><input id="cm" placeholder="Model" style="width:120px"><input id="ck" type="password" placeholder="API key (optional)" style="width:150px"></div><p class="mut">Any OpenAI-compatible chat endpoint, for example Ollama at http://localhost:11434/v1/chat/completions with model gemma3. Allow CORS on the server. Scanner mode needs a vision model. Settings stay in this browser.</p></details><div id="pg" class="mut"></div></div><div id="lib"></div>`;
+$('#go').onclick=build;{const c=CF();$('#cu').value=c.u||DU;$('#cm').value=c.m||'gemma3';$('#ck').value=c.k||'';['cu','cm','ck'].forEach(i=>$('#'+i).onchange=()=>localStorage.setItem('ehc',JSON.stringify({u:$('#cu').value.trim(),m:$('#cm').value.trim(),k:$('#ck').value.trim()})))}document.querySelectorAll('.fi').forEach(i=>i.onchange=()=>{$('#fn').textContent=[...document.querySelectorAll('.fi')].flatMap(x=>[...x.files]).map(f=>f.name).join(', ')});lib()}
+const hist=()=>S.hist.length?'<h3>Past attempts</h3>'+S.hist.slice(0,8).map((h,n)=>`<div class="card"><div class="row"><span style="flex:1"><b>${esc(h.n)}</b> <span class="mut">${h.mode} · ${h.sc}/${h.mx} · ${h.ac}% accuracy</span></span><button class="b g" onclick="openH(${n})">Analysis</button></div></div>`).join(''):'';
+function lib(){$('#lib').innerHTML=(S.tests.length?'':'<p class="mut">No tests yet. Upload a file to begin.</p>')+S.tests.map((t,i)=>`<div class="card"><b>${esc(t.n)}</b><div class="mut">${t.qs.length} questions</div>
+<div class="row"><label class="mut">Minutes <input type="number" min="1" value="${t.m}" data-i="${i}" data-k="m" style="width:76px"></label><label class="mut">Right + <input type="number" value="${t.p}" data-i="${i}" data-k="p" style="width:60px"></label><label class="mut">Wrong − <input type="number" value="${t.x}" data-i="${i}" data-k="x" style="width:60px"></label></div>
+<div class="row"><button class="b" onclick="start(S.tests[${i}],'test')">Start test</button><button class="b g" onclick="start(S.tests[${i}],'practice')">Practice</button><button class="b g" onclick="pdf(${i})">Export PDF</button><button class="b g" onclick="del(${i},this)">Delete</button></div></div>`).join('')+hist();
+document.querySelectorAll('[data-k]').forEach(e=>e.onchange=()=>{S.tests[e.dataset.i][e.dataset.k]=+e.value;keep()})}
+function del(i,b){if(b.dataset.s){S.tests.splice(i,1);keep();lib()}else{b.dataset.s=1;b.textContent='Tap again to delete'}}
+
+const P='Extract every multiple-choice question from this exam material, in order, exactly as printed. Return ONLY a JSON array: [{"q":"question","o":["option A","option B","option C","option D"],"a":0,"e":"one or two sentence explanation","t":"topic"}]. a is the index (0-3) of the correct option: use the printed answer key if present, otherwise solve it yourself. Ignore headers, footers and page numbers. Write formulas in plain text.';
+const rx=t=>[...t.matchAll(/(?:^|\s)\d{1,3}[.)]\s+([\s\S]*?)(?=\s\d{1,3}[.)]\s|$)/g)].map(m=>{const s=m[1].split(/\s*\(?[A-Da-d1-4][).]\s+/);return{q:s[0].trim(),o:s.slice(1,5).map(x=>x.trim()),a:null,e:'',t:''}}).filter(q=>q.q&&q.o.length>=2);
+async function ext(b,signal){if(!AI)return rx(b.t||'');const o={signal,modelTier:'default'};if(b.b)o.images=b.b;
+ for(let n=0;n<2;n++)try{const r=await AI.json(b.t?P+'\n\nMATERIAL:\n'+b.t:P+'\n\nThe pages are attached as images.',o);return(Array.isArray(r)?r:r.questions||[]).filter(q=>q&&q.q&&Array.isArray(q.o)&&q.o.length>1)}catch(e){if(e.code=='net'&&b.t)return rx(b.t);if(e.code!='invalid_json'&&e.code!='upstream_error')throw e}
+ return[]}
+async function build(){const fs=[...document.querySelectorAll('.fi')].flatMap(i=>[...i.files]),tx=$('#pt').value.trim();let J=null;if(tx[0]=='[')try{J=JSON.parse(tx)}catch(e){}if(!fs.length&&!tx)return pg('Choose a file or paste some text first.');
+ const scan=$('#sc').checked,ctl=new AbortController();$('#go').disabled=true;$('#stop').hidden=false;$('#stop').onclick=()=>ctl.abort();
+ try{const pages=[];
+  for(const f of fs){if(f.type.startsWith('image/')){pages.push({b:f});continue}
+   const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
+   for(let n=1;n<=d.numPages;n++){pg(`Opening ${f.name}: page ${n} of ${d.numPages}…`);const p=await d.getPage(n),t=(await p.getTextContent()).items.map(i=>i.str+(i.hasEOL?'\n':' ')).join('');
+    if(!scan&&t.trim().length>150)pages.push({t});else{const v=p.getViewport({scale:1.6}),c=document.createElement('canvas');c.width=v.width;c.height=v.height;await p.render({canvasContext:c.getContext('2d'),viewport:v}).promise;pages.push({b:await new Promise(r=>c.toBlob(r,'image/jpeg',.8))})}}}
+  if(tx&&!J)pages.push({t:tx});const lim=AI?await AI.limits().catch(()=>({})):{},mx=lim.images?.maxCount||3,B=[];let cur=null;
+  for(const p of pages){if(p.t){if(cur&&cur.t!=null&&cur.t.length<3500)cur.t+=p.t;else B.push(cur={t:p.t})}else{if(cur&&cur.b&&cur.b.length<mx)cur.b.push(p.b);else B.push(cur={b:[p.b]})}}
+  if(B.some(b=>b.b)&&!lim.images)throw{code:'images_unavailable'};
+  const out=[];let k=0,done=0,er=null;
+  const w=async()=>{while(k<B.length){const i=k++;try{out[i]=await ext(B[i],ctl.signal)}catch(e){if(e.code=='cancelled')throw e;er=e;k=B.length;break}pg(`Read ${++done} of ${B.length} sections · ${out.flat().length} questions so far`)}};
+  await Promise.all([w(),w()]);
+  const seen=new Set(),qs=[];for(const q of (J||out.flat()).filter(q=>q&&q.q&&Array.isArray(q.o)&&q.o.length>1)){const key=q.q.slice(0,60).toLowerCase();if(seen.has(key))continue;seen.add(key);qs.push({q:String(q.q),o:q.o.slice(0,6).map(String),a:Number.isInteger(q.a)&&q.a>=0&&q.a<q.o.length?q.a:null,e:q.e||'',t:q.t||'General'})}
+  if(!qs.length)throw er||{code:'none'};
+  S.tests.unshift({id:Date.now(),n:(fs[0]?fs[0].name.replace(/\.[^.]+$/,''):'Pasted questions')+(fs.length>1?' +'+(fs.length-1):''),qs,m:qs.length,p:4,x:1});keep();home();
+  msg(er?'Stopped early ('+cp(er)+') but saved '+qs.length+' questions.':qs.length+' questions loaded.')
+ }catch(e){pg(e.code=='cancelled'?'Stopped.':e.code=='none'?'No questions found. Try Scanner mode.':cp(e));const g=$('#go');if(g){g.disabled=false;$('#stop').hidden=true}}}
+
+const upd=i=>{E.s[i]=E.mk[i]?(E.a[i]!=null?4:3):(E.a[i]!=null?2:1)};
+function tick(){E.tm[E.i]=(E.tm[E.i]||0)+(Date.now()-E.q0)/1000;E.q0=Date.now()}
+function start(t,mode,qs){qs=qs||t.qs;E={t,qs,mode,i:0,a:[],s:[],tm:[],mk:[],left:t.m*60,q0:Date.now()};upd(0);
+ if(mode=='test')E.iv=setInterval(()=>{E.left--;if(E.left<=0)submit();else{const x=$('#tm');if(x)x.textContent=fmt(E.left)}},1000);exam()}
+function exam(){const{qs,i,a,s,mode}=E,q=qs[i],pr=mode=='practice'&&a[i]!=null;
+ $('main').innerHTML=`<div class="row"><b style="flex:1">${esc(E.t.n)}</b>${mode=='test'?`<span class="card" style="margin:0;padding:6px 12px" id="tm">${fmt(E.left)}</span>`:'<span class="mut">Practice</span>'}<button class="b" onclick="submit()">${mode=='test'?'Submit':'Finish'}</button></div>
+<div class="exam"><div><div class="card"><div class="mut">Question ${i+1} of ${qs.length} · ${esc(q.t)}</div><p style="font-size:18px;white-space:pre-wrap">${esc(q.q)}</p>
+${q.o.map((o,j)=>`<button class="opt ${a[i]===j?'sel':''} ${pr?(j===q.a?'ok':a[i]===j?'no':''):''}" onclick="pick(${j})"><b>${A[j]}.</b> ${esc(o)}</button>`).join('')}
+${pr?`<p><b>${a[i]===q.a?'Correct.':'Not quite. Answer: '+(A[q.a]??'?')+'.'}</b> ${esc(q.e)}</p><button class="b g" onclick="teach(${i})">Ask teacher</button>`:''}</div>
+<div class="row"><button class="b g" onclick="jump(E.i-1)">Previous</button><button class="b g" onclick="mark()">Mark for review</button><button class="b g" onclick="pick(null)">Clear</button><button class="b" onclick="jump(E.i+1)">Save &amp; next</button></div></div>
+<div class="card"><div class="grid">${qs.map((_,n)=>`<button class="pn s${s[n]||0} ${n===i?'cur':''}" onclick="jump(${n})">${n+1}</button>`).join('')}</div><p class="mut">Green answered · Red not answered · Purple marked for review</p></div></div>`}
+function pick(j){if(E.mode=='practice'&&E.a[E.i]!=null)return;E.a[E.i]=j;upd(E.i);exam()}
+function mark(){E.mk[E.i]=!E.mk[E.i];upd(E.i);exam()}
+function jump(n){tick();upd(E.i);E.i=Math.max(0,Math.min(E.qs.length-1,n));upd(E.i);exam();scrollTo(0,0)}
+const grade=e=>{let c=0,w=0,sk=0;const tp={};e.qs.forEach((q,i)=>{const a=e.a[i],t=tp[q.t]=tp[q.t]||[0,0];t[1]++;if(a==null)sk++;else if(a===q.a){c++;t[0]++}else w++});return{c,w,sk,tp,sc:c*e.t.p-w*e.t.x,mx:e.qs.length*e.t.p,ac:c+w?Math.round(100*c/(c+w)):0}};
+function submit(){tick();clearInterval(E.iv);const r=grade(E);S.hist.unshift({tid:E.t.id,n:E.t.n,mode:E.mode,a:E.a,tm:E.tm,qi:E.qs===E.t.qs?null:E.qs.map(q=>E.t.qs.indexOf(q)),sc:r.sc,mx:r.mx,ac:r.ac});S.hist=S.hist.slice(0,15);keep();res(E)}
+function openH(n){const h=S.hist[n],t=S.tests.find(x=>x.id==h.tid);if(!t)return msg('That test was deleted.');res({t,qs:h.qi?h.qi.map(x=>t.qs[x]):t.qs,mode:h.mode,a:h.a,tm:h.tm})}
+function retry(){const qs=E.qs.filter((q,i)=>E.a[i]!==q.a);if(!qs.length)return msg('No mistakes to practise. Well done.');start(E.t,'practice',qs)}
+function res(e){E=e;const r=grade(e),T0=e.tm.reduce((a,b)=>a+(b||0),0);
+ $('main').innerHTML=`<div class="card"><h2>${esc(e.t.n)}: ${e.mode=='test'?'test':'practice'} result</h2><div class="stat"><div><b>${r.sc}/${r.mx}</b>Score</div><div><b>${r.ac}%</b>Accuracy</div><div><b>${r.c}</b>Correct</div><div><b>${r.w}</b>Wrong</div><div><b>${r.sk}</b>Skipped</div><div><b>${fmt(T0)}</b>Time used</div></div></div>
+<div class="card"><h3>Topics, weakest first</h3>${Object.entries(r.tp).sort((a,b)=>a[1][0]/a[1][1]-b[1][0]/b[1][1]).map(([k,v])=>`<div class="row" style="margin-bottom:2px"><span style="flex:1">${esc(k)}</span><span class="mut">${v[0]}/${v[1]}</span></div><div class="bar"><i style="width:${100*v[0]/v[1]}%"></i></div>`).join('')}</div>
+<div class="row"><button class="b" onclick="retry()">Practise my mistakes</button><button class="b g" onclick="RF=RF=='all'?'bad':'all';res(E)">${RF=='all'?'Show only mistakes':'Show all questions'}</button><button class="b g" onclick="home()">Back to library</button></div>
+${e.qs.map((q,i)=>{const a=e.a[i];if(RF!='all'&&a===q.a)return'';return`<div class="card"><div class="mut">Q${i+1} · ${esc(q.t)} · ${a==null?'Skipped':a===q.a?'Correct':'Wrong'} · ${fmt(e.tm[i]||0)}</div><p style="white-space:pre-wrap">${esc(q.q)}</p><div>Your answer: ${a==null?'none':A[a]+'. '+esc(q.o[a])}</div><div>Correct: ${q.a==null?'unknown':A[q.a]+'. '+esc(q.o[q.a])}</div><p class="mut">${esc(q.e)}</p><button class="b" onclick="teach(${i})">Teacher explains</button></div>`}).join('')}`;scrollTo(0,0)}
+
+async function pdf(i){const t=S.tests[i];if(!window.jspdf||!DL)return msg('PDF export is unavailable in this view.');const d=new jspdf.jsPDF();let y=16;
+ const put=(s,b)=>{d.setFont('helvetica',b?'bold':'normal');for(const l of d.splitTextToSize(s,180)){if(y>280){d.addPage();y=16}d.text(l,15,y);y+=5.5}};
+ put(t.n+': '+t.qs.length+' questions, '+t.m+' minutes',1);y+=3;
+ t.qs.forEach((q,n)=>{put(`${n+1}. ${q.q}`,1);q.o.forEach((o,j)=>put(`    (${A[j]}) ${o}`));y+=3});
+ d.addPage();y=16;put('Answer key',1);put(t.qs.map((q,n)=>`${n+1}-${q.a==null?'?':A[q.a]}`).join('   '));
+ try{await DL.save({filename:t.n+'.pdf',data:d.output('arraybuffer')})}catch(e){msg('Save was cancelled.')}}
+
+const TP=(q,a,h,d)=>`You are a warm, patient teacher helping a student after a test. Question: ${q.q}\nOptions: ${q.o.map((o,j)=>A[j]+') '+o).join(' | ')}\nCorrect answer: ${q.a==null?'unknown, work it out':A[q.a]}. The student chose: ${a==null?'nothing':A[a]}.\n${h}\nStudent says: ${d}\nTeach like a real teacher at a whiteboard. Return ONLY JSON {"steps":[{"title":"short","board":"1-4 short lines written on the board","say":"1-3 friendly spoken sentences"}]} with 3 to 6 steps. Reply in the language the student writes in.`;
+function teach(i){T={q:E.qs[i],a:E.a[i],steps:[],k:0,id:0,log:[],play:false,mute:false};
+ document.body.insertAdjacentHTML('beforeend',`<div class="ov" id="ov"><div class="row"><b style="flex:1">AI teacher</b><button class="b g" onclick="bye()">Close</button></div>
+<div class="card"><div class="row"><svg id="fig" class="fig" viewBox="0 0 84 84"><circle cx="42" cy="42" r="38" fill="#f2c9a0"/><circle cx="30" cy="36" r="4" fill="#222"/><circle cx="54" cy="36" r="4" fill="#222"/><ellipse class="mouth" cx="42" cy="58" rx="10" ry="6" fill="#8a2c2c"/></svg><div style="flex:1"><b id="tt"></b><div class="mut" id="tn"></div></div></div>
+<div class="board" id="bd">Preparing the lesson…</div><div class="row"><button class="b g" onclick="stp(-1)">Back</button><button class="b" id="pl" onclick="tog()">Pause</button><button class="b g" onclick="stp(1)">Next</button><button class="b g" id="mu" onclick="T.mute=!T.mute;this.textContent=T.mute?'Voice off':'Voice on'">Voice on</button></div></div>
+<div class="card"><div id="lg" class="mut"></div><div class="row"><input id="dq" placeholder="Ask your doubt…" style="flex:1;min-width:160px"><button class="b g" id="mic">🎤</button><button class="b" id="ask">Ask</button></div></div></div>`);
+ const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(R)$('#mic').onclick=()=>{try{const r=new R();r.onresult=e=>$('#dq').value=e.results[0][0].transcript;r.start()}catch(e){}};else $('#mic').hidden=true;
+ $('#ask').onclick=()=>{const d=$('#dq').value.trim();if(d){$('#dq').value='';lesson(d)}};$('#dq').onkeydown=e=>{if(e.key=='Enter')$('#ask').click()};lesson('Please explain this question step by step.')}
+async function lesson(d){clearTimeout(T.tm);T.id++;window.speechSynthesis?.cancel();T.c?.abort();$('#bd').textContent='Thinking…';
+ if(!AI){T.steps=[{title:'Explanation',board:T.q.e||'No explanation saved.',say:T.q.e||'No explanation saved.'}];return play()}
+ const c=T.c=new AbortController();
+ try{const r=await AI.json(TP(T.q,T.a,T.log.slice(-4).join('\n'),d),{cache:false,signal:c.signal,modelTier:'default'});T.steps=(r.steps||[]).filter(s=>s&&s.say);if(!T.steps.length)throw{code:'invalid_json'};
+  T.log.push('Student: '+d+'\nTeacher: '+T.steps.map(s=>s.say).join(' ').slice(0,500));$('#lg').textContent='You asked: '+d;play()}
+ catch(e){if(e.code!='cancelled')$('#bd').textContent=cp(e)}}
+function play(){T.k=0;T.play=true;$('#pl').textContent='Pause';show()}
+function show(){const s=T.steps[T.k];if(!s)return;$('#tt').textContent=s.title||'';$('#tn').textContent=`Step ${T.k+1} of ${T.steps.length}`;$('#bd').textContent=s.board||'';sp(s.say)}
+function sp(t){const f=$('#fig'),id=++T.id,ss=window.speechSynthesis;clearTimeout(T.tm);ss?.cancel();
+ if(T.mute||!ss){f.classList.remove('talk');T.tm=setTimeout(()=>id==T.id&&nx(),Math.max(2500,t.length*60));return}
+ const u=new SpeechSynthesisUtterance(t);u.onstart=()=>f.classList.add('talk');u.onend=u.onerror=()=>{f.classList.remove('talk');if(id==T.id)nx()};ss.speak(u)}
+function nx(){if(T.play&&T.k<T.steps.length-1){T.k++;show()}else{T.play=false;$('#pl').textContent='Replay'}}
+function stp(d){T.k=Math.max(0,Math.min(T.steps.length-1,T.k+d));T.play=true;$('#pl').textContent='Pause';show()}
+function tog(){if(T.play){T.play=false;T.id++;clearTimeout(T.tm);window.speechSynthesis?.cancel();$('#fig').classList.remove('talk');$('#pl').textContent='Play'}else{if(T.k>=T.steps.length-1)T.k=0;T.play=true;$('#pl').textContent='Pause';show()}}
+function bye(){T.c?.abort();T.id++;clearTimeout(T.tm);window.speechSynthesis?.cancel();$('#ov').remove()}
+
+const DU='http://localhost:11434/v1/chat/completions',CF=()=>{try{return JSON.parse(localStorage.getItem('ehc'))||{}}catch(e){return{}}};
+AI={limits:async()=>({images:{maxCount:3}}),async json(p,o={}){const c={u:DU,m:'gemma3',...CF()};if(!c.u)throw{code:'noai',message:'Set your AI endpoint in AI settings first.'};
+ const im=o.images?await Promise.all(o.images.map(b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r({type:'image_url',image_url:{url:f.result}});f.readAsDataURL(b)}))):[];
+ const r=await fetch(c.u,{method:'POST',signal:o.signal,headers:{'Content-Type':'application/json',...(c.k?{Authorization:'Bearer '+c.k}:{})},body:JSON.stringify({model:c.m,messages:[{role:'user',content:im.length?[{type:'text',text:p},...im]:p}],temperature:.2,stream:false})}).catch(e=>{if(e.name=='AbortError')throw{code:'cancelled'};throw{code:'net',message:'Could not reach your AI endpoint. Check the URL, CORS and that the server is running.'}});
+ if(!r.ok)throw{code:'http',message:'AI endpoint returned error '+r.status+'.'};
+ const t=(await r.json()).choices?.[0]?.message?.content||'',m=t.match(/[\[{][\s\S]*[\]}]/);try{return JSON.parse(m?m[0]:t)}catch(e){throw{code:'invalid_json'}}}};
+DL={save:async({filename,data})=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data]));a.download=filename;a.click()}};
+home();
+</script></body></html>
+
