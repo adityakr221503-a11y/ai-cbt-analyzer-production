@@ -27,6 +27,14 @@ def ocr_page(a):
             rs=red.crop((a0+max(0,x-30),top+max(0,y-6),a0+x+90,top+y2+6)).histogram()[255]
             lines.append({'t':' '.join(ws),'r':rs,'p':p})
     json.dump(lines,open(out,'w'));os.remove(png+'.png');return p
+def mrg(a,b):return {i:(a[i] if i in a else b[i]) for i in set(a)|set(b) if not (i in a and i in b and a[i]!=b[i])}
+def key_ocr(a):
+    pdf,p,cache=a;out=f'{cache}/{p}.k.json'
+    if os.path.exists(out):return p
+    png=f'{cache}/k{p}';sh('pdftoppm','-f',str(p),'-l',str(p),'-r','300','-png','-singlefile',pdf,png)
+    gr,red=clean(png+'.png');W,H=gr.size;gr.crop((0,int(H*.12),W,int(H*.9))).save(png+'_k.png')
+    tx=sh('tesseract',png+'_k.png','-','--psm','6','-c','tessedit_char_whitelist=0123456789().- ');os.remove(png+'.png')
+    json.dump({int(x):int(y) for x,y in KR.findall(tx) if 1<=int(y)<=4},open(out,'w'));return p
 def mk(k):return r'(?:\(\s*%d\s*\)?|(?<![.\d])\d?%d\s*\))'%(k,k)
 def opts(t,k):
     m=re.match(r'^.{0,6}?'+mk(k)+r'\s*(.*)$',t)
@@ -44,7 +52,7 @@ def clean_lines(ls):
         if not l.get('keys'):pg.setdefault(l['p'],set()).add(nm(l['t']))
     for sset in pg.values():
         for k in sset:c[k]=c.get(k,0)+1
-    lim=max(3,len(pg)*.3);hdr=lambda t:len(t)<50 and (re.search(r'\b(Chap\s*ter|Test|NCERT\s*HOT\s*SPOTS?)\s*[-–]?\s*\d{1,2}\b',t,re.I) or re.match(r'^\W*(zoology|botany)\W*$',t,re.I));keep=lambda l:l.get('keys') or hdr(l['t']) or (not JUNK.search(l['t']) and not (c[nm(l['t'])]>=lim and not re.match(r'^\W{0,6}\(?\s*[1-4]\s*\)',l['t']) and not re.match(r'^(?:Q\.?\s*)?\d{1,3}\s*[.)]',l['t'])))
+    lim=max(3,len(pg)*.3);hdr=lambda t:len(t)<60 and (re.search(r'\b(Chap\s*ter|Intensive\s*Test\s*Series|Test|NCERT\s*HOT\s*SPOTS?)\s*[-–]?\s*\d{1,2}\b',t,re.I) or re.match(r'^\W*(zoology|botany)\W*$',t,re.I));keep=lambda l:l.get('keys') or hdr(l['t']) or (not JUNK.search(l['t']) and not (c[nm(l['t'])]>=lim and not re.match(r'^\W{0,6}\(?\s*[1-4]\s*\)',l['t']) and not re.match(r'^(?:Q\.?\s*)?\d{1,3}\s*[.)]',l['t'])))
     return [l for l in ls if keep(l)]
 def parse(lines):
     qs=[];cur=[];q=None;o=-1;exp=0;seg='';sub=''
@@ -62,9 +70,9 @@ def parse(lines):
         if not t:continue
         mm=re.match(r'^\W*(zoology|botany)\W*$',t,re.I)
         if mm:sub=mm.group(1).title();continue
-        m=re.search(r'\b(Chap\s*ter|Test|NCERT\s*HOT\s*SPOTS?)\s*[-–]?\s*(\d{1,2})\b',t,re.I) if len(t)<50 else None
+        m=re.search(r'\b(Chap\s*ter|Intensive\s*Test\s*Series|Test|NCERT\s*HOT\s*SPOTS?)\s*[-–]?\s*(\d{1,2})\b',t,re.I) if len(t)<60 else None
         if m:
-            lab=('Test' if m.group(1).lower()=='test' else 'Chapter')+'-'+m.group(2)
+            lab=('Test' if 'test' in m.group(1).lower() else 'Chapter')+'-'+m.group(2)
             if lab!=seg:
                 if seg=='':
                     for z in qs:z['seg']=z['seg'] or lab
@@ -94,7 +102,7 @@ def keypage(ls):
         if len(x)==len(y):d.update({int(i):int(j) for i,j in zip(x,y) if 1<=int(j)<=4})
     if len(d)>=5:return d
     tx=' '.join(l['t'] for l in ls);ks=KR.findall(tx)
-    return {int(i):int(j) for i,j in ks} if len(ks)>=10 and len(tx)/len(ks)<16 else None
+    return {int(i):int(j) for i,j in ks} if (len(ks)>=10 and len(tx)/len(ks)<16) or (len(ks)>=8 and re.search(r'ANSWERS',tx)) else None
 def tag_of(ls):
     top=' '.join(l['t'] for l in ls[:14])
     m=re.search(r'NCERT\s*HOT\s*SPOTS?\s*[-–]?\s*(\d{1,2})',top,re.I) or re.search(r'Chap\s*ter\s*[-–]?\s*(\d{1,2})',top,re.I);kind='Chapter'
@@ -135,8 +143,13 @@ def main():
         for k,nm,s,e in toc:
             if s<=p<=e:return nm
     pages={p:json.load(open(f'{cache}/{p}.json')) for p in range(a,b+1)};lines=[];keys={};lastsub=''
+    kc=[p for p in pages if tag_of(pages[p]) and re.search(r'ANSWERS',' '.join(l['t'] for l in pages[p][:14]))]
+    with Pool(jobs) as pl:
+        for i,_ in enumerate(pl.imap_unordered(key_ocr,[(pdf,p,cache) for p in kc])):print(f'\ranswer pages {i+1}/{len(kc)}',end='',flush=True)
+    print()
+    k2={p:{int(x):y for x,y in json.load(open(f'{cache}/{p}.k.json')).items()} for p in kc}
     for p in range(a,b+1):
-        kp=keypage(pages[p]);tg=tag_of(pages[p]) if kp else None
+        kp=keypage(pages[p]) if p not in k2 else mrg(keypage(pages[p]) or {},k2[p]);tg=tag_of(pages[p]) if kp else None
         if kp and tg:
             sb=tg[2] or lastsub;lastsub=sb;keys.setdefault((tg[0],tg[1],sb),{}).update(kp)
         elif kp:lines.append({'t':'@@KEY','keys':kp,'p':p,'r':0})
