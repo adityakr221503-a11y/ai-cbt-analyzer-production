@@ -148,6 +148,18 @@
     var consumed = env.sessionRaw && env.sessionRaw("RF_HANDOFF_CONSUMED");
 
     if (src === "pdf" || params.get("rf-final") === "1" || params.get("pdfcbt") === "1") {
+      /* Current PDF session must beat any stale, larger Biology cache. */
+      if (/^PDF$/i.test(sTag)) {
+        var sessionPdf = normalizeList(arrayFrom(env.session("CBT_ACTIVE_QUESTIONS")));
+        if (sessionPdf.length) {
+          return done({
+            label: "session.CBT_ACTIVE_QUESTIONS",
+            list: sessionPdf,
+            tag: sTag,
+            title: ""
+          }, "pdf");
+        }
+      }
       add("local.pdfCbtQuestions", env.local("pdfCbtQuestions"), "PDF");
       add("local.CBT_ACTIVE_QUESTIONS", env.local("CBT_ACTIVE_QUESTIONS"), "PDF");
       add("local.TOPPER_TEST_180", env.local("TOPPER_TEST_180"), "PDF");

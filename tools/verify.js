@@ -47,6 +47,27 @@ check("ES-module graph in src/ resolves",()=>{const e=[];
     for(const m of t.matchAll(/(?:from|import)\s*\(?\s*["'](\.[^"']+)["']/g)){
       if(!fs.existsSync(path.normalize(path.join(path.dirname(f),m[1]))))e.push(f+" -> "+m[1])}}return e});
 
+check("PDF handoff outranks stale Biology cache",()=>{
+  const api=require("../rf-fixpack-v1.js");
+  const q=(text)=>({text,options:["Option A","Option B"]});
+  const pdf=[q("NEW PDF QUESTION")];
+  const stale=[q("STALE BIOLOGY CACHE"),q("STALE BIOLOGY CACHE 2"),q("STALE BIOLOGY CACHE 3")];
+  const picked=api.chooseSource({
+    search:"?source=pdf&rf-final=1",
+    session:k=>k==="CBT_ACTIVE_QUESTIONS"?pdf:
+      k==="CBT_ACTIVE_TEST"?{sourceType:"BIOLOGY",questions:stale}:null,
+    local:k=>k==="pdfCbtQuestions"?stale:
+      k==="CBT_ACTIVE_TEST"?{sourceType:"BIOLOGY",questions:stale}:null,
+    sessionRaw:k=>k==="CBT_ACTIVE_SOURCE"?"PDF":null
+  });
+  if(picked.mode!=="handoff")return ["mode was "+picked.mode];
+  if(!picked.questions.length)return ["no questions selected"];
+  if(picked.questions[0].question!=="NEW PDF QUESTION")
+    return ["selected stale question: "+picked.questions[0].question];
+  if(picked.reason!=="session.CBT_ACTIVE_QUESTIONS")
+    return ["unexpected source: "+picked.reason];
+  return [];
+});
 (async()=>{
   /* core learning loop, run for real with an in-memory localStorage */
   const store={};global.localStorage={getItem:k=>k in store?store[k]:null,setItem:(k,v)=>{store[k]=String(v)},removeItem:k=>{delete store[k]},clear(){for(const k in store)delete store[k]},key:i=>Object.keys(store)[i],get length(){return Object.keys(store).length}};
