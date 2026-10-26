@@ -62,9 +62,9 @@ def parse(lines):
         if not t:continue
         mm=re.match(r'^\W*(zoology|botany)\W*$',t,re.I)
         if mm:sub=mm.group(1).title();continue
-        m=re.search(r'\b(Chapter|Test)\s*[-–]?\s*(\d{1,2})\b',t,re.I) if len(t)<50 else None
+        m=re.search(r'\b(Chap\s*ter|Test|NCERT\s*HOT\s*SPOTS?)\s*[-–]?\s*(\d{1,2})\b',t,re.I) if len(t)<50 else None
         if m:
-            lab=m.group(1).title()+'-'+m.group(2)
+            lab=('Test' if m.group(1).lower()=='test' else 'Chapter')+'-'+m.group(2)
             if lab!=seg:
                 if seg=='':
                     for z in qs:z['seg']=z['seg'] or lab
@@ -95,10 +95,33 @@ def keypage(ls):
     if len(d)>=5:return d
     tx=' '.join(l['t'] for l in ls);ks=KR.findall(tx)
     return {int(i):int(j) for i,j in ks} if len(ks)>=10 and len(tx)/len(ks)<16 else None
+def tag_of(ls):
+    top=' '.join(l['t'] for l in ls[:14])
+    m=re.search(r'NCERT\s*HOT\s*SPOTS?\s*[-–]?\s*(\d{1,2})',top,re.I) or re.search(r'Chap\s*ter\s*[-–]?\s*(\d{1,2})',top,re.I);kind='Chapter'
+    if not m:
+        m=re.search(r'\bTest\s*[-–]?\s*(\d{1,2})',top,re.I);kind='Test'
+        if not m:return None
+    sb='Botany' if re.search('botany',top,re.I) else 'Zoology' if re.search('zoology',top,re.I) else ''
+    return kind,int(m.group(1)),sb
 def level(q):
     t=q['q'];s=0;s+=len(t)>140;s+=len(t)>260;s+=2*bool(re.search(r'statement|assertion|reason|column|match|list-?i',t,re.I));s+=bool(re.search(r'\b(except|not|incorrect|false|wrong)\b',t,re.I));s+=sum(map(len,q['o']))/max(1,len(q['o']))>45;s+=bool(re.search(r'how many|number of|total',t,re.I))
     return 'Easy' if s<=1 else 'Medium' if s==2 else 'Hard' if s==3 else 'Elite'
 BOT=r'plant|flower|photosynth|respiration in|botany|living world|classification|ecosystem|biodiversity|organisms|microbes|biotechnology|cell|root|stem|leaf|seed|kingdom'
+BW=re.compile(r'plant|xylem|phloem|stem|root|leaf|flower|seed|pollen|photosynth|chloroplast|stomata|cambium|meristem|angiosperm|gymnosperm|monocot|dicot|fruit|ovule|algae|fungi|bryophyte|auxin|gibberellin|ethylene|transpiration',re.I);ZW=re.compile(r'human|animal|blood|heart|kidney|neuron|nerve|muscle|bone|lung|artery|uterus|ovary|testis|sperm|insect|cockroach|frog|earthworm|vertebrate|chordate|mammal|hormone',re.I)
+def assign(qs,keys):
+    runs=[]
+    for q in qs:
+        if runs and runs[-1][-1]['seg']==q['seg'] and q['n']>runs[-1][-1]['n']:runs[-1].append(q)
+        else:runs.append([q])
+    for r in runs:
+        tx=' '.join(x['q']+' '.join(x['o']) for x in r);sc=len(BW.findall(tx))-len(ZW.findall(tx))
+        sb='Botany' if sc>=3 else 'Zoology' if sc<=-3 else r[0]['sub']
+        kd,_,nn=r[0]['seg'].partition('-')
+        ks=(keys.get((kd,int(nn),sb)) or keys.get((kd,int(nn),'')) or ({} if sb else next((v for (k2,n2,s2),v in keys.items() if k2==kd and n2==int(nn)),{}))) if nn.isdigit() else {}
+        for q in r:
+            if sb:q['sub']=sb
+            if q['n'] in ks and ks[q['n']]<=len(q['o']):q['a']=ks[q['n']]-1
+    return qs
 def main():
     pdf,bid,name=sys.argv[1:4];ar=sys.argv[4:];jobs=int(ar[ar.index('--jobs')+1]) if '--jobs' in ar else 2;sub0=ar[ar.index('--subject')+1] if '--subject' in ar else 'Biology'
     n=int(re.search(r'Pages:\s+(\d+)',sh('pdfinfo',pdf)).group(1));a,b=1,n
@@ -111,17 +134,20 @@ def main():
     def chap(p):
         for k,nm,s,e in toc:
             if s<=p<=e:return nm
-    pages={p:json.load(open(f'{cache}/{p}.json')) for p in range(a,b+1)};lines=[]
+    pages={p:json.load(open(f'{cache}/{p}.json')) for p in range(a,b+1)};lines=[];keys={};lastsub=''
     for p in range(a,b+1):
-        kp=keypage(pages[p])
-        if kp:lines.append({'t':'@@KEY','keys':kp,'p':p,'r':0})
+        kp=keypage(pages[p]);tg=tag_of(pages[p]) if kp else None
+        if kp and tg:
+            sb=tg[2] or lastsub;lastsub=sb;keys.setdefault((tg[0],tg[1],sb),{}).update(kp)
+        elif kp:lines.append({'t':'@@KEY','keys':kp,'p':p,'r':0})
         else:lines+=[dict(l,c=chap(p) or '') for l in pages[p]]
     out=[];qid=0
-    for q in parse(lines):
+    for q in assign(parse(lines),keys):
         ch=chap(q['p']) or q['seg'] or 'General'
         if q['a'] is None and q['rs'] and max(q['rs'])>=50 and sorted(q['rs'])[-1]>=1.3*max(1,sorted(q['rs'])[-2] if len(q['rs'])>1 else 0):q['a']=q['rs'].index(max(q['rs']));q['src']='tick'
         qid+=1;sub=q['sub'] or (sub0 if sub0!='Biology' else ('Botany' if re.search(BOT,ch,re.I) else 'Zoology'))
         out.append({'id':f'{bid}-{qid}','n':q['n'],'q':q['q'].strip(),'o':[x.strip() for x in q['o'][:4]],'a':q['a'],'s':sub,'ch':ch,'t':ch,'lvl':level(q),'pg':q['p'],'chk':int(len(q['q'])<20 or len(q['o'])<4 or q['a'] is None)})
+    if '--keyed-only' in ar:out=[x for x in out if x['a'] is not None]
     os.makedirs('banks',exist_ok=True);json.dump({'id':bid,'name':name,'questions':out},open(f'banks/{bid}.json','w'),ensure_ascii=False)
     ix=json.load(open('banks/index.json')) if os.path.exists('banks/index.json') else []
     ix=[x for x in ix if x['id']!=bid]+[{'id':bid,'name':name,'count':len(out),'keyed':sum(x['a'] is not None for x in out)}];json.dump(ix,open('banks/index.json','w'))
