@@ -44,7 +44,7 @@ def clean_lines(ls):
         if not l.get('keys'):pg.setdefault(l['p'],set()).add(nm(l['t']))
     for sset in pg.values():
         for k in sset:c[k]=c.get(k,0)+1
-    lim=max(3,len(pg)*.3);keep=lambda l:l.get('keys') or (not JUNK.search(l['t']) and not (c[nm(l['t'])]>=lim and not re.match(r'^\W{0,6}\(?\s*[1-4]\s*\)',l['t']) and not re.match(r'^(?:Q\.?\s*)?\d{1,3}\s*[.)]',l['t'])))
+    lim=max(3,len(pg)*.3);hdr=lambda t:len(t)<50 and (re.search(r'\b(Chap\s*ter|Test|NCERT\s*HOT\s*SPOTS?)\s*[-–]?\s*\d{1,2}\b',t,re.I) or re.match(r'^\W*(zoology|botany)\W*$',t,re.I));keep=lambda l:l.get('keys') or hdr(l['t']) or (not JUNK.search(l['t']) and not (c[nm(l['t'])]>=lim and not re.match(r'^\W{0,6}\(?\s*[1-4]\s*\)',l['t']) and not re.match(r'^(?:Q\.?\s*)?\d{1,3}\s*[.)]',l['t'])))
     return [l for l in ls if keep(l)]
 def parse(lines):
     qs=[];cur=[];q=None;o=-1;exp=0;seg='';sub=''
@@ -143,7 +143,7 @@ def main():
         else:lines+=[dict(l,c=chap(p) or '') for l in pages[p]]
     out=[];qid=0
     for q in assign(parse(lines),keys):
-        ch=chap(q['p']) or q['seg'] or 'General'
+        ch=chap(q['p']) or ((q['sub']+' ' if q['sub'] else '')+q['seg']).strip() or 'General'
         if q['a'] is None and q['rs'] and max(q['rs'])>=50 and sorted(q['rs'])[-1]>=1.3*max(1,sorted(q['rs'])[-2] if len(q['rs'])>1 else 0):q['a']=q['rs'].index(max(q['rs']));q['src']='tick'
         qid+=1;sub=q['sub'] or (sub0 if sub0!='Biology' else ('Botany' if re.search(BOT,ch,re.I) else 'Zoology'))
         out.append({'id':f'{bid}-{qid}','n':q['n'],'q':q['q'].strip(),'o':[x.strip() for x in q['o'][:4]],'a':q['a'],'s':sub,'ch':ch,'t':ch,'lvl':level(q),'pg':q['p'],'chk':int(len(q['q'])<20 or len(q['o'])<4 or q['a'] is None)})
