@@ -1,0 +1,2702 @@
+{
+  "neet": [
+    {
+      "id": "neet-2024-re-neet",
+      "title": "NEET 2024 (Re-NEET)",
+      "year": 2024,
+      "count": 174,
+      "subjects": {
+        "Biology": 82,
+        "Physics": 52,
+        "Chemistry": 40
+      },
+      "file": "pyq-bank/papers/neet-2024-re-neet.json"
+    },
+    {
+      "id": "neet-2024",
+      "title": "NEET 2024",
+      "year": 2024,
+      "count": 173,
+      "subjects": {
+        "Biology": 78,
+        "Physics": 54,
+        "Chemistry": 41
+      },
+      "file": "pyq-bank/papers/neet-2024.json"
+    },
+    {
+      "id": "neet-2023-manipur",
+      "title": "NEET 2023 (Manipur)",
+      "year": 2023,
+      "count": 183,
+      "subjects": {
+        "Biology": 84,
+        "Physics": 60,
+        "Chemistry": 39
+      },
+      "file": "pyq-bank/papers/neet-2023-manipur.json"
+    },
+    {
+      "id": "neet-2023-all-india",
+      "title": "NEET 2023 (All India)",
+      "year": 2023,
+      "count": 169,
+      "subjects": {
+        "Biology": 75,
+        "Physics": 54,
+        "Chemistry": 40
+      },
+      "file": "pyq-bank/papers/neet-2023-all-india.json"
+    },
+    {
+      "id": "neet-2022-phase-2",
+      "title": "NEET 2022 (Phase 2)",
+      "year": 2022,
+      "count": 181,
+      "subjects": {
+        "Biology": 86,
+        "Physics": 49,
+        "Chemistry": 46
+      },
+      "file": "pyq-bank/papers/neet-2022-phase-2.json"
+    },
+    {
+      "id": "neet-2022-phase-1",
+      "title": "NEET 2022 (Phase 1)",
+      "year": 2022,
+      "count": 172,
+      "subjects": {
+        "Biology": 78,
+        "Physics": 55,
+        "Chemistry": 39
+      },
+      "file": "pyq-bank/papers/neet-2022-phase-1.json"
+    },
+    {
+      "id": "neet-2021",
+      "title": "NEET 2021",
+      "year": 2021,
+      "count": 196,
+      "subjects": {
+        "Biology": 95,
+        "Physics": 56,
+        "Chemistry": 45
+      },
+      "file": "pyq-bank/papers/neet-2021.json"
+    },
+    {
+      "id": "neet-2020-phase-2",
+      "title": "NEET 2020 (Phase 2)",
+      "year": 2020,
+      "count": 172,
+      "subjects": {
+        "Biology": 87,
+        "Physics": 45,
+        "Chemistry": 40
+      },
+      "file": "pyq-bank/papers/neet-2020-phase-2.json"
+    },
+    {
+      "id": "neet-2020-phase-1",
+      "title": "NEET 2020 (Phase 1)",
+      "year": 2020,
+      "count": 163,
+      "subjects": {
+        "Biology": 78,
+        "Physics": 49,
+        "Chemistry": 36
+      },
+      "file": "pyq-bank/papers/neet-2020-phase-1.json"
+    },
+    {
+      "id": "neet-2019-odisha",
+      "title": "NEET 2019 (Odisha)",
+      "year": 2019,
+      "count": 181,
+      "subjects": {
+        "Biology": 87,
+        "Physics": 50,
+        "Chemistry": 44
+      },
+      "file": "pyq-bank/papers/neet-2019-odisha.json"
+    },
+    {
+      "id": "neet-2019-all-india",
+      "title": "NEET 2019 (All India)",
+      "year": 2019,
+      "count": 181,
+      "subjects": {
+        "Biology": 85,
+        "Physics": 53,
+        "Chemistry": 43
+      },
+      "file": "pyq-bank/papers/neet-2019-all-india.json"
+    },
+    {
+      "id": "neet-2018",
+      "title": "NEET 2018",
+      "year": 2018,
+      "count": 178,
+      "subjects": {
+        "Biology": 88,
+        "Physics": 49,
+        "Chemistry": 41
+      },
+      "file": "pyq-bank/papers/neet-2018.json"
+    },
+    {
+      "id": "neet-2017",
+      "title": "NEET 2017",
+      "year": 2017,
+      "count": 182,
+      "subjects": {
+        "Biology": 87,
+        "Physics": 49,
+        "Chemistry": 46
+      },
+      "file": "pyq-bank/papers/neet-2017.json"
+    },
+    {
+      "id": "neet-2016-phase-2",
+      "title": "NEET 2016 (Phase 2)",
+      "year": 2016,
+      "count": 187,
+      "subjects": {
+        "Biology": 89,
+        "Physics": 55,
+        "Chemistry": 43
+      },
+      "file": "pyq-bank/papers/neet-2016-phase-2.json"
+    },
+    {
+      "id": "neet-2016-phase-1",
+      "title": "NEET 2016 (Phase 1)",
+      "year": 2016,
+      "count": 184,
+      "subjects": {
+        "Biology": 89,
+        "Physics": 52,
+        "Chemistry": 43
+      },
+      "file": "pyq-bank/papers/neet-2016-phase-1.json"
+    },
+    {
+      "id": "neet-2015-phase-2",
+      "title": "NEET 2015 (Phase 2)",
+      "year": 2015,
+      "count": 186,
+      "subjects": {
+        "Biology": 91,
+        "Physics": 49,
+        "Chemistry": 46
+      },
+      "file": "pyq-bank/papers/neet-2015-phase-2.json"
+    },
+    {
+      "id": "neet-2015-phase-1",
+      "title": "NEET 2015 (Phase 1)",
+      "year": 2015,
+      "count": 181,
+      "subjects": {
+        "Biology": 86,
+        "Physics": 50,
+        "Chemistry": 45
+      },
+      "file": "pyq-bank/papers/neet-2015-phase-1.json"
+    },
+    {
+      "id": "neet-2014",
+      "title": "NEET 2014",
+      "year": 2014,
+      "count": 178,
+      "subjects": {
+        "Biology": 85,
+        "Physics": 50,
+        "Chemistry": 43
+      },
+      "file": "pyq-bank/papers/neet-2014.json"
+    },
+    {
+      "id": "neet-2013-karnataka",
+      "title": "NEET 2013 (Karnataka)",
+      "year": 2013,
+      "count": 179,
+      "subjects": {
+        "Biology": 86,
+        "Physics": 52,
+        "Chemistry": 41
+      },
+      "file": "pyq-bank/papers/neet-2013-karnataka.json"
+    },
+    {
+      "id": "neet-2013-all-india",
+      "title": "NEET 2013 (All India)",
+      "year": 2013,
+      "count": 188,
+      "subjects": {
+        "Biology": 92,
+        "Physics": 51,
+        "Chemistry": 45
+      },
+      "file": "pyq-bank/papers/neet-2013-all-india.json"
+    },
+    {
+      "id": "neet-2012-screening",
+      "title": "NEET 2012 (Screening)",
+      "year": 2012,
+      "count": 197,
+      "subjects": {
+        "Biology": 93,
+        "Physics": 56,
+        "Chemistry": 48
+      },
+      "file": "pyq-bank/papers/neet-2012-screening.json"
+    },
+    {
+      "id": "neet-2012-mains",
+      "title": "NEET 2012 (Mains)",
+      "year": 2012,
+      "count": 110,
+      "subjects": {
+        "Biology": 51,
+        "Physics": 33,
+        "Chemistry": 26
+      },
+      "file": "pyq-bank/papers/neet-2012-mains.json"
+    },
+    {
+      "id": "neet-2011-screening",
+      "title": "NEET 2011 (Screening)",
+      "year": 2011,
+      "count": 205,
+      "subjects": {
+        "Biology": 100,
+        "Physics": 56,
+        "Chemistry": 49
+      },
+      "file": "pyq-bank/papers/neet-2011-screening.json"
+    },
+    {
+      "id": "neet-2011-mains",
+      "title": "NEET 2011 (Mains)",
+      "year": 2011,
+      "count": 122,
+      "subjects": {
+        "Biology": 55,
+        "Physics": 34,
+        "Chemistry": 33
+      },
+      "file": "pyq-bank/papers/neet-2011-mains.json"
+    },
+    {
+      "id": "neet-2010-screening",
+      "title": "NEET 2010 (Screening)",
+      "year": 2010,
+      "count": 210,
+      "subjects": {
+        "Biology": 99,
+        "Physics": 60,
+        "Chemistry": 51
+      },
+      "file": "pyq-bank/papers/neet-2010-screening.json"
+    },
+    {
+      "id": "neet-2010-mains",
+      "title": "NEET 2010 (Mains)",
+      "year": 2010,
+      "count": 115,
+      "subjects": {
+        "Biology": 56,
+        "Physics": 31,
+        "Chemistry": 28
+      },
+      "file": "pyq-bank/papers/neet-2010-mains.json"
+    },
+    {
+      "id": "neet-2009-screening",
+      "title": "NEET 2009 (Screening)",
+      "year": 2009,
+      "count": 201,
+      "subjects": {
+        "Biology": 99,
+        "Physics": 55,
+        "Chemistry": 47
+      },
+      "file": "pyq-bank/papers/neet-2009-screening.json"
+    },
+    {
+      "id": "neet-2009-mains",
+      "title": "NEET 2009 (Mains)",
+      "year": 2009,
+      "count": 201,
+      "subjects": {
+        "Biology": 99,
+        "Physics": 56,
+        "Chemistry": 46
+      },
+      "file": "pyq-bank/papers/neet-2009-mains.json"
+    },
+    {
+      "id": "neet-2008-screening",
+      "title": "NEET 2008 (Screening)",
+      "year": 2008,
+      "count": 199,
+      "subjects": {
+        "Biology": 97,
+        "Physics": 54,
+        "Chemistry": 48
+      },
+      "file": "pyq-bank/papers/neet-2008-screening.json"
+    },
+    {
+      "id": "neet-2008-mains",
+      "title": "NEET 2008 (Mains)",
+      "year": 2008,
+      "count": 199,
+      "subjects": {
+        "Biology": 97,
+        "Physics": 55,
+        "Chemistry": 47
+      },
+      "file": "pyq-bank/papers/neet-2008-mains.json"
+    },
+    {
+      "id": "neet-2007",
+      "title": "NEET 2007",
+      "year": 2007,
+      "count": 207,
+      "subjects": {
+        "Biology": 102,
+        "Physics": 57,
+        "Chemistry": 48
+      },
+      "file": "pyq-bank/papers/neet-2007.json"
+    },
+    {
+      "id": "neet-2006",
+      "title": "NEET 2006",
+      "year": 2006,
+      "count": 204,
+      "subjects": {
+        "Biology": 96,
+        "Physics": 59,
+        "Chemistry": 49
+      },
+      "file": "pyq-bank/papers/neet-2006.json"
+    },
+    {
+      "id": "neet-2005",
+      "title": "NEET 2005",
+      "year": 2005,
+      "count": 193,
+      "subjects": {
+        "Biology": 91,
+        "Physics": 53,
+        "Chemistry": 49
+      },
+      "file": "pyq-bank/papers/neet-2005.json"
+    },
+    {
+      "id": "neet-2004",
+      "title": "NEET 2004",
+      "year": 2004,
+      "count": 211,
+      "subjects": {
+        "Biology": 100,
+        "Physics": 61,
+        "Chemistry": 50
+      },
+      "file": "pyq-bank/papers/neet-2004.json"
+    },
+    {
+      "id": "neet-2003",
+      "title": "NEET 2003",
+      "year": 2003,
+      "count": 199,
+      "subjects": {
+        "Biology": 96,
+        "Physics": 56,
+        "Chemistry": 47
+      },
+      "file": "pyq-bank/papers/neet-2003.json"
+    },
+    {
+      "id": "neet-2002",
+      "title": "NEET 2002",
+      "year": 2002,
+      "count": 197,
+      "subjects": {
+        "Biology": 97,
+        "Physics": 56,
+        "Chemistry": 44
+      },
+      "file": "pyq-bank/papers/neet-2002.json"
+    }
+  ],
+  "jee_main": [
+    {
+      "id": "jee-main-2024-31-jan-shift-2",
+      "title": "JEE Main 2024 (31 Jan Shift 2)",
+      "year": 2024,
+      "count": 53,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 9,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2024-31-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-31-jan-shift-1",
+      "title": "JEE Main 2024 (31 Jan Shift 1)",
+      "year": 2024,
+      "count": 59,
+      "subjects": {
+        "Physics": 24,
+        "Chemistry": 15,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2024-31-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-30-jan-shift-2",
+      "title": "JEE Main 2024 (30 Jan Shift 2)",
+      "year": 2024,
+      "count": 73,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 24,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2024-30-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-30-jan-shift-1",
+      "title": "JEE Main 2024 (30 Jan Shift 1)",
+      "year": 2024,
+      "count": 62,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 21,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2024-30-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-29-jan-shift-2",
+      "title": "JEE Main 2024 (29 Jan Shift 2)",
+      "year": 2024,
+      "count": 64,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 22,
+        "Mathematics": 17
+      },
+      "file": "pyq-bank/papers/jee-main-2024-29-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-29-jan-shift-1",
+      "title": "JEE Main 2024 (29 Jan Shift 1)",
+      "year": 2024,
+      "count": 67,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 18,
+        "Mathematics": 26
+      },
+      "file": "pyq-bank/papers/jee-main-2024-29-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-27-jan-shift-2",
+      "title": "JEE Main 2024 (27 Jan Shift 2)",
+      "year": 2024,
+      "count": 66,
+      "subjects": {
+        "Physics": 24,
+        "Chemistry": 21,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2024-27-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-27-jan-shift-1",
+      "title": "JEE Main 2024 (27 Jan Shift 1)",
+      "year": 2024,
+      "count": 60,
+      "subjects": {
+        "Physics": 20,
+        "Chemistry": 21,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2024-27-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-09-apr-shift-2",
+      "title": "JEE Main 2024 (09 Apr Shift 2)",
+      "year": 2024,
+      "count": 70,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 22,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2024-09-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-09-apr-shift-1",
+      "title": "JEE Main 2024 (09 Apr Shift 1)",
+      "year": 2024,
+      "count": 58,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 17,
+        "Mathematics": 16
+      },
+      "file": "pyq-bank/papers/jee-main-2024-09-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-08-apr-shift-2",
+      "title": "JEE Main 2024 (08 Apr Shift 2)",
+      "year": 2024,
+      "count": 66,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 19,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2024-08-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-08-apr-shift-1",
+      "title": "JEE Main 2024 (08 Apr Shift 1)",
+      "year": 2024,
+      "count": 66,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 20,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2024-08-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-06-apr-shift-2",
+      "title": "JEE Main 2024 (06 Apr Shift 2)",
+      "year": 2024,
+      "count": 63,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 19,
+        "Mathematics": 17
+      },
+      "file": "pyq-bank/papers/jee-main-2024-06-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-06-apr-shift-1",
+      "title": "JEE Main 2024 (06 Apr Shift 1)",
+      "year": 2024,
+      "count": 53,
+      "subjects": {
+        "Physics": 18,
+        "Chemistry": 20,
+        "Mathematics": 15
+      },
+      "file": "pyq-bank/papers/jee-main-2024-06-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-05-apr-shift-2",
+      "title": "JEE Main 2024 (05 Apr Shift 2)",
+      "year": 2024,
+      "count": 64,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 18,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2024-05-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-05-apr-shift-1",
+      "title": "JEE Main 2024 (05 Apr Shift 1)",
+      "year": 2024,
+      "count": 53,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 16,
+        "Mathematics": 15
+      },
+      "file": "pyq-bank/papers/jee-main-2024-05-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-04-apr-shift-2",
+      "title": "JEE Main 2024 (04 Apr Shift 2)",
+      "year": 2024,
+      "count": 57,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 17,
+        "Mathematics": 14
+      },
+      "file": "pyq-bank/papers/jee-main-2024-04-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-04-apr-shift-1",
+      "title": "JEE Main 2024 (04 Apr Shift 1)",
+      "year": 2024,
+      "count": 54,
+      "subjects": {
+        "Physics": 21,
+        "Chemistry": 18,
+        "Mathematics": 15
+      },
+      "file": "pyq-bank/papers/jee-main-2024-04-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2024-01-feb-shift-2",
+      "title": "JEE Main 2024 (01 Feb Shift 2)",
+      "year": 2024,
+      "count": 61,
+      "subjects": {
+        "Physics": 34,
+        "Chemistry": 15,
+        "Mathematics": 12
+      },
+      "file": "pyq-bank/papers/jee-main-2024-01-feb-shift-2.json"
+    },
+    {
+      "id": "jee-main-2024-01-feb-shift-1",
+      "title": "JEE Main 2024 (01 Feb Shift 1)",
+      "year": 2024,
+      "count": 65,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 20,
+        "Mathematics": 16
+      },
+      "file": "pyq-bank/papers/jee-main-2024-01-feb-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-31-jan-shift-2",
+      "title": "JEE Main 2023 (31 Jan Shift 2)",
+      "year": 2023,
+      "count": 64,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 16,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2023-31-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-31-jan-shift-1",
+      "title": "JEE Main 2023 (31 Jan Shift 1)",
+      "year": 2023,
+      "count": 75,
+      "subjects": {
+        "Physics": 30,
+        "Chemistry": 23,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2023-31-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-30-jan-shift-2",
+      "title": "JEE Main 2023 (30 Jan Shift 2)",
+      "year": 2023,
+      "count": 75,
+      "subjects": {
+        "Physics": 31,
+        "Chemistry": 19,
+        "Mathematics": 25
+      },
+      "file": "pyq-bank/papers/jee-main-2023-30-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-30-jan-shift-1",
+      "title": "JEE Main 2023 (30 Jan Shift 1)",
+      "year": 2023,
+      "count": 61,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 21,
+        "Mathematics": 17
+      },
+      "file": "pyq-bank/papers/jee-main-2023-30-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-29-jan-shift-2",
+      "title": "JEE Main 2023 (29 Jan Shift 2)",
+      "year": 2023,
+      "count": 65,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 25,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-main-2023-29-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-29-jan-shift-1",
+      "title": "JEE Main 2023 (29 Jan Shift 1)",
+      "year": 2023,
+      "count": 76,
+      "subjects": {
+        "Physics": 32,
+        "Chemistry": 20,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2023-29-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-25-jan-shift-2",
+      "title": "JEE Main 2023 (25 Jan Shift 2)",
+      "year": 2023,
+      "count": 72,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 24,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2023-25-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-25-jan-shift-1",
+      "title": "JEE Main 2023 (25 Jan Shift 1)",
+      "year": 2023,
+      "count": 71,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 22,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2023-25-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-24-jan-shift-2",
+      "title": "JEE Main 2023 (24 Jan Shift 2)",
+      "year": 2023,
+      "count": 66,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 19,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2023-24-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-24-jan-shift-1",
+      "title": "JEE Main 2023 (24 Jan Shift 1)",
+      "year": 2023,
+      "count": 69,
+      "subjects": {
+        "Physics": 24,
+        "Chemistry": 21,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2023-24-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-15-apr-shift-1",
+      "title": "JEE Main 2023 (15 Apr Shift 1)",
+      "year": 2023,
+      "count": 76,
+      "subjects": {
+        "Physics": 34,
+        "Chemistry": 20,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2023-15-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-13-apr-shift-2",
+      "title": "JEE Main 2023 (13 Apr Shift 2)",
+      "year": 2023,
+      "count": 61,
+      "subjects": {
+        "Physics": 24,
+        "Chemistry": 14,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2023-13-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-13-apr-shift-1",
+      "title": "JEE Main 2023 (13 Apr Shift 1)",
+      "year": 2023,
+      "count": 64,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 22,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2023-13-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-12-apr-shift-1",
+      "title": "JEE Main 2023 (12 Apr Shift 1)",
+      "year": 2023,
+      "count": 62,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 17,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2023-12-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-11-apr-shift-2",
+      "title": "JEE Main 2023 (11 Apr Shift 2)",
+      "year": 2023,
+      "count": 71,
+      "subjects": {
+        "Physics": 30,
+        "Chemistry": 17,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2023-11-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-11-apr-shift-1",
+      "title": "JEE Main 2023 (11 Apr Shift 1)",
+      "year": 2023,
+      "count": 55,
+      "subjects": {
+        "Physics": 24,
+        "Chemistry": 13,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-main-2023-11-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-10-apr-shift-2",
+      "title": "JEE Main 2023 (10 Apr Shift 2)",
+      "year": 2023,
+      "count": 67,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 21,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2023-10-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-10-apr-shift-1",
+      "title": "JEE Main 2023 (10 Apr Shift 1)",
+      "year": 2023,
+      "count": 71,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 19,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2023-10-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-08-apr-shift-2",
+      "title": "JEE Main 2023 (08 Apr Shift 2)",
+      "year": 2023,
+      "count": 73,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 21,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2023-08-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-08-apr-shift-1",
+      "title": "JEE Main 2023 (08 Apr Shift 1)",
+      "year": 2023,
+      "count": 76,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 24,
+        "Mathematics": 27
+      },
+      "file": "pyq-bank/papers/jee-main-2023-08-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-06-apr-shift-2",
+      "title": "JEE Main 2023 (06 Apr Shift 2)",
+      "year": 2023,
+      "count": 65,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 20,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2023-06-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-06-apr-shift-1",
+      "title": "JEE Main 2023 (06 Apr Shift 1)",
+      "year": 2023,
+      "count": 64,
+      "subjects": {
+        "Physics": 17,
+        "Chemistry": 22,
+        "Mathematics": 25
+      },
+      "file": "pyq-bank/papers/jee-main-2023-06-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2023-01-feb-shift-2",
+      "title": "JEE Main 2023 (01 Feb Shift 2)",
+      "year": 2023,
+      "count": 63,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 18,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2023-01-feb-shift-2.json"
+    },
+    {
+      "id": "jee-main-2023-01-feb-shift-1",
+      "title": "JEE Main 2023 (01 Feb Shift 1)",
+      "year": 2023,
+      "count": 62,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 17,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2023-01-feb-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-29-jun-shift-2",
+      "title": "JEE Main 2022 (29 Jun Shift 2)",
+      "year": 2022,
+      "count": 64,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 19,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2022-29-jun-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-29-jun-shift-1",
+      "title": "JEE Main 2022 (29 Jun Shift 1)",
+      "year": 2022,
+      "count": 63,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 22,
+        "Mathematics": 16
+      },
+      "file": "pyq-bank/papers/jee-main-2022-29-jun-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-29-jul-shift-2",
+      "title": "JEE Main 2022 (29 Jul Shift 2)",
+      "year": 2022,
+      "count": 56,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 15,
+        "Mathematics": 15
+      },
+      "file": "pyq-bank/papers/jee-main-2022-29-jul-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-29-jul-shift-1",
+      "title": "JEE Main 2022 (29 Jul Shift 1)",
+      "year": 2022,
+      "count": 57,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 18,
+        "Mathematics": 16
+      },
+      "file": "pyq-bank/papers/jee-main-2022-29-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-28-jun-shift-2",
+      "title": "JEE Main 2022 (28 Jun Shift 2)",
+      "year": 2022,
+      "count": 69,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 22,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2022-28-jun-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-28-jun-shift-1",
+      "title": "JEE Main 2022 (28 Jun Shift 1)",
+      "year": 2022,
+      "count": 60,
+      "subjects": {
+        "Physics": 21,
+        "Chemistry": 19,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2022-28-jun-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-28-jul-shift-2",
+      "title": "JEE Main 2022 (28 Jul Shift 2)",
+      "year": 2022,
+      "count": 63,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 18,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2022-28-jul-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-28-jul-shift-1",
+      "title": "JEE Main 2022 (28 Jul Shift 1)",
+      "year": 2022,
+      "count": 52,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 15,
+        "Mathematics": 10
+      },
+      "file": "pyq-bank/papers/jee-main-2022-28-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-27-jun-shift-2",
+      "title": "JEE Main 2022 (27 Jun Shift 2)",
+      "year": 2022,
+      "count": 61,
+      "subjects": {
+        "Physics": 21,
+        "Chemistry": 20,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2022-27-jun-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-27-jun-shift-1",
+      "title": "JEE Main 2022 (27 Jun Shift 1)",
+      "year": 2022,
+      "count": 62,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 13,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2022-27-jun-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-27-jul-shift-2",
+      "title": "JEE Main 2022 (27 Jul Shift 2)",
+      "year": 2022,
+      "count": 54,
+      "subjects": {
+        "Physics": 21,
+        "Chemistry": 18,
+        "Mathematics": 15
+      },
+      "file": "pyq-bank/papers/jee-main-2022-27-jul-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-27-jul-shift-1",
+      "title": "JEE Main 2022 (27 Jul Shift 1)",
+      "year": 2022,
+      "count": 55,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 13,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2022-27-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-26-jun-shift-2",
+      "title": "JEE Main 2022 (26 Jun Shift 2)",
+      "year": 2022,
+      "count": 72,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 27,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-main-2022-26-jun-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-26-jun-shift-1",
+      "title": "JEE Main 2022 (26 Jun Shift 1)",
+      "year": 2022,
+      "count": 66,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 26,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-main-2022-26-jun-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-26-jul-shift-2",
+      "title": "JEE Main 2022 (26 Jul Shift 2)",
+      "year": 2022,
+      "count": 61,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 20,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-main-2022-26-jul-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-26-jul-shift-1",
+      "title": "JEE Main 2022 (26 Jul Shift 1)",
+      "year": 2022,
+      "count": 57,
+      "subjects": {
+        "Physics": 18,
+        "Chemistry": 21,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-main-2022-26-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-25-jun-shift-2",
+      "title": "JEE Main 2022 (25 Jun Shift 2)",
+      "year": 2022,
+      "count": 64,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 16,
+        "Mathematics": 26
+      },
+      "file": "pyq-bank/papers/jee-main-2022-25-jun-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-25-jun-shift-1",
+      "title": "JEE Main 2022 (25 Jun Shift 1)",
+      "year": 2022,
+      "count": 57,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 17,
+        "Mathematics": 15
+      },
+      "file": "pyq-bank/papers/jee-main-2022-25-jun-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-25-jul-shift-2",
+      "title": "JEE Main 2022 (25 Jul Shift 2)",
+      "year": 2022,
+      "count": 60,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 17,
+        "Mathematics": 15
+      },
+      "file": "pyq-bank/papers/jee-main-2022-25-jul-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-25-jul-shift-1",
+      "title": "JEE Main 2022 (25 Jul Shift 1)",
+      "year": 2022,
+      "count": 51,
+      "subjects": {
+        "Physics": 16,
+        "Chemistry": 19,
+        "Mathematics": 16
+      },
+      "file": "pyq-bank/papers/jee-main-2022-25-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2022-24-jun-shift-2",
+      "title": "JEE Main 2022 (24 Jun Shift 2)",
+      "year": 2022,
+      "count": 72,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 27,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-main-2022-24-jun-shift-2.json"
+    },
+    {
+      "id": "jee-main-2022-24-jun-shift-1",
+      "title": "JEE Main 2022 (24 Jun Shift 1)",
+      "year": 2022,
+      "count": 62,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 20,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2022-24-jun-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-31-aug-shift-2",
+      "title": "JEE Main 2021 (31 Aug Shift 2)",
+      "year": 2021,
+      "count": 69,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 19,
+        "Mathematics": 25
+      },
+      "file": "pyq-bank/papers/jee-main-2021-31-aug-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-31-aug-shift-1",
+      "title": "JEE Main 2021 (31 Aug Shift 1)",
+      "year": 2021,
+      "count": 66,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 15,
+        "Mathematics": 26
+      },
+      "file": "pyq-bank/papers/jee-main-2021-31-aug-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-27-jul-shift-2",
+      "title": "JEE Main 2021 (27 Jul Shift 2)",
+      "year": 2021,
+      "count": 57,
+      "subjects": {
+        "Physics": 21,
+        "Chemistry": 17,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2021-27-jul-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-27-jul-shift-1",
+      "title": "JEE Main 2021 (27 Jul Shift 1)",
+      "year": 2021,
+      "count": 66,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 22,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2021-27-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-27-aug-shift-2",
+      "title": "JEE Main 2021 (27 Aug Shift 2)",
+      "year": 2021,
+      "count": 62,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 18,
+        "Mathematics": 16
+      },
+      "file": "pyq-bank/papers/jee-main-2021-27-aug-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-27-aug-shift-1",
+      "title": "JEE Main 2021 (27 Aug Shift 1)",
+      "year": 2021,
+      "count": 78,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 27,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2021-27-aug-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-26-feb-shift-2",
+      "title": "JEE Main 2021 (26 Feb Shift 2)",
+      "year": 2021,
+      "count": 69,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 22,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2021-26-feb-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-26-feb-shift-1",
+      "title": "JEE Main 2021 (26 Feb Shift 1)",
+      "year": 2021,
+      "count": 72,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 22,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2021-26-feb-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-26-aug-shift-2",
+      "title": "JEE Main 2021 (26 Aug Shift 2)",
+      "year": 2021,
+      "count": 71,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 16,
+        "Mathematics": 26
+      },
+      "file": "pyq-bank/papers/jee-main-2021-26-aug-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-26-aug-shift-1",
+      "title": "JEE Main 2021 (26 Aug Shift 1)",
+      "year": 2021,
+      "count": 66,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 17,
+        "Mathematics": 26
+      },
+      "file": "pyq-bank/papers/jee-main-2021-26-aug-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-25-jul-shift-2",
+      "title": "JEE Main 2021 (25 Jul Shift 2)",
+      "year": 2021,
+      "count": 75,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 21,
+        "Mathematics": 25
+      },
+      "file": "pyq-bank/papers/jee-main-2021-25-jul-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-25-jul-shift-1",
+      "title": "JEE Main 2021 (25 Jul Shift 1)",
+      "year": 2021,
+      "count": 66,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 18,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2021-25-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-25-feb-shift-2",
+      "title": "JEE Main 2021 (25 Feb Shift 2)",
+      "year": 2021,
+      "count": 80,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 23,
+        "Mathematics": 31
+      },
+      "file": "pyq-bank/papers/jee-main-2021-25-feb-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-25-feb-shift-1",
+      "title": "JEE Main 2021 (25 Feb Shift 1)",
+      "year": 2021,
+      "count": 75,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 23,
+        "Mathematics": 25
+      },
+      "file": "pyq-bank/papers/jee-main-2021-25-feb-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-24-feb-shift-2",
+      "title": "JEE Main 2021 (24 Feb Shift 2)",
+      "year": 2021,
+      "count": 76,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 23,
+        "Mathematics": 25
+      },
+      "file": "pyq-bank/papers/jee-main-2021-24-feb-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-24-feb-shift-1",
+      "title": "JEE Main 2021 (24 Feb Shift 1)",
+      "year": 2021,
+      "count": 71,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 21,
+        "Mathematics": 25
+      },
+      "file": "pyq-bank/papers/jee-main-2021-24-feb-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-22-jul-shift-1",
+      "title": "JEE Main 2021 (22 Jul Shift 1)",
+      "year": 2021,
+      "count": 69,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 27,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2021-22-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-20-jul-shift-2",
+      "title": "JEE Main 2021 (20 Jul Shift 2)",
+      "year": 2021,
+      "count": 68,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 20,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2021-20-jul-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-20-jul-shift-1",
+      "title": "JEE Main 2021 (20 Jul Shift 1)",
+      "year": 2021,
+      "count": 76,
+      "subjects": {
+        "Physics": 30,
+        "Chemistry": 22,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2021-20-jul-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-18-mar-shift-2",
+      "title": "JEE Main 2021 (18 Mar Shift 2)",
+      "year": 2021,
+      "count": 75,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 23,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2021-18-mar-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-18-mar-shift-1",
+      "title": "JEE Main 2021 (18 Mar Shift 1)",
+      "year": 2021,
+      "count": 71,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 22,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2021-18-mar-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-17-mar-shift-2",
+      "title": "JEE Main 2021 (17 Mar Shift 2)",
+      "year": 2021,
+      "count": 69,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 22,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-main-2021-17-mar-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-17-mar-shift-1",
+      "title": "JEE Main 2021 (17 Mar Shift 1)",
+      "year": 2021,
+      "count": 75,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 23,
+        "Mathematics": 27
+      },
+      "file": "pyq-bank/papers/jee-main-2021-17-mar-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-16-mar-shift-2",
+      "title": "JEE Main 2021 (16 Mar Shift 2)",
+      "year": 2021,
+      "count": 75,
+      "subjects": {
+        "Physics": 30,
+        "Chemistry": 24,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2021-16-mar-shift-2.json"
+    },
+    {
+      "id": "jee-main-2021-16-mar-shift-1",
+      "title": "JEE Main 2021 (16 Mar Shift 1)",
+      "year": 2021,
+      "count": 70,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 20,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2021-16-mar-shift-1.json"
+    },
+    {
+      "id": "jee-main-2021-01-sep-shift-2",
+      "title": "JEE Main 2021 (01 Sep Shift 2)",
+      "year": 2021,
+      "count": 66,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 20,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2021-01-sep-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-09-jan-shift-2",
+      "title": "JEE Main 2020 (09 Jan Shift 2)",
+      "year": 2020,
+      "count": 60,
+      "subjects": {
+        "Physics": 17,
+        "Chemistry": 22,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2020-09-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-09-jan-shift-1",
+      "title": "JEE Main 2020 (09 Jan Shift 1)",
+      "year": 2020,
+      "count": 63,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 16,
+        "Mathematics": 25
+      },
+      "file": "pyq-bank/papers/jee-main-2020-09-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2020-08-jan-shift-2",
+      "title": "JEE Main 2020 (08 Jan Shift 2)",
+      "year": 2020,
+      "count": 67,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 19,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2020-08-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-08-jan-shift-1",
+      "title": "JEE Main 2020 (08 Jan Shift 1)",
+      "year": 2020,
+      "count": 63,
+      "subjects": {
+        "Physics": 17,
+        "Chemistry": 24,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2020-08-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2020-07-jan-shift-2",
+      "title": "JEE Main 2020 (07 Jan Shift 2)",
+      "year": 2020,
+      "count": 68,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 21,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2020-07-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-07-jan-shift-1",
+      "title": "JEE Main 2020 (07 Jan Shift 1)",
+      "year": 2020,
+      "count": 62,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 16,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2020-07-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2020-06-sep-shift-2",
+      "title": "JEE Main 2020 (06 Sep Shift 2)",
+      "year": 2020,
+      "count": 59,
+      "subjects": {
+        "Physics": 16,
+        "Chemistry": 21,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2020-06-sep-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-06-sep-shift-1",
+      "title": "JEE Main 2020 (06 Sep Shift 1)",
+      "year": 2020,
+      "count": 51,
+      "subjects": {
+        "Physics": 17,
+        "Chemistry": 15,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2020-06-sep-shift-1.json"
+    },
+    {
+      "id": "jee-main-2020-05-sep-shift-2",
+      "title": "JEE Main 2020 (05 Sep Shift 2)",
+      "year": 2020,
+      "count": 67,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 20,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-main-2020-05-sep-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-05-sep-shift-1",
+      "title": "JEE Main 2020 (05 Sep Shift 1)",
+      "year": 2020,
+      "count": 66,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 19,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-main-2020-05-sep-shift-1.json"
+    },
+    {
+      "id": "jee-main-2020-04-sep-shift-2",
+      "title": "JEE Main 2020 (04 Sep Shift 2)",
+      "year": 2020,
+      "count": 72,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 26,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2020-04-sep-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-04-sep-shift-1",
+      "title": "JEE Main 2020 (04 Sep Shift 1)",
+      "year": 2020,
+      "count": 59,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 18,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-main-2020-04-sep-shift-1.json"
+    },
+    {
+      "id": "jee-main-2020-03-sep-shift-2",
+      "title": "JEE Main 2020 (03 Sep Shift 2)",
+      "year": 2020,
+      "count": 69,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 20,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2020-03-sep-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-03-sep-shift-1",
+      "title": "JEE Main 2020 (03 Sep Shift 1)",
+      "year": 2020,
+      "count": 72,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 21,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2020-03-sep-shift-1.json"
+    },
+    {
+      "id": "jee-main-2020-02-sep-shift-2",
+      "title": "JEE Main 2020 (02 Sep Shift 2)",
+      "year": 2020,
+      "count": 68,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 20,
+        "Mathematics": 21
+      },
+      "file": "pyq-bank/papers/jee-main-2020-02-sep-shift-2.json"
+    },
+    {
+      "id": "jee-main-2020-02-sep-shift-1",
+      "title": "JEE Main 2020 (02 Sep Shift 1)",
+      "year": 2020,
+      "count": 69,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 21,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-main-2020-02-sep-shift-1.json"
+    },
+    {
+      "id": "jee-main-2019-12-jan-shift-2",
+      "title": "JEE Main 2019 (12 Jan Shift 2)",
+      "year": 2019,
+      "count": 75,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 25,
+        "Mathematics": 27
+      },
+      "file": "pyq-bank/papers/jee-main-2019-12-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2019-12-jan-shift-1",
+      "title": "JEE Main 2019 (12 Jan Shift 1)",
+      "year": 2019,
+      "count": 72,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 25,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2019-12-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2019-12-apr-shift-2",
+      "title": "JEE Main 2019 (12 Apr Shift 2)",
+      "year": 2019,
+      "count": 81,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 25,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2019-12-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2019-12-apr-shift-1",
+      "title": "JEE Main 2019 (12 Apr Shift 1)",
+      "year": 2019,
+      "count": 85,
+      "subjects": {
+        "Physics": 32,
+        "Chemistry": 25,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2019-12-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2019-11-jan-shift-2",
+      "title": "JEE Main 2019 (11 Jan Shift 2)",
+      "year": 2019,
+      "count": 85,
+      "subjects": {
+        "Physics": 30,
+        "Chemistry": 27,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2019-11-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2019-11-jan-shift-1",
+      "title": "JEE Main 2019 (11 Jan Shift 1)",
+      "year": 2019,
+      "count": 78,
+      "subjects": {
+        "Physics": 24,
+        "Chemistry": 25,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2019-11-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2019-10-jan-shift-2",
+      "title": "JEE Main 2019 (10 Jan Shift 2)",
+      "year": 2019,
+      "count": 90,
+      "subjects": {
+        "Physics": 31,
+        "Chemistry": 28,
+        "Mathematics": 31
+      },
+      "file": "pyq-bank/papers/jee-main-2019-10-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2019-10-jan-shift-1",
+      "title": "JEE Main 2019 (10 Jan Shift 1)",
+      "year": 2019,
+      "count": 79,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 25,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2019-10-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2019-10-apr-shift-2",
+      "title": "JEE Main 2019 (10 Apr Shift 2)",
+      "year": 2019,
+      "count": 80,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 27,
+        "Mathematics": 27
+      },
+      "file": "pyq-bank/papers/jee-main-2019-10-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2019-10-apr-shift-1",
+      "title": "JEE Main 2019 (10 Apr Shift 1)",
+      "year": 2019,
+      "count": 76,
+      "subjects": {
+        "Physics": 25,
+        "Chemistry": 27,
+        "Mathematics": 24
+      },
+      "file": "pyq-bank/papers/jee-main-2019-10-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2019-09-jan-shift-2",
+      "title": "JEE Main 2019 (09 Jan Shift 2)",
+      "year": 2019,
+      "count": 80,
+      "subjects": {
+        "Physics": 31,
+        "Chemistry": 21,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2019-09-jan-shift-2.json"
+    },
+    {
+      "id": "jee-main-2019-09-jan-shift-1",
+      "title": "JEE Main 2019 (09 Jan Shift 1)",
+      "year": 2019,
+      "count": 88,
+      "subjects": {
+        "Physics": 35,
+        "Chemistry": 27,
+        "Mathematics": 26
+      },
+      "file": "pyq-bank/papers/jee-main-2019-09-jan-shift-1.json"
+    },
+    {
+      "id": "jee-main-2019-09-apr-shift-2",
+      "title": "JEE Main 2019 (09 Apr Shift 2)",
+      "year": 2019,
+      "count": 78,
+      "subjects": {
+        "Physics": 27,
+        "Chemistry": 24,
+        "Mathematics": 27
+      },
+      "file": "pyq-bank/papers/jee-main-2019-09-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2019-09-apr-shift-1",
+      "title": "JEE Main 2019 (09 Apr Shift 1)",
+      "year": 2019,
+      "count": 85,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 29,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2019-09-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2019-08-apr-shift-2",
+      "title": "JEE Main 2019 (08 Apr Shift 2)",
+      "year": 2019,
+      "count": 89,
+      "subjects": {
+        "Physics": 35,
+        "Chemistry": 25,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2019-08-apr-shift-2.json"
+    },
+    {
+      "id": "jee-main-2019-08-apr-shift-1",
+      "title": "JEE Main 2019 (08 Apr Shift 1)",
+      "year": 2019,
+      "count": 81,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 23,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2019-08-apr-shift-1.json"
+    },
+    {
+      "id": "jee-main-2018-16-apr-online",
+      "title": "JEE Main 2018 (16 Apr Online)",
+      "year": 2018,
+      "count": 95,
+      "subjects": {
+        "Physics": 36,
+        "Chemistry": 29,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2018-16-apr-online.json"
+    },
+    {
+      "id": "jee-main-2018-15-apr",
+      "title": "JEE Main 2018 (15 Apr)",
+      "year": 2018,
+      "count": 95,
+      "subjects": {
+        "Physics": 37,
+        "Chemistry": 26,
+        "Mathematics": 32
+      },
+      "file": "pyq-bank/papers/jee-main-2018-15-apr.json"
+    },
+    {
+      "id": "jee-main-2018-15-apr-shift-2-online",
+      "title": "JEE Main 2018 (15 Apr Shift 2 Online)",
+      "year": 2018,
+      "count": 97,
+      "subjects": {
+        "Physics": 39,
+        "Chemistry": 28,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2018-15-apr-shift-2-online.json"
+    },
+    {
+      "id": "jee-main-2018-15-apr-shift-1-online",
+      "title": "JEE Main 2018 (15 Apr Shift 1 Online)",
+      "year": 2018,
+      "count": 95,
+      "subjects": {
+        "Physics": 37,
+        "Chemistry": 26,
+        "Mathematics": 32
+      },
+      "file": "pyq-bank/papers/jee-main-2018-15-apr-shift-1-online.json"
+    },
+    {
+      "id": "jee-main-2018-08-apr",
+      "title": "JEE Main 2018 (08 Apr)",
+      "year": 2018,
+      "count": 87,
+      "subjects": {
+        "Physics": 30,
+        "Chemistry": 27,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2018-08-apr.json"
+    },
+    {
+      "id": "jee-main-2017-09-apr-online",
+      "title": "JEE Main 2017 (09 Apr Online)",
+      "year": 2017,
+      "count": 93,
+      "subjects": {
+        "Physics": 34,
+        "Chemistry": 31,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2017-09-apr-online.json"
+    },
+    {
+      "id": "jee-main-2017-08-apr-online",
+      "title": "JEE Main 2017 (08 Apr Online)",
+      "year": 2017,
+      "count": 92,
+      "subjects": {
+        "Physics": 33,
+        "Chemistry": 29,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2017-08-apr-online.json"
+    },
+    {
+      "id": "jee-main-2017-02-apr",
+      "title": "JEE Main 2017 (02 Apr)",
+      "year": 2017,
+      "count": 93,
+      "subjects": {
+        "Physics": 35,
+        "Chemistry": 28,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2017-02-apr.json"
+    },
+    {
+      "id": "jee-main-2016-10-apr-online",
+      "title": "JEE Main 2016 (10 Apr Online)",
+      "year": 2016,
+      "count": 94,
+      "subjects": {
+        "Physics": 37,
+        "Chemistry": 26,
+        "Mathematics": 31
+      },
+      "file": "pyq-bank/papers/jee-main-2016-10-apr-online.json"
+    },
+    {
+      "id": "jee-main-2016-09-apr-online",
+      "title": "JEE Main 2016 (09 Apr Online)",
+      "year": 2016,
+      "count": 91,
+      "subjects": {
+        "Physics": 35,
+        "Chemistry": 27,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2016-09-apr-online.json"
+    },
+    {
+      "id": "jee-main-2016-03-apr",
+      "title": "JEE Main 2016 (03 Apr)",
+      "year": 2016,
+      "count": 86,
+      "subjects": {
+        "Physics": 29,
+        "Chemistry": 29,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2016-03-apr.json"
+    },
+    {
+      "id": "jee-main-2015-11-apr-online",
+      "title": "JEE Main 2015 (11 Apr Online)",
+      "year": 2015,
+      "count": 91,
+      "subjects": {
+        "Physics": 32,
+        "Chemistry": 30,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2015-11-apr-online.json"
+    },
+    {
+      "id": "jee-main-2015-10-apr-online",
+      "title": "JEE Main 2015 (10 Apr Online)",
+      "year": 2015,
+      "count": 94,
+      "subjects": {
+        "Physics": 33,
+        "Chemistry": 31,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2015-10-apr-online.json"
+    },
+    {
+      "id": "jee-main-2015-04-apr",
+      "title": "JEE Main 2015 (04 Apr)",
+      "year": 2015,
+      "count": 87,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 28,
+        "Mathematics": 31
+      },
+      "file": "pyq-bank/papers/jee-main-2015-04-apr.json"
+    },
+    {
+      "id": "jee-main-2014-19-apr-online",
+      "title": "JEE Main 2014 (19 Apr Online)",
+      "year": 2014,
+      "count": 92,
+      "subjects": {
+        "Physics": 35,
+        "Chemistry": 26,
+        "Mathematics": 31
+      },
+      "file": "pyq-bank/papers/jee-main-2014-19-apr-online.json"
+    },
+    {
+      "id": "jee-main-2014-12-apr-online",
+      "title": "JEE Main 2014 (12 Apr Online)",
+      "year": 2014,
+      "count": 87,
+      "subjects": {
+        "Physics": 31,
+        "Chemistry": 27,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2014-12-apr-online.json"
+    },
+    {
+      "id": "jee-main-2014-11-apr-online",
+      "title": "JEE Main 2014 (11 Apr Online)",
+      "year": 2014,
+      "count": 90,
+      "subjects": {
+        "Physics": 33,
+        "Chemistry": 28,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2014-11-apr-online.json"
+    },
+    {
+      "id": "jee-main-2014-09-apr-online",
+      "title": "JEE Main 2014 (09 Apr Online)",
+      "year": 2014,
+      "count": 92,
+      "subjects": {
+        "Physics": 33,
+        "Chemistry": 31,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2014-09-apr-online.json"
+    },
+    {
+      "id": "jee-main-2014-06-apr",
+      "title": "JEE Main 2014 (06 Apr)",
+      "year": 2014,
+      "count": 86,
+      "subjects": {
+        "Physics": 31,
+        "Chemistry": 25,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2014-06-apr.json"
+    },
+    {
+      "id": "jee-main-2013-25-apr-online",
+      "title": "JEE Main 2013 (25 Apr Online)",
+      "year": 2013,
+      "count": 89,
+      "subjects": {
+        "Physics": 33,
+        "Chemistry": 26,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2013-25-apr-online.json"
+    },
+    {
+      "id": "jee-main-2013-23-apr-online",
+      "title": "JEE Main 2013 (23 Apr Online)",
+      "year": 2013,
+      "count": 92,
+      "subjects": {
+        "Physics": 37,
+        "Chemistry": 25,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2013-23-apr-online.json"
+    },
+    {
+      "id": "jee-main-2013-22-apr-online",
+      "title": "JEE Main 2013 (22 Apr Online)",
+      "year": 2013,
+      "count": 90,
+      "subjects": {
+        "Physics": 35,
+        "Chemistry": 27,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2013-22-apr-online.json"
+    },
+    {
+      "id": "jee-main-2013-09-apr-online",
+      "title": "JEE Main 2013 (09 Apr Online)",
+      "year": 2013,
+      "count": 89,
+      "subjects": {
+        "Physics": 31,
+        "Chemistry": 26,
+        "Mathematics": 32
+      },
+      "file": "pyq-bank/papers/jee-main-2013-09-apr-online.json"
+    },
+    {
+      "id": "jee-main-2013-07-apr",
+      "title": "JEE Main 2013 (07 Apr)",
+      "year": 2013,
+      "count": 93,
+      "subjects": {
+        "Physics": 35,
+        "Chemistry": 28,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2013-07-apr.json"
+    },
+    {
+      "id": "jee-main-2012-offline",
+      "title": "JEE Main 2012 (Offline)",
+      "year": 2012,
+      "count": 95,
+      "subjects": {
+        "Physics": 35,
+        "Chemistry": 29,
+        "Mathematics": 31
+      },
+      "file": "pyq-bank/papers/jee-main-2012-offline.json"
+    },
+    {
+      "id": "jee-main-2012-26-may-online",
+      "title": "JEE Main 2012 (26 May Online)",
+      "year": 2012,
+      "count": 90,
+      "subjects": {
+        "Physics": 32,
+        "Chemistry": 29,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2012-26-may-online.json"
+    },
+    {
+      "id": "jee-main-2012-19-may-online",
+      "title": "JEE Main 2012 (19 May Online)",
+      "year": 2012,
+      "count": 98,
+      "subjects": {
+        "Physics": 38,
+        "Chemistry": 30,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2012-19-may-online.json"
+    },
+    {
+      "id": "jee-main-2012-12-may-online",
+      "title": "JEE Main 2012 (12 May Online)",
+      "year": 2012,
+      "count": 93,
+      "subjects": {
+        "Physics": 34,
+        "Chemistry": 29,
+        "Mathematics": 30
+      },
+      "file": "pyq-bank/papers/jee-main-2012-12-may-online.json"
+    },
+    {
+      "id": "jee-main-2012-07-may-online",
+      "title": "JEE Main 2012 (07 May Online)",
+      "year": 2012,
+      "count": 93,
+      "subjects": {
+        "Physics": 32,
+        "Chemistry": 29,
+        "Mathematics": 32
+      },
+      "file": "pyq-bank/papers/jee-main-2012-07-may-online.json"
+    },
+    {
+      "id": "jee-main-2011",
+      "title": "JEE Main 2011",
+      "year": 2011,
+      "count": 96,
+      "subjects": {
+        "Physics": 36,
+        "Chemistry": 32,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-main-2011.json"
+    },
+    {
+      "id": "jee-main-2010",
+      "title": "JEE Main 2010",
+      "year": 2010,
+      "count": 90,
+      "subjects": {
+        "Physics": 32,
+        "Chemistry": 29,
+        "Mathematics": 29
+      },
+      "file": "pyq-bank/papers/jee-main-2010.json"
+    },
+    {
+      "id": "jee-main-2009",
+      "title": "JEE Main 2009",
+      "year": 2009,
+      "count": 90,
+      "subjects": {
+        "Physics": 32,
+        "Chemistry": 31,
+        "Mathematics": 27
+      },
+      "file": "pyq-bank/papers/jee-main-2009.json"
+    },
+    {
+      "id": "jee-main-2008",
+      "title": "JEE Main 2008",
+      "year": 2008,
+      "count": 108,
+      "subjects": {
+        "Physics": 42,
+        "Chemistry": 30,
+        "Mathematics": 36
+      },
+      "file": "pyq-bank/papers/jee-main-2008.json"
+    },
+    {
+      "id": "jee-main-2007",
+      "title": "JEE Main 2007",
+      "year": 2007,
+      "count": 126,
+      "subjects": {
+        "Physics": 51,
+        "Chemistry": 38,
+        "Mathematics": 37
+      },
+      "file": "pyq-bank/papers/jee-main-2007.json"
+    },
+    {
+      "id": "jee-main-2006",
+      "title": "JEE Main 2006",
+      "year": 2006,
+      "count": 150,
+      "subjects": {
+        "Physics": 62,
+        "Chemistry": 50,
+        "Mathematics": 38
+      },
+      "file": "pyq-bank/papers/jee-main-2006.json"
+    },
+    {
+      "id": "jee-main-2005",
+      "title": "JEE Main 2005",
+      "year": 2005,
+      "count": 238,
+      "subjects": {
+        "Physics": 93,
+        "Chemistry": 70,
+        "Mathematics": 75
+      },
+      "file": "pyq-bank/papers/jee-main-2005.json"
+    },
+    {
+      "id": "jee-main-2004",
+      "title": "JEE Main 2004",
+      "year": 2004,
+      "count": 234,
+      "subjects": {
+        "Physics": 86,
+        "Chemistry": 73,
+        "Mathematics": 75
+      },
+      "file": "pyq-bank/papers/jee-main-2004.json"
+    },
+    {
+      "id": "jee-main-2003",
+      "title": "JEE Main 2003",
+      "year": 2003,
+      "count": 230,
+      "subjects": {
+        "Physics": 89,
+        "Chemistry": 68,
+        "Mathematics": 73
+      },
+      "file": "pyq-bank/papers/jee-main-2003.json"
+    },
+    {
+      "id": "jee-main-2002",
+      "title": "JEE Main 2002",
+      "year": 2002,
+      "count": 225,
+      "subjects": {
+        "Physics": 80,
+        "Chemistry": 71,
+        "Mathematics": 74
+      },
+      "file": "pyq-bank/papers/jee-main-2002.json"
+    }
+  ],
+  "jee_advanced": [
+    {
+      "id": "jee-advanced-2023-paper-2",
+      "title": "JEE Advanced 2023 (Paper 2)",
+      "year": 2023,
+      "count": 4,
+      "subjects": {
+        "Physics": 4
+      },
+      "file": "pyq-bank/papers/jee-advanced-2023-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2022-paper-2",
+      "title": "JEE Advanced 2022 (Paper 2)",
+      "year": 2022,
+      "count": 3,
+      "subjects": {
+        "Physics": 3
+      },
+      "file": "pyq-bank/papers/jee-advanced-2022-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2022-paper-1",
+      "title": "JEE Advanced 2022 (Paper 1)",
+      "year": 2022,
+      "count": 3,
+      "subjects": {
+        "Physics": 3
+      },
+      "file": "pyq-bank/papers/jee-advanced-2022-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2021-paper-2",
+      "title": "JEE Advanced 2021 (Paper 2)",
+      "year": 2021,
+      "count": 3,
+      "subjects": {
+        "Physics": 3
+      },
+      "file": "pyq-bank/papers/jee-advanced-2021-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2021-paper-1",
+      "title": "JEE Advanced 2021 (Paper 1)",
+      "year": 2021,
+      "count": 4,
+      "subjects": {
+        "Physics": 4
+      },
+      "file": "pyq-bank/papers/jee-advanced-2021-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2020-paper-2",
+      "title": "JEE Advanced 2020 (Paper 2)",
+      "year": 2020,
+      "count": 1,
+      "subjects": {
+        "Physics": 1
+      },
+      "file": "pyq-bank/papers/jee-advanced-2020-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2020-paper-1",
+      "title": "JEE Advanced 2020 (Paper 1)",
+      "year": 2020,
+      "count": 2,
+      "subjects": {
+        "Physics": 2
+      },
+      "file": "pyq-bank/papers/jee-advanced-2020-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2019-paper-2",
+      "title": "JEE Advanced 2019 (Paper 2)",
+      "year": 2019,
+      "count": 2,
+      "subjects": {
+        "Physics": 2
+      },
+      "file": "pyq-bank/papers/jee-advanced-2019-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2018-paper-2",
+      "title": "JEE Advanced 2018 (Paper 2)",
+      "year": 2018,
+      "count": 1,
+      "subjects": {
+        "Physics": 1
+      },
+      "file": "pyq-bank/papers/jee-advanced-2018-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2018-paper-1",
+      "title": "JEE Advanced 2018 (Paper 1)",
+      "year": 2018,
+      "count": 2,
+      "subjects": {
+        "Physics": 2
+      },
+      "file": "pyq-bank/papers/jee-advanced-2018-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2017-paper-2",
+      "title": "JEE Advanced 2017 (Paper 2)",
+      "year": 2017,
+      "count": 2,
+      "subjects": {
+        "Physics": 2
+      },
+      "file": "pyq-bank/papers/jee-advanced-2017-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2016-paper-2",
+      "title": "JEE Advanced 2016 (Paper 2)",
+      "year": 2016,
+      "count": 1,
+      "subjects": {
+        "Physics": 1
+      },
+      "file": "pyq-bank/papers/jee-advanced-2016-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2015-paper-1",
+      "title": "JEE Advanced 2015 (Paper 1)",
+      "year": 2015,
+      "count": 2,
+      "subjects": {
+        "Physics": 2
+      },
+      "file": "pyq-bank/papers/jee-advanced-2015-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2014-paper-2",
+      "title": "JEE Advanced 2014 (Paper 2)",
+      "year": 2014,
+      "count": 1,
+      "subjects": {
+        "Physics": 1
+      },
+      "file": "pyq-bank/papers/jee-advanced-2014-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2013-paper-1",
+      "title": "JEE Advanced 2013 (Paper 1)",
+      "year": 2013,
+      "count": 2,
+      "subjects": {
+        "Physics": 2
+      },
+      "file": "pyq-bank/papers/jee-advanced-2013-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2012-paper-2",
+      "title": "JEE Advanced 2012 (Paper 2)",
+      "year": 2012,
+      "count": 58,
+      "subjects": {
+        "Physics": 21,
+        "Chemistry": 19,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-advanced-2012-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2012-paper-1",
+      "title": "JEE Advanced 2012 (Paper 1)",
+      "year": 2012,
+      "count": 63,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 20,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-advanced-2012-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2011-paper-2",
+      "title": "JEE Advanced 2011 (Paper 2)",
+      "year": 2011,
+      "count": 63,
+      "subjects": {
+        "Physics": 24,
+        "Chemistry": 19,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-advanced-2011-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2011-paper-1",
+      "title": "JEE Advanced 2011 (Paper 1)",
+      "year": 2011,
+      "count": 74,
+      "subjects": {
+        "Physics": 28,
+        "Chemistry": 23,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-advanced-2011-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2010-paper-2",
+      "title": "JEE Advanced 2010 (Paper 2)",
+      "year": 2010,
+      "count": 60,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 19,
+        "Mathematics": 18
+      },
+      "file": "pyq-bank/papers/jee-advanced-2010-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2010-paper-1",
+      "title": "JEE Advanced 2010 (Paper 1)",
+      "year": 2010,
+      "count": 87,
+      "subjects": {
+        "Physics": 31,
+        "Chemistry": 28,
+        "Mathematics": 28
+      },
+      "file": "pyq-bank/papers/jee-advanced-2010-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2009-paper-2",
+      "title": "JEE Advanced 2009 (Paper 2)",
+      "year": 2009,
+      "count": 59,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 18,
+        "Mathematics": 19
+      },
+      "file": "pyq-bank/papers/jee-advanced-2009-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2009-paper-1",
+      "title": "JEE Advanced 2009 (Paper 1)",
+      "year": 2009,
+      "count": 61,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 19,
+        "Mathematics": 20
+      },
+      "file": "pyq-bank/papers/jee-advanced-2009-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2008-paper-2",
+      "title": "JEE Advanced 2008 (Paper 2)",
+      "year": 2008,
+      "count": 70,
+      "subjects": {
+        "Physics": 26,
+        "Chemistry": 22,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-advanced-2008-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2008-paper-1",
+      "title": "JEE Advanced 2008 (Paper 1)",
+      "year": 2008,
+      "count": 68,
+      "subjects": {
+        "Physics": 23,
+        "Chemistry": 23,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-advanced-2008-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2007-paper-2",
+      "title": "JEE Advanced 2007 (Paper 2)",
+      "year": 2007,
+      "count": 65,
+      "subjects": {
+        "Physics": 22,
+        "Chemistry": 21,
+        "Mathematics": 22
+      },
+      "file": "pyq-bank/papers/jee-advanced-2007-paper-2.json"
+    },
+    {
+      "id": "jee-advanced-2007-paper-1",
+      "title": "JEE Advanced 2007 (Paper 1)",
+      "year": 2007,
+      "count": 69,
+      "subjects": {
+        "Physics": 24,
+        "Chemistry": 22,
+        "Mathematics": 23
+      },
+      "file": "pyq-bank/papers/jee-advanced-2007-paper-1.json"
+    },
+    {
+      "id": "jee-advanced-2006",
+      "title": "JEE Advanced 2006",
+      "year": 2006,
+      "count": 121,
+      "subjects": {
+        "Physics": 43,
+        "Chemistry": 39,
+        "Mathematics": 39
+      },
+      "file": "pyq-bank/papers/jee-advanced-2006.json"
+    }
+  ]
+}

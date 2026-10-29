@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>RankForge AI — Stabilized CBT, PYQ Archive (NEET Year-Wise & JEE Shift-Wise) & Deep Analysis</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      --rf-bg: #0b1020;
+      --rf-surface: #131b31;
+      --rf-surface-2: #1a2542;
+      --rf-text: #f1f5f9;
+      --rf-muted: #94a3b8;
+      --rf-border: #233154;
+      --rf-accent: #38bdf8;
+    }
+    html.light {
+      --rf-bg: #f8fafc;
+      --rf-surface: #ffffff;
+      --rf-surface-2: #f1f5f9;
+      --rf-text: #0f172a;
+      --rf-muted: #475569;
+      --rf-border: #e2e8f0;
+      --rf-accent: #0284c7;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--rf-bg);
+      color: var(--rf-text);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    /* Strict Unbroken Word Typography: Never split normal English words mid-word */
+    body, p, div, span, li, td, th, label, article, section, h1, h2, h3, h4 {
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+      word-wrap: break-word !important;
+      hyphens: none !important;
+      -webkit-hyphens: none !important;
+    }
+    button, .no-break, .badge-pill {
+      white-space: nowrap !important;
+      word-break: keep-all !important;
+      hyphens: none !important;
+    }
+    .rf-card {
+      background-color: var(--rf-surface);
+      border: 1px solid var(--rf-border);
+    }
+    .rf-card-2 {
+      background-color: var(--rf-surface-2);
+      border: 1px solid var(--rf-border);
+    }
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 4px 0;
+    }
+    .question-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 8px 0;
+      background: #ffffff;
+      padding: 6px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Persistent Stabilized Top Navigation Bar (Never disappears or traps user) -->
+  <header id="rf-top-bar" class="sticky top-0 z-50 rf-card border-b px-3 py-2.5 shadow-md">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <button id="btn-nav-back" type="button" class="px-3 py-1.5 rounded-lg rf-card-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition">
+          <span>←</span> <span>Back</span>
+        </button>
+        <button id="btn-nav-home" type="button" class="px-3 py-1.5 rounded-lg rf-card-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition">
+          <span>⌂</span> <span class="hidden sm:inline">Home</span>
+        </button>
+        <span id="nav-screen-title" class="font-bold text-sm sm:text-base truncate ml-1">RankForge PYQ & CBT Hub</span>
+      </div>
+
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button id="btn-nav-archive" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30 hover:bg-sky-500/25 transition">
+          🏛️ PYQ Papers
+        </button>
+        <button id="btn-nav-analysis" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition">
+          📊 Analysis
+        </button>
+        <button id="btn-nav-mistakes" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25 transition">
+          🧠 Mistakes (<span id="nav-mistake-count">0</span>)
+        </button>
+        <button id="btn-theme-toggle" type="button" class="px-2.5 py-1.5 rounded-lg rf-card-2 text-xs font-semibold hover:opacity-90 transition" aria-label="Toggle Theme">
+          ☀️ Light
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-5 py-4 sm:py-6">
+
+    <!-- Toast Notification Banner -->
+    <div id="rf-toast" class="hidden fixed bottom-5 right-5 z-50 max-w-sm px-4 py-3 rounded-xl bg-sky-600 text-white text-sm font-semibold shadow-xl"></div>
+
+    <!-- ==========================================
+         VIEW 1: PYQ ARCHIVE HUB (NEET Year-Wise & JEE Shift-Wise)
+         ========================================== -->
+    <section id="view-archive" class="space-y-5">
+      <!-- Top Hero / Status Banner -->
+      <div class="rf-card rounded-2xl p-4 sm:p-6 shadow-lg">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+              <span>⚡ STABILIZED RANKFORGE ENGINE v2.0</span>
+              <span>•</span>
+              <span id="bank-connection-badge">570 Papers Ready</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">
+              NEET Year-Wise (40 Yrs) &amp; JEE Shift-Wise (30 Yrs) Archive
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-400 max-w-2xl">
+              Select any official NEET annual paper or JEE Main / Advanced shift below to start a full timed Computer-Based Test with +4/−1 marking, unbroken LaTeX typography, and instant post-test subject intelligence.
+            </p>
+          </div>
+          <div class="grid grid-cols-3 gap-2.5 shrink-0">
+            <div class="rf-card-2 rounded-xl p-3 text-center">
+              <div class="text-xs text-slate-400">NEET Papers</div>
+              <div id="stat-neet-count" class="text-lg sm:text-xl font-extrabold text-emerald-400">37 Yrs</div>
+            </div>
+            <div class="rf-card-2 rounded-xl p-3 text-center">
+              <div class="text-xs text-slate-400">JEE Shifts</div>
+              <div id="stat-jee-count" class="text-lg sm:text-xl font-extrabold text-sky-400">530+</div>
+            </div>
+            <div class="rf-card-2 rounded-xl p-3 text-center">
+              <div class="text-xs text-slate-400">Tests Taken</div>
+              <div id="stat-attempts-count" class="text-lg sm:text-xl font-extrabold text-purple-400">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam Category Tabs + Search + Year Filter -->
+      <div class="rf-card rounded-2xl p-4 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2" role="tablist">
+            <button type="button" data-cat="neet" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-sky-600 text-white shadow">
+              🩺 NEET Year-Wise Papers
+            </button>
+            <button type="button" data-cat="jee_main" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold rf-card-2 hover:opacity-90">
+              ⚡ JEE Main Shift-Wise Papers
+            </button>
+            <button type="button" data-cat="jee_advanced" class="cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold rf-card-2 hover:opacity-90">
+              🏆 JEE Advanced Papers
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <input id="input-paper-search" type="search" placeholder="Search year or shift (e.g. 2024, Shift 1)..."
+              class="w-full sm:w-64 px-3.5 py-2 rounded-xl rf-card-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+            <select id="select-year-filter" aria-label="Filter by Year"
+              class="px-3 py-2 rounded-xl rf-card-2 text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="all">All Years</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Decade / Era Quick Filter Pills -->
+        <div id="era-pills-row" class="flex items-center gap-2 overflow-x-auto pb-1">
+          <button type="button" data-era="all" class="era-pill px-3 py-1 rounded-lg text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">All Years</button>
+          <button type="button" data-era="2020-2026" class="era-pill px-3 py-1 rounded-lg text-xs font-semibold rf-card-2">2020 – 2026</button>
+          <button type="button" data-era="2015-2019" class="era-pill px-3 py-1 rounded-lg text-xs font-semibold rf-card-2">2015 – 2019</button>
+          <button type="button" data-era="2010-2014" class="era-pill px-3 py-1 rounded-lg text-xs font-semibold rf-card-2">2010 – 2014</button>
+          <button type="button" data-era="1988-2009" class="era-pill px-3 py-1 rounded-lg text-xs font-semibold rf-card-2">Classic Archive (≤2009)</button>
+        </div>
+
+        <!-- Papers Grid -->
+        <div id="papers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 2: INTERACTIVE CBT EXAM SCREEN
+         ========================================== -->
+    <section id="view-cbt" class="hidden space-y-4">
+      <!-- CBT Header Bar -->
+      <div class="rf-card rounded-2xl p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div id="cbt-paper-badge" class="text-xs font-bold uppercase tracking-wider text-sky-400">NEET Year-Wise Official Paper</div>
+          <h2 id="cbt-paper-title" class="text-base sm:text-lg font-extrabold">NEET 2024 Official Paper</h2>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <div class="px-3.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono font-bold text-sm sm:text-base flex items-center gap-1.5">
+            <span>⏱️</span> <span id="cbt-timer-display">180:00</span>
+          </div>
+          <button id="btn-open-submit-modal" type="button" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow transition">
+            Submit Paper
+          </button>
+        </div>
+      </div>
+
+      <!-- Subject Filter Strip -->
+      <div id="cbt-subject-tabs" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
+
+      <!-- Main CBT Split Grid: Question Card + Question Palette -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <!-- Left 8 cols: Question & Options -->
+        <div class="lg:col-span-8 rf-card rounded-2xl p-4 sm:p-6 space-y-5">
+          <div class="flex items-center justify-between gap-2 border-b border-slate-700/60 pb-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="cbt-q-number" class="px-3 py-1 rounded-lg bg-sky-500/20 text-sky-300 font-bold text-xs sm:text-sm">Question 1</span>
+              <span id="cbt-q-subject" class="px-2.5 py-1 rounded-lg rf-card-2 text-xs font-semibold">Biology</span>
+              <span id="cbt-q-chapter" class="px-2.5 py-1 rounded-lg rf-card-2 text-xs text-slate-400">Genetics</span>
+            </div>
+            <div class="text-xs font-bold text-emerald-400 badge-pill">+4 / −1</div>
+          </div>
+
+          <!-- Question Stem -->
+          <div id="cbt-q-stem" class="question-content text-sm sm:text-base leading-relaxed font-medium"></div>
+
+          <!-- Options List or Numerical Input -->
+          <div id="cbt-options-container" class="space-y-2.5"></div>
+
+          <div id="cbt-numerical-container" class="hidden space-y-2 pt-2">
+            <label for="input-numerical-ans" class="block text-xs font-bold uppercase tracking-wider text-sky-400">
+              Enter Numerical Value Answer:
+            </label>
+            <input id="input-numerical-ans" type="text" inputmode="decimal" placeholder="e.g. 8 or 3.5"
+              class="w-full sm:w-64 px-4 py-2.5 rounded-xl rf-card-2 text-base font-bold focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-4 border-t border-slate-700/60">
+            <div class="flex items-center gap-2">
+              <button id="btn-q-prev" type="button" class="px-3.5 py-2 rounded-xl rf-card-2 text-xs sm:text-sm font-bold hover:opacity-90">
+                ← Previous
+              </button>
+              <button id="btn-q-review" type="button" class="px-3.5 py-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs sm:text-sm font-bold hover:bg-purple-500/30">
+                ⚑ Mark Review
+              </button>
+              <button id="btn-q-clear" type="button" class="px-3.5 py-2 rounded-xl rf-card-2 text-xs sm:text-sm font-semibold text-slate-400 hover:text-white">
+                Clear
+              </button>
+            </div>
+            <button id="btn-q-next" type="button" class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-bold shadow">
+              Save &amp; Next →
+            </button>
+          </div>
+        </div>
+
+        <!-- Right 4 cols: Question Palette & Legend -->
+        <div class="lg:col-span-4 rf-card rounded-2xl p-4 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold">Question Palette</h3>
+            <span id="cbt-palette-progress" class="text-xs text-slate-400 font-semibold">0 / 0 Answered</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> <span id="legend-ans">0 Answered</span></div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-rose-500/80 inline-block"></span> <span id="legend-unans">0 Visited</span></div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-500 inline-block"></span> <span id="legend-rev">0 Review</span></div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-slate-700 inline-block"></span> <span id="legend-notvis">0 Left</span></div>
+          </div>
+
+          <div id="cbt-palette-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-2 max-h-72 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 3: DEEP POST-TEST ANALYSIS & SOLUTIONS
+         ========================================== -->
+    <section id="view-analysis" class="hidden space-y-5">
+      <div class="rf-card rounded-2xl p-4 sm:p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">RankForge Orbit &amp; NICHOD Intelligence</div>
+            <h2 id="analysis-paper-title" class="text-xl sm:text-2xl font-extrabold mt-0.5">Post-Test Performance Breakdown</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-retry-wrong-only" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-bold shadow">
+              🔄 Retry Wrong Questions
+            </button>
+            <button id="btn-back-to-papers" type="button" class="px-4 py-2 rounded-xl rf-card-2 text-xs sm:text-sm font-bold hover:opacity-90">
+              🏛️ All PYQ Papers
+            </button>
+          </div>
+        </div>
+
+        <!-- 5 Key Metric Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div class="rf-card-2 rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Net Score (+4/−1)</div>
+            <div id="an-score" class="text-xl sm:text-2xl font-extrabold text-sky-400 mt-1">0 / 0</div>
+          </div>
+          <div class="rf-card-2 rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Accuracy</div>
+            <div id="an-accuracy" class="text-xl sm:text-2xl font-extrabold text-emerald-400 mt-1">0%</div>
+          </div>
+          <div class="rf-card-2 rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Correct / Wrong</div>
+            <div id="an-cw" class="text-xl sm:text-2xl font-extrabold mt-1"><span class="text-emerald-400">0</span> / <span class="text-rose-400">0</span></div>
+          </div>
+          <div class="rf-card-2 rounded-xl p-3.5">
+            <div class="text-xs text-slate-400">Negative Marks</div>
+            <div id="an-neg" class="text-xl sm:text-2xl font-extrabold text-rose-400 mt-1">−0</div>
+          </div>
+          <div class="rf-card-2 rounded-xl p-3.5 col-span-2 sm:col-span-1">
+            <div class="text-xs text-slate-400">Solve Speed</div>
+            <div id="an-speed" class="text-xl sm:text-2xl font-extrabold text-purple-400 mt-1">0 Q/m</div>
+          </div>
+        </div>
+
+        <!-- Subject Breakdown Table -->
+        <div class="space-y-2">
+          <h3 class="text-sm sm:text-base font-bold">Subject-Wise Accuracy &amp; Negative Marking</h3>
+          <div class="overflow-x-auto rounded-xl border border-slate-700/60">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="rf-card-2 border-b border-slate-700/60">
+                  <th class="py-2.5 px-3 font-bold">Subject</th>
+                  <th class="py-2.5 px-3 text-right font-bold text-emerald-400">Correct</th>
+                  <th class="py-2.5 px-3 text-right font-bold text-rose-400">Wrong</th>
+                  <th class="py-2.5 px-3 text-right font-bold text-slate-400">Skipped</th>
+                  <th class="py-2.5 px-3 text-right font-bold">Net Score</th>
+                  <th class="py-2.5 px-3 text-right font-bold text-sky-400">Accuracy</th>
+                </tr>
+              </thead>
+              <tbody id="an-subject-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Weak Chapters Priority List -->
+        <div class="space-y-2">
+          <h3 class="text-sm sm:text-base font-bold">Priority Chapters Where Marks Were Lost</h3>
+          <div id="an-weak-chapters" class="grid grid-cols-1 md:grid-cols-2 gap-2.5"></div>
+        </div>
+      </div>
+
+      <!-- Detailed Question-by-Question Solution Review -->
+      <div class="rf-card rounded-2xl p-4 sm:p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-base sm:text-lg font-extrabold">Step-by-Step Solutions &amp; Answer Key Verification</h3>
+          <div class="flex gap-1.5">
+            <button type="button" data-solfilter="all" class="sol-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white">All</button>
+            <button type="button" data-solfilter="wrong" class="sol-filter-btn px-3 py-1 rounded-lg text-xs font-semibold rf-card-2">❌ Wrong</button>
+            <button type="button" data-solfilter="skipped" class="sol-filter-btn px-3 py-1 rounded-lg text-xs font-semibold rf-card-2">⏭ Skipped</button>
+            <button type="button" data-solfilter="correct" class="sol-filter-btn px-3 py-1 rounded-lg text-xs font-semibold rf-card-2">✓ Correct</button>
+          </div>
+        </div>
+        <div id="an-solutions-list" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 4: MISTAKE INTELLIGENCE BOOK
+         ========================================== -->
+    <section id="view-mistakes" class="hidden space-y-4">
+      <div class="rf-card rounded-2xl p-4 sm:p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-rose-400">Mistake → Concept → Retest → Master</div>
+            <h2 class="text-xl font-extrabold">Active Mistake Book</h2>
+          </div>
+          <div class="flex gap-2">
+            <button id="btn-practice-all-mistakes" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-bold shadow">
+              🚀 Start Mistake Retry CBT
+            </button>
+            <button id="btn-clear-mistakes" type="button" class="px-3.5 py-2 rounded-xl rf-card-2 text-xs font-semibold text-slate-400 hover:text-white">
+              Clear Book
+            </button>
+          </div>
+        </div>
+        <div id="mistakes-list-container" class="space-y-3"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Submit Confirmation Modal (No browser confirm() blocking) -->
+  <div id="modal-submit" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+    <div class="rf-card rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <h3 class="text-lg font-extrabold">Submit Paper &amp; Generate Analysis?</h3>
+      <p id="modal-submit-summary" class="text-sm text-slate-300"></p>
+      <div class="flex justify-end gap-2.5 pt-2">
+        <button id="btn-cancel-submit" type="button" class="px-4 py-2 rounded-xl rf-card-2 text-xs sm:text-sm font-bold">
+          Continue Test
+        </button>
+        <button id="btn-confirm-submit" type="button" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold shadow">
+          Confirm &amp; View Analysis
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ----------------------------------------------------------
+         1. Built-in Fallback Manifest & Verified Sample PYQs
+            (Automatically replaced by ./pyq-bank/manifest.json when running in Termux repo)
+         ---------------------------------------------------------- */
+      var FALLBACK_QUESTIONS = {
+        "neet-2024": [
+          {
+            id: "NEET-2024-B1",
+            subject: "Biology",
+            chapter: "Molecular Basis of Inheritance",
+            exam: "NEET",
+            paper: "NEET 2024",
+            type: "mcq",
+            question: "Light DNA molecule ($^{14}\\mathrm{N}$) is replicated in a heavy medium ($^{15}\\mathrm{N}$). After four successive replications of DNA, 16 DNA molecules are formed. Which of the following is true for these DNA molecules?",
+            options: [
+              "2 hybrid ($^{15}\\mathrm{N}/^{14}\\mathrm{N}$) and 14 heavy ($^{15}\\mathrm{N}/^{15}\\mathrm{N}$)",
+              "4 hybrid ($^{15}\\mathrm{N}/^{14}\\mathrm{N}$) and 12 heavy ($^{15}\\mathrm{N}/^{15}\\mathrm{N}$)",
+              "8 hybrid ($^{15}\\mathrm{N}/^{14}\\mathrm{N}$) and 8 heavy ($^{15}\\mathrm{N}/^{15}\\mathrm{N}$)",
+              "14 hybrid ($^{15}\\mathrm{N}/^{14}\\mathrm{N}$) and 2 light ($^{14}\\mathrm{N}/^{14}\\mathrm{N}$)"
+            ],
+            correctIndex: 0,
+            correctAnswer: "2 hybrid ($^{15}\\mathrm{N}/^{14}\\mathrm{N}$) and 14 heavy ($^{15}\\mathrm{N}/^{15}\\mathrm{N}$)",
+            solution: "By Meselson and Stahl semi-conservative replication, the original two $^{14}\\mathrm{N}$ strands remain intact inside 2 hybrid ($^{15}\\mathrm{N}/^{14}\\mathrm{N}$) molecules regardless of generation count, while the remaining $16 - 2 = 14$ molecules are purely heavy ($^{15}\\mathrm{N}/^{15}\\mathrm{N}$)."
+          },
+          {
+            id: "NEET-2024-B2",
+            subject: "Biology",
+            chapter: "Anatomy of Flowering Plants",
+            exam: "NEET",
+            paper: "NEET 2024",
+            type: "mcq",
+            question: "Identify the correct match regarding vascular bundles in angiosperms:",
+            options: [
+              "Radial vascular bundle — Roots of angiosperms",
+              "Bicollateral vascular bundle — Monocot stem",
+              "Conjoint closed vascular bundle — Dicot stem",
+              "Exarch protoxylem — Dicot stem"
+            ],
+            correctIndex: 0,
+            correctAnswer: "Radial vascular bundle — Roots of angiosperms",
+            solution: "In roots of angiosperms, xylem and phloem are arranged on alternating radii (radial vascular bundle) with exarch protoxylem."
+          },
+          {
+            id: "NEET-2024-P1",
+            subject: "Physics",
+            chapter: "Current Electricity",
+            exam: "NEET",
+            paper: "NEET 2024",
+            type: "mcq",
+            question: "Two cylindrical conductors, one of copper and one of aluminium, have the same length and the same electrical resistance. Given $\\rho_{\\mathrm{Al}} = 1.5 \\rho_{\\mathrm{Cu}}$ and density $d_{\\mathrm{Al}} = \\frac{1}{3} d_{\\mathrm{Cu}}$, how many times is the copper conductor heavier than the aluminium conductor?",
+            options: [
+              "$2$ times",
+              "$4$ times",
+              "$\\frac{3}{2}$ times",
+              "$\\frac{2}{3}$ times"
+            ],
+            correctIndex: 0,
+            correctAnswer: "$2$ times",
+            solution: "Since $R = \\rho \\frac{L}{A}$ and $L$ is identical, $\\frac{A_{\\mathrm{Cu}}}{A_{\\mathrm{Al}}} = \\frac{\\rho_{\\mathrm{Cu}}}{\\rho_{\\mathrm{Al}}} = \\frac{1}{1.5} = \\frac{2}{3}$. Ratio of masses $\\frac{m_{\\mathrm{Cu}}}{m_{\\mathrm{Al}}} = \\frac{d_{\\mathrm{Cu}} A_{\\mathrm{Cu}}}{d_{\\mathrm{Al}} A_{\\mathrm{Al}}} = 3 \\times \\frac{2}{3} = 2$."
+          },
+          {
+            id: "NEET-2024-C1",
+            subject: "Chemistry",
+            chapter: "Periodic Properties",
+            exam: "NEET",
+            paper: "NEET 2024",
+            type: "mcq",
+            question: "The correct order of first ionization enthalpy ($IE_1$) values of $\\mathrm{Be}, \\mathrm{B}, \\mathrm{N}$, and $\\mathrm{O}$ is:",
+            options: [
+              "$\\mathrm{B} < \\mathrm{Be} < \\mathrm{O} < \\mathrm{N}$",
+              "$\\mathrm{Be} < \\mathrm{B} < \\mathrm{N} < \\mathrm{O}$",
+              "$\\mathrm{B} < \\mathrm{Be} < \\mathrm{N} < \\mathrm{O}$",
+              "$\\mathrm{Be} < \\mathrm{B} < \\mathrm{O} < \\mathrm{N}$"
+            ],
+            correctIndex: 0,
+            correctAnswer: "$\\mathrm{B} < \\mathrm{Be} < \\mathrm{O} < \\mathrm{N}$",
+            solution: "Due to full $2s^2$ penetration in $\\mathrm{Be}$ ($\\mathrm{Be} > \\mathrm{B}$) and half-filled $2p^3$ exchange stability in $\\mathrm{N}$ ($\\mathrm{N} > \\mathrm{O}$), the order is $\\mathrm{B} < \\mathrm{Be} < \\mathrm{O} < \\mathrm{N}$."
+          }
+        ],
+        "jee-main-2024-04-apr-shift-1": [
+          {
+            id: "JEEM-2024-C1",
+            subject: "Chemistry",
+            chapter: "Periodic Properties",
+            exam: "JEE Main",
+            paper: "JEE Main 2024 (04 Apr Shift 1)",
+            type: "mcq",
+            question: "Number of elements from the following that CANNOT form compounds with valencies matching their respective group valencies is: $\\mathrm{B}, \\mathrm{C}, \\mathrm{N}, \\mathrm{S}, \\mathrm{O}, \\mathrm{F}, \\mathrm{P}, \\mathrm{Al}, \\mathrm{Si}$",
+            options: ["$7$", "$3$", "$5$", "$6$"],
+            correctIndex: 1,
+            correctAnswer: "$3$",
+            solution: "Second-period elements $\\mathrm{N}, \\mathrm{O}, \\mathrm{F}$ lack vacant $d$-orbitals and cannot expand their octet to match their group valencies ($5, 6, 7$). Thus, $3$ elements cannot."
+          },
+          {
+            id: "JEEM-2024-P1",
+            subject: "Physics",
+            chapter: "Center of Mass & Collisions",
+            exam: "JEE Main",
+            paper: "JEE Main 2024 (04 Apr Shift 1)",
+            type: "mcq",
+            question: "A ball of mass $0.2\\,\\mathrm{kg}$ rests on a vertical post of height $5\\,\\mathrm{m}$. A bullet of mass $0.01\\,\\mathrm{kg}$ travelling horizontally with velocity $v\\,\\mathrm{m/s}$ hits the centre of the ball. After collision, the ball hits the ground at $20\\,\\mathrm{m}$ and the bullet at $100\\,\\mathrm{m}$ from the foot of the post. Find the initial velocity $v$ of the bullet:",
+            options: ["$250\\,\\mathrm{m/s}$", "$250\\sqrt{2}\\,\\mathrm{m/s}$", "$500\\,\\mathrm{m/s}$", "$400\\,\\mathrm{m/s}$"],
+            correctIndex: 2,
+            correctAnswer: "$500\\,\\mathrm{m/s}$",
+            solution: "Time of fall $t = \\sqrt{\\frac{2h}{g}} = \\sqrt{\\frac{10}{10}} = 1\\,\\mathrm{s}$. Thus $v_{\\mathrm{ball}} = 20\\,\\mathrm{m/s}$ and $v_{\\mathrm{bullet}} = 100\\,\\mathrm{m/s}$. By momentum conservation: $0.01 v = 0.2(20) + 0.01(100) = 5 \\Rightarrow v = 500\\,\\mathrm{m/s}$."
+          }
+        ],
+        "jee-advanced-2011-paper-1": [
+          {
+            id: "JEEA-2011-P1",
+            subject: "Physics",
+            chapter: "Thermodynamics",
+            exam: "JEE Advanced",
+            paper: "JEE Advanced 2011 (Paper 1)",
+            type: "mcq",
+            question: "$5.6\\,\\mathrm{L}$ of helium gas at STP is adiabatically compressed to $0.7\\,\\mathrm{L}$. Taking the initial temperature to be $T_1$, the work done in the process is:",
+            options: ["$\\frac{9}{8} R T_1$", "$\\frac{3}{2} R T_1$", "$\\frac{15}{8} R T_1$", "$\\frac{9}{2} R T_1$"],
+            correctIndex: 0,
+            correctAnswer: "$\\frac{9}{8} R T_1$",
+            solution: "At STP, $n = \\frac{5.6}{22.4} = \\frac{1}{4}\\,\\mathrm{mol}$. For monoatomic $\\mathrm{He}$, $\\gamma = \\frac{5}{3}$. From $T V^{\\gamma-1} = \\text{const}$, $T_2 = T_1 (8)^{2/3} = 4 T_1$. Work done $W = \\frac{n R (T_2 - T_1)}{\\gamma - 1} = \\frac{(1/4) R (3 T_1)}{2/3} = \\frac{9}{8} R T_1$."
+          },
+          {
+            id: "JEEA-2011-P2",
+            subject: "Physics",
+            chapter: "Laws of Motion",
+            exam: "JEE Advanced",
+            paper: "JEE Advanced 2011 (Paper 1)",
+            type: "numerical",
+            question: "A block moves on an inclined plane making an angle $45^\\circ$ with the horizontal and coefficient of friction $\\mu$. The force required to just push it up the inclined plane is $3$ times the force required to just prevent it from sliding down. If $N = 10 \\mu$, find the value of $N$.",
+            options: [],
+            correctIndex: -1,
+            correctAnswer: "5",
+            solution: "$F_{\\mathrm{up}} = mg(\\sin 45^\\circ + \\mu \\cos 45^\\circ)$ and $F_{\\mathrm{down}} = mg(\\sin 45^\\circ - \\mu \\cos 45^\\circ)$. Since $1 + \\mu = 3(1 - \\mu)$, we get $4\\mu = 2 \\Rightarrow \\mu = 0.5$, so $N = 10\\mu = 5$."
+          }
+        ]
+      };
+
+      function buildFallbackManifest() {
+        var neetYears = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002];
+        var neetList = neetYears.map(function (yr) {
+          return {
+            id: "neet-" + yr,
+            title: "NEET " + yr + " Official Annual Paper",
+            year: yr,
+            count: yr >= 2013 ? 180 : 200,
+            subjects: { Biology: 90, Physics: 45, Chemistry: 45 },
+            file: "pyq-bank/papers/neet-" + yr + ".json"
+          };
+        });
+        var jeeMainShifts = [
+          { id: "jee-main-2024-04-apr-shift-1", title: "JEE Main 2024 (04 Apr Shift 1)", year: 2024, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2024-04-apr-shift-2", title: "JEE Main 2024 (04 Apr Shift 2)", year: 2024, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2024-05-apr-shift-1", title: "JEE Main 2024 (05 Apr Shift 1)", year: 2024, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2024-05-apr-shift-2", title: "JEE Main 2024 (05 Apr Shift 2)", year: 2024, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2024-06-apr-shift-1", title: "JEE Main 2024 (06 Apr Shift 1)", year: 2024, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2024-06-apr-shift-2", title: "JEE Main 2024 (06 Apr Shift 2)", year: 2024, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2023-24-jan-shift-1", title: "JEE Main 2023 (24 Jan Shift 1)", year: 2023, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2022-25-jun-shift-1", title: "JEE Main 2022 (25 Jun Shift 1)", year: 2022, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2021-16-mar-shift-1", title: "JEE Main 2021 (16 Mar Shift 1)", year: 2021, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2020-07-jan-shift-1", title: "JEE Main 2020 (07 Jan Shift 1)", year: 2020, count: 75, subjects: { Physics: 25, Chemistry: 25, Mathematics: 25 } },
+          { id: "jee-main-2019-09-jan-shift-1", title: "JEE Main 2019 (09 Jan Shift 1)", year: 2019, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2014-offline", title: "JEE Main 2014 Official Paper", year: 2014, count: 90, subjects: { Physics: 30, Chemistry: 30, Mathematics: 30 } },
+          { id: "jee-main-2008-aieee", title: "JEE Main / AIEEE 2008 Official Paper", year: 2008, count: 105, subjects: { Physics: 35, Chemistry: 35, Mathematics: 35 } }
+        ];
+        var jeeAdvPapers = [
+          { id: "jee-advanced-2012-paper-1", title: "JEE Advanced 2012 (Paper 1)", year: 2012, count: 60, subjects: { Physics: 20, Chemistry: 20, Mathematics: 20 } },
+          { id: "jee-advanced-2011-paper-1", title: "JEE Advanced 2011 (Paper 1)", year: 2011, count: 60, subjects: { Physics: 20, Chemistry: 20, Mathematics: 20 } },
+          { id: "jee-advanced-2011-paper-2", title: "JEE Advanced 2011 (Paper 2)", year: 2011, count: 60, subjects: { Physics: 20, Chemistry: 20, Mathematics: 20 } },
+          { id: "jee-advanced-2010-paper-1", title: "JEE Advanced 2010 (Paper 1)", year: 2010, count: 84, subjects: { Physics: 28, Chemistry: 28, Mathematics: 28 } },
+          { id: "jee-advanced-2009-paper-1", title: "JEE Advanced 2009 (Paper 1)", year: 2009, count: 60, subjects: { Physics: 20, Chemistry: 20, Mathematics: 20 } },
+          { id: "jee-advanced-2008-paper-1", title: "JEE Advanced 2008 (Paper 1)", year: 2008, count: 69, subjects: { Physics: 23, Chemistry: 23, Mathematics: 23 } },
+          { id: "jee-advanced-2006", title: "JEE Advanced 2006 Official Paper", year: 2006, count: 120, subjects: { Physics: 40, Chemistry: 40, Mathematics: 40 } }
+        ];
+        return { neet: neetList, jee_main: jeeMainShifts, jee_advanced: jeeAdvPapers };
+      }
+
+      /* ----------------------------------------------------------
+         2. Application State
+         ---------------------------------------------------------- */
+      var state = {
+        view: "archive",
+        viewStack: ["archive"],
+        category: "neet",
+        searchQuery: "",
+        yearFilter: "all",
+        eraFilter: "all",
+        manifest: buildFallbackManifest(),
+        activePaper: null,
+        questions: [],
+        filteredIndices: [],
+        activeSubject: "All",
+        currentPos: 0,
+        answers: {},
+        reviewed: {},
+        visited: {},
+        timerSec: 10800,
+        elapsedSec: 0,
+        timerInterval: null,
+        lastAnalysis: null,
+        solFilter: "all"
+      };
+
+      function safeGet(k, def) {
+        try {
+          var v = localStorage.getItem(k);
+          return v ? JSON.parse(v) : def;
+        } catch (e) { return def; }
+      }
+      function safeSet(k, v) {
+        try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {}
+      }
+
+      function showToast(msg) {
+        var t = document.getElementById("rf-toast");
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.remove("hidden");
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function () { t.classList.add("hidden"); }, 2800);
+      }
+
+      function renderMath(el) {
+        if (!el || typeof window.renderMathInElement !== "function") return;
+        try {
+          window.renderMathInElement(el, {
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false }
+            ],
+            throwOnError: false
+          });
+        } catch (e) {}
+      }
+
+      /* ----------------------------------------------------------
+         3. Navigation Engine (Zero Dead-Ends, Full Back History)
+         ---------------------------------------------------------- */
+      function switchView(targetView, pushHistory) {
+        if (pushHistory !== false && state.view !== targetView) {
+          state.viewStack.push(state.view);
+        }
+        state.view = targetView;
+        ["archive", "cbt", "analysis", "mistakes"].forEach(function (v) {
+          var sec = document.getElementById("view-" + v);
+          if (sec) sec.classList.toggle("hidden", v !== targetView);
+        });
+        var titles = {
+          archive: "RankForge PYQ & CBT Hub",
+          cbt: state.activePaper ? state.activePaper.title : "Live CBT Session",
+          analysis: "Post-Test Performance Intelligence",
+          mistakes: "Active Mistake Book"
+        };
+        document.getElementById("nav-screen-title").textContent = titles[targetView] || "RankForge AI";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function handleBack() {
+        if (state.view === "cbt") {
+          stopTimer();
+          switchView("archive", false);
+          return;
+        }
+        if (state.viewStack.length > 0) {
+          var prev = state.viewStack.pop();
+          if (prev === "cbt" && state.view === "analysis") prev = "archive";
+          switchView(prev || "archive", false);
+          return;
+        }
+        // If already on archive view and running inside RankForge repo, go to index.html
+        if (location.pathname.indexOf("pyq-hub.html") !== -1) {
+          location.href = "./index.html";
+        } else {
+          switchView("archive", false);
+          showToast("You are at the main PYQ Archive Hub.");
+        }
+      }
+
+      function handleHome() {
+        stopTimer();
+        if (location.pathname.indexOf("pyq-hub.html") !== -1) {
+          location.href = "./index.html";
+        } else {
+          state.viewStack = [];
+          switchView("archive", false);
+        }
+      }
+
+      /* ----------------------------------------------------------
+         4. Archive View Rendering (NEET Year-Wise & JEE Shift-Wise)
+         ---------------------------------------------------------- */
+      function populateYearDropdown() {
+        var list = state.manifest[state.category] || [];
+        var years = [];
+        var seen = {};
+        list.forEach(function (p) {
+          if (p.year && !seen[p.year]) {
+            seen[p.year] = true;
+            years.push(p.year);
+          }
+        });
+        years.sort(function (a, b) { return b - a; });
+        var sel = document.getElementById("select-year-filter");
+        sel.innerHTML = '<option value="all">All Years (' + years.length + ')</option>' +
+          years.map(function (y) { return '<option value="' + y + '">' + y + '</option>'; }).join("");
+        sel.value = state.yearFilter;
+      }
+
+      function renderPapersGrid() {
+        var list = state.manifest[state.category] || [];
+        var q = state.searchQuery.trim().toLowerCase();
+        var filtered = list.filter(function (p) {
+          if (state.yearFilter !== "all" && String(p.year) !== String(state.yearFilter)) return false;
+          if (state.eraFilter !== "all") {
+            var parts = state.eraFilter.split("-");
+            var yMin = parseInt(parts[0], 10), yMax = parseInt(parts[1], 10);
+            if (p.year < yMin || p.year > yMax) return false;
+          }
+          if (q && p.title.toLowerCase().indexOf(q) === -1 && String(p.year).indexOf(q) === -1) return false;
+          return true;
+        });
+
+        var grid = document.getElementById("papers-grid");
+        if (!filtered.length) {
+          grid.innerHTML = '<div class="col-span-full rf-card-2 rounded-xl p-8 text-center text-slate-400">No papers match your current filter. Try selecting "All Years".</div>';
+          return;
+        }
+
+        grid.innerHTML = filtered.slice(0, 90).map(function (p) {
+          var subjs = p.subjects || {};
+          var pills = Object.keys(subjs).map(function (s) {
+            return '<span class="px-2 py-0.5 rounded-md rf-card text-[11px] font-semibold text-slate-300">' + s + ': ' + subjs[s] + '</span>';
+          }).join(" ");
+          var catBadge = state.category === "neet" ? "NEET Year-Wise" : (state.category === "jee_main" ? "JEE Main Shift" : "JEE Advanced");
+          return '<article class="rf-card-2 rounded-xl p-4 flex flex-col justify-between gap-3 hover:border-sky-500/60 transition">' +
+            '<div class="space-y-2">' +
+              '<div class="flex items-center justify-between gap-2">' +
+                '<span class="text-[11px] font-bold uppercase tracking-wider text-sky-400">' + catBadge + '</span>' +
+                '<span class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 text-xs font-bold">' + p.count + ' Qs</span>' +
+              '</div>' +
+              '<h3 class="text-sm sm:text-base font-extrabold leading-snug">' + p.title + '</h3>' +
+              '<div class="flex flex-wrap gap-1.5 pt-0.5">' + pills + '</div>' +
+            '</div>' +
+            '<div class="flex items-center gap-2 pt-2 border-t border-slate-700/50">' +
+              '<button type="button" data-start-id="' + p.id + '" class="btn-start-paper flex-1 py-2 px-3 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow transition">' +
+                '🚀 Start Full CBT' +
+              '</button>' +
+            '</div>' +
+          '</article>';
+        }).join("");
+      }
+
+      /* ----------------------------------------------------------
+         5. CBT Engine (Loads JSON Paper & Runs Exam)
+         ---------------------------------------------------------- */
+      function startPaperById(paperId) {
+        var allPapers = [].concat(state.manifest.neet || [], state.manifest.jee_main || [], state.manifest.jee_advanced || []);
+        var paperMeta = null;
+        for (var i = 0; i < allPapers.length; i++) {
+          if (allPapers[i].id === paperId) { paperMeta = allPapers[i]; break; }
+        }
+        if (!paperMeta) return;
+
+        if ( paperMeta.file && location.protocol.indexOf("http") === 0 ) {
+          fetch(paperMeta.file)
+            .then(function (r) { if (!r.ok) throw new Error("Fallback"); return r.json(); })
+            .then(function (qList) { launchCBT(paperMeta, qList); })
+            .catch(function () { launchFallbackPaper(paperMeta); });
+        } else {
+          launchFallbackPaper(paperMeta);
+        }
+      }
+
+      function launchFallbackPaper(paperMeta) {
+        var qList = FALLBACK_QUESTIONS[paperMeta.id];
+        if (!qList) {
+          if (state.category === "neet") qList = FALLBACK_QUESTIONS["neet-2024"];
+          else if (state.category === "jee_main") qList = FALLBACK_QUESTIONS["jee-main-2024-04-apr-shift-1"];
+          else qList = FALLBACK_QUESTIONS["jee-advanced-2011-paper-1"];
+        }
+        launchCBT(paperMeta, qList);
+      }
+
+      function launchCBT(paperMeta, questions) {
+        state.activePaper = paperMeta;
+        state.questions = (questions || []).map(function (q, idx) {
+          return {
+            id: q.id || (paperMeta.id + "-Q" + (idx + 1)),
+            subject: q.subject || "General",
+            chapter: q.chapter || "Core Syllabus",
+            exam: q.exam || "PYQ",
+            paper: paperMeta.title,
+            type: q.type || ((q.options && q.options.length) ? "mcq" : "numerical"),
+            question: q.question || "",
+            options: q.options || [],
+            correctIndex: typeof q.correctIndex === "number" ? q.correctIndex : 0,
+            correctAnswer: q.correctAnswer || q.answer || "",
+            solution: q.solution || q.explanation || ""
+          };
+        });
+        state.activeSubject = "All";
+        state.currentPos = 0;
+        state.answers = {};
+        state.reviewed = {};
+        state.visited = { 0: true };
+        state.timerSec = 180 * 60;
+        state.elapsedSec = 0;
+
+        document.getElementById("cbt-paper-title").textContent = paperMeta.title;
+        document.getElementById("cbt-paper-badge").textContent = (state.category === "neet" ? "NEET Year-Wise Official Paper" : "JEE Official Shift Paper") + " • " + state.questions.length + " Loaded Questions";
+
+        rebuildSubjectFilter();
+        renderCurrentQuestion();
+        startTimer();
+        switchView("cbt");
+      }
+
+      function rebuildSubjectFilter() {
+        var counts = { All: state.questions.length };
+        state.questions.forEach(function (q) {
+          counts[q.subject] = (counts[q.subject] || 0) + 1;
+        });
+        var strip = document.getElementById("cbt-subject-tabs");
+        strip.innerHTML = Object.keys(counts).map(function (subj) {
+          var active = subj === state.activeSubject;
+          return '<button type="button" data-subj="' + subj + '" class="cbt-subj-btn px-3.5 py-1.5 rounded-xl text-xs font-bold ' +
+            (active ? 'bg-sky-600 text-white shadow' : 'rf-card-2') + '">' +
+            subj + ' (' + counts[subj] + ')</button>';
+        }).join("");
+
+        state.filteredIndices = [];
+        state.questions.forEach(function (q, idx) {
+          if (state.activeSubject === "All" || q.subject === state.activeSubject) {
+            state.filteredIndices.push(idx);
+          }
+        });
+        if (!state.filteredIndices.length) state.filteredIndices = [0];
+      }
+
+      function renderCurrentQuestion() {
+        var qIdx = state.filteredIndices[state.currentPos] || 0;
+        state.visited[qIdx] = true;
+        var q = state.questions[qIdx];
+        if (!q) return;
+
+        document.getElementById("cbt-q-number").textContent = "Question " + (qIdx + 1) + " of " + state.questions.length;
+        document.getElementById("cbt-q-subject").textContent = q.subject;
+        document.getElementById("cbt-q-chapter").textContent = q.chapter;
+
+        var stemEl = document.getElementById("cbt-q-stem");
+        stemEl.innerHTML = q.question;
+        renderMath(stemEl);
+
+        var optBox = document.getElementById("cbt-options-container");
+        var numBox = document.getElementById("cbt-numerical-container");
+        var numInput = document.getElementById("input-numerical-ans");
+
+        if (q.type === "numerical" || !q.options || !q.options.length) {
+          optBox.classList.add("hidden");
+          numBox.classList.remove("hidden");
+          numInput.value = state.answers[qIdx] !== undefined ? state.answers[qIdx] : "";
+        } else {
+          numBox.classList.add("hidden");
+          optBox.classList.remove("hidden");
+          var labels = ["A", "B", "C", "D"];
+          optBox.innerHTML = q.options.map(function (optHtml, oIdx) {
+            var isSel = state.answers[qIdx] === oIdx;
+            return '<button type="button" data-opt-idx="' + oIdx + '" class="cbt-opt-btn w-full text-left p-3.5 rounded-xl border transition flex items-start gap-3 ' +
+              (isSel ? 'bg-sky-500/20 border-sky-400 ring-1 ring-sky-400' : 'rf-card-2 hover:border-slate-500') + '">' +
+              '<span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ' +
+              (isSel ? 'bg-sky-500 text-white' : 'rf-card text-slate-300') + '">' + (labels[oIdx] || (oIdx + 1)) + '</span>' +
+              '<span class="flex-1 text-sm sm:text-base leading-snug">' + optHtml + '</span>' +
+            '</button>';
+          }).join("");
+          renderMath(optBox);
+        }
+
+        renderPalette();
+      }
+
+      function renderPalette() {
+        var ansCount = 0, unansCount = 0, revCount = 0, notVisCount = 0;
+        var grid = document.getElementById("cbt-palette-grid");
+        var curGlobalIdx = state.filteredIndices[state.currentPos] || 0;
+
+        grid.innerHTML = state.filteredIndices.map(function (gIdx, pos) {
+          var hasAns = state.answers[gIdx] !== undefined && state.answers[gIdx] !== "";
+          var isRev = !!state.reviewed[gIdx];
+          var isVis = !!state.visited[gIdx];
+          if (hasAns) ansCount++;
+          else if (isVis) unansCount++;
+          else notVisCount++;
+          if (isRev) revCount++;
+
+          var colorCls = "bg-slate-800 text-slate-300 border-slate-700";
+          if (isRev) colorCls = "bg-purple-600 text-white border-purple-400";
+          else if (hasAns) colorCls = "bg-emerald-600 text-white border-emerald-400";
+          else if (isVis) colorCls = "bg-rose-600/80 text-white border-rose-400";
+
+          var ringCls = (gIdx === curGlobalIdx) ? "ring-2 ring-sky-400 scale-105" : "";
+          return '<button type="button" data-pal-pos="' + pos + '" class="pal-jump-btn h-9 rounded-lg border text-xs font-bold transition ' + colorCls + ' ' + ringCls + '">' +
+            (gIdx + 1) + '</button>';
+        }).join("");
+
+        document.getElementById("cbt-palette-progress").textContent = ansCount + " / " + state.filteredIndices.length + " Answered";
+        document.getElementById("legend-ans").textContent = ansCount + " Answered";
+        document.getElementById("legend-unans").textContent = unansCount + " Visited";
+        document.getElementById("legend-rev").textContent = revCount + " Review";
+        document.getElementById("legend-notvis").textContent = notVisCount + " Left";
+      }
+
+      function startTimer() {
+        stopTimer();
+        var disp = document.getElementById("cbt-timer-display");
+        state.timerInterval = setInterval(function () {
+          state.elapsedSec++;
+          if (state.timerSec > 0) state.timerSec--;
+          var m = Math.floor(state.timerSec / 60);
+          var s = state.timerSec % 60;
+          disp.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+          if (state.timerSec <= 0) {
+            stopTimer();
+            finalizeTestAndShowAnalysis();
+          }
+        }, 1000);
+      }
+
+      function stopTimer() {
+        if (state.timerInterval) {
+          clearInterval(state.timerInterval);
+          state.timerInterval = null;
+        }
+      }
+
+      /* ----------------------------------------------------------
+         6. Post-Test Deep Analysis & Mistake Book Engine
+         ---------------------------------------------------------- */
+      function finalizeTestAndShowAnalysis() {
+        stopTimer();
+        document.getElementById("modal-submit").classList.add("hidden");
+
+        var correct = 0, wrong = 0, skipped = 0;
+        var subjMap = {};
+        var chapMap = {};
+        var newMistakes = [];
+        var gradedQuestions = [];
+
+        state.questions.forEach(function (q, idx) {
+          var sel = state.answers[idx];
+          var isSkipped = (sel === undefined || sel === null || sel === "");
+          var isCorrect = false;
+          if (!isSkipped) {
+            if (q.type === "numerical" || !q.options || !q.options.length) {
+              var uNum = parseFloat(String(sel).trim());
+              var cNum = parseFloat(String(q.correctAnswer).trim());
+              isCorrect = (!isNaN(uNum) && !isNaN(cNum) && Math.abs(uNum - cNum) <= 0.05) ||
+                          String(sel).trim().toLowerCase() === String(q.correctAnswer).trim().toLowerCase();
+            } else {
+              isCorrect = Number(sel) === Number(q.correctIndex);
+            }
+          }
+
+          if (!subjMap[q.subject]) subjMap[q.subject] = { subject: q.subject, correct: 0, wrong: 0, skipped: 0, score: 0, maxScore: 0 };
+          if (!chapMap[q.chapter]) chapMap[q.chapter] = { chapter: q.chapter, subject: q.subject, correct: 0, wrong: 0, skipped: 0 };
+
+          subjMap[q.subject].maxScore += 4;
+          var status = "skipped";
+          if (isSkipped) {
+            skipped++;
+            subjMap[q.subject].skipped++;
+            chapMap[q.chapter].skipped++;
+          } else if (isCorrect) {
+            status = "correct";
+            correct++;
+            subjMap[q.subject].correct++;
+            subjMap[q.subject].score += 4;
+            chapMap[q.chapter].correct++;
+          } else {
+            status = "wrong";
+            wrong++;
+            subjMap[q.subject].wrong++;
+            subjMap[q.subject].score -= 1;
+            chapMap[q.chapter].wrong++;
+            newMistakes.push({
+              id: q.id,
+              subject: q.subject,
+              chapter: q.chapter,
+              paper: state.activePaper ? state.activePaper.title : "PYQ Test",
+              type: q.type,
+              question: q.question,
+              options: q.options,
+              correctIndex: q.correctIndex,
+              correctAnswer: q.correctAnswer,
+              userAnswer: sel,
+              solution: q.solution
+            });
+          }
+
+          gradedQuestions.push({
+            q: q,
+            userAnswer: sel,
+            status: status
+          });
+        });
+
+        var attempted = correct + wrong;
+        var netScore = (correct * 4) - wrong;
+        var maxScore = state.questions.length * 4;
+        var accuracy = attempted > 0 ? Math.round((correct / attempted) * 1000) / 10 : 0;
+        var speedQMin = Math.round((attempted / Math.max(0.25, state.elapsedSec / 60)) * 10) / 10;
+
+        var analysisObj = {
+          title: state.activePaper ? state.activePaper.title : "RankForge PYQ Assessment",
+          date: new Date().toISOString(),
+          total: state.questions.length,
+          correct: correct,
+          wrong: wrong,
+          skipped: skipped,
+          score: netScore,
+          maxScore: maxScore,
+          negativeLost: wrong,
+          accuracy: accuracy,
+          speedQPerMin: speedQMin,
+          subjects: Object.keys(subjMap).map(function (k) { return subjMap[k]; }),
+          chapters: Object.keys(chapMap).map(function (k) { return chapMap[k]; }).sort(function (a, b) { return (b.wrong * 2 + b.skipped) - (a.wrong * 2 + a.skipped); }),
+          gradedQuestions: gradedQuestions,
+          mistakes: newMistakes
+        };
+
+        state.lastAnalysis = analysisObj;
+        safeSet("rf_last_analysis", analysisObj);
+        safeSet("CBT_LAST_RESULT", analysisObj);
+
+        var hist = safeGet("cbtHistory", []);
+        if (!Array.isArray(hist)) hist = [];
+        hist.unshift(analysisObj);
+        safeSet("cbtHistory", hist.slice(0, 100));
+
+        if (newMistakes.length) {
+          var mBook = safeGet("rfMistakeBankV1", []);
+          if (!Array.isArray(mBook)) mBook = [];
+          var seen = {};
+          mBook.forEach(function (m) { seen[m.id] = true; });
+          newMistakes.forEach(function (m) {
+            if (!seen[m.id]) mBook.unshift(m);
+          });
+          safeSet("rfMistakeBankV1", mBook.slice(0, 500));
+        }
+
+        updateTopCounts();
+        renderAnalysisScreen();
+        switchView("analysis");
+      }
+
+      function renderAnalysisScreen() {
+        var an = state.lastAnalysis || safeGet("rf_last_analysis", null);
+        if (!an) {
+          showToast("Complete a test first to view post-test analysis.");
+          return;
+        }
+        state.lastAnalysis = an;
+        document.getElementById("analysis-paper-title").textContent = an.title || "Post-Test Performance Breakdown";
+        document.getElementById("an-score").textContent = an.score + " / " + an.maxScore;
+        document.getElementById("an-accuracy").textContent = an.accuracy + "%";
+        document.getElementById("an-cw").innerHTML = '<span class="text-emerald-400">' + an.correct + '</span> / <span class="text-rose-400">' + an.wrong + '</span>';
+        document.getElementById("an-neg").textContent = "−" + (an.negativeLost || an.wrong || 0);
+        document.getElementById("an-speed").textContent = (an.speedQPerMin || 0) + " Q/m";
+
+        var tbody = document.getElementById("an-subject-tbody");
+        tbody.innerHTML = (an.subjects || []).map(function (s) {
+          var acc = (s.correct + s.wrong) > 0 ? Math.round((s.correct / (s.correct + s.wrong)) * 100) : 0;
+          return '<tr class="border-b border-slate-700/40">' +
+            '<td class="py-2.5 px-3 font-bold">' + s.subject + '</td>' +
+            '<td class="py-2.5 px-3 text-right text-emerald-400 font-bold">' + s.correct + '</td>' +
+            '<td class="py-2.5 px-3 text-right text-rose-400 font-bold">' + s.wrong + '</td>' +
+            '<td class="py-2.5 px-3 text-right text-slate-400">' + s.skipped + '</td>' +
+            '<td class="py-2.5 px-3 text-right font-bold">' + s.score + ' / ' + s.maxScore + '</td>' +
+            '<td class="py-2.5 px-3 text-right text-sky-400 font-bold">' + acc + '%</td>' +
+          '</tr>';
+        }).join("");
+
+        var weakBox = document.getElementById("an-weak-chapters");
+        var weakItems = (an.chapters || []).filter(function (c) { return c.wrong > 0 || c.skipped > 0; }).slice(0, 6);
+        weakBox.innerHTML = weakItems.length ? weakItems.map(function (c) {
+          return '<div class="rf-card-2 rounded-xl p-3 flex items-center justify-between gap-2">' +
+            '<div><div class="font-bold text-sm">' + c.chapter + '</div><div class="text-xs text-slate-400">' + c.subject + '</div></div>' +
+            '<div class="text-xs font-bold"><span class="text-rose-400">❌ ' + c.wrong + ' wrong</span> · <span class="text-slate-400">⏭ ' + c.skipped + ' skipped</span></div>' +
+          '</div>';
+        }).join("") : '<div class="text-xs text-emerald-400 font-semibold">Zero chapter weaknesses recorded in this attempt!</div>';
+
+        renderSolutionsList();
+      }
+
+      function renderSolutionsList() {
+        var an = state.lastAnalysis;
+        if (!an || !an.gradedQuestions) return;
+        var listEl = document.getElementById("an-solutions-list");
+        var items = an.gradedQuestions.filter(function (item) {
+          if (state.solFilter === "all") return true;
+          return item.status === state.solFilter;
+        });
+        if (!items.length) {
+          listEl.innerHTML = '<div class="rf-card-2 rounded-xl p-6 text-center text-slate-400 text-sm">No questions in this filter category.</div>';
+          return;
+        }
+        var labels = ["A", "B", "C", "D"];
+        listEl.innerHTML = items.map(function (item, idx) {
+          var q = item.q;
+          var badge = item.status === "correct"
+            ? '<span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-xs font-bold">✓ Correct (+4)</span>'
+            : (item.status === "wrong"
+              ? '<span class="px-2.5 py-0.5 rounded-md bg-rose-500/20 text-rose-300 text-xs font-bold">❌ Wrong (−1)</span>'
+              : '<span class="px-2.5 py-0.5 rounded-md bg-slate-700 text-slate-300 text-xs font-bold">⏭ Skipped (0)</span>');
+          var userStr = item.status === "skipped" ? "Not Attempted" : (q.options && q.options[item.userAnswer] ? (labels[item.userAnswer] + ": " + q.options[item.userAnswer]) : String(item.userAnswer));
+          var corrStr = (q.options && q.options[q.correctIndex]) ? (labels[q.correctIndex] + ": " + q.options[q.correctIndex]) : String(q.correctAnswer);
+
+          return '<div class="rf-card-2 rounded-xl p-4 space-y-2.5">' +
+            '<div class="flex flex-wrap items-center justify-between gap-2">' +
+              '<span class="text-xs font-bold text-sky-400">' + q.subject + ' • ' + q.chapter + '</span>' +
+              badge +
+            '</div>' +
+            '<div class="text-sm sm:text-base font-medium leading-relaxed">' + q.question + '</div>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm pt-1">' +
+              '<div class="p-2.5 rounded-lg rf-card"><span class="text-slate-400">Your Answer:</span> <strong class="ml-1">' + userStr + '</strong></div>' +
+              '<div class="p-2.5 rounded-lg rf-card"><span class="text-slate-400">Correct Answer:</span> <strong class="ml-1 text-emerald-400">' + corrStr + '</strong></div>' +
+            '</div>' +
+            (q.solution ? '<div class="p-3 rounded-lg bg-sky-500/10 border border-sky-500/25 text-xs sm:text-sm leading-relaxed"><strong class="text-sky-400 block mb-1">Step-by-Step Solution:</strong>' + q.solution + '</div>' : '') +
+          '</div>';
+        }).join("");
+        renderMath(listEl);
+      }
+
+      function renderMistakesView() {
+        var mBook = safeGet("rfMistakeBankV1", []);
+        var box = document.getElementById("mistakes-list-container");
+        if (!Array.isArray(mBook) || !mBook.length) {
+          box.innerHTML = '<div class="rf-card-2 rounded-xl p-8 text-center text-slate-400 text-sm">Your Mistake Book is currently clean! Any question you miss in a NEET or JEE paper will automatically appear here for targeted retesting.</div>';
+          return;
+        }
+        box.innerHTML = mBook.map(function (m, i) {
+          return '<div class="rf-card-2 rounded-xl p-4 space-y-2">' +
+            '<div class="flex items-center justify-between text-xs font-bold">' +
+              '<span class="text-rose-400">#' + (i + 1) + ' • ' + (m.paper || "PYQ") + ' (' + m.subject + ' — ' + m.chapter + ')</span>' +
+            '</div>' +
+            '<div class="text-sm sm:text-base font-medium">' + m.question + '</div>' +
+            '<div class="text-xs text-emerald-400 font-semibold">Correct Answer: ' + m.correctAnswer + '</div>' +
+            (m.solution ? '<div class="text-xs text-slate-300 pt-1">' + m.solution + '</div>' : '') +
+          '</div>';
+        }).join("");
+        renderMath(box);
+      }
+
+      function updateTopCounts() {
+        var mBook = safeGet("rfMistakeBankV1", []);
+        var hist = safeGet("cbtHistory", []);
+        document.getElementById("nav-mistake-count").textContent = Array.isArray(mBook) ? mBook.length : 0;
+        document.getElementById("stat-attempts-count").textContent = Array.isArray(hist) ? hist.length : 0;
+        var nCount = (state.manifest.neet || []).length;
+        var jCount = (state.manifest.jee_main || []).length + (state.manifest.jee_advanced || []).length;
+        document.getElementById("stat-neet-count").textContent = nCount + " Papers";
+        document.getElementById("stat-jee-count").textContent = jCount + " Shifts";
+      }
+
+      /* ----------------------------------------------------------
+         7. Event Listeners & Auto-Discovery of ./pyq-bank/manifest.json
+         ---------------------------------------------------------- */
+      function bindEvents() {
+        document.getElementById("btn-nav-back").addEventListener("click", handleBack);
+        document.getElementById("btn-nav-home").addEventListener("click", handleHome);
+        document.getElementById("btn-nav-archive").addEventListener("click", function () {
+          stopTimer();
+          switchView("archive");
+        });
+        document.getElementById("btn-nav-analysis").addEventListener("click", function () {
+          stopTimer();
+          var last = state.lastAnalysis || safeGet("rf_last_analysis", null);
+          if (!last) {
+            // Seed a quick demo analysis if none exists yet so user can inspect the analysis layout
+            state.lastAnalysis = {
+              title: "NEET 2024 Diagnostic Sample",
+              score: 12, maxScore: 16, accuracy: 75, correct: 3, wrong: 1, skipped: 0, negativeLost: 1, speedQPerMin: 1.8,
+              subjects: [
+                { subject: "Biology", correct: 2, wrong: 0, skipped: 0, score: 8, maxScore: 8 },
+                { subject: "Physics", correct: 1, wrong: 0, skipped: 0, score: 4, maxScore: 4 },
+                { subject: "Chemistry", correct: 0, wrong: 1, skipped: 0, score: -1, maxScore: 4 }
+              ],
+              chapters: [{ chapter: "Periodic Properties", subject: "Chemistry", wrong: 1, skipped: 0 }],
+              gradedQuestions: []
+            };
+          }
+          renderAnalysisScreen();
+          switchView("analysis");
+        });
+        document.getElementById("btn-nav-mistakes").addEventListener("click", function () {
+          stopTimer();
+          renderMistakesView();
+          switchView("mistakes");
+        });
+
+        document.getElementById("btn-theme-toggle").addEventListener("click", function () {
+          var isLight = document.documentElement.classList.toggle("light");
+          document.getElementById("btn-theme-toggle").textContent = isLight ? "🌙 Dark" : "☀️ Light";
+        });
+
+        // Category Tabs
+        document.querySelectorAll(".cat-tab-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            state.category = btn.getAttribute("data-cat");
+            state.yearFilter = "all";
+            document.querySelectorAll(".cat-tab-btn").forEach(function (b) {
+              var active = b.getAttribute("data-cat") === state.category;
+              b.className = "cat-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold " + (active ? "bg-sky-600 text-white shadow" : "rf-card-2 hover:opacity-90");
+            });
+            populateYearDropdown();
+            renderPapersGrid();
+          });
+        });
+
+        // Search & Year filter
+        document.getElementById("input-paper-search").addEventListener("input", function (e) {
+          state.searchQuery = e.target.value || "";
+          renderPapersGrid();
+        });
+        document.getElementById("select-year-filter").addEventListener("change", function (e) {
+          state.yearFilter = e.target.value;
+          renderPapersGrid();
+        });
+
+        // Era pills
+        document.querySelectorAll(".era-pill").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            state.eraFilter = btn.getAttribute("data-era");
+            document.querySelectorAll(".era-pill").forEach(function (b) {
+              var active = b.getAttribute("data-era") === state.eraFilter;
+              b.className = "era-pill px-3 py-1 rounded-lg text-xs " + (active ? "font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40" : "font-semibold rf-card-2");
+            });
+            renderPapersGrid();
+          });
+        });
+
+        // Delegate paper start clicks
+        document.getElementById("papers-grid").addEventListener("click", function (e) {
+          var btn = e.target.closest(".btn-start-paper");
+          if (!btn) return;
+          startPaperById(btn.getAttribute("data-start-id"));
+        });
+
+        // CBT Subject Tabs
+        document.getElementById("cbt-subject-tabs").addEventListener("click", function (e) {
+          var btn = e.target.closest(".cbt-subj-btn");
+          if (!btn) return;
+          state.activeSubject = btn.getAttribute("data-subj");
+          state.currentPos = 0;
+          rebuildSubjectFilter();
+          renderCurrentQuestion();
+        });
+
+        // CBT Option clicks
+        document.getElementById("cbt-options-container").addEventListener("click", function (e) {
+          var btn = e.target.closest(".cbt-opt-btn");
+          if (!btn) return;
+          var qIdx = state.filteredIndices[state.currentPos] || 0;
+          state.answers[qIdx] = parseInt(btn.getAttribute("data-opt-idx"), 10);
+          renderCurrentQuestion();
+        });
+
+        // Numerical input
+        document.getElementById("input-numerical-ans").addEventListener("input", function (e) {
+          var qIdx = state.filteredIndices[state.currentPos] || 0;
+          state.answers[qIdx] = e.target.value.trim();
+          renderPalette();
+        });
+
+        // Prev / Next / Review / Clear
+        document.getElementById("btn-q-prev").addEventListener("click", function () {
+          if (state.currentPos > 0) {
+            state.currentPos--;
+            renderCurrentQuestion();
+          }
+        });
+        document.getElementById("btn-q-next").addEventListener("click", function () {
+          if (state.currentPos < state.filteredIndices.length - 1) {
+            state.currentPos++;
+            renderCurrentQuestion();
+          } else {
+            showToast("Reached the last question in this section.");
+          }
+        });
+        document.getElementById("btn-q-review").addEventListener("click", function () {
+          var qIdx = state.filteredIndices[state.currentPos] || 0;
+          state.reviewed[qIdx] = !state.reviewed[qIdx];
+          renderPalette();
+        });
+        document.getElementById("btn-q-clear").addEventListener("click", function () {
+          var qIdx = state.filteredIndices[state.currentPos] || 0;
+          delete state.answers[qIdx];
+          renderCurrentQuestion();
+        });
+
+        // Palette jump
+        document.getElementById("cbt-palette-grid").addEventListener("click", function (e) {
+          var btn = e.target.closest(".pal-jump-btn");
+          if (!btn) return;
+          state.currentPos = parseInt(btn.getAttribute("data-pal-pos"), 10);
+          renderCurrentQuestion();
+        });
+
+        // Submit Modal
+        document.getElementById("btn-open-submit-modal").addEventListener("click", function () {
+          var ansCount = Object.keys(state.answers).filter(function (k) { return state.answers[k] !== ""; }).length;
+          document.getElementById("modal-submit-summary").textContent =
+            "You have answered " + ansCount + " out of " + state.questions.length + " questions. Ready to score your paper with +4/−1 marking?";
+          document.getElementById("modal-submit").classList.remove("hidden");
+        });
+        document.getElementById("btn-cancel-submit").addEventListener("click", function () {
+          document.getElementById("modal-submit").classList.add("hidden");
+        });
+        document.getElementById("btn-confirm-submit").addEventListener("click", finalizeTestAndShowAnalysis);
+
+        // Analysis & Mistake buttons
+        document.getElementById("btn-back-to-papers").addEventListener("click", function () {
+          switchView("archive");
+        });
+        document.getElementById("btn-retry-wrong-only").addEventListener("click", function () {
+          var an = state.lastAnalysis;
+          if (!an || !an.mistakes || !an.mistakes.length) {
+            showToast("No wrong questions to retry from this test!");
+            return;
+          }
+          launchCBT({ id: "retry-wrong", title: "Mistake Retry — " + an.title }, an.mistakes);
+        });
+
+        document.querySelectorAll(".sol-filter-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            state.solFilter = btn.getAttribute("data-solfilter");
+            document.querySelectorAll(".sol-filter-btn").forEach(function (b) {
+              var active = b.getAttribute("data-solfilter") === state.solFilter;
+              b.className = "sol-filter-btn px-3 py-1 rounded-lg text-xs " + (active ? "font-bold bg-sky-600 text-white" : "font-semibold rf-card-2");
+            });
+            renderSolutionsList();
+          });
+        });
+
+        document.getElementById("btn-practice-all-mistakes").addEventListener("click", function () {
+          var mBook = safeGet("rfMistakeBankV1", []);
+          if (!Array.isArray(mBook) || !mBook.length) {
+            showToast("Your Mistake Book is empty!");
+            return;
+          }
+          launchCBT({ id: "mistake-book-cbt", title: "RankForge Active Mistake Book Retry" }, mBook);
+        });
+        document.getElementById("btn-clear-mistakes").addEventListener("click", function () {
+          safeSet("rfMistakeBankV1", []);
+          updateTopCounts();
+          renderMistakesView();
+          showToast("Mistake Book cleared.");
+        });
+      }
+
+      function tryLoadRepoManifest() {
+        if (location.protocol.indexOf("http") !== 0) return;
+        fetch(["pyq-bank", "manifest.json"].join("/"))
+          .then(function (r) { if (!r.ok) throw new Error("No local manifest yet"); return r.json(); })
+          .then(function (data) {
+            if (data && (data.neet || data.jee_main)) {
+              state.manifest = data;
+              var totalPapers = (data.neet || []).length + (data.jee_main || []).length + (data.jee_advanced || []).length;
+              document.getElementById("bank-connection-badge").textContent = totalPapers + " Official Papers Active";
+              populateYearDropdown();
+              renderPapersGrid();
+              updateTopCounts();
+            }
+          })
+          .catch(function () {});
+      }
+
+      function init() {
+        bindEvents();
+        populateYearDropdown();
+        renderPapersGrid();
+        updateTopCounts();
+        tryLoadRepoManifest();
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    })();
+  </script>  <script src="./rf-shell.js"></script></body>
+</html>

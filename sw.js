@@ -1,9 +1,31 @@
-const C='eh-v1';
-self.addEventListener('install',e=>self.skipWaiting());
-self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
-self.addEventListener('fetch',e=>{const r=e.request,u=new URL(r.url);if(r.method!='GET')return;
- const page=u.origin==location.origin&&/examhall-standalone/.test(u.pathname),lib=/cdnjs\.cloudflare\.com|fonts\.(googleapis|gstatic)\.com/.test(u.host);if(!page&&!lib)return;
- e.respondWith(caches.open(C).then(async c=>{const m=await c.match(r,{ignoreSearch:true});
-  const n=()=>fetch(r).then(x=>{if(x.ok||x.type=='opaque')c.put(r,x.clone());return x});
-  if(page)return n().catch(()=>m);
-  return m||n()}))});
+const C = 'rankforge-shell-v320';
+self.addEventListener('install', e => { self.skipWaiting(); });
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== C).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+self.addEventListener('fetch', e => {
+  const r = e.request;
+  if (r.method !== 'GET') return;
+  const u = new URL(r.url);
+  const sameOrigin = u.origin === location.origin;
+  const cdn = /cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|fonts\.(googleapis|gstatic)\.com/.test(u.host);
+  if (!sameOrigin && !cdn) return;
+  e.respondWith(
+    caches.open(C).then(async c => {
+      const net = () => fetch(r).then(res => {
+        if (res && (res.ok || res.type === 'opaque')) c.put(r, res.clone());
+        return res;
+      });
+      if (sameOrigin) {
+        const cached = await c.match(r, { ignoreSearch: true });
+        return net().catch(() => cached);
+      }
+      const cached = await c.match(r);
+      return cached || net();
+    })
+  );
+});
+

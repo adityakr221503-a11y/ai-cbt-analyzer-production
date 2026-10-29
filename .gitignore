@@ -28,3 +28,5 @@ rankforge-selected-module-master-v2.json
 
 # Temporary canonical-runtime backups
 cbt.pre-canonical-*.html
+*.db
+*.bak-pre-v2
